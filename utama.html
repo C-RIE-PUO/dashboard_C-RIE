@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard KPI Penyelidikan & Inovasi</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar Umum */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Efek Sidebar & Tab */
+        .active-tab {
+            background-color: #1e3a8a !important;
+            color: white !important;
+            border-left: 4px solid #f59e0b;
+        }
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.3rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #cbd5e1;
+        }
+        .sidebar-btn:hover {
+            background-color: #1e40af;
+            color: white;
+        }
+        
+        /* --- Scrollbar standard untuk jadual --- */
+        .scroll-jadual {
+            /* Sokongan untuk Firefox */
+            scrollbar-width: auto;
+            scrollbar-color: #cbd5e1 #f8fafc;
+        }
+        
+        /* Sokongan untuk Chrome, Edge, Safari */
+        .scroll-jadual::-webkit-scrollbar {
+            width: 16px; 
+            height: 16px;
+        }
+        .scroll-jadual::-webkit-scrollbar-track {
+            background: #f8fafc; 
+            border-left: 1px solid #e2e8f0;
+        }
+        .scroll-jadual::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1; 
+            border: 4px solid #f8fafc;
+            border-radius: 8px;
+        }
+        .scroll-jadual::-webkit-scrollbar-thumb:hover {
+            background-color: #94a3b8; 
+        }
+
+        /* Paksa tajuk (header) jadual lekat di atas */
+        #headerJadual th {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background-color: #1e3a8a; 
+            /* Letakkan sedikit outline/border-bottom untuk nampak lebih kemas bila skrol */
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); 
+        }
+    </style>
+</head>
+<body class="bg-slate-50 flex flex-col min-h-screen">
+
+<header class="w-full bg-blue-950 text-white py-4 px-4 md:px-6 shadow-lg z-50 relative border-b border-blue-800 flex items-center justify-center">
+    
+    <button onclick="toggleMenu()" class="absolute left-4 md:hidden text-white focus:outline-none">
+        <i class="fa-solid fa-bars text-2xl"></i>
+    </button>
+
+    <div class="text-center px-10 md:px-0">
+        <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter leading-tight">
+            Dashboard KPI Penyelidikan & Inovasi
+        </h1>
+        <p class="text-[9px] md:text-xs font-bold text-blue-300 opacity-80 uppercase mt-1">
+            PETUNJUK PRESTASI PUSAT KECEMERLANGAN PENYELIDIKAN DAN INOVASI, POLITEKNIK UNGKU OMAR
+        </p>
+    </div>
+</header>
+
+    <div class="flex flex-1 overflow-hidden">
+        
+<aside class="w-full md:w-64 lg:w-72 bg-blue-900 text-white flex flex-col shadow-2xl z-20 flex-shrink-0 md:h-screen md:sticky top-0">
+        
+    <div class="p-6 text-center md:text-left border-b border-blue-800 bg-blue-950/80">
+        <h1 class="text-xl md:text-2xl font-extrabold tracking-wide text-white flex items-center justify-center md:justify-start gap-3">
+            <span class="text-2xl">🚀</span> Portal R&I
+        </h1>
+        <p class="text-blue-300 text-[10px] md:text-xs mt-2 font-bold uppercase tracking-wider">
+            Pusat Akses Berpusat Modul
+        </p>
+    </div>
+
+    <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+        
+        <div class="p-5 border-b border-blue-800 flex flex-col gap-3">
+            <a href="login.html" id="btnLogMasuk" class="w-full bg-yellow-400 text-blue-900 px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-yellow-300 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
+                🔒 Log Masuk Utama
+            </a>
+
+            <a href="tukar-katalaluan.html" id="btnTukarKataLaluan" class="hidden w-full bg-slate-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-slate-800 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
+                🔑 Tukar Kata Laluan
+            </a>
+
+            <button onclick="logKeluar()" id="btnLogKeluar" class="hidden w-full bg-red-500 text-white px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-red-600 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
+                🚪 Log Keluar
+            </button>
+
+            <div id="infoPengguna" class="hidden w-full bg-blue-800 rounded-xl p-4 border border-blue-700 shadow-inner text-center md:text-left relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 text-5xl opacity-10">👤</div>
+                <p class="text-blue-200 text-xs font-bold uppercase tracking-wider mb-1">Selamat Datang,</p>
+                <p id="paparNama" class="font-bold text-yellow-300 text-sm md:text-base leading-tight truncate"></p>
+                <div class="mt-2 pt-2 border-t border-blue-700">
+                    <p class="text-[10px] text-blue-100 uppercase">Peranan: <span id="paparPeranan" class="font-bold text-white"></span></p>
+                    <p class="text-[10px] text-blue-100 mt-0.5 uppercase">Jabatan: <span id="paparJabatan" class="font-bold text-white"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <nav id="tabMenuPortal" class="p-4 space-y-2 border-b border-blue-800 bg-blue-900/50">
+            <p class="text-emerald-300 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Modul Utama Portal</p>
+            
+            <button onclick="tukarTab('MODUL_PENYELIDIKAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold border-l-4 border-transparent hover:border-emerald-400 hover:bg-emerald-900/40 text-slate-200 hover:text-white" data-tab="MODUL_PENYELIDIKAN">
+                <i class="fa-solid fa-microscope w-5 text-emerald-400"></i> Penyelidikan
+            </button>
+            <button onclick="tukarTab('MODUL_INOVASI')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold border-l-4 border-transparent hover:border-purple-400 hover:bg-purple-900/40 text-slate-200 hover:text-white" data-tab="MODUL_INOVASI">
+                <i class="fa-solid fa-lightbulb w-5 text-purple-400"></i> Inovasi
+            </button>
+        </nav>
+
+        <nav id="tabMenuDashboard" class="p-4 space-y-1 border-b border-blue-800">
+            <p class="text-cyan-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Dashboard Analitik</p>
+            
+            <button onclick="tukarTab('INOVASI')" class="sidebar-btn active-tab w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="INOVASI">
+                <i class="fa-solid fa-trophy w-5 text-yellow-400"></i> Data Inovasi (Pingat)
+            </button>
+            <button onclick="tukarTab('KPI_INOVASI')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="KPI_INOVASI">
+                <i class="fa-solid fa-chart-line w-5 text-cyan-400"></i> KPI Inovasi
+            </button>
+            <button onclick="tukarTab('HARTA_INTELEK')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="HARTA_INTELEK">
+                <i class="fa-solid fa-shield-halved w-5 text-cyan-400"></i> Harta Intelek
+            </button>
+            <button onclick="tukarTab('KPI_PENYELIDIKAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="KPI_PENYELIDIKAN">
+                <i class="fa-solid fa-microscope w-5 text-cyan-400"></i> KPI Penyelidikan
+            </button>
+            <button onclick="tukarTab('GERAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="GERAN">
+                <i class="fa-solid fa-hand-holding-dollar w-5 text-cyan-400"></i> Geran Penyelidikan
+            </button>
+        </nav>
+
+        <div class="p-4 space-y-2 border-b border-blue-800 bg-blue-950/30">
+            <p class="text-amber-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Menu Pantas</p>
+            
+            <button onclick="tukarTab('MODUL_ORGANISASI')" data-tab="MODUL_ORGANISASI" class="sidebar-btn w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400 text-left">
+                <span class="text-lg">🏢</span> Carta Organisasi
+            </button>
+            
+            <a href="kemaskini-penyelaras.html" id="btnSidePenyelaras" class="hidden w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400">
+                <span class="text-lg">👥</span> Senarai Penyelaras
+            </a>
+            
+            <a href="pengurusan-data.html" id="btnSidePengurusan" class="hidden w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400">
+                <span class="text-lg">⚙️</span> Pengurusan Data
+            </a>
+        </div>
+
+        <div class="p-4 mb-4">
+            <p class="text-blue-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-70">Akses Terbuka</p>
+            
+            <a href="daftar-penyelaras.html" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-4 py-3 rounded-xl shadow-lg font-bold transition transform hover:-translate-y-1 flex items-center justify-center gap-2 border border-blue-500 text-sm">
+                <span class="text-lg">👨‍🏫</span> Daftar Penyelaras
+            </a>
+        </div>
+
+    </div> 
+    
+    <div class="mt-auto">
+        <div class="p-4 bg-blue-950/80 border-t border-blue-800">
+            <div id="statusUpdate" class="flex items-center space-x-2 text-[9px] font-bold">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span id="lastUpdated" class="text-blue-200 uppercase tracking-tighter">Sistem Aktif</span>
+            </div>
+        </div>
+        
+        <footer class="p-3 text-center text-blue-500 text-[10px] border-t border-blue-900 bg-blue-950 uppercase font-black tracking-widest">
+            &copy; 2024 Sistem R&I
+        </footer>
+    </div>
+
+</aside>
+
+ <main class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+
+    <div id="sectionDashboard">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="relative group">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+                <input type="text" id="carianInput" onkeyup="laksanaFilter()" placeholder="Carian Ketua, Tajuk atau Jabatan..." 
+                    class="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium text-slate-700">
+            </div>
+            <select id="filterTahun" onchange="laksanaFilter()" class="p-3.5 rounded-2xl border border-slate-200 shadow-sm outline-none bg-white font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10"></select>
+            <select id="filterJabatan" onchange="laksanaFilter()" class="p-3.5 rounded-2xl border border-slate-200 shadow-sm outline-none bg-white font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10"></select>
+        </div>
+
+        <div id="kpiCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8"></div>
+
+        <div id="chartSection" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-all hover:shadow-md">
+                <h3 id="tajukCartaBar" class="font-black text-slate-700 mb-6 flex items-center text-sm uppercase tracking-wide"></h3>
+                <div class="h-72 relative"><canvas id="barChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-all hover:shadow-md">
+                <h3 id="tajukCartaPie" class="font-black text-slate-700 mb-6 flex items-center text-sm uppercase tracking-wide"></h3>
+                <div class="h-72 relative"><canvas id="pieChart"></canvas></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 mb-10">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse relative">
+                    <thead id="headerJadual" class="bg-slate-50 border-b border-slate-100"></thead>
+                    <tbody id="bodyJadual" class="text-xs"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="paginationNav" class="mt-6 flex justify-center space-x-2 pb-10"></div>
+    </div>
+
+<div id="sectionPenyelidikan" class="hidden">
+    <h2 class="text-2xl font-black text-emerald-800 mb-6 flex items-center gap-3">
+        <span class="bg-emerald-100 p-2 rounded-xl">🔬</span> MODUL PENYELIDIKAN
+    </h2>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:shadow-lg">
+            <div class="bg-emerald-600 text-white p-4 flex items-center gap-3">
+                <div class="bg-white bg-opacity-20 p-2 rounded-lg text-lg">🔬</div>
+                <h2 class="text-lg md:text-xl font-bold uppercase tracking-wider">Akses Pantas Penyelidikan</h2>
+            </div>
+
+            <div class="p-4 flex-grow flex flex-col gap-3">
+                <div class="grid grid-cols-2 gap-2 lg:gap-3">
+                    
+                    <a href="#" onclick="aksesModul(event, 'penerbitan.html')" class="group bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📚</span>
+                        <span class="font-bold text-emerald-800 group-hover:text-white text-xs lg:text-sm">Penerbitan</span>
+                    </a>
+                    <a href="#" onclick="aksesModul(event, 'kik.html')" class="group bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💡</span>
+                        <span class="font-bold text-emerald-800 group-hover:text-white text-xs lg:text-sm">KIK</span>
+                    </a>
+
+                    <a href="#" onclick="aksesModul(event, 'e-daftar.html')" class="group col-span-2 bg-teal-50 hover:bg-teal-600 border border-teal-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📝</span>
+                        <span class="font-bold text-teal-800 group-hover:text-white text-xs lg:text-sm">e-Daftar R&D</span>
+                    </a>
+
+                    <a href="#" onclick="aksesModul(event, 'dashboard.html')" class="group bg-slate-50 hover:bg-emerald-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📊</span>
+                        <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard Pencapaian</span>
+                    </a>
+                    <a href="#" onclick="aksesModul(event, 'dashboard-penyelidikan.html')" class="group bg-slate-50 hover:bg-emerald-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📈</span>
+                        <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard KPI</span>
+                    </a>
+
+                </div>
+            </div>
+        </section>
+        
+        </div>
+</div>
+
+<div id="sectionInovasi" class="hidden">
+    <h2 class="text-2xl font-black text-purple-800 mb-6 flex items-center gap-3">
+        <span class="bg-purple-100 p-2 rounded-xl">🚀</span> MODUL INOVASI
+    </h2>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:shadow-lg">
+            <div class="bg-purple-600 text-white p-4 flex items-center gap-3">
+                <div class="bg-white bg-opacity-20 p-2 rounded-lg text-lg">🚀</div>
+                <h2 class="text-lg md:text-xl font-bold uppercase tracking-wider">Akses Pantas Inovasi</h2>
+            </div>
+
+            <div class="p-4 flex-grow flex flex-col gap-3">
+                <div class="grid grid-cols-2 gap-2 lg:gap-3">
+                    <a href="#" onclick="aksesModul(event, 'pencapaian_pelajar.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">🎓</span>
+                        <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Projek Pelajar</span>
+                    </a>
+                    <a href="#" onclick="aksesModul(event, 'geran.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💰</span>
+                        <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Geran</span>
+                    </a>
+
+                    <a href="#" onclick="aksesModul(event, 'komersilan.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💎</span>
+                        <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Komersilan</span>
+                    </a>
+                    <a href="#" onclick="aksesModul(event, 'harta-intelek.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">©️</span>
+                        <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Harta Intelek</span>
+                    </a>
+
+                    <a href="#" onclick="aksesModul(event, 'tambah-inovasi.html')" class="group col-span-2 bg-indigo-50 hover:bg-indigo-600 border border-indigo-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📝</span>
+                        <span class="font-bold text-indigo-800 group-hover:text-white text-xs lg:text-sm">Laporan Pencapaian Inovasi</span>
+                    </a>
+
+                    <a href="#" onclick="aksesModul(event, 'senarai-pertandingan.html')" class="group col-span-2 bg-pink-50 hover:bg-pink-600 border border-pink-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">🏆</span>
+                        <span class="font-bold text-pink-800 group-hover:text-white text-xs lg:text-sm">Senarai Pertandingan</span>
+                    </a>
+
+                    <a href="#" onclick="aksesModul(event, 'dashboard.html')" class="group bg-slate-50 hover:bg-purple-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📊</span>
+                        <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard Pencapaian</span>
+                    </a>
+                    <a href="#" onclick="aksesModul(event, 'dashboard-kpi.html')" class="group bg-slate-50 hover:bg-purple-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📈</span>
+                        <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard KPI</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        </div>
+</div>
+
+
+<div id="sectionOrganisasi" class="hidden">
+    <h2 class="text-2xl font-black text-blue-900 mb-6 flex items-center gap-3">
+        <span class="bg-blue-100 p-2 rounded-xl">🏢</span> CARTA ORGANISASI PUSAT KECEMERLANGAN PENYELIDIKAN DAN INOVASI, POLITEKNIK UNGKU OMAR
+    </h2>
+    
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center min-h-[500px] relative">
+        
+        <div id="loading-carta" class="absolute flex flex-col items-center justify-center z-10">
+            <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-500 mb-3"></i>
+            <span class="text-sm font-bold text-slate-500 animate-pulse">Memuat turun carta terkini...</span>
+        </div>
+
+        <img id="img-carta" src="" alt="Carta Organisasi" onclick="bukaGambarPenuh()" 
+             class="opacity-0 transition-opacity duration-700 w-full max-w-lg lg:max-w-2xl max-h-[400px] md:max-h-[500px] object-contain rounded-xl shadow-sm cursor-pointer hover:shadow-lg border border-slate-200 z-20 mx-auto" 
+             title="Klik untuk paparan penuh">
+        
+        <button onclick="bukaGambarPenuh()" id="btn-zoom-carta" class="mt-8 bg-slate-800 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 z-20 hidden">
+            <i class="fa-solid fa-expand"></i> Paparan Penuh
+        </button>
+    </div>
+</div>
+
+
+
+
+
+
+
+</main>
+    </div>
+
+    <script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
+let barChartInstance = null;
+let pieChartInstance = null;
+let rawDataCache = {}; 
+let tabSemasa = 'INOVASI';
+
+// Variable Global Pagination
+let halamanSemasa = 1;
+const hadRekod = 10;
+let dataGlobal = [];
+let tabGlobal = '';
+
+window.onload = () => tukarTab('INOVASI');
+
+// 1. KEMASKINI FUNGSI tukarTab SEDIA ADA
+function tukarTab(tabName) {
+    tabSemasa = tabName;
+    halamanSemasa = 1; // Reset halaman
+
+    if (typeof closeMobileMenu === 'function') closeMobileMenu(); // Tutup menu mobile jika ada
+
+    // Kemaskini Gaya Butang Aktif
+    document.querySelectorAll('.tab-btn, .sidebar-btn').forEach(btn => {
+        btn.classList.remove('active-tab');
+        if(btn.dataset.tab === tabName) btn.classList.add('active-tab');
+    });
+
+    // Kenalpasti Seksyen Paparan
+    const secDashboard = document.getElementById('sectionDashboard');
+    const secPenyelidikan = document.getElementById('sectionPenyelidikan');
+    const secInovasi = document.getElementById('sectionInovasi');
+    const secOrganisasi = document.getElementById('sectionOrganisasi'); // Tambahan Baru
+
+    // Sembunyikan semua seksyen
+    if (secDashboard) secDashboard.classList.add('hidden');
+    if (secPenyelidikan) secPenyelidikan.classList.add('hidden');
+    if (secInovasi) secInovasi.classList.add('hidden');
+    if (secOrganisasi) secOrganisasi.classList.add('hidden');
+
+    // Logik Tunjuk Seksyen
+    if (tabName === 'MODUL_PENYELIDIKAN') {
+        if (secPenyelidikan) secPenyelidikan.classList.remove('hidden');
+    } 
+    else if (tabName === 'MODUL_INOVASI') {
+        if (secInovasi) secInovasi.classList.remove('hidden');
+    } 
+    else if (tabName === 'MODUL_ORGANISASI') {
+        // Tunjuk Seksyen Organisasi
+        if (secOrganisasi) secOrganisasi.classList.remove('hidden');
+    } 
+    else {
+        // Jika tab Dashboard/Data
+        if (secDashboard) secDashboard.classList.remove('hidden');
+        
+        const tajukBar = document.getElementById('tajukCartaBar');
+        if (tajukBar) tajukBar.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-blue-500 mr-2"></i> Memproses...`;
+        
+        if (rawDataCache && rawDataCache[tabName]) {
+            janaPilihanFilter(rawDataCache[tabName]);
+            laksanaFilter(); 
+        } else if (typeof fetchDataDariServer === 'function') {
+            fetchDataDariServer(tabName);
+        }
+    }
+}
+
+// 2. MASUKKAN FUNGSI DATA CARTA (Kod Anda)
+async function muatTurunCartaTerkini() {
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
+    const img = document.getElementById('img-carta');
+    const loading = document.getElementById('loading-carta');
+    const btnZoom = document.getElementById('btn-zoom-carta');
+
+    try {
+        const response = await fetch(scriptURL + "?action=getLatestCartaUrl");
+        const data = await response.json();
+
+        if (data.status === "BERJAYA") {
+            img.src = data.url;
+            img.classList.remove('opacity-0');
+            if (loading) loading.classList.add('hidden');
+            if (btnZoom) btnZoom.classList.remove('hidden'); // Tunjuk butang paparan penuh
+        } else {
+            console.error("Mesej fail:", data.mesej);
+            if (loading) loading.innerHTML = `<span class="text-red-500 text-xs font-bold">⚠️ ${data.mesej}</span>`;
+        }
+    } catch (err) {
+        console.error("Ralat rangkaian:", err);
+        if (loading) loading.innerHTML = `<span class="text-red-500 text-xs font-bold">⚠️ Ralat sambungan server. Sila semak internet.</span>`;
+    }
+}
+
+function bukaGambarPenuh() {
+    const imgSrc = document.getElementById('img-carta').src;
+    
+    if (imgSrc && imgSrc.startsWith("data:image")) {
+        const tabBaru = window.open();
+        tabBaru.document.write(`
+            <html>
+                <head><title>Carta Organisasi Penuh</title></head>
+                <body style="margin:0; display:flex; justify-content:center; align-items:center; background-color:#1e293b; min-height:100vh;">
+                    <img src="${imgSrc}" style="max-width:100%; max-height:100vh; object-fit:contain; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                </body>
+            </html>
+        `);
+        tabBaru.document.close(); 
+    } else {
+        alert("⏳ Gambar sedang dimuat turun atau tidak dijumpai. Sila tunggu.");
+    }
+}
+
+// Jalankan fungsi muat turun gambar ketika halaman dibuka
+window.addEventListener('DOMContentLoaded', muatTurunCartaTerkini);
+
+function fetchDataDariServer(tabName) {
+    let action = (tabName === 'INOVASI') ? "ambilData" : 
+                 (tabName === 'KPI_INOVASI') ? "ambilKPI" : 
+                 (tabName === 'HARTA_INTELEK') ? "ambilHartaIntelek" : 
+                 (tabName === 'KPI_PENYELIDIKAN') ? "ambilKPIPenyelidikan" : "ambilGeran";
+                 
+    fetch(`${SCRIPT_URL}?action=${action}`)
+        .then(res => res.json())
+        .then(response => {
+            if (response.status === "BERJAYA") {
+                rawDataCache[tabName] = response.data;
+                document.getElementById('lastUpdated').innerText = `KEMAS KINI: ${new Date().toLocaleTimeString()}`;
+                janaPilihanFilter(response.data);
+                laksanaFilter();
+            }
+        });
+}
+
+function janaPilihanFilter(rawData) {
+    let setTahun = new Set();
+    let setJabatan = new Set();
+    
+    rawData.forEach(r => {
+        if (tabSemasa === 'HARTA_INTELEK' || tabSemasa === 'KPI_PENYELIDIKAN') {
+            if (r.tahun) setTahun.add(String(r.tahun).trim());
+            if (r.jabatan) setJabatan.add(String(r.jabatan).trim());
+        } else {
+            let idxTahun, idxJabatan;
+            
+            if (tabSemasa === 'KPI_INOVASI') {
+                idxTahun = 10;
+                idxJabatan = 6;
+            } else if (tabSemasa === 'GERAN') {
+                idxTahun = 5;  
+                idxJabatan = 3; 
+            } else { 
+                idxTahun = 8;
+                idxJabatan = 3;
+            }
+
+            if (r[idxTahun]) setTahun.add(String(r[idxTahun]).trim());
+            if (r[idxJabatan]) setJabatan.add(String(r[idxJabatan]).trim());
+        }
+    });
+    
+    const fTahun = document.getElementById('filterTahun');
+    const fJabatan = document.getElementById('filterJabatan');
+    
+    fTahun.innerHTML = '<option value="SEMUA">Semua Tahun</option>';
+    Array.from(setTahun).sort((a,b) => b-a).forEach(t => fTahun.innerHTML += `<option value="${t}">${t}</option>`);
+    
+    fJabatan.innerHTML = '<option value="SEMUA">Semua Jabatan</option>';
+    Array.from(setJabatan).sort().forEach(j => fJabatan.innerHTML += `<option value="${j}">${j}</option>`);
+}
+
+function laksanaFilter() {
+    let rawData = rawDataCache[tabSemasa];
+    if (!rawData) return;
+    
+    let thn = document.getElementById('filterTahun').value;
+    let jbt = document.getElementById('filterJabatan').value;
+    let cari = document.getElementById('carianInput').value.toLowerCase();
+
+    let dataFiltered = rawData.filter(r => {
+        let valTahun, valJabatan;
+
+        if (tabSemasa === 'HARTA_INTELEK' || tabSemasa === 'KPI_PENYELIDIKAN') {
+            valTahun = String(r.tahun || '');
+            valJabatan = String(r.jabatan || '');
+        } else {
+            let idxTahun, idxJabatan;
+            
+            if (tabSemasa === 'KPI_INOVASI') {
+                idxTahun = 10;
+                idxJabatan = 6;
+            } else if (tabSemasa === 'GERAN') {
+                idxTahun = 5;
+                idxJabatan = 3;
+            } else {
+                idxTahun = 8;
+                idxJabatan = 3;
+            }
+            
+            valTahun = String(r[idxTahun] || '');
+            valJabatan = String(r[idxJabatan] || '');
+        }
+
+        let pTahun = (thn === "SEMUA" || valTahun === thn);
+        let pJabatan = (jbt === "SEMUA" || valJabatan === jbt);
+        let pCari = JSON.stringify(r).toLowerCase().includes(cari);
+        
+        return pTahun && pJabatan && pCari;
+    });
+
+    halamanSemasa = 1; 
+    prosesDanRender(tabSemasa, dataFiltered, 1);
+}
+
+function prosesDanRender(tab, data, page = 1) {
+    dataGlobal = data;
+    tabGlobal = tab;
+    halamanSemasa = page;
+    
+    const indeksMula = (halamanSemasa - 1) * hadRekod;
+    const indeksTamat = indeksMula + hadRekod;
+    const dataTerhad = data.slice(indeksMula, indeksTamat);
+    
+    const totalRekod = data.length;
+    document.getElementById('chartSection').classList.remove('hidden');
+
+    if (tab === 'KPI_PENYELIDIKAN') {
+        document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-microscope mr-2 text-blue-600"></i> Bilangan Kertas Penyelidikan Mengikut Jabatan`;
+        document.getElementById('tajukCartaPie').innerText = `Status Indeks Penyelidikan`;
+
+        let headerHtml = `<tr class="bg-blue-900 text-white">
+            <th class="p-4 border-b">BIL</th>
+            <th class="p-4 border-b w-1/3">TAJUK KERTAS PENYELIDIKAN</th>
+            <th class="p-4 border-b">PENULIS</th>
+            <th class="p-4 border-b text-center">JABATAN</th>
+            <th class="p-4 border-b text-center">TAHUN</th>
+            <th class="p-4 border-b text-center">INDEX</th>
+            <th class="p-4 border-b text-center">STATUS</th>
+        </tr>`;
+        document.getElementById('headerJadual').innerHTML = headerHtml;
+
+        let bodyHtml = dataTerhad.map((r, index) => {
+            let noBil = r.bil || (indeksMula + index + 1);
+            let statusVal = String(r.statusPengesahan || 'MENUNGGU').toUpperCase();
+            let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+            
+            return `<tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
+                <td class="p-4 border-b font-bold text-slate-700 uppercase text-xs">
+                    ${r.tajuk || '-'}
+                    <div class="text-[9px] text-blue-500 mt-1 font-normal lowercase">${r.doiUrl || ''}</div>
+                </td>
+                <td class="p-4 border-b text-xs font-semibold uppercase">${r.penulis || '-'}</td>
+                <td class="p-4 border-b font-black text-blue-700 text-center text-[10px] uppercase">${r.jabatan || '-'}</td>
+                <td class="p-4 border-b text-center font-bold text-xs">${r.tahun || '-'}</td>
+                <td class="p-4 border-b text-center"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[9px] font-bold uppercase">${r.indexStatus || '-'}</span></td>
+                <td class="p-4 border-b text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${statusClass}">${statusVal}</span></td>
+            </tr>`;
+        }).join('');
+        document.getElementById('bodyJadual').innerHTML = bodyHtml;
+
+        let statsPenyelidikan = kiraStatsPenyelidikan(data);
+        renderChartsPenyelidikan(statsPenyelidikan);
+        renderKadPenyelidikan(statsPenyelidikan);
+
+    } else if (tab === 'HARTA_INTELEK') {
+        document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-shield-halved mr-2 text-blue-600"></i> Harta Intelek Mengikut Jabatan`;
+        document.getElementById('tajukCartaPie').innerText = `Pecahan Jenis Harta Intelek`;
+
+        let headerHtml = `<tr class="bg-blue-900 text-white">
+            <th class="p-4 border-b">BIL</th>
+            <th class="p-4 border-b w-1/3">TAJUK INOVASI</th>
+            <th class="p-4 border-b">KETUA PROJEK</th>
+            <th class="p-4 border-b text-center">JABATAN</th>
+            <th class="p-4 border-b text-center">JENIS</th>
+            <th class="p-4 border-b">NO. DAFTAR</th>
+            <th class="p-4 border-b text-center">STATUS</th>
+        </tr>`;
+        document.getElementById('headerJadual').innerHTML = headerHtml;
+
+        let bodyHtml = dataTerhad.map((r, index) => {
+            let noBil = r.bil || (indeksMula + index + 1);
+            let statusVal = String(r.statusHI || '').toUpperCase();
+            let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+            return `<tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
+                <td class="p-4 border-b font-bold text-slate-700 uppercase text-xs">${r.tajuk || '-'}</td>
+                <td class="p-4 border-b text-xs font-semibold">${r.ketua || '-'}</td>
+                <td class="p-4 border-b font-black text-blue-700 text-center text-[10px] uppercase">${r.jabatan || '-'}</td>
+                <td class="p-4 border-b text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-[9px] font-bold uppercase">${r.jenis || '-'}</span></td>
+                <td class="p-4 border-b text-xs font-mono text-blue-600 font-bold">${r.noDaftar || '-'}</td>
+                <td class="p-4 border-b text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${statusClass}">${r.statusHI || 'PROSES'}</span></td>
+            </tr>`;
+        }).join('');
+        document.getElementById('bodyJadual').innerHTML = bodyHtml;
+
+        let statsHI = kiraStatsHI(data);
+        renderChartsHI(statsHI);
+        renderKadHI(statsHI);
+
+    } else if (tab === 'KPI_INOVASI') {
+        document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-chart-column mr-2 text-blue-600"></i> Produk Diaplikasikan Mengikut Jabatan`;
+        document.getElementById('tajukCartaPie').innerText = `Jenis Hakcipta`;
+
+        let headerHtml = `<tr class="bg-blue-600 text-white">
+            <th class="p-4 border-b">BIL</th>
+            <th class="p-4 border-b w-1/4">NAMA PRODUK</th>
+            <th class="p-4 border-b">KETUA</th>
+            <th class="p-4 border-b">AHLI</th>
+            <th class="p-4 border-b text-center">JABATAN</th>
+            <th class="p-4 border-b">APLIKASI</th>
+            <th class="p-4 border-b text-center">JENIS</th>
+            <th class="p-4 border-b">NO DAFTAR</th>
+            <th class="p-4 border-b text-center">TAHUN</th>
+            <th class="p-4 border-b text-center">SUKUAN</th>
+            <th class="p-4 border-b text-center">STATUS</th>
+        </tr>`;
+        document.getElementById('headerJadual').innerHTML = headerHtml;
+
+        let bodyHtml = dataTerhad.map((r, index) => {
+            let noBil = r[0] || (indeksMula + index + 1);
+            let statusVal = String(r[13] || '').toUpperCase();
+            let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+            return `<tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
+                <td class="p-4 border-b font-bold text-slate-700 uppercase">${r[1] || '-'}</td>
+                <td class="p-4 border-b text-xs font-semibold">${r[2] || '-'}</td>
+                <td class="p-4 border-b text-[10px] text-slate-500">${r[5] || '-'}</td>
+                <td class="p-4 border-b font-black text-blue-700 text-center text-xs uppercase">${r[6] || '-'}</td>
+                <td class="p-4 border-b text-[10px] uppercase italic">${r[7] || '-'}</td>
+                <td class="p-4 border-b text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-[9px] font-bold">${r[8] || '-'}</span></td>
+                <td class="p-4 border-b text-xs font-mono text-blue-600">${r[9] || '-'}</td>
+                <td class="p-4 border-b text-center font-bold">${r[10] || '-'}</td>
+                <td class="p-4 border-b text-center font-black text-blue-600">${r[12] || '-'}</td>
+                <td class="p-4 border-b text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${statusClass}">${r[13] || 'PROSES'}</span></td>
+            </tr>`;
+        }).join('');
+        document.getElementById('bodyJadual').innerHTML = bodyHtml;
+        let statsKPI = kiraStatsKPI(data);
+        renderChartsKPI(statsKPI);
+        renderKadKPI(statsKPI);
+
+    } else if (tab === 'GERAN') {
+        document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-money-bill-trend-up mr-2 text-blue-600"></i> Nilai Geran Mengikut Jabatan (RM)`;
+        document.getElementById('tajukCartaPie').innerText = `Pecahan Jenis Geran`;
+
+        let headerHtml = `<tr class="bg-blue-900 text-white">
+            <th class="p-4 border-b">BIL</th>
+            <th class="p-4 border-b">KETUA & AHLI</th>
+            <th class="p-4 border-b w-1/4">TAJUK PROJEK</th>
+            <th class="p-4 border-b text-center">JABATAN</th>
+            <th class="p-4 border-b text-center">TAHUN</th>
+            <th class="p-4 border-b">JENIS GERAN</th>
+            <th class="p-4 border-b text-right">NILAI (RM)</th>
+        </tr>`;
+        document.getElementById('headerJadual').innerHTML = headerHtml;
+
+        let bodyHtml = dataTerhad.map((r, index) => {
+            let noBil = r[0] || (indeksMula + index + 1);
+            let nilai = r[7] ? parseFloat(r[7]).toLocaleString('en-MY', {minimumFractionDigits: 2}) : '0.00';
+            
+            return `<tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
+                <td class="p-4 border-b">
+                    <div class="font-bold text-blue-900 text-xs uppercase">${r[1] || '-'}</div>
+                    <div class="text-[9px] text-slate-500 mt-1">${r[2] || '-'}</div>
+                </td>
+                <td class="p-4 border-b font-bold text-slate-700 uppercase text-xs">${r[4] || '-'}</td>
+                <td class="p-4 border-b font-black text-blue-700 text-center text-[10px] uppercase">${r[3] || '-'}</td>
+                <td class="p-4 border-b text-center font-bold text-xs">${r[5] || '-'}</td>
+                <td class="p-4 border-b"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[9px] font-bold uppercase">${r[6] || '-'}</span></td>
+                <td class="p-4 border-b text-right font-mono font-bold text-emerald-700">RM ${nilai}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('bodyJadual').innerHTML = bodyHtml;
+
+        let statsGeran = kiraStatsGeran(data);
+        renderChartsGeran(statsGeran);
+        renderKadGeran(statsGeran);
+
+    } else {
+        document.getElementById('kpiCards').innerHTML = ''; 
+        let headerHtml = `<tr class="bg-blue-900 text-white">
+            <th class="p-4 border-b sticky top-0 bg-blue-900">BIL</th>
+            <th class="p-4 border-b sticky top-0 bg-blue-900">INNOVATOR / AHLI</th>
+            <th class="p-4 border-b sticky top-0 bg-blue-900">PRODUK & PERTANDINGAN</th>
+            <th class="p-4 border-b sticky top-0 bg-blue-900">JABATAN</th>
+            <th class="p-4 border-b sticky top-0 bg-blue-900">PINGAT</th>
+            <th class="p-4 border-b sticky top-0 bg-blue-900">STATUS</th>
+        </tr>`;
+        document.getElementById('headerJadual').innerHTML = headerHtml;
+
+        let bodyHtml = dataTerhad.map((r, index) => {
+            let noBil = r[0] || (indeksMula + index + 1);
+            let badgePingat = "";
+            let p = String(r[7]).toUpperCase();
+            if(p.includes('EMAS')) badgePingat = "bg-yellow-500 text-white";
+            else if(p.includes('PERAK')) badgePingat = "bg-slate-400 text-white";
+            else if(p.includes('GANGSA')) badgePingat = "bg-orange-600 text-white";
+            else badgePingat = "bg-slate-100 text-slate-600";
+            let statusClass = r[9].includes('DISAHKAN') ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50';
+
+            return `<tr class="hover:bg-blue-50/30 transition-colors">
+                <td class="p-4 border-b font-bold text-slate-400">${noBil}</td>
+                <td class="p-4 border-b">
+                    <div class="font-bold text-blue-900">${r[1]}</div>
+                    <div class="text-[10px] text-slate-500 italic uppercase">${r[2]}</div>
+                </td>
+                <td class="p-4 border-b">
+                    <div class="font-bold uppercase text-slate-700">${r[4]}</div>
+                    <div class="text-[10px] text-blue-600">${r[5]} (${r[8]})</div>
+                </td>
+                <td class="p-4 border-b font-bold text-xs">${r[3]}</td>
+                <td class="p-4 border-b"><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${badgePingat}">${r[7]}</span></td>
+                <td class="p-4 border-b"><span class="px-2 py-1 rounded text-[9px] font-bold ${statusClass}">${r[9]}</span></td>
+            </tr>`;
+        }).join('');
+        document.getElementById('bodyJadual').innerHTML = bodyHtml;
+        
+        if(tab === 'INOVASI') {
+            let stats = kiraStats(data);
+            renderCharts(stats.jabatan, stats.overall);
+        } else {
+            document.getElementById('chartSection').classList.add('hidden');
+        }
+    }
+
+    binaButangPagination(totalRekod);
+}
+
+// ==========================================
+// FUNGSI PAGINATION
+// ==========================================
+function binaButangPagination(totalRekod) {
+    const totalHalaman = Math.ceil(totalRekod / hadRekod);
+    const navHalaman = document.getElementById('paginationNav');
+    
+    if (!navHalaman) return;
+
+    if (totalHalaman <= 1) {
+        navHalaman.innerHTML = '';
+        return;
+    }
+
+    navHalaman.innerHTML = `
+        <div class="flex items-center justify-center space-x-2 py-6 border-t border-slate-100 bg-slate-50/50">
+            <button onclick="tukarHalaman(-1)" ${halamanSemasa === 1 ? 'disabled' : ''} 
+                class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
+                <i class="fa-solid fa-chevron-left mr-2"></i> KEMBALI
+            </button>
+            
+            <span class="px-4 py-2 text-[10px] font-black text-blue-900 bg-blue-100/50 rounded-lg border border-blue-200 uppercase tracking-widest">
+                HALAMAN ${halamanSemasa} / ${totalHalaman}
+            </span>
+
+            <button onclick="tukarHalaman(1)" ${halamanSemasa === totalHalaman ? 'disabled' : ''} 
+                class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
+                SETERUSNYA <i class="fa-solid fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+    `;
+}
+
+function tukarHalaman(arah) {
+    const totalHalaman = Math.ceil(dataGlobal.length / hadRekod);
+    const halamanBaru = halamanSemasa + arah;
+
+    if (halamanBaru >= 1 && halamanBaru <= totalHalaman) {
+        prosesDanRender(tabGlobal, dataGlobal, halamanBaru);
+        const headerJadual = document.getElementById('headerJadual');
+        if(headerJadual) headerJadual.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// ==========================================
+// FUNGSI STATISTIK (KPI PENYELIDIKAN)
+// ==========================================
+function kiraStatsPenyelidikan(data) {
+    let statsJabatan = {};
+    let statsIndex = {};
+    let totalDisahkan = 0;
+    data.forEach(r => {
+        let jbt = String(r.jabatan || 'TIADA JABATAN').trim();
+        let idx = String(r.indexStatus || 'LAIN-LAIN').trim().toUpperCase();
+        let status = String(r.statusPengesahan || '').toUpperCase();
+        statsJabatan[jbt] = (statsJabatan[jbt] || 0) + 1;
+        statsIndex[idx] = (statsIndex[idx] || 0) + 1;
+        if(status.includes('DISAHKAN')) totalDisahkan++;
+    });
+    return { jabatan: statsJabatan, index: statsIndex, disahkan: totalDisahkan, total: data.length };
+}
+
+function renderKadPenyelidikan(stats) {
+    const kpiContainer = document.getElementById('kpiCards');
+    kpiContainer.innerHTML = `
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-900 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Penyelidikan</p><h4 class="text-3xl font-black text-slate-800">${stats.total}</h4></div>
+            <div class="bg-blue-50 p-3 rounded-xl"><i class="fa-solid fa-book-open text-blue-900 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Rekod Disahkan</p><h4 class="text-3xl font-black text-emerald-600">${stats.disahkan}</h4></div>
+            <div class="bg-emerald-50 p-3 rounded-xl"><i class="fa-solid fa-circle-check text-emerald-600 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Scopus / MyCITE</p><h4 class="text-3xl font-black text-indigo-600">${(stats.index['SCOPUS'] || 0) + (stats.index['MYCITE'] || 0)}</h4></div>
+            <div class="bg-indigo-50 p-3 rounded-xl"><i class="fa-solid fa-quote-right text-indigo-600 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-orange-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Menunggu Pengesahan</p><h4 class="text-3xl font-black text-orange-600">${stats.total - stats.disahkan}</h4></div>
+            <div class="bg-orange-50 p-3 rounded-xl"><i class="fa-solid fa-clock-rotate-left text-orange-600 text-2xl"></i></div>
+        </div>`;
+}
+
+function renderChartsPenyelidikan(stats) {
+    if (barChartInstance) barChartInstance.destroy();
+    if (pieChartInstance) pieChartInstance.destroy();
+
+    // 1. Sediakan senarai warna yang pelbagai untuk jabatan
+    const senaraiWarna = [
+        '#3b82f6', // Biru
+        '#10b981', // Zamrud (Emerald)
+        '#8b5cf6', // Ungu
+        '#f59e0b', // Jingga (Amber)
+        '#ef4444', // Merah
+        '#06b6d4', // Sian (Cyan)
+        '#f43f5e', // Merah Jambu (Rose)
+        '#84cc16', // Hijau Limau (Lime)
+        '#6366f1', // Indigo
+        '#14b8a6'  // Teal
+    ];
+
+    // 2. Dapatkan label jabatan
+    const labelJabatan = Object.keys(stats.jabatan);
+    
+    // 3. Petakan warna mengikut senaraiWarna di atas
+    /* NOTA: Jika anda ingin warna jabatan sentiasa sama/seragam di semua tab 
+       (menggunakan penyelesaian yang kita buat sebelum ini), 
+       anda boleh gantikan baris di bawah dengan: 
+       const warnaBar = labelJabatan.map(jbt => dapatkanWarna(jbt));
+    */
+    const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
+
+    barChartInstance = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: labelJabatan,
+            datasets: [{ 
+                label: 'Bilangan Kertas Penyelidikan', 
+                data: Object.values(stats.jabatan), 
+                backgroundColor: warnaBar, // <-- Array warna dimasukkan di sini
+                borderRadius: 8 
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { display: false } 
+            } 
+        }
+    });
+
+    pieChartInstance = new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(stats.index),
+            datasets: [{ 
+                data: Object.values(stats.index), 
+                backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'] 
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            cutout: '70%', 
+            plugins: { 
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } 
+            } 
+        }
+    });
+}
+
+// ==========================================
+// FUNGSI STATISTIK (HARTA INTELEK)
+// ==========================================
+function kiraStatsHI(data) {
+    let statsJabatan = {};
+    let statsJenis = {};
+    let totalDisahkan = 0;
+    data.forEach(r => {
+        let jbt = String(r.jabatan || 'TIADA JABATAN').trim();
+        let jenis = String(r.jenis || 'HAK CIPTA').trim().toUpperCase();
+        let status = String(r.statusHI || '').toUpperCase();
+        statsJabatan[jbt] = (statsJabatan[jbt] || 0) + 1;
+        statsJenis[jenis] = (statsJenis[jenis] || 0) + 1;
+        if(status.includes('DISAHKAN')) totalDisahkan++;
+    });
+    return { jabatan: statsJabatan, jenis: statsJenis, disahkan: totalDisahkan, total: data.length };
+}
+
+function renderKadHI(stats) {
+    const kpiContainer = document.getElementById('kpiCards');
+    kpiContainer.innerHTML = `
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-900 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah HI</p><h4 class="text-3xl font-black text-slate-800">${stats.total}</h4></div>
+            <div class="bg-blue-50 p-3 rounded-xl"><i class="fa-solid fa-shield-halved text-blue-900 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">HI Disahkan</p><h4 class="text-3xl font-black text-emerald-600">${stats.disahkan}</h4></div>
+            <div class="bg-emerald-50 p-3 rounded-xl"><i class="fa-solid fa-circle-check text-emerald-600 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-purple-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Hak Cipta</p><h4 class="text-3xl font-black text-purple-600">${stats.jenis['HAK CIPTA'] || 0}</h4></div>
+            <div class="bg-purple-50 p-3 rounded-xl"><i class="fa-solid fa-copyright text-purple-600 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-orange-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Dalam Proses</p><h4 class="text-3xl font-black text-orange-600">${stats.total - stats.disahkan}</h4></div>
+            <div class="bg-orange-50 p-3 rounded-xl"><i class="fa-solid fa-spinner text-orange-600 text-2xl"></i></div>
+        </div>`;
+}
+
+function renderChartsHI(stats) {
+    if (barChartInstance) barChartInstance.destroy();
+    if (pieChartInstance) pieChartInstance.destroy();
+
+    // 1. Sediakan senarai warna yang pelbagai untuk jabatan
+    const senaraiWarna = [
+        '#3b82f6', // Biru
+        '#10b981', // Zamrud (Emerald)
+        '#8b5cf6', // Ungu
+        '#f59e0b', // Jingga (Amber)
+        '#ef4444', // Merah
+        '#06b6d4', // Sian (Cyan)
+        '#f43f5e', // Merah Jambu (Rose)
+        '#84cc16', // Hijau Limau (Lime)
+        '#6366f1', // Indigo
+        '#14b8a6'  // Teal
+    ];
+
+    // 2. Petakan warna mengikut jumlah jabatan
+    const labelJabatan = Object.keys(stats.jabatan);
+    const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
+
+    barChartInstance = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: labelJabatan,
+            datasets: [{ 
+                label: 'Bilangan Harta Intelek', 
+                data: Object.values(stats.jabatan), 
+                backgroundColor: warnaBar, // <-- Masukkan array warna di sini
+                borderRadius: 8 
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false // Sembunyikan petunjuk (legend) supaya lebih kemas bila banyak warna
+                }
+            }
+        }
+    });
+
+    pieChartInstance = new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(stats.jenis),
+            datasets: [{ 
+                data: Object.values(stats.jenis), 
+                backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#0ea5e9'] 
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+    });
+}
+
+// ==========================================
+// FUNGSI STATISTIK (KPI INOVASI)
+// ==========================================
+function kiraStatsKPI(data) {
+    let statsJabatan = {};
+    let pecahanHakcipta = {};
+    let setJabatanUnik = new Set();
+    data.forEach(r => {
+        let jbt = String(r[6] || 'TIADA JABATAN').trim(); 
+        let jenis = String(r[8] || 'TIADA DATA').trim().toUpperCase(); 
+        if(jbt !== 'TIADA JABATAN') setJabatanUnik.add(jbt);
+        statsJabatan[jbt] = (statsJabatan[jbt] || 0) + 1;
+        pecahanHakcipta[jenis] = (pecahanHakcipta[jenis] || 0) + 1;
+    });
+    return { jabatan: statsJabatan, hakcipta: pecahanHakcipta, totalJabatan: setJabatanUnik.size, totalProduk: data.length };
+}
+
+function renderKadKPI(stats) {
+    const kpiContainer = document.getElementById('kpiCards');
+    kpiContainer.innerHTML = `
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-600"><p class="text-xs font-bold text-slate-500 uppercase">Bilangan Jabatan</p><h4 class="text-3xl font-black text-slate-800">${stats.totalJabatan}</h4></div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-600"><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Produk KPI</p><h4 class="text-3xl font-black text-slate-800">${stats.totalProduk}</h4></div>
+    `;
+}
+
+function renderChartsKPI(stats) {
+    if (barChartInstance) barChartInstance.destroy();
+    if (pieChartInstance) pieChartInstance.destroy();
+
+    // 1. Sediakan senarai warna yang pelbagai untuk jabatan
+    const senaraiWarna = [
+        '#3b82f6', // Biru
+        '#10b981', // Zamrud (Emerald)
+        '#8b5cf6', // Ungu
+        '#f59e0b', // Jingga (Amber)
+        '#ef4444', // Merah
+        '#06b6d4', // Sian (Cyan)
+        '#f43f5e', // Merah Jambu (Rose)
+        '#84cc16', // Hijau Limau (Lime)
+        '#6366f1', // Indigo
+        '#14b8a6'  // Teal
+    ];
+
+    // 2. Petakan warna mengikut jumlah jabatan
+    const labelJabatan = Object.keys(stats.jabatan);
+    const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
+
+    barChartInstance = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: labelJabatan,
+            datasets: [{ 
+                label: 'Bilangan Produk Diaplikasikan', 
+                data: Object.values(stats.jabatan), 
+                backgroundColor: warnaBar, // <-- Masukkan array warna di sini
+                borderRadius: 8 
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false // Sembunyikan petunjuk (legend) supaya lebih kemas
+                }
+            }
+        }
+    });
+
+    pieChartInstance = new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(stats.hakcipta),
+            datasets: [{ 
+                data: Object.values(stats.hakcipta), 
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] 
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '60%' }
+    });
+}
+
+// ==========================================
+// FUNGSI STATISTIK (PRODUK INOVASI)
+// ==========================================
+function kiraStats(data) {
+    let emas = 0, perak = 0, gangsa = 0;
+    let statsJabatan = {};
+    data.forEach(r => {
+        let pingat = String(r[7]).toUpperCase();
+        let j = String(r[3]);
+        if (!statsJabatan[j]) statsJabatan[j] = { emas: 0, perak: 0, gangsa: 0 };
+        if (pingat.includes('EMAS')) { emas++; statsJabatan[j].emas++; }
+        else if (pingat.includes('PERAK')) { perak++; statsJabatan[j].perak++; }
+        else if (pingat.includes('GANGSA')) { gangsa++; statsJabatan[j].gangsa++; }
+    });
+    return { overall: {emas, perak, gangsa}, jabatan: statsJabatan };
+}
+
+function renderCharts(statsJabatan, overall) {
+    if (barChartInstance) barChartInstance.destroy();
+    if (pieChartInstance) pieChartInstance.destroy();
+
+    // TAMBAH DUA BARIS INI:
+    document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-chart-column mr-2 text-blue-600"></i> Analisis Prestasi Mengikut Jabatan`;
+    document.getElementById('tajukCartaPie').innerText = `Pecahan Keseluruhan`;
+
+    const kpiContainer = document.getElementById('kpiCards');
+    kpiContainer.innerHTML = `
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-yellow-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Pingat Emas</p><h4 class="text-3xl font-black text-slate-800">${overall.emas}</h4></div>
+            <div class="bg-yellow-50 p-3 rounded-xl"><i class="fa-solid fa-medal text-yellow-600 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-slate-400 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Pingat Perak</p><h4 class="text-3xl font-black text-slate-800">${overall.perak}</h4></div>
+            <div class="bg-slate-50 p-3 rounded-xl"><i class="fa-solid fa-medal text-slate-400 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-orange-600 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Pingat Gangsa</p><h4 class="text-3xl font-black text-slate-800">${overall.gangsa}</h4></div>
+            <div class="bg-orange-50 p-3 rounded-xl"><i class="fa-solid fa-medal text-orange-700 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-900 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Pingat</p><h4 class="text-3xl font-black text-slate-800">${overall.emas + overall.perak + overall.gangsa}</h4></div>
+            <div class="bg-blue-50 p-3 rounded-xl"><i class="fa-solid fa-trophy text-blue-900 text-2xl"></i></div>
+        </div>`;
+    
+    const labels = Object.keys(statsJabatan);
+    barChartInstance = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Emas', data: labels.map(l => statsJabatan[l].emas), backgroundColor: '#EAB308' },
+                { label: 'Perak', data: labels.map(l => statsJabatan[l].perak), backgroundColor: '#94A3B8' },
+                { label: 'Gangsa', data: labels.map(l => statsJabatan[l].gangsa), backgroundColor: '#F97316' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+    });
+    
+    pieChartInstance = new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Emas', 'Perak', 'Gangsa'],
+            datasets: [{ data: [overall.emas, overall.perak, overall.gangsa], backgroundColor: ['#EAB308', '#94A3B8', '#F97316'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+    });
+}
+
+// ==========================================
+// FUNGSI STATISTIK (GERAN)
+// ==========================================
+function kiraStatsGeran(data) {
+    let statsJabatan = {};
+    let statsJenis = {};
+    let totalNilai = 0;
+    
+    data.forEach(r => {
+        let jbt = String(r[3] || 'TIADA JABATAN').trim();
+        let jenis = String(r[6] || 'LAIN-LAIN').trim().toUpperCase();
+        let nilai = r[7] ? parseFloat(r[7]) : 0;
+
+        statsJabatan[jbt] = (statsJabatan[jbt] || 0) + nilai;
+        statsJenis[jenis] = (statsJenis[jenis] || 0) + 1;
+        totalNilai += nilai;
+    });
+
+    return { 
+        jabatan: statsJabatan, 
+        jenis: statsJenis, 
+        totalNilai: totalNilai, 
+        totalProjek: data.length 
+    };
+}
+
+function renderKadGeran(stats) {
+    const kpiContainer = document.getElementById('kpiCards');
+    kpiContainer.innerHTML = `
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Nilai Geran</p><h4 class="text-2xl font-black text-emerald-700">RM ${stats.totalNilai.toLocaleString('en-MY')}</h4></div>
+            <div class="bg-emerald-50 p-3 rounded-xl"><i class="fa-solid fa-comments-dollar text-emerald-700 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Bilangan Projek</p><h4 class="text-3xl font-black text-slate-800">${stats.totalProjek}</h4></div>
+            <div class="bg-indigo-50 p-3 rounded-xl"><i class="fa-solid fa-diagram-project text-indigo-600 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-purple-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Purata Nilai</p><h4 class="text-xl font-black text-slate-800">RM ${(stats.totalNilai / (stats.totalProjek || 1)).toLocaleString('en-MY', {maximumFractionDigits:0})}</h4></div>
+            <div class="bg-purple-50 p-3 rounded-xl"><i class="fa-solid fa-calculator text-purple-600 text-2xl"></i></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-orange-500 flex items-center justify-between">
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Jenis Geran Unik</p><h4 class="text-3xl font-black text-slate-800">${Object.keys(stats.jenis).length}</h4></div>
+            <div class="bg-orange-50 p-3 rounded-xl"><i class="fa-solid fa-tags text-orange-600 text-2xl"></i></div>
+        </div>`;
+}
+
+function renderChartsGeran(stats) {
+    if (barChartInstance) barChartInstance.destroy();
+    if (pieChartInstance) pieChartInstance.destroy();
+
+    // 1. Sediakan senarai warna yang pelbagai untuk jabatan
+    const senaraiWarna = [
+        '#3b82f6', // Biru
+        '#10b981', // Zamrud (Emerald)
+        '#8b5cf6', // Ungu
+        '#f59e0b', // Jingga (Amber)
+        '#ef4444', // Merah
+        '#06b6d4', // Sian (Cyan)
+        '#f43f5e', // Merah Jambu (Rose)
+        '#84cc16', // Hijau Limau (Lime)
+        '#6366f1', // Indigo
+        '#14b8a6'  // Teal
+    ];
+
+    // 2. Petakan warna mengikut jumlah jabatan
+    const labelJabatan = Object.keys(stats.jabatan);
+    const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
+
+    barChartInstance = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: labelJabatan,
+            datasets: [{ 
+                label: 'Jumlah Nilai (RM)', 
+                data: Object.values(stats.jabatan), 
+                backgroundColor: warnaBar, // <-- Array warna telah dimasukkan di sini
+                borderRadius: 8 
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false // Disembunyikan supaya carta nampak lebih kemas apabila banyak warna
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'RM ' + context.parsed.y.toLocaleString('en-MY');
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    pieChartInstance = new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(stats.jenis),
+            datasets: [{ 
+                data: Object.values(stats.jenis), 
+                backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] 
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            cutout: '70%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } }
+        }
+    });
+}
+    </script>
+	
+	<script>
+    window.onload = () => {
+        // 1. Logik asal untuk pengesahan sesi/login
+        const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
+        const perananPengguna = (sessionStorage.getItem("peranan") || "").trim().toUpperCase();
+
+        if (sudahLogin) {
+            const btnLogMasuk = document.getElementById('btnLogMasuk');
+            if (btnLogMasuk) {
+                btnLogMasuk.classList.add('hidden');
+                btnLogMasuk.style.display = 'none';
+            }
+
+            const infoPengguna = document.getElementById('infoPengguna');
+            if (infoPengguna) {
+                infoPengguna.classList.remove('hidden');
+                infoPengguna.style.display = 'block'; 
+            }
+
+            const pNama = document.getElementById('paparNama');
+            const pPeranan = document.getElementById('paparPeranan');
+            const pJabatan = document.getElementById('paparJabatan');
+            
+            if (pNama) pNama.innerText = sessionStorage.getItem("namaPengguna") || "Pengguna";
+            if (pPeranan) pPeranan.innerText = perananPengguna;
+            if (pJabatan) pJabatan.innerText = sessionStorage.getItem("jabatan") || "TIADA";
+
+            const btnLogKeluar = document.getElementById('btnLogKeluar');
+            if (btnLogKeluar) {
+                btnLogKeluar.classList.remove('hidden');
+                btnLogKeluar.style.display = 'flex';
+            }
+
+            const btnTukarKataLaluan = document.getElementById('btnTukarKataLaluan');
+            if (btnTukarKataLaluan && perananPengguna !== "STAF" && perananPengguna !== "") {
+                btnTukarKataLaluan.classList.remove('hidden'); 
+                btnTukarKataLaluan.style.display = 'flex';
+            }
+
+            const btnSidePenyelaras = document.getElementById('btnSidePenyelaras');
+            const btnSidePengurusan = document.getElementById('btnSidePengurusan');
+
+            if (["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"].includes(perananPengguna)) {
+                if (btnSidePengurusan) { 
+                    btnSidePengurusan.classList.remove('hidden'); 
+                    btnSidePengurusan.style.display = 'flex';
+                }
+            }
+            
+            if (perananPengguna !== "STAF" && perananPengguna !== "") {
+                if (btnSidePenyelaras) { 
+                    btnSidePenyelaras.classList.remove('hidden'); 
+                    btnSidePenyelaras.style.display = 'flex';
+                }
+            }
+        }
+
+        // 2. KOD BARU: Aktifkan TAB INOVASI secara automatik
+        // Pastikan fungsi tukarTab() sudah didefinisikan dalam fail anda
+        if (typeof tukarTab === "function") {
+            tukarTab('INOVASI');
+        }
+    };
+
+    function aksesModul(event, sasaranURL) {
+        event.preventDefault(); 
+        const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
+
+        if (sudahLogin) {
+            window.location.href = sasaranURL;
+        } else {
+            alert("Sila log masuk terlebih dahulu untuk mengakses modul ini.");
+            window.location.href = "login.html";
+        }
+    }
+
+    function logKeluar() {
+        sessionStorage.clear(); 
+        window.location.reload(); 
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Inovasi - Sistem Pintar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        // HALANG AKSES JIKA BELUM LOGIN
+        if (sessionStorage.getItem("userLulus") !== "YA") {
+            alert("Akses ditolak! Sila log masuk terlebih dahulu.");
+            window.location.href = "login.html"; 
+        }
+    </script>
+</head>
+<body class="bg-gray-100 p-6 font-sans">
+
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-4">
+            <a href="dashboard.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition">
+                &larr; Kembali ke Paparan Utama
+            </a>
+        </div>
+
+        <div class="bg-white p-8 rounded-lg shadow-md">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">➕ Tambah Rekod Inovasi</h1>
+
+            <div id="statusMesej" class="hidden mb-4 p-4 rounded text-center font-semibold border"></div>
+
+            <div id="tabMenu" class="flex border-b border-gray-200 mb-6">
+                <button id="tabManual" class="flex-1 py-3 font-semibold text-center border-b-2 border-blue-600 text-blue-600 focus:outline-none transition">
+                    ✍️ Isi Borang Manual
+                </button>
+                <button id="tabUpload" class="hidden flex-1 py-3 font-semibold text-center text-gray-500 hover:text-blue-600 focus:outline-none transition">
+                    📂 Upload Pukal (CSV)
+                </button>
+                <button id="tabPreview" class="flex-1 py-3 font-semibold text-center text-gray-500 hover:text-blue-600 focus:outline-none transition">
+                    🔍 Pratonton Data
+                </button>
+            </div>
+
+            <div id="bahagianManual" class="block">
+                <form id="borangInovasi" class="space-y-6">
+                    <div class="bg-gray-50 p-4 rounded border">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Anda</label>
+                        <input type="text" id="jabatan" name="jabatan" readonly class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none bg-gray-200 text-gray-700 font-bold cursor-not-allowed">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Innovator Utama <span class="text-red-500">*</span></label>
+                            <input type="text" name="innovator" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Ahli Kumpulan (Pisahkan dengan koma)</label>
+                            <input type="text" name="ahli_kumpulan" placeholder="Contoh: Ali, Abu, Siti" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Produk Inovasi <span class="text-red-500">*</span></label>
+                        <input type="text" name="produk_inovasi" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tajuk Pertandingan <span class="text-red-500">*</span></label>
+                        <input type="text" name="tajuk_pertandingan" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Pertandingan <span class="text-red-500">*</span></label>
+                            <input type="date" name="tarikh_pertandingan" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tempat Pertandingan <span class="text-red-500">*</span></label>
+                            <input type="text" name="tempat_pertandingan" required placeholder="Contoh: PICC, Putrajaya" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Pingat / Pencapaian <span class="text-red-500">*</span></label>
+                            <select name="pingat" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="" disabled selected>Sila Pilih Pingat...</option>
+                                <option value="EMAS">EMAS (Gold)</option>
+                                <option value="PERAK">PERAK (Silver)</option>
+                                <option value="GANGSA">GANGSA (Bronze)</option>
+                                <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN Sahaja</option>
+                                <option value="LAIN-LAIN">Lain-lain</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
+                            <input type="number" name="tahun" required placeholder="Contoh: 2024" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+						
+					<div class="col-span-1 md:col-span-2 border-t pt-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Muat Naik Sijil Pencapaian (Maksimum 2 Sijil) <span class="text-xs text-gray-500 font-normal">- Pilihan</span></label>
+                        
+                        <div id="kawasanDrop" class="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 hover:bg-blue-100 transition cursor-pointer">
+                            <svg class="w-10 h-10 text-blue-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <p class="text-sm text-gray-700 font-bold">Klik untuk pilih ATAU seret & lepas fail di sini</p>
+                            
+                            <p class="text-xs text-red-500 mt-1 font-semibold">Format: PDF sahaja. (Maksimum 5 MB / fail)</p>
+                            
+                            <input type="file" id="sijilPencapaian" accept=".pdf, application/pdf" multiple class="hidden">
+                        </div>
+
+                        <ul id="senaraiFailUI" class="mt-3 space-y-2"></ul>
+                    </div>
+					
+                    </div>
+
+                    <div class="pt-4 border-t">
+                        <button type="button" id="btnSemakData" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition">
+                            Semak Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="bahagianUpload" class="hidden">
+                <div class="bg-purple-50 border border-purple-200 p-8 rounded-lg text-center">
+                    <h3 class="text-xl font-bold text-purple-800 mb-2">📂 Muat Naik Rekod Pukal</h3>
+                    <p class="text-sm text-gray-600 mb-2">Status data yang dimuat naik melalui fail CSV akan ditetapkan sebagai <strong class="text-green-600">DISAHKAN</strong> secara automatik.</p>
+                    
+                    <div class="bg-white p-4 border border-purple-200 rounded text-left mb-6 text-sm text-gray-700 shadow-sm">
+                        <span class="font-bold text-purple-700">💡 Panduan Sijil Pencapaian (Lajur K):</span><br>
+                        Anda boleh memasukkan sehingga maksimum <strong>2 pautan sijil</strong> (URL) bagi setiap rekod. Jika terdapat lebih daripada 1 pautan, pisahkannya menggunakan tanda koma (,) dan pastikan pautan tersebut <strong>diapit dengan tanda pembuka kata (" ")</strong> di dalam fail CSV anda. <br><br>
+                        <em>Contoh format dalam Excel/CSV:</em> <br>
+                        <code class="bg-gray-100 p-1 text-red-600 rounded">"https://drive.google.com/fail1, https://drive.google.com/fail2"</code>
+                    </div>
+                    
+                    <button id="btnDownloadTemplate" class="mb-6 inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 font-semibold py-2 px-4 rounded shadow-sm transition">
+                        ⬇️ Muat Turun Template CSV Terkini
+                    </button>
+                    
+                    <div class="max-w-md mx-auto bg-white p-6 rounded border shadow-sm">
+                        <label class="block text-left text-sm font-semibold text-gray-700 mb-2">Pilih Fail CSV:</label>
+                        <input type="file" id="fileCsv" accept=".csv" class="w-full mb-4 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                        
+                        <button type="button" id="btnUploadCsv" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded transition">
+                            Mula Muat Naik Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bahagianPratonton" class="hidden">
+                <div class="bg-blue-50 border border-blue-200 p-6 rounded-lg">
+                    <h3 class="text-lg font-bold text-blue-800 mb-4 border-b border-blue-200 pb-2">Pratonton Data Anda</h3>
+                    <ul class="space-y-2 text-sm text-gray-800 mb-6" id="senaraiPratonton"></ul>
+                    <div class="flex gap-4">
+                        <button type="button" id="btnEditSemula" class="w-1/3 bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded transition">
+                            Edit Semula
+                        </button>
+                        <button type="button" id="btnSahkanSimpan" class="w-2/3 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
+                            Sahkan & Simpan Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bahagianBerjaya" class="hidden text-center py-10">
+                <div class="text-6xl mb-4">🎉</div>
+                <h2 class="text-2xl font-bold text-green-600 mb-2">Data Berjaya Disimpan!</h2>
+                <p id="mesejBerjaya" class="text-gray-600 mb-8">Rekod inovasi telah dimasukkan ke dalam pangkalan data.</p>
+                <div class="flex justify-center gap-4">
+                    <a href="dashboard.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded transition">Lihat Dashboard</a>
+                    <button id="btnTambahLagi" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded transition">Tambah Lagi</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // TETAPAN ASAS DARI SESSION STORAGE
+        const userJabatan = sessionStorage.getItem("jabatan") || "TIDAK DIKETAHUI";
+        const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
+        document.getElementById('jabatan').value = userJabatan;
+
+        // SEMAK KELAYAKAN TAB UPLOAD
+        const rolesDibenarkan = ["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"];
+        if (rolesDibenarkan.includes(userPeranan)) {
+            document.getElementById('tabUpload').classList.remove('hidden');
+        }
+
+        // KAWALAN TAB
+        const tabManual = document.getElementById('tabManual');
+        const tabUpload = document.getElementById('tabUpload');
+        const tabPreview = document.getElementById('tabPreview');
+        const bahagianManual = document.getElementById('bahagianManual');
+        const bahagianUpload = document.getElementById('bahagianUpload');
+        const bahagianPratonton = document.getElementById('bahagianPratonton');
+        const bahagianBerjaya = document.getElementById('bahagianBerjaya');
+        const statusMesej = document.getElementById('statusMesej');
+
+        function resetTabs() {
+            [tabManual, tabUpload, tabPreview].forEach(t => {
+                t.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                t.classList.add('text-gray-500');
+            });
+            bahagianManual.classList.add('hidden');
+            bahagianUpload.classList.add('hidden');
+            bahagianPratonton.classList.add('hidden');
+            statusMesej.classList.add('hidden');
+        }
+
+        tabManual.addEventListener('click', () => {
+            resetTabs();
+            tabManual.classList.replace('text-gray-500', 'text-blue-600');
+            tabManual.classList.add('border-b-2', 'border-blue-600');
+            bahagianManual.classList.remove('hidden');
+        });
+
+        tabUpload.addEventListener('click', () => {
+            resetTabs();
+            tabUpload.classList.replace('text-gray-500', 'text-blue-600');
+            tabUpload.classList.add('border-b-2', 'border-blue-600');
+            bahagianUpload.classList.remove('hidden');
+        });
+
+        // URL WEB APP 
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
+
+// ==========================================
+        // FUNGSI ISI BORANG MANUAL & PROSES FAIL SIJIL (DRAG & DROP)
+        // ==========================================
+        const form = document.getElementById('borangInovasi');
+        let senaraiSijilBase64 = []; // Pembolehubah global untuk simpan fail
+
+        // Deklarasi Elemen UI untuk Drag & Drop
+        const kawasanDrop = document.getElementById('kawasanDrop');
+        const inputFail = document.getElementById('sijilPencapaian');
+        const senaraiFailUI = document.getElementById('senaraiFailUI');
+
+        // Buka dialog pilih fail apabila kotak dropzone diklik
+        kawasanDrop.addEventListener('click', () => inputFail.click());
+
+        // 1. Kesan fail yang dipilih menggunakan butang 'Klik'
+        inputFail.addEventListener('change', (e) => prosesFail(e.target.files));
+
+        // 2. Kesan fail melalui tindakan seret dan lepas (Drag & Drop)
+        kawasanDrop.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            kawasanDrop.classList.add('border-blue-500', 'bg-blue-100'); // Tukar warna bila hover
+        });
+
+        kawasanDrop.addEventListener('dragleave', () => {
+            kawasanDrop.classList.remove('border-blue-500', 'bg-blue-100'); // Kembali ke warna asal
+        });
+
+        kawasanDrop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            kawasanDrop.classList.remove('border-blue-500', 'bg-blue-100');
+            prosesFail(e.dataTransfer.files);
+        });
+
+        // 3. Fungsi memproses fail (Semakan Jenis PDF, Saiz 5MB & Tukar ke Base64)
+        function prosesFail(files) {
+            // Semak jika kuantiti fail melebihi had (maksimum 2)
+            if (senaraiSijilBase64.length + files.length > 2) {
+                alert("⚠️ Anda hanya dibenarkan memuat naik maksimum 2 fail sijil sahaja.");
+                inputFail.value = ''; 
+                return;
+            }
+
+            const maxSize = 5 * 1024 * 1024; // Had 5 MB (dikira dalam Bytes)
+            let adaRalat = false;
+
+            // --- FASA 1: SEMAKAN KETAT SEMUA FAIL ---
+            for (let i = 0; i < files.length; i++) {
+                let file = files[i];
+
+                // 1. Semak format fail (HANYA PDF)
+                if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith('.pdf')) {
+                    alert(`❌ Ralat Format: Fail "${file.name}" tidak disokong. Hanya format PDF sahaja dibenarkan.`);
+                    adaRalat = true;
+                    break; // Hentikan semakan serta merta
+                }
+
+                // 2. Semak saiz fail (MAKSIMUM 5 MB)
+                if (file.size > maxSize) {
+                    let saizMB = (file.size / (1024 * 1024)).toFixed(2);
+                    alert(`⚠️ Ralat Saiz: Fail "${file.name}" bersaiz ${saizMB} MB. Had maksimum setiap fail adalah 5 MB.`);
+                    adaRalat = true;
+                    break; // Hentikan semakan serta merta
+                }
+            }
+
+            // Jika terdapat ralat, batalkan keseluruhan pemilihan fail kali ini
+            if (adaRalat) {
+                inputFail.value = ''; 
+                return; 
+            }
+
+            // --- FASA 2: JIKA LULUS SEMAKAN, TUKAR KEPADA BASE64 ---
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    senaraiSijilBase64.push({
+                        nama: file.name,
+                        saiz: (file.size / 1024).toFixed(2) + " KB", 
+                        mimeType: file.type,
+                        base64: reader.result.split(',')[1] 
+                    });
+                    kemaskiniPaparanFail(); // Render semula senarai fail di skrin
+                };
+            });
+            
+            inputFail.value = ''; // Reset input supaya fail yang sama boleh dipilih lagi jika sengaja dipadam
+        }
+
+        // 4. Fungsi memaparkan senarai fail di skrin berserta butang Padam
+        function kemaskiniPaparanFail() {
+            senaraiFailUI.innerHTML = ''; // Kosongkan paparan lama
+            
+            senaraiSijilBase64.forEach((sijil, indeks) => {
+                const li = document.createElement('li');
+                li.className = "flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-sm";
+                
+                const ikon = sijil.mimeType.includes('pdf') ? '📄' : '🖼️';
+
+                li.innerHTML = `
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                        <span class="text-2xl">${ikon}</span>
+                        <div class="truncate">
+                            <p class="text-sm font-semibold text-gray-700 truncate">${sijil.nama}</p>
+                            <p class="text-xs text-gray-500">${sijil.saiz}</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="padamSatuFail(${indeks})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition" title="Padam Fail">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                senaraiFailUI.appendChild(li);
+            });
+        }
+
+        // 5. Fungsi memadam satu fail tertentu apabila butang sampah diklik
+        window.padamSatuFail = function(indeks) {
+            senaraiSijilBase64.splice(indeks, 1); // Padam 1 data dari senarai
+            kemaskiniPaparanFail(); // Render semula paparan terkini
+        };
+        
+        function dapatkanDataBorang() {
+            return {
+                jabatan: document.getElementById('jabatan').value,
+                innovator: document.querySelector('input[name="innovator"]').value,
+                ahli_kumpulan: document.querySelector('input[name="ahli_kumpulan"]').value,
+                produk_inovasi: document.querySelector('input[name="produk_inovasi"]').value,
+                tajuk_pertandingan: document.querySelector('input[name="tajuk_pertandingan"]').value,
+                tarikh_pertandingan: document.querySelector('input[name="tarikh_pertandingan"]').value,
+                tempat_pertandingan: document.querySelector('input[name="tempat_pertandingan"]').value,
+                pingat: document.querySelector('select[name="pingat"]').value,
+                tahun: document.querySelector('input[name="tahun"]').value,
+                // Tambahan data sijil
+                dataSijil: senaraiSijilBase64, 
+                bilSijil: senaraiSijilBase64.length
+            };
+        }
+
+        document.getElementById('btnSemakData').addEventListener('click', () => {
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            const data = dapatkanDataBorang();
+            document.getElementById('senaraiPratonton').innerHTML = `
+                <li><strong>Jabatan:</strong> ${data.jabatan}</li>
+                <li><strong>Innovator Utama:</strong> ${data.innovator}</li>
+                <li><strong>Ahli Kumpulan:</strong> ${data.ahli_kumpulan || '-'}</li>
+                <li><strong>Produk Inovasi:</strong> ${data.produk_inovasi}</li>
+                <li><strong>Tajuk Pertandingan:</strong> ${data.tajuk_pertandingan}</li>
+                <li><strong>Tarikh Pertandingan:</strong> ${data.tarikh_pertandingan}</li>
+                <li><strong>Tempat Pertandingan:</strong> ${data.tempat_pertandingan}</li>
+                <li><strong>Pingat:</strong> ${data.pingat}</li>
+                <li><strong>Tahun:</strong> ${data.tahun}</li>
+                <li><strong class="text-blue-700">Lampiran Sijil:</strong> ${data.bilSijil > 0 ? data.bilSijil + ' Fail Disertakan' : 'Tiada Sijil'}</li>
+            `;
+            resetTabs();
+            tabPreview.classList.replace('text-gray-500', 'text-blue-600');
+            tabPreview.classList.add('border-b-2', 'border-blue-600');
+            bahagianPratonton.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        });
+
+        document.getElementById('btnEditSemula').addEventListener('click', () => tabManual.click());
+
+        document.getElementById('btnSahkanSimpan').addEventListener('click', () => {
+            const btn = document.getElementById('btnSahkanSimpan');
+            btn.disabled = true;
+            btn.innerHTML = 'Memproses & Memuat Naik... ⏳'; // Ditukar untuk tunjukkan proses upload
+
+            const d = dapatkanDataBorang();
+            const dataHantar = {
+                action: 'tambahData',
+                "JABATAN": d.jabatan,
+                "INNOVATOR": d.innovator,
+                "AHLI": d.ahli_kumpulan,
+                "PRODUK": d.produk_inovasi,
+                "NAMA": d.tajuk_pertandingan,
+                "TARIKH": d.tarikh_pertandingan + ' (' + d.tempat_pertandingan + ')',
+                "PINGAT": d.pingat,
+                "TAHUN": d.tahun,
+                "SIJIL_DATA": d.dataSijil // <--- Hantar fail yang telah ditukar ke Base64 ke server
+            };
+            hantarKeGoogleSheet(dataHantar, btn, 'Sahkan & Simpan Data');
+        });
+
+        // ==========================================
+        // FUNGSI UPLOAD PUKAL (CSV)
+        // ==========================================
+        // 🌟 KEMASKINI TEMPLATE: Tambah Lajur 'LINK_SIJIL_PENCAPAIAN'
+        const csvTemplateData = "BIL,INNOVATOR,AHLI,JABATAN,PRODUK,NAMA,TARIKH,PINGAT,TAHUN,LINK_SIJIL_PENCAPAIAN\n1,Ali Bin Abu,\"Siti, Ahmad\",JTMK,Sistem Pintar,Inovasi Kebangsaan,2024-05-20 (PICC Putrajaya),EMAS,2024,\"https://link-sijil-1.com, https://link-sijil-2.com\"";
+
+        document.getElementById('btnDownloadTemplate').addEventListener('click', () => {
+            const blob = new Blob([csvTemplateData], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "Template_Bulk_Inovasi.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Simple CSV Parser (Menguruskan koma di dalam teks (quotes))
+        function parseCSV(text) {
+            let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
+            for (l of text) {
+                if ('"' === l) {
+                    if (s && l === p) row[i] += l;
+                    s = !s;
+                } else if (',' === l && s) l = row[++i] = '';
+                else if ('\n' === l && s) {
+                    if ('\r' === p) row[i] = row[i].slice(0, -1);
+                    row = ret[++r] = [l = '']; i = 0;
+                } else row[i] += l;
+                p = l;
+            }
+            return ret;
+        }
+
+        document.getElementById('btnUploadCsv').addEventListener('click', () => {
+            const fileInput = document.getElementById('fileCsv');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Sila pilih fail CSV terlebih dahulu.");
+                return;
+            }
+
+            const btn = document.getElementById('btnUploadCsv');
+            btn.disabled = true;
+            btn.innerHTML = 'Membaca Fail CSV... ⏳';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = parseCSV(text);
+                
+                let dataPukal = [];
+                // Bermula dari index 1 (Abaikan Tajuk/Header)
+                for (let i = 1; i < rows.length; i++) {
+                    let d = rows[i];
+                    // 🌟 KEMASKINI PARSER: Baca sehingga lajur ke-10 (Index 9)
+                    if (d.length >= 9 && d[0].trim() !== "") {
+                        
+                        // Ekstrak dan potong jika lebih dari 2 link
+                        let linkSijilRaw = d[9] ? d[9].trim() : "";
+                        let linkArray = linkSijilRaw.split(/[\n,]+/).filter(l => l.trim() !== "");
+                        
+                        if (linkArray.length > 2) {
+                            alert(`Amaran pada Baris ${i}: Terdapat lebih daripada 2 pautan sijil dikesan. Sistem hanya akan memproses 2 pautan yang pertama sahaja.`);
+                            linkArray = linkArray.slice(0, 2); // Ambil 2 yang pertama
+                        }
+                        
+                        dataPukal.push({
+                            "BIL": d[0],
+                            "INNOVATOR": d[1],
+                            "AHLI": d[2],
+                            "JABATAN": d[3],
+                            "PRODUK": d[4],
+                            "NAMA": d[5],
+                            "TARIKH": d[6],
+                            "PINGAT": d[7],
+                            "TAHUN": d[8],
+                            "LINK_SIJIL": linkArray.join(", "), // 🌟 Hantar pautan yang telah disahkan ke backend
+                            "STATUS": "DISAHKAN" // Status Automatik
+                        });
+                    }
+                }
+
+                if (dataPukal.length === 0) {
+                    alert("Tiada data sah ditemui dalam fail CSV.");
+                    btn.disabled = false;
+                    btn.innerHTML = 'Mula Muat Naik Data';
+                    return;
+                }
+
+                btn.innerHTML = `Menghantar ${dataPukal.length} Rekod... ⏳`;
+                
+                // Hantar ke Google Sheet dengan action baru
+                const payloadPukal = {
+                    action: 'tambahDataPukal',
+                    data: dataPukal
+                };
+
+                hantarKeGoogleSheet(payloadPukal, btn, 'Mula Muat Naik Data');
+            };
+            reader.readAsText(file);
+        });
+
+        // ==========================================
+        // FUNGSI API BERSAMA
+        // ==========================================
+        function hantarKeGoogleSheet(dataPayload, buttonObj, btnTextAsal) {
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(dataPayload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "BERJAYA") {
+                    document.getElementById('mesejBerjaya').innerText = data.mesej || "Rekod inovasi telah dimasukkan ke pangkalan data.";
+                    paparKejayaan();
+                } else {
+                    paparRalat(new Error(data.mesej || "Penyimpanan gagal di Google Sheet."), buttonObj, btnTextAsal);
+                }
+            })
+            .catch(error => {
+                paparRalat(new Error("Gagal berhubung dengan pelayan. Sila cuba lagi."), buttonObj, btnTextAsal);
+            });
+        }
+
+        function paparKejayaan() {
+            document.getElementById('tabMenu').classList.add('hidden');
+            bahagianManual.classList.add('hidden');
+            bahagianUpload.classList.add('hidden');
+            bahagianPratonton.classList.add('hidden');
+            bahagianBerjaya.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function paparRalat(error, buttonObj, btnTextAsal) {
+            statusMesej.classList.remove('hidden');
+            statusMesej.className = 'bg-red-100 text-red-800 border-red-200 mb-4 p-4 rounded text-center font-semibold border';
+            statusMesej.innerText = "⚠️ Ralat: " + error.message;
+            buttonObj.disabled = false;
+            buttonObj.innerHTML = btnTextAsal;
+            window.scrollTo(0, 0);
+        }
+
+		document.getElementById('btnTambahLagi').addEventListener('click', () => {
+            // 1. Reset borang asas
+            form.reset();
+            
+            // 2. Kekalkan nama Jabatan dari sesi log masuk
+            document.getElementById('jabatan').value = userJabatan;
+            
+            // 3. Bersihkan data sijil (Array dan Paparan UI)
+            senaraiSijilBase64 = []; 
+            document.getElementById('senaraiFailUI').innerHTML = ''; 
+            document.getElementById('sijilPencapaian').value = ''; 
+            
+            // 4. Reset juga butang simpan ke keadaan asal (jika tersangkut pada 'Memproses...')
+            const btnSimpan = document.getElementById('btnSahkanSimpan');
+            btnSimpan.disabled = false;
+            btnSimpan.innerHTML = 'Sahkan & Simpan Data';
+
+            // 5. Kosongkan CSV dan tukar paparan
+            document.getElementById('fileCsv').value = "";
+            document.getElementById('tabMenu').classList.remove('hidden');
+            bahagianBerjaya.classList.add('hidden');
+            
+            // 6. Kembali ke tab isi borang
+            tabManual.click();
+        });
+        
+        // Mula pada tab manual
+        tabManual.click();
+    </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dokumen KPI Inovasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col relative">
+
+    <header class="bg-indigo-800 text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-wide">📂 Pengurusan Dokumen</h1>
+                <p class="text-indigo-200 mt-1 text-sm">Muat Naik, Muat Turun & Kemaskini Dokumen KPI Inovasi</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="utama.html" class="bg-white text-indigo-800 px-5 py-2 rounded-full font-bold shadow hover:bg-indigo-50 transition flex items-center gap-2 text-sm border border-indigo-200">
+                    🏠 Utama
+                </a>
+                <a href="dashboard-kpi.html" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold shadow hover:bg-indigo-700 transition flex items-center gap-2 text-sm border border-indigo-400">
+                    📊 Dashboard KPI
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full">
+        
+        <div id="mesejUI" class="hidden mb-6 p-4 rounded-xl text-center text-sm font-bold shadow-sm border"></div>
+
+        <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+            <div class="bg-indigo-50 p-5 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📄 Senarai Dokumen Inovasi</h2>
+            </div>
+            
+            <div class="p-6 space-y-4" id="senaraiDokumen">
+                </div>
+        </div>
+
+    </main>
+
+    <div id="modalTahun" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center px-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 transform transition-all">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Maklumat Tahun</h3>
+            <p class="text-sm text-gray-500 mb-4">Sila masukkan tahun untuk KAMUS KPI sebelum fail disimpan ke Google Drive.</p>
+            
+            <input type="number" id="inputTahun" class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Contoh: 2024" min="2000" max="2100">
+            
+            <div class="flex justify-end gap-3">
+                <button onclick="tutupModalTahun()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-200 transition">Batal</button>
+                <button onclick="sahkanMuatNaikKamus()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">Simpan ke Drive</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+        // URL GOOGLE APPS SCRIPT
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
+
+        // TETAPAN GOOGLE DRIVE FOLDER ID
+        const FOLDER_ID_KAMUS = "1NYqDHUyaz1HTnbJh4_6kh1Axgu60WaoC"; 
+        const FOLDER_ID_DOKUMEN = "1zYRQF7Ftd-9LYz_NWso93N0h66lXeZSA"; 
+
+        let failSementara = null;
+        let idDokumenSementara = null;
+
+        // 🌟 SEMAKAN PERANAN PENGGUNA UNTUK KAWALAN BUTANG
+        const userPeranan = sessionStorage.getItem("peranan") || "";
+        const perananLayakUpload = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "ADMIN", "KUPIK"];
+        const layakUpload = perananLayakUpload.some(p => userPeranan.toUpperCase().includes(p));
+
+        const senaraiDokumen = [
+            { id: "doc1", tajuk: "GARIS PANDUAN PENYEDIAAN LAPORAN INOVASI PRODUK", failSemasa: null },
+            { id: "doc2", tajuk: "SURAT APLIKASI PRODUK_AGENSI KERAJAAN", failSemasa: null },
+            { id: "doc3", tajuk: "SURAT APLIKASI PRODUK_AGENSI SWASTA", failSemasa: null },
+            { id: "doc4", tajuk: "LAPORAN INOVASI", failSemasa: null },
+            { id: "doc5", tajuk: "KAMUS KPI", failSemasa: null, tahun: null },
+			{ id: "doc6", tajuk: "BORANG PENDAFTARAN HARTA INTELEK CR-1", failSemasa: null }
+        ];
+
+        function paparSenaraiDokumen() {
+            const container = document.getElementById("senaraiDokumen");
+            container.innerHTML = "";
+
+            senaraiDokumen.forEach((doc, index) => {
+                const hasFile = doc.failSemasa !== null;
+                const statusWarna = hasFile ? "text-emerald-600" : "text-gray-400";
+                
+                let statusTeks = hasFile ? `✅ Fail tersedia: ${doc.failSemasa.name}` : "⚠️ Belum dimuat naik";
+                if (hasFile && doc.id === "doc5" && doc.tahun) {
+                    statusTeks += ` (Tahun: ${doc.tahun})`;
+                }
+
+                // 🌟 LOGIK RENDER BUTANG BERDASARKAN PERANAN
+                let butangAksiHtml = "";
+
+                if (!hasFile) {
+                    if (layakUpload) {
+                        butangAksiHtml = `
+                            <button onclick="klikInputFail('${doc.id}')" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-sm flex items-center justify-center gap-2">
+                                📤 Muat Naik
+                            </button>
+                        `;
+                    } else {
+                        // Jika bukan admin dan fail tiada
+                        butangAksiHtml = `<span class="text-gray-400 italic text-sm px-2">Tiada Dokumen Boleh Dimuat Turun</span>`;
+                    }
+                } else {
+                    // Butang Download untuk SEMUA orang
+                    let butangDownload = `
+                        <button onclick="muatTurunFail('${doc.id}')" class="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-sm flex items-center justify-center gap-2">
+                            📥 Download
+                        </button>
+                    `;
+                    
+                    // Butang Tukar/Update KHAS untuk Admin/Penyelaras sahaja
+                    let butangTukar = layakUpload ? `
+                        <button onclick="klikInputFail('${doc.id}')" class="flex-1 md:flex-none bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-sm flex items-center justify-center gap-2">
+                            🔄 Tukar Dokumen
+                        </button>
+                    ` : "";
+
+                    butangAksiHtml = butangDownload + butangTukar;
+                }
+
+                const htmlBaris = `
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-5 border rounded-xl ${hasFile ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'} transition duration-300">
+                        <div class="mb-4 md:mb-0 md:pr-4 flex-grow">
+                            <h3 class="font-bold text-gray-800 uppercase tracking-wide text-sm">${index + 1}. ${doc.tajuk}</h3>
+                            <p class="text-xs font-medium mt-1.5 ${statusWarna}" id="status_${doc.id}">${statusTeks}</p>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 w-full md:w-auto items-center">
+                            ${layakUpload ? `<input type="file" id="input_file_${doc.id}" class="hidden" onchange="handlePilihFail(event, '${doc.id}')" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg">` : ''}
+                            
+                            ${butangAksiHtml}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += htmlBaris;
+            });
+        }
+
+        function klikInputFail(id) {
+            const input = document.getElementById(`input_file_${id}`);
+            if(input) {
+                input.value = ''; 
+                input.click();
+            }
+        }
+
+        function handlePilihFail(event, id) {
+            const fail = event.target.files[0];
+            if (!fail) return;
+
+            if (id === "doc5") {
+                failSementara = fail;
+                idDokumenSementara = id;
+                bukaModalTahun();
+                return;
+            }
+
+            paparNotis(`⏳ Sedang memuat naik '${fail.name}' ke Google Drive...`, "biru");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result.split(',')[1]; 
+                
+                const docInfo = senaraiDokumen.find(d => d.id === id);
+                const extension = fail.name.split('.').pop();
+                const namaFailRasmi = `${docInfo.tajuk}.${extension}`;
+
+                const payloadJSON = {
+                    action: "uploadDokumenBiasa",
+                    folderId: FOLDER_ID_DOKUMEN,
+                    fileName: namaFailRasmi,
+                    mimeType: fail.type,
+                    fileData: base64Data
+                };
+
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payloadJSON)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success' || data.status === 'BERJAYA') {
+                        const docIndex = senaraiDokumen.findIndex(d => d.id === id);
+                        senaraiDokumen[docIndex].failSemasa = { name: namaFailRasmi, url: data.url }; // Update nama
+                        paparNotis(`✅ Berjaya! Dokumen disimpan.`, "hijau");
+                        paparSenaraiDokumen();
+                    } else {
+                        paparNotis(`❌ Ralat Google Drive: ${data.message || data.mesej}`, "merah");
+                    }
+                })
+                .catch(error => {
+                    paparNotis(`❌ Ralat sistem: ${error.message}`, "merah");
+                });
+            };
+            reader.readAsDataURL(fail);
+        }
+
+        function bukaModalTahun() {
+            document.getElementById("inputTahun").value = new Date().getFullYear();
+            const modal = document.getElementById("modalTahun");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function tutupModalTahun() {
+            const modal = document.getElementById("modalTahun");
+            modal.classList.remove("flex");
+            modal.classList.add("hidden");
+            failSementara = null;
+            idDokumenSementara = null;
+        }
+
+        function sahkanMuatNaikKamus() {
+            const tahun = document.getElementById("inputTahun").value;
+            if (!tahun) {
+                alert("Sila masukkan tahun yang sah.");
+                return;
+            }
+
+            const modal = document.getElementById("modalTahun");
+            modal.classList.remove("flex");
+            modal.classList.add("hidden");
+
+            paparNotis(`⏳ Sedang memuat naik ke Google Drive (Tahun ${tahun}). Sila tunggu...`, "biru");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result.split(',')[1]; 
+                
+                // PENTING: Kita seragamkan nama fail Kamus KPI kat sini supaya senang nak jumpa masa semak!
+                const extension = failSementara.name.split('.').pop();
+                const namaFailRasmi = `KAMUS KPI_${tahun}.${extension}`;
+
+                const payloadJSON = {
+                    action: "uploadKamusKPI",
+                    folderId: FOLDER_ID_KAMUS,
+                    tahun: tahun,
+                    fileName: namaFailRasmi, // Guna nama fail seragam, bukan nama asal fail
+                    mimeType: failSementara.type,
+                    fileData: base64Data
+                };
+
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payloadJSON)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success' || data.status === 'BERJAYA') {
+                        const docIndex = senaraiDokumen.findIndex(d => d.id === idDokumenSementara);
+                        senaraiDokumen[docIndex].failSemasa = { name: namaFailRasmi, url: data.url };
+                        senaraiDokumen[docIndex].tahun = tahun;
+                        
+                        paparNotis(`✅ Berjaya! Fail untuk tahun ${tahun} selamat disimpan di Drive.`, "hijau");
+                        
+                        failSementara = null;
+                        idDokumenSementara = null;
+                        paparSenaraiDokumen();
+                    } else {
+                        paparNotis(`❌ Ralat Google Drive: ${data.message || data.mesej}`, "merah");
+                    }
+                })
+                .catch(error => {
+                    paparNotis(`❌ Ralat sistem: ${error.message}`, "merah");
+                });
+            };
+
+            reader.readAsDataURL(failSementara);
+        }
+
+        function semakStatusDariDrive() {
+            paparNotis("🔄 Menyemak rekod dokumen di Google Drive...", "biru");
+
+            const payloadJSON = {
+                action: "semakDokumen",
+                folderIdDokumen: FOLDER_ID_DOKUMEN,
+                folderIdKamus: FOLDER_ID_KAMUS
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payloadJSON)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const failDariDrive = result.data; 
+
+                    senaraiDokumen.forEach(doc => {
+                        // Cari fail yang mula dengan tajuk dokumen (Cth: KAMUS KPI)
+                        const namaFailJumpa = Object.keys(failDariDrive).find(namaFail => namaFail.startsWith(doc.tajuk));
+                        
+                        if (namaFailJumpa) {
+                            doc.failSemasa = { 
+                                name: namaFailJumpa, 
+                                url: failDariDrive[namaFailJumpa].url 
+                            };
+                            
+                            if (doc.id === "doc5") {
+                                const matchTahun = namaFailJumpa.match(/\d{4}/);
+                                if (matchTahun) doc.tahun = matchTahun[0];
+                            }
+                        }
+                    });
+
+                    paparSenaraiDokumen(); 
+                    paparNotis("✅ Sinkronisasi Google Drive berjaya.", "hijau");
+                }
+            })
+            .catch(error => {
+                paparNotis("❌ Gagal menyemak status Drive.", "merah");
+            });
+        }
+
+        function muatTurunFail(id) {
+            const dokumen = senaraiDokumen.find(d => d.id === id);
+            
+            if (dokumen && dokumen.failSemasa && dokumen.failSemasa.url) {
+                paparNotis(`📥 Membuka dokumen: ${dokumen.failSemasa.name}...`, "biru");
+                window.open(dokumen.failSemasa.url, '_blank');
+            } else {
+                paparNotis("❌ Ralat: Pautan fail belum tersedia.", "merah");
+            }
+        }
+
+        function paparNotis(teks, warna) {
+            const msgBox = document.getElementById('mesejUI');
+            const colorClass = (warna === 'hijau') ? 'bg-green-100 text-green-800 border-green-200' : 
+                               (warna === 'merah') ? 'bg-red-100 text-red-800 border-red-200' : 
+                               'bg-blue-100 text-blue-800 border-blue-200';
+            
+            msgBox.className = `mb-6 p-4 rounded-xl text-center text-sm font-bold shadow-sm border ${colorClass}`;
+            msgBox.innerText = teks;
+            msgBox.classList.remove('hidden');
+            
+            setTimeout(() => msgBox.classList.add('hidden'), 4000);
+        }
+
+        window.onload = () => {
+            paparSenaraiDokumen(); 
+            semakStatusDariDrive(); 
+        };
+    </script>
+</body>
+</html>
