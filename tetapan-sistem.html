@@ -49,6 +49,8 @@
 
 <div class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10 overflow-x-auto no-scrollbar">
     <div class="max-w-7xl mx-auto flex min-w-max px-2">
+	    <button onclick="tukarTab('SESI', 'SESI')" id="tab_SESI" class="px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap">📅 SESI</button>
+		<button onclick="tukarTab('TAHUN_SEMASA', 'TAHUN SEMASA')" id="tab_TAHUN_SEMASA" class="px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap">⏳ TAHUN SEMASA</button>
         <button onclick="tukarTab('JABATAN', 'JABATAN')" id="tab_JABATAN" class="px-6 py-4 text-center transition duration-300 tab-aktif outline-none whitespace-nowrap">🏢 JABATAN</button>
         
         <button onclick="tukarTab('PERANAN', 'PERANAN')" id="tab_PERANAN" class="px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap">👤 PERANAN</button>
@@ -215,7 +217,7 @@
 
         let tabSemasa = 'JABATAN';
         let labelSemasa = 'JABATAN';
-		let dataGlobal = { JABATAN: [], PERANAN: [], BAHAGIAN: [], HARTA_INTELEK: [], PERINGKAT: [], PROGRAM: [], PENETAPAN_KPI: [] };
+		let dataGlobal = { SESI: [], TAHUN_SEMASA: [], JABATAN: [], PERANAN: [], BAHAGIAN: [], HARTA_INTELEK: [], PERINGKAT: [], PROGRAM: [], PENETAPAN_KPI: [] };
         let currentPageSistem = 1;
 		const rowsPerPageSistem = 10;
         // PEMBOLEHUBAH UNTUK PAGINATION (TARGET SEMASA)
@@ -263,7 +265,7 @@
         currentPageSistem = 1; // 🌟 TAMBAH BARIS INI: Supaya reset ke page 1
         // 1. Kawal Butang Tab (Aktif / Tidak Aktif)
         
-		['JABATAN', 'PERANAN', 'BAHAGIAN', 'HARTA_INTELEK', 'PERINGKAT', 'PROGRAM', 'PENETAPAN_KPI', 'CARTA'].forEach(t => {
+		['SESI', 'TAHUN_SEMASA', 'JABATAN', 'PERANAN', 'BAHAGIAN', 'HARTA_INTELEK', 'PERINGKAT', 'PROGRAM', 'PENETAPAN_KPI', 'CARTA'].forEach(t => {
 			let tabEl = document.getElementById('tab_' + t);
 			if (tabEl) {
 				tabEl.className = "px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap";
@@ -399,6 +401,8 @@
             .then(res => res.json())
             .then(result => {
                 if(result.status === "BERJAYA") {
+				    dataGlobal.SESI = result.SESI || [];
+                    dataGlobal.TAHUN_SEMASA = result.TAHUN_SEMASA || [];
                     dataGlobal.JABATAN = result.JABATAN || [];
                     dataGlobal.PERANAN = result.PERANAN || [];
                     dataGlobal.BAHAGIAN = result.BAHAGIAN || [];

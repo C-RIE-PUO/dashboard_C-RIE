@@ -54,6 +54,32 @@
                 </a>
             </div>
         </div>
+		
+		<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 items-end">
+            <div class="w-full md:w-1/4">
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tapis Sesi</label>
+                <select id="filterSesi" onchange="applyFilters()" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+                    <option value="SEMUA">Semua Sesi</option>
+                </select>
+            </div>
+            <div class="w-full md:w-1/4">
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tapis Tahun</label>
+                <select id="filterTahun" onchange="applyFilters()" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+                    <option value="SEMUA">Semua Tahun</option>
+                </select>
+            </div>
+            <div class="w-full md:w-1/4">
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tapis Jabatan</label>
+                <select id="filterJabatan" onchange="applyFilters()" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+                    <option value="SEMUA">Semua Jabatan</option>
+                </select>
+            </div>
+            <div class="w-full md:w-1/4 flex gap-2">
+                <button onclick="resetFilters()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2">
+                    🔄 Reset Filter
+                </button>
+            </div>
+        </div>
 
         <div id="statusMesejUtama" class="hidden mb-4 p-4 rounded-lg text-center text-sm font-bold shadow-sm border"></div>
 
@@ -61,17 +87,19 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm border-collapse">
                     <thead>
-                        <tr class="bg-indigo-50 text-indigo-900 border-b border-indigo-100">
-                            <th class="p-4 font-bold text-center w-12">BIL</th>
-                            <th class="p-4 font-bold">NO. IC / ID</th>
-                            <th class="p-4 font-bold">NAMA PENUH</th>
-                            <th class="p-4 font-bold text-center">JABATAN</th>
-                            <th class="p-4 font-bold text-center">PERANAN</th>
-                            <th class="p-4 font-bold text-center">BAHAGIAN</th>
-                            <th class="p-4 font-bold text-center">STATUS</th>
-                            <th class="p-4 font-bold text-center w-56">TINDAKAN</th>
-                        </tr>
-                    </thead>
+						<tr class="bg-indigo-50 text-indigo-900 border-b border-indigo-100">
+						<th class="p-4 font-bold text-center w-12">BIL</th>
+						<th class="p-4 font-bold">NO. IC / ID</th>
+						<th class="p-4 font-bold">NAMA PENUH</th>
+						<th class="p-4 font-bold text-center">JABATAN</th>
+						<th class="p-4 font-bold text-center">PERANAN</th>
+						<th class="p-4 font-bold text-center">BAHAGIAN</th>
+						<th class="p-4 font-bold text-center">SESI</th>
+						<th class="p-4 font-bold text-center">TAHUN</th>
+						<th class="p-4 font-bold text-center">STATUS</th>
+						<th class="p-4 font-bold text-center w-56">TINDAKAN</th>
+						</tr>
+					</thead>
                     <tbody id="isiJadualPengguna" class="divide-y divide-gray-100">
                         <tr><td colspan="8" class="p-8 text-center text-indigo-500 font-bold animate-pulse">⏳ Memuat turun senarai pengguna...</td></tr>
                     </tbody>
@@ -81,7 +109,7 @@
     </div>
 
     <div id="modalDaftar" class="fixed inset-0 bg-slate-900 bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden hover:overflow-y-auto max-h-screen">
             <div class="bg-indigo-600 p-4 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg">➕ Daftar Pengguna</h3>
                 <button onclick="tutupModal('modalDaftar')" class="text-white hover:text-indigo-200 text-2xl leading-none">&times;</button>
@@ -102,6 +130,18 @@
                     <label class="block text-xs font-bold text-gray-700 mb-1">Kata Laluan Default</label>
                     <input type="text" id="daftar_pass" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Cth: 123456">
                 </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Sesi</label>
+                        <input type="text" id="daftar_sesi" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase outline-none" placeholder="Cth: 1 / 2">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tahun</label>
+                        <input type="number" id="daftar_tahun" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Cth: 2024">
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan</label>
@@ -116,6 +156,14 @@
                         </select>
                     </div>
                 </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Bahagian / Unit</label>
+                    <select id="daftar_bahagian" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 bg-slate-50 uppercase outline-none">
+                        <option value="">-- TIADA BAHAGIAN --</option>
+                    </select>
+                </div>
+
                 <div class="pt-4 flex justify-end gap-2 border-t mt-4">
                     <button type="button" onclick="tutupModal('modalDaftar')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-bold text-sm hover:bg-gray-300">Batal</button>
                     <button type="submit" id="btnSubmitDaftar" class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold text-sm hover:bg-indigo-700 shadow">Daftar Pengguna</button>
@@ -125,18 +173,18 @@
     </div>
 
     <div id="modalEdit" class="fixed inset-0 bg-slate-900 bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden hover:overflow-y-auto max-h-screen">
             <div class="bg-amber-500 p-4 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg">✏️ Kemaskini Pengguna</h3>
                 <button onclick="tutupModal('modalEdit')" class="text-white hover:text-amber-200 text-2xl leading-none">&times;</button>
             </div>
             <form id="borangEdit" class="p-6 space-y-4">
-			    <input type="hidden" id="edit_ic_lama">
-				<div>
-					<label class="block text-xs font-bold text-gray-700 mb-1">No. Kad Pengenalan / ID</label>
-					<input type="text" id="edit_ic" required class="w-full px-3 py-2 border rounded-lg">
-				</div>
-				
+                <input type="hidden" id="edit_ic_lama">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">No. Kad Pengenalan / ID</label>
+                    <input type="text" id="edit_ic" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">Nama Penuh</label>
                     <input type="text" id="edit_nama" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 uppercase outline-none">
@@ -144,15 +192,25 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan</label>
-                        <select id="edit_jabatan" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 bg-slate-50 uppercase outline-none">
-                            </select>
+                        <select id="edit_jabatan" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 bg-slate-50 uppercase outline-none"></select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Peranan</label>
-                        <select id="edit_peranan" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 bg-slate-50 uppercase outline-none">
-                            </select>
+                        <select id="edit_peranan" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 bg-slate-50 uppercase outline-none"></select>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Sesi</label>
+                        <input type="text" id="edit_sesi" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 uppercase outline-none" placeholder="Cth: 1 / 2">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tahun</label>
+                        <input type="number" id="edit_tahun" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Cth: 2024">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">Bahagian / Unit</label>
                     <select id="edit_bahagian" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 bg-slate-50 uppercase outline-none">
@@ -186,8 +244,66 @@
             muatDropdownSistem();
             muatDataPengguna();
         };
+		
+		
+		// ====================================================================
+        // 🌟 FUNGSI BARU: PENGURUSAN SARINGAN (FILTER) SESI, TAHUN & JABATAN
+        // ====================================================================
 
-        // FUNGSI 1: TARIK DROPDOWN JABATAN, PERANAN & BAHAGIAN DARI SHEET "SISTEM"
+        function isiDropdownFilter(data) {
+            const setSesi = new Set();
+            const setTahun = new Set();
+            const setJabatan = new Set();
+
+            data.forEach(row => {
+                if(row.sesi && String(row.sesi).trim() !== "") setSesi.add(String(row.sesi).toUpperCase().trim());
+                if(row.tahun && String(row.tahun).trim() !== "") setTahun.add(String(row.tahun).trim());
+                if(row.jabatan && String(row.jabatan).trim() !== "") setJabatan.add(String(row.jabatan).toUpperCase().trim());
+            });
+
+            const masukanKeSelect = (id, set, labelLalai) => {
+                const select = document.getElementById(id);
+                if(select) {
+                    select.innerHTML = `<option value="SEMUA">${labelLalai}</option>`;
+                    [...set].sort().forEach(val => {
+                        select.innerHTML += `<option value="${val}">${val}</option>`;
+                    });
+                }
+            };
+
+            masukanKeSelect('filterSesi', setSesi, 'Semua Sesi');
+            masukanKeSelect('filterTahun', setTahun, 'Semua Tahun');
+            masukanKeSelect('filterJabatan', setJabatan, 'Semua Jabatan');
+        }
+
+        function applyFilters() {
+            const valSesi = document.getElementById('filterSesi').value;
+            const valTahun = document.getElementById('filterTahun').value;
+            const valJabatan = document.getElementById('filterJabatan').value;
+
+            // Tapis data menggunakan dataPenggunaGlobal
+            const dataDitapis = dataPenggunaGlobal.filter(row => {
+                const matchSesi = (valSesi === "SEMUA") || (String(row.sesi).toUpperCase().trim() === valSesi);
+                const matchTahun = (valTahun === "SEMUA") || (String(row.tahun).trim() === valTahun);
+                const matchJabatan = (valJabatan === "SEMUA") || (String(row.jabatan).toUpperCase().trim() === valJabatan);
+
+                return matchSesi && matchTahun && matchJabatan;
+            });
+
+            // Hantar data yang telah ditapis ke jadual (reset ke muka surat 1)
+            renderJadual(dataDitapis, 1);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterSesi').value = "SEMUA";
+            document.getElementById('filterTahun').value = "SEMUA";
+            document.getElementById('filterJabatan').value = "SEMUA";
+            
+            // Kembalikan jadual ke paparan asal menggunakan data penuh
+            renderJadual(dataPenggunaGlobal, 1);
+        }
+
+        // FUNGSI 1: TARIK DROPDOWN JABATAN, PERANAN & BAHAGIAN
         function muatDropdownSistem() {
             fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
             .then(res => res.json())
@@ -212,6 +328,8 @@
                     document.getElementById('daftar_peranan').innerHTML = htmlPer;
                     document.getElementById('edit_peranan').innerHTML = htmlPer;
 
+                    // 🌟 TAMBAHAN: Pastikan id 'daftar_bahagian' juga diisi senarai Bahagian
+                    document.getElementById('daftar_bahagian').innerHTML = htmlBah;
                     document.getElementById('edit_bahagian').innerHTML = htmlBah;
                 }
             });
@@ -220,106 +338,221 @@
         // FUNGSI 2: PAPAR SENARAI PENGGUNA
         function muatDataPengguna() {
             const tbody = document.getElementById('isiJadualPengguna');
-            tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-indigo-500 font-bold animate-pulse">⏳ Memuat turun data...</td></tr>`;
+            
+            // Kemaskini colspan="10" kerana jadual kini ada 10 lajur
+            tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-indigo-500 font-bold animate-pulse">⏳ Memuat turun data...</td></tr>`;
 
             fetch(`${SCRIPT_URL}?action=ambilSemuaPengguna`)
             .then(res => res.json())
             .then(result => {
                 if (result.status === "BERJAYA") {
+                    // 1. Simpan data ke dalam pembolehubah global
                     dataPenggunaGlobal = result.data || [];
-                    renderJadual(dataPenggunaGlobal);
+                    
+                    // 2. 🌟 TAMBAHAN: Bina pilihan filter dari data yang baru ditarik
+                    if (typeof isiDropdownFilter === 'function') {
+                        isiDropdownFilter(dataPenggunaGlobal);
+                    }
+                    
+                    // 3. Papar jadual untuk mula-mula (Muka surat 1)
+                    renderJadual(dataPenggunaGlobal, 1);
+                    
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`;
                 }
             }).catch(err => {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke server.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke server. Sila cuba lagi.</td></tr>`;
+                console.error("Ralat muatDataPengguna:", err); // Tambah log ke console untuk rujukan debug
             });
         }
 
-        function renderJadual(data) {
-            const tbody = document.getElementById('isiJadualPengguna');
-            tbody.innerHTML = "";
+ // PEMBOLEHUBAH UNTUK PAGINATION
+let currentPage = 1;
+const rowsPerPage = 10;
 
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500 font-medium">Tiada pengguna dijumpai.</td></tr>`;
-                return;
+function renderJadual(data, page = 1) {
+    const tbody = document.getElementById('isiJadualPengguna');
+    tbody.innerHTML = "";
+
+    // Kemaskini colspan kepada 10 kerana Sesi & Tahun ditambah
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-gray-500 font-medium">Tiada pengguna dijumpai.</td></tr>`;
+        if (typeof kemaskiniPagination === 'function') kemaskiniPagination(0);
+        return;
+    }
+
+    // LOGIK PAGINATION & ELAK MUTASI ARRAY ASAL
+    const rowsPerPage = typeof window.rowsPerPage !== 'undefined' ? window.rowsPerPage : 10;
+    const jumlahData = data.length;
+    const totalPages = Math.ceil(jumlahData / rowsPerPage);
+    
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    if (typeof window.currentPage !== 'undefined') window.currentPage = page;
+
+    const startIndex = (page - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    
+    // Susun dari terbaru (reverse) dan potong (slice) untuk muka surat semasa sahaja
+    const paparanData = [...data].reverse().slice(startIndex, endIndex);
+
+    // ==========================================
+    // DEFINISI HIERARKI KUASA (DI LUAR LOOP)
+    // ==========================================
+    const userRoleStr = typeof userPeranan !== 'undefined' ? userPeranan.toUpperCase().trim() : "";
+    
+    // 🌟 KEMASKINI: Tangkap apa-apa role yang ada perkataan "ADMIN" (contoh: ADMIN, SUPER ADMIN)
+    const isAdminLogin = userRoleStr.includes("ADMIN"); 
+    const isKupikLogin = userRoleStr === "KUPIK";
+    
+    const perananPengurusan = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+    const isPengurusanLogin = perananPengurusan.includes(userRoleStr);
+
+    paparanData.forEach((row, index) => {
+        const stat = String(row.status || "").toUpperCase().trim();
+        let badge = `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-[10px] font-bold border border-orange-200">⏳ ${stat}</span>`;
+        if(stat === "AKTIF" || stat === "SAH") badge = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-[10px] font-bold border border-green-200">✅ AKTIF</span>`;
+        if(stat === "DIGANTUNG") badge = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200">⛔ DIGANTUNG</span>`;
+
+        const perananSemasa = String(row.peranan || "").toUpperCase().trim();
+        const strBahagian = row.bahagian || "-";
+        
+        const safeBahagian = strBahagian.replace(/'/g, "\\'");
+        const safeNama = String(row.nama || "").replace(/'/g, "\\'");
+        const safeSesi = String(row.sesi || "").replace(/'/g, "\\'");
+        const safeTahun = String(row.tahun || "").replace(/'/g, "\\'");
+
+        const paparSesi = row.sesi ? row.sesi : "-";
+        const paparTahun = row.tahun ? row.tahun : "-";
+
+        const barisIC = String(row.ic).trim(); 
+        
+        let isSelf = (typeof userICSemasa !== 'undefined' && userICSemasa !== "" && barisIC === userICSemasa);
+        let isSasaranPengurusanAtauTinggi = perananPengurusan.includes(perananSemasa) || perananSemasa === "KUPIK" || perananSemasa.includes("ADMIN");
+
+        // ==========================================
+        // LOGIK BUTANG SAHKAN
+        // ==========================================
+        let btnSahkan = "";
+        if (stat === "MENUNGGU PENGESAHAN" || stat === "MENUNGGU") {
+            if (isPengurusanLogin && isSasaranPengurusanAtauTinggi) {
+                btnSahkan = `<button disabled class="bg-gray-300 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-400 cursor-not-allowed shadow-none" title="Anda tiada kuasa mengesahkan peranan ini">🔒 Sahkan</button>`;
+            } else {
+                btnSahkan = `<button onclick="sahkanPengguna('${barisIC}', '${safeNama}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded font-bold transition text-xs border border-emerald-700 shadow">✅ Sahkan</button>`;
             }
-
-            data.reverse().forEach((row, index) => {
-                const stat = String(row.status || "").toUpperCase().trim();
-                let badge = `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-[10px] font-bold border border-orange-200">⏳ ${stat}</span>`;
-                if(stat === "AKTIF" || stat === "SAH") badge = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-[10px] font-bold border border-green-200">✅ AKTIF</span>`;
-                if(stat === "DIGANTUNG") badge = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200">⛔ DIGANTUNG</span>`;
-
-                const perananSemasa = String(row.peranan || "").toUpperCase().trim();
-                const strBahagian = row.bahagian || "-";
-                const safeBahagian = strBahagian.replace(/'/g, "\\'");
-                const safeNama = String(row.nama || "").replace(/'/g, "\\'");
-                const barisIC = String(row.ic).trim(); 
-                
-                // 🌟 SEMAKAN: KAWALAN SUPER POWER ADMIN & FAILSAFE DIRI SENDIRI
-                let isSelf = (userICSemasa !== "" && barisIC === userICSemasa);
-                
-                let perananPengurusan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-                let isPengurusan = perananPengurusan.includes(perananSemasa);
-
-                // LOGIK BUTANG SAHKAN
-                let btnSahkan = "";
-                if (stat === "MENUNGGU PENGESAHAN" || stat === "MENUNGGU") {
-                    btnSahkan = `<button onclick="sahkanPengguna('${barisIC}', '${safeNama}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded font-bold transition text-xs border border-emerald-700 shadow">✅ Sahkan</button>`;
-                }
-
-                // LOGIK BUTANG DELETE
-                let btnDelete = "";
-                if (isSelf) {
-                    // Semua orang tidak boleh delete diri sendiri
-                    btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tidak boleh memadam akaun sendiri">🔒 Kunci Diri</button>`;
-                } else if (userPeranan === "ADMIN") {
-                    // ADMIN 'Super Power': Boleh delete sesiapa sahaja (sebab isSelf dah handle kat atas)
-                    btnDelete = `<button onclick="padamPengguna('${barisIC}', '${safeNama}', '${perananSemasa}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded font-bold transition text-xs border border-red-200">🗑️ Padam</button>`;
-                } else if (isPengurusan) {
-                    // BUKAN ADMIN, dan cuba nak delete akaun PENGURUSAN -> KUNCI
-                    btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tiada kuasa memadam akaun Pengurusan">🔒 Kunci</button>`;
-                } else {
-                    // BUKAN ADMIN, tapi nak delete akaun BIASA (cth: PENYELARAS JABATAN) -> BOLEH
-                    btnDelete = `<button onclick="padamPengguna('${barisIC}', '${safeNama}', '${perananSemasa}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded font-bold transition text-xs border border-red-200">🗑️ Padam</button>`;
-                }
-
-                // LOGIK BUTANG RESET
-                let btnReset = "";
-                if (stat === "AKTIF" || stat === "SAH") {
-                    btnReset = `<button onclick="resetPasswordJadual('${barisIC}')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold transition text-xs shadow border border-slate-900">🔑 Reset Pass</button>`;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="p-4 text-center font-bold text-gray-500 text-xs">${index + 1}</td>
-                    <td class="p-4 font-mono font-bold text-sm text-indigo-700">${row.ic}</td>
-                    <td class="p-4 font-bold text-gray-800 uppercase text-xs">${row.nama}</td>
-                    <td class="p-4 text-center font-bold text-gray-600 text-xs uppercase">${row.jabatan}</td>
-                    <td class="p-4 text-center text-xs font-semibold text-slate-600 uppercase">${row.peranan}</td>
-                    <td class="p-4 text-center text-xs font-semibold text-slate-500 uppercase">${strBahagian}</td>
-                    <td class="p-4 text-center">${badge}</td>
-                    <td class="p-4 text-center">
-                        <div class="flex justify-center gap-1 flex-wrap">
-                            ${btnSahkan}
-                            ${btnReset}
-                            <button onclick="bukaModalEdit('${barisIC}', '${safeNama}', '${row.jabatan}', '${row.peranan}', '${stat}', '${safeBahagian}')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded font-bold transition text-xs border border-amber-300">✏️ Edit</button>
-                            ${btnDelete}
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
         }
+
+        // ==========================================
+        // LOGIK BUTANG DELETE (🌟 KEMASKINI)
+        // ==========================================
+        let btnDelete = "";
+        
+        if (isSelf) {
+            // 1. DIRI SENDIRI: Kunci (Admin pun tak boleh padam diri sendiri)
+            btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tidak boleh memadam akaun sendiri">🔒 Kunci Diri</button>`;
+        } else if (isAdminLogin) {
+            // 2. ADMIN LOG MASUK: Bypass semua, boleh padam semua orang
+            btnDelete = `<button onclick="padamPengguna('${barisIC}', '${safeNama}', '${perananSemasa}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded font-bold transition text-xs border border-red-200">🗑️ Padam</button>`;
+        } else if (isKupikLogin && perananSemasa.includes("ADMIN")) {
+            // 3. KUPIK LOG MASUK: Kunci jika baris itu adalah ADMIN
+            btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tiada kuasa memadam akaun ADMIN">🔒 Kunci</button>`;
+        } else if (isPengurusanLogin && isSasaranPengurusanAtauTinggi) {
+            // 4. PENGURUSAN LOG MASUK: Kunci jika baris itu Pengurusan / Atasan
+            btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tiada kuasa memadam akaun Pengurusan/Atasan">🔒 Kunci</button>`;
+        } else {
+            // 5. BAKI: Boleh dipadam
+            btnDelete = `<button onclick="padamPengguna('${barisIC}', '${safeNama}', '${perananSemasa}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded font-bold transition text-xs border border-red-200">🗑️ Padam</button>`;
+        }
+
+        // ==========================================
+        // LOGIK BUTANG RESET
+        // ==========================================
+        let btnReset = "";
+        if (stat === "AKTIF" || stat === "SAH") {
+            btnReset = `<button onclick="resetPasswordJadual('${barisIC}')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold transition text-xs shadow border border-slate-900">🔑 Reset Pass</button>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+            <td class="p-4 text-center font-bold text-gray-500 text-xs">${startIndex + index + 1}</td>
+            <td class="p-4 font-mono font-bold text-sm text-indigo-700">${row.ic}</td>
+            <td class="p-4 font-bold text-gray-800 uppercase text-xs">${row.nama}</td>
+            <td class="p-4 text-center font-bold text-gray-600 text-xs uppercase">${row.jabatan}</td>
+            <td class="p-4 text-center text-xs font-semibold text-slate-600 uppercase">${row.peranan}</td>
+            <td class="p-4 text-center text-xs font-semibold text-slate-500 uppercase">${strBahagian}</td>
+            <td class="p-4 text-center text-xs font-bold text-slate-700 uppercase">${paparSesi}</td>
+            <td class="p-4 text-center text-xs font-bold text-slate-700 uppercase">${paparTahun}</td>
+            <td class="p-4 text-center">${badge}</td>
+            <td class="p-4 text-center">
+                <div class="flex justify-center gap-1 flex-wrap">
+                    ${btnSahkan}
+                    ${btnReset}
+                    <button onclick="bukaModalEdit('${barisIC}', '${safeNama}', '${row.jabatan}', '${row.peranan}', '${stat}', '${safeBahagian}', '${safeSesi}', '${safeTahun}')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded font-bold transition text-xs border border-amber-300">✏️ Edit</button>
+                    ${btnDelete}
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    if (typeof kemaskiniPagination === 'function') {
+        kemaskiniPagination(jumlahData);
+    }
+}
+
+// FUNGSI KAWALAN PAPARAN BUTANG NEXT / PREV
+function kemaskiniPagination(totalData) {
+    let pagDiv = document.getElementById('paginationControls');
+    
+    // Jana container pagination secara automatik jika belum ada
+    if (!pagDiv) {
+        const tableContainer = document.querySelector('.overflow-x-auto').parentElement;
+        pagDiv = document.createElement('div');
+        pagDiv.id = 'paginationControls';
+        pagDiv.className = 'p-4 flex items-center justify-between border-t bg-white';
+        tableContainer.appendChild(pagDiv);
+    }
+
+    const totalPages = Math.ceil(totalData / rowsPerPage);
+    
+    // Sembunyikan butang jika rekod 10 atau kurang
+    if (totalData <= rowsPerPage) {
+        pagDiv.innerHTML = ''; 
+        return;
+    }
+
+    // Butang disabled styles vs active styles
+    const btnDisabled = 'px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed text-xs font-bold border';
+    const btnActive = 'px-4 py-2 bg-white border border-gray-300 hover:bg-indigo-50 hover:text-indigo-700 text-gray-700 rounded-lg shadow-sm text-xs font-bold transition';
+
+    pagDiv.innerHTML = `
+        <div class="text-xs text-gray-500 font-semibold">
+            Paparan <span class="font-bold text-indigo-900">${(currentPage - 1) * rowsPerPage + 1}</span> hingga <span class="font-bold text-indigo-900">${Math.min(currentPage * rowsPerPage, totalData)}</span> daripada <span class="font-bold text-indigo-900">${totalData}</span> rekod
+        </div>
+        <div class="flex gap-2">
+            <button onclick="tukarPage(${currentPage - 1})" class="${currentPage === 1 ? btnDisabled : btnActive}" ${currentPage === 1 ? 'disabled' : ''}>
+                &laquo; Previous
+            </button>
+            <button onclick="tukarPage(${currentPage + 1})" class="${currentPage === totalPages ? btnDisabled : btnActive}" ${currentPage === totalPages ? 'disabled' : ''}>
+                Next &raquo;
+            </button>
+        </div>
+    `;
+}
+
+// FUNGSI TUKAR MUKA SURAT BILA BUTANG DITEKAN
+function tukarPage(newPage) {
+    // dataPenggunaGlobal digunakan semula dari tetapan sedia ada anda
+    renderJadual(dataPenggunaGlobal, newPage);
+}
 
         // MUAT TURUN CSV
         function muatTurunCSV() {
             if (dataPenggunaGlobal.length === 0) return alert("Tiada data untuk dimuat turun.");
             
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "BIL,NAMA,NO_IC,JABATAN,PERANAN,BAHAGIAN,STATUS\n";
+            csvContent += "BIL,NAMA,NO_IC,JABATAN,PERANAN,BAHAGIAN,SESI,TAHUN,STATUS\n";
             
             dataPenggunaGlobal.forEach((row, index) => {
                 let nama = `"${row.nama || ""}"`;
@@ -327,8 +560,10 @@
                 let jab = `"${row.jabatan || ""}"`;
                 let per = `"${row.peranan || ""}"`;
                 let bah = `"${row.bahagian || ""}"`;
+                let sesi = `"${row.sesi || ""}"`;
+                let tahun = `"${row.tahun || ""}"`;
                 let stat = `"${row.status || ""}"`;
-                csvContent += `${index+1},${nama},${ic},${jab},${per},${bah},${stat}\n`;
+                csvContent += `${index+1},${nama},${ic},${jab},${per},${bah},${sesi},${tahun},${stat}\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
@@ -348,6 +583,21 @@
 
         document.getElementById('borangDaftar').addEventListener('submit', function(e) {
             e.preventDefault();
+			
+			const perananDipilih = document.getElementById('daftar_peranan').value;
+			// 🌟 KAWALAN KESELAMATAN: Halang Pengurusan daftar rakan sejawatan atau Kuasa Tinggi
+			const perananPengurusan = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+			const senaraiKuasaTinggi = ["ADMIN", "KUPIK"];
+    
+			const isPengurusanLogin = perananPengurusan.includes(userPeranan); // userPeranan ialah peranan login semasa
+			const isCubaDaftarPengurusanAtauTinggi = perananPengurusan.includes(perananDipilih) || senaraiKuasaTinggi.includes(perananDipilih);
+
+			if (isPengurusanLogin && isCubaDaftarPengurusanAtauTinggi) {
+			alert(`❌ Ralat: Anda (sebagai ${userPeranan}) tiada kebenaran untuk mendaftar pengguna dengan peranan ${perananDipilih}.`);
+			return; // Hentikan proses pendaftaran serta-merta
+			}
+			
+			
             const btn = document.getElementById('btnSubmitDaftar');
             btn.disabled = true; btn.innerHTML = '⏳ Mendaftar...';
 
@@ -361,7 +611,10 @@
                     KATA_LALUAN: document.getElementById('daftar_pass').value,
                     JABATAN: document.getElementById('daftar_jabatan').value, 
                     PERANAN: document.getElementById('daftar_peranan').value,
-                    STATUS: "AKTIF", // Pengurusan daftar, terus aktif
+                    BAHAGIAN: document.getElementById('daftar_bahagian') ? document.getElementById('daftar_bahagian').value : "", // 🌟 TAMBAHAN
+                    SESI: document.getElementById('daftar_sesi').value, 
+                    TAHUN: document.getElementById('daftar_tahun').value, 
+                    STATUS: "AKTIF", 
                     LOGIN_ROLE: userPeranan 
                 })
             }).then(res => res.json()).then(data => {
@@ -377,11 +630,37 @@
         });
 
         // FUNGSI 4: KEMASKINI PENGGUNA
-        function bukaModalEdit(ic, nama, jabatan, peranan, status, bahagian) {
-		    // 🌟 TAMBAHAN: Simpan IC lama secara tersembunyi
+        function bukaModalEdit(ic, nama, jabatan, peranan, status, bahagian, sesi, tahun) {
+		
+		
+		// Tambahkan snippet ini ke dalam fungsi bukaModalEdit() anda
+		const selectPerananEdit = document.getElementById('edit_peranan');
+		const roleLoginSemasa = typeof userPeranan !== 'undefined' ? userPeranan.toUpperCase().trim() : "";
+
+		if (selectPerananEdit) {
+		// Cari elemen pilihan (option) yang bernilai "ADMIN"
+		const optionAdmin = Array.from(selectPerananEdit.options).find(opt => opt.value.toUpperCase() === "ADMIN");
+    
+			if (optionAdmin) {
+				if (roleLoginSemasa === "ADMIN") {
+				// Jika ADMIN yang login, pastikan pilihan ADMIN sentiasa wujud dan boleh dipilih
+				optionAdmin.disabled = false;
+				optionAdmin.style.display = "block";
+			} 	else {
+            // Jika KUPIK atau PENYELARAS yang login, matikan dan sorok pilihan ADMIN
+            optionAdmin.disabled = true;
+            optionAdmin.style.display = "none";
+			}
+		}
+	}
+		
+		
             document.getElementById('edit_ic_lama').value = ic;
             document.getElementById('edit_ic').value = ic;
             document.getElementById('edit_nama').value = nama;
+            
+            document.getElementById('edit_sesi').value = sesi || "";
+            document.getElementById('edit_tahun').value = tahun || "";
             
             let elJab = document.getElementById('edit_jabatan');
             if(Array.from(elJab.options).map(o=>o.value).includes(jabatan)) elJab.value = jabatan;
@@ -408,14 +687,15 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ 
                     action: "kemaskiniPenggunaAdmin", 
-                    // 🌟 PASTIKAN NAMANYA IALAH "NO_IC" BUKAN "NO_IC_LAMA"
                     NO_IC: document.getElementById('edit_ic_lama').value,
                     NO_IC_BARU: document.getElementById('edit_ic').value,
                     NAMA: document.getElementById('edit_nama').value,
                     JABATAN: document.getElementById('edit_jabatan').value,
                     PERANAN: document.getElementById('edit_peranan').value,
                     BAHAGIAN: document.getElementById('edit_bahagian').value,
-                    STATUS: document.getElementById('edit_status').value
+                    STATUS: document.getElementById('edit_status').value,
+                    SESI: document.getElementById('edit_sesi').value,
+                    TAHUN: document.getElementById('edit_tahun').value
                 })
             }).then(res => res.json()).then(data => {
                 btn.disabled = false; btn.innerHTML = 'Simpan Kemaskini';
@@ -428,38 +708,58 @@
         });
 
         // FUNGSI 5: PADAM PENGGUNA
-        function padamPengguna(ic, nama, perananBaris) {
-            // Failsafe 1: Tidak boleh padam diri sendiri
-            if (userICSemasa !== "" && String(ic).trim() === userICSemasa) {
-                alert("❌ Ralat: Anda tidak dibenarkan memadam akaun anda sendiri!");
-                return;
-            }
-            
-            // Failsafe 2: Halang jika bukan Admin cuba padam Pengurusan
-            let perananPengurusan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-            let isPengurusanBaris = perananBaris && perananPengurusan.includes(perananBaris.toUpperCase().trim());
-            
-            if (userPeranan !== "ADMIN" && isPengurusanBaris) {
-                alert("❌ Ralat: Anda tiada kuasa untuk memadam akaun Pengurusan!");
-                return;
-            }
-
-            if(!confirm(`⚠️ Adakah anda pasti mahu memadam pengguna ini secara kekal?\n\nNama: ${nama}\nIC: ${ic}`)) return;
-            
-            paparStatusUI("⏳ Sedang memadam rekod...", 'bg-blue-100 text-blue-800 border-blue-200');
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "padamPenggunaAdmin", NO_IC: ic }) 
-            }).then(res => res.json()).then(data => {
-                if(data.status === "BERJAYA") {
-                    paparStatusUI("✅ Pengguna berjaya dipadam.", 'bg-green-100 text-green-800 border-green-200');
-                    muatDataPengguna();
-                } else paparStatusUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
-            });
+function padamPengguna(ic, nama, perananBaris) {
+    // 1. Halang padam diri sendiri
+    if (userICSemasa !== "" && String(ic).trim() === userICSemasa) {
+        alert("❌ Ralat: Anda tidak dibenarkan memadam akaun anda sendiri!");
+        return;
+    }
+    
+    // Pembersihan data teks peranan
+    const roleLogin = typeof userPeranan !== 'undefined' ? userPeranan.toUpperCase().trim() : "";
+    const roleTarget = perananBaris ? perananBaris.toUpperCase().trim() : "";
+    const perananPengurusan = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+    
+    // ==========================================
+    // 2. KAWALAN HIERARKI MEMADAM PENGGUNA
+    // ==========================================
+    if (roleLogin === "KUPIK") {
+        // KES A: KUPIK tidak boleh padam ADMIN
+        if (roleTarget === "ADMIN") {
+            alert("❌ Ralat: Anda (KUPIK) tiada kuasa untuk memadam akaun ADMIN!");
+            return;
         }
+    } else if (perananPengurusan.includes(roleLogin)) {
+        // KES B: PENYELARAS tidak boleh padam ADMIN, KUPIK, atau sesama PENYELARAS
+        if (roleTarget === "ADMIN" || roleTarget === "KUPIK" || perananPengurusan.includes(roleTarget)) {
+            alert("❌ Ralat: Anda tiada kuasa untuk memadam akaun Pengurusan / Atasan!");
+            return;
+        }
+    }
+    // Jika ADMIN login, dia akan terlepas (bypass) semua sekatan di atas dan boleh memadam sesiapa sahaja.
 
-        // FUNGSI 6: RESET PASSWORD TERUS DARI JADUAL
+    // 3. Pengesahan sebelum memadam
+    if(!confirm(`⚠️ Adakah anda pasti mahu memadam pengguna ini secara kekal?\n\nNama: ${nama}\nIC: ${ic}`)) return;
+    
+    paparStatusUI("⏳ Sedang memadam rekod...", 'bg-blue-100 text-blue-800 border-blue-200');
+    
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: "padamPenggunaAdmin", NO_IC: ic }) 
+    }).then(res => res.json()).then(data => {
+        if(data.status === "BERJAYA") {
+            paparStatusUI("✅ Pengguna berjaya dipadam.", 'bg-green-100 text-green-800 border-green-200');
+            if (typeof muatDataPengguna === 'function') muatDataPengguna();
+        } else {
+            paparStatusUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
+        }
+    }).catch(err => {
+        paparStatusUI("⚠️ Ralat sistem ketika cuba memadam.", 'bg-red-100 text-red-800 border-red-200');
+    });
+}
+
+        // FUNGSI 6: RESET PASSWORD
         function resetPasswordJadual(ic) {
             if(!confirm(`Adakah anda pasti mahu me-reset kata laluan pengguna ini kembali kepada No IC (${ic})?`)) return;
 
@@ -480,27 +780,36 @@
             });
         }
 
-        // FUNGSI 7: SAHKAN PENGGUNA
-        function sahkanPengguna(ic, nama) {
-            if(!confirm(`Adakah anda pasti mahu MENGESAHKAN dan MENGAKTIFKAN akaun pengguna ini?\n\nNama: ${nama}`)) return;
-            
-            paparStatusUI("⏳ Sedang memproses pengesahan...", 'bg-blue-100 text-blue-800 border-blue-200');
-            
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "sahkanPengguna", NO_IC: ic }) 
-            }).then(res => res.json()).then(data => {
-                if(data.status === "BERJAYA") {
-                    paparStatusUI("✅ Akaun pengguna berjaya disahkan dan diaktifkan.", 'bg-green-100 text-green-800 border-green-200');
-                    muatDataPengguna(); // Refresh jadual terus
-                } else {
-                    paparStatusUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
-                }
-            }).catch(err => {
-                paparStatusUI("⚠️ Gagal menghubungi server.", 'bg-red-100 text-red-800 border-red-200');
-            });
+        // FUNGSI 7: SAHKAN PENGGUNA (TAMBAH BAIK)
+	function sahkanPengguna(ic, nama) {
+    if(!confirm(`Adakah anda pasti mahu MENGESAHKAN dan MENGAKTIFKAN akaun pengguna ini?\n\nNama: ${nama}`)) return;
+    
+    // 1. Ambil peranan yang disimpan semasa login
+    const roleSemasa = sessionStorage.getItem("peranan") || ""; 
+    
+    paparStatusUI("⏳ Sedang memproses pengesahan...", 'bg-blue-100 text-blue-800 border-blue-200');
+    
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        // 2. Sertakan LOGIN_ROLE supaya server tahu anda adalah KUPIK/INOVASI dll.
+        body: JSON.stringify({ 
+            action: "sahkanPengguna", 
+            NO_IC: ic,
+            LOGIN_ROLE: roleSemasa.toUpperCase() 
+        }) 
+    }).then(res => res.json()).then(data => {
+        if(data.status === "BERJAYA") {
+            paparStatusUI(`✅ ${data.mesej}`, 'bg-green-100 text-green-800 border-green-200');
+            muatDataPengguna();
+        } else {
+            // Mesej ralat dari server (Contoh: "Anda tiada kuasa")
+            paparStatusUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
         }
+    }).catch(err => {
+        paparStatusUI("⚠️ Gagal menghubungi server.", 'bg-red-100 text-red-800 border-red-200');
+    });
+}
 
         // FUNGSI UTILITI
         function tutupModal(id) { document.getElementById(id).classList.add('hidden'); }
@@ -513,6 +822,22 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => sm.classList.add('hidden'), 5000);
         }
+		
+function setelahDataDiterimaDariServer(dataServer) {
+    // 1. Semakan Keselamatan: Pastikan data yang diterima adalah tatasusunan (array). 
+    // Jika server memulangkan null/undefined, kita setkan ia sebagai [] untuk elak sistem 'crash'.
+    dataPenggunaGlobal = Array.isArray(dataServer) ? dataServer : []; 
+    
+    // 2. Auto-isi dropdown saringan berdasarkan rekod yang wujud
+    // Kita semak dahulu jika fungsi ini wujud sebelum memanggilnya
+    if (typeof isiDropdownFilter === 'function') {
+        isiDropdownFilter(dataPenggunaGlobal); 
+    }
+    
+    // 3. Papar jadual pertama kali dan tetapkan ke Muka Surat 1
+    renderJadual(dataPenggunaGlobal, 1); 
+}
+		
     </script>
 </body>
 </html>

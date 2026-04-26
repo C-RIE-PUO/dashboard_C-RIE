@@ -6,20 +6,19 @@
     <title>Panel Pengurusan Data</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <script>
+	<script>
         // KAWALAN AKSES KETAT KHAS UNTUK PENGURUSAN
         const userLulus = sessionStorage.getItem("userLulus") || "";
-        const userPeranan = sessionStorage.getItem("peranan") || "";
+        const userPeranan = sessionStorage.getItem("peranan") ? sessionStorage.getItem("peranan").toUpperCase() : "";
+
+        // Senaraikan semua peranan yang dibenarkan masuk ke panel ini
+        const perananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
 
         if (userLulus !== "YA") {
             alert("Sila log masuk terlebih dahulu.");
             window.location.href = "login.html"; 
-        } else if (
-            userPeranan.toUpperCase() !== "PENYELARAS INOVASI" && 
-            userPeranan.toUpperCase() !== "PENYELARAS PENYELIDIKAN" && 
-            userPeranan.toUpperCase() !== "ADMIN"
-        ) {
-            alert("🛑 Akses Ditolak! Panel ini hanya untuk Penyelaras Inovasi atau Penyelaras Penyelidikan sahaja.");
+        } else if (!perananDibenarkan.includes(userPeranan)) {
+            alert("🛑 Akses Ditolak! Panel ini hanya untuk Admin, KUPIK, dan Penyelaras Inovasi/Penyelidikan sahaja.");
             window.location.href = "utama.html"; 
         }
     </script>

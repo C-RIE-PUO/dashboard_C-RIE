@@ -81,18 +81,24 @@
 
 <header class="w-full bg-blue-950 text-white py-4 px-4 md:px-6 shadow-lg z-50 relative border-b border-blue-800 flex items-center justify-center">
     
-    <button onclick="toggleMenu()" class="absolute left-4 md:hidden text-white focus:outline-none">
+    <button onclick="toggleMenu()" class="absolute left-4 md:hidden text-white focus:outline-none hover:text-blue-300 transition">
         <i class="fa-solid fa-bars text-2xl"></i>
     </button>
 
-    <div class="text-center px-10 md:px-0">
+    <div class="text-center px-14 md:px-0"> 
         <h1 class="text-lg md:text-xl font-black uppercase tracking-tighter leading-tight">
             Dashboard KPI Penyelidikan & Inovasi
         </h1>
         <p class="text-[9px] md:text-xs font-bold text-blue-300 opacity-80 uppercase mt-1">
-            PETUNJUK PRESTASI PUSAT KECEMERLANGAN PENYELIDIKAN DAN INOVASI, POLITEKNIK UNGKU OMAR
+            PETUNJUK PRESTASI PUSAT KECEMERLANGAN PENYELIDIKAN DAN INOVASI, POLITEKNIK UNGKU OMAR <span id="paparanTahunHeader"></span>
         </p>
     </div>
+
+    <button id="btnTetapanSesi" onclick="bukaTetapanSesi()" style="display: none;" class="absolute right-4 md:right-6 items-center gap-2 bg-blue-800 hover:bg-blue-700 text-white text-xs md:text-sm font-semibold py-1.5 px-3 rounded-lg border border-blue-600 shadow-md transition-all focus:outline-none">
+        <i class="fa-solid fa-calendar-days text-sm"></i>
+        <span class="hidden md:inline">Sesi Semasa</span>
+    </button>
+
 </header>
 
     <div class="flex flex-1 overflow-hidden">
@@ -126,7 +132,7 @@
             <div id="infoPengguna" class="hidden w-full bg-blue-800 rounded-xl p-4 border border-blue-700 shadow-inner text-center md:text-left relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 text-5xl opacity-10">👤</div>
                 <p class="text-blue-200 text-xs font-bold uppercase tracking-wider mb-1">Selamat Datang,</p>
-                <p id="paparNama" class="font-bold text-yellow-300 text-sm md:text-base leading-tight truncate"></p>
+                <p id="paparNama" class="font-bold text-yellow-300 text-xs md:text-sm leading-tight truncate"></p>
                 <div class="mt-2 pt-2 border-t border-blue-700">
                     <p class="text-[10px] text-blue-100 uppercase">Peranan: <span id="paparPeranan" class="font-bold text-white"></span></p>
                     <p class="text-[10px] text-blue-100 mt-0.5 uppercase">Jabatan: <span id="paparJabatan" class="font-bold text-white"></span></p>
@@ -1322,6 +1328,30 @@ function renderChartsGeran(stats) {
     </script>
 	
 	<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Ambil peranan pengguna dari sessionStorage (pastikan huruf besar untuk keseragaman)
+        const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
+        
+        // 2. Senarai peranan yang dibenarkan melihat butang ini
+        const perananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+        
+        // 3. Cari butang berdasarkan ID
+        const btnSesi = document.getElementById("btnTetapanSesi");
+        
+        // 4. Semak jika peranan pengguna ada di dalam senarai yang dibenarkan
+        if (perananDibenarkan.includes(userPeranan) && btnSesi) {
+            // Tunjukkan butang dan jadikan ia 'flex' supaya ikon dan teks tersusun kemas
+            btnSesi.style.display = "flex";
+        }
+    });
+</script>
+	
+	
+	
+	
+	
+	
+	<script>
     window.onload = () => {
         // 1. Logik asal untuk pengesahan sesi/login
         const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
@@ -1401,6 +1431,264 @@ function renderChartsGeran(stats) {
         sessionStorage.clear(); 
         window.location.reload(); 
     }
+	
+
 </script>
+
+<div id="modalSesi" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+        <div class="bg-blue-950 p-4 text-white flex justify-between items-center">
+            <h3 class="font-bold flex items-center gap-2">
+                <i class="fa-solid fa-gears"></i> Konfigurasi Sesi & Tahun
+            </h3>
+            <button onclick="tutupModalSesi()" class="hover:text-red-400 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <p class="text-xs text-gray-500 italic">* Tetapan ini akan menentukan sesi aktif bagi sistem log masuk dan pelaporan.</p>
+            
+			<div>
+                <label for="inputSesi" class="block text-sm font-bold text-gray-700 mb-1">Sesi Semasa</label>
+                <select id="inputSesi" class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                    <option value="" disabled selected>-- Pilih Sesi --</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="inputTahun" class="block text-sm font-bold text-gray-700 mb-1">Tahun Semasa</label>
+                <input type="number" id="inputTahun" 
+                       class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" 
+                       placeholder="Contoh: 2024" 
+                       min="2000" max="2100"
+                       autocomplete="off" required>
+            </div>
+
+            <div id="pesananSesi" class="hidden text-center p-2 rounded text-xs font-bold"></div>
+        </div>
+
+        <div class="bg-gray-50 p-4 flex justify-end gap-2">
+            <button onclick="tutupModalSesi()" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-lg transition">
+                Batal
+            </button>
+            <button id="btnSimpanSesi" onclick="simpanSesiAktif()" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition">
+                Simpan Tetapan
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+function bukaTetapanSesi() {
+    const modal = document.getElementById('modalSesi');
+    modal.classList.remove('hidden');
+    
+    // Reset mesej amaran
+    const pesanan = document.getElementById('pesananSesi');
+    if (pesanan) pesanan.classList.add('hidden');
+    
+    // Tarik data terbaru dari Google Sheet
+    muatSesiDanTahun(); 
+}
+
+// Fungsi untuk menutup modal
+function tutupModalSesi() {
+    document.getElementById('modalSesi').classList.add('hidden');
+    
+    // Pilihan: Anda juga boleh clearkan input di sini jika pengguna klik "Batal"
+    document.getElementById('inputSesi').value = "";
+    document.getElementById('inputTahun').value = "";
+}
+
+// Fungsi untuk mengisi data dari Google Sheet ke dalam ruang input
+function muatSesiDanTahun() {
+    const inputSesi = document.getElementById('inputSesi');
+    const inputTahun = document.getElementById('inputTahun');
+
+    // Tunjukkan status sedang memuatkan (optional)
+    inputSesi.disabled = true;
+    inputTahun.disabled = true;
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: "ambilSesiGlobal" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "BERJAYA") {
+            // Masukkan data dari Google Sheet ke dalam input/select
+            inputSesi.value = data.sesi;
+            inputTahun.value = data.tahun;
+            
+            // Kemaskini localStorage supaya selari dengan cloud
+            localStorage.setItem("sesiAktif", data.sesi);
+            localStorage.setItem("tahunAktif", data.tahun);
+            
+            // Panggil semula fungsi kemaskini tajuk di header jika perlu
+            if (typeof kemaskiniTajukTahun === "function") kemaskiniTajukTahun();
+        }
+        
+        inputSesi.disabled = false;
+        inputTahun.disabled = false;
+    })
+    .catch(err => {
+        console.error("Gagal mengambil data sesi:", err);
+        // Jika gagal cloud, gunakan data localStorage sebagai backup
+        const sAktif = localStorage.getItem("sesiAktif");
+        const tAktif = localStorage.getItem("tahunAktif");
+        if (sAktif) inputSesi.value = sAktif;
+        if (tAktif) inputTahun.value = tAktif;
+        
+        inputSesi.disabled = false;
+        inputTahun.disabled = false;
+    });
+}
+
+function simpanSesiAktif() {
+    const sesi = document.getElementById('inputSesi').value.trim();
+    const tahun = document.getElementById('inputTahun').value.trim();
+    const btn = document.getElementById('btnSimpanSesi');
+    const pesanan = document.getElementById('pesananSesi');
+
+    // Validasi input
+    if (!sesi || !tahun) {
+        alert("Sila masukkan Sesi dan Tahun!");
+        return;
+    }
+
+    // Tukar rupa butang semasa proses menyimpan
+    btn.disabled = true;
+    btn.innerText = "Menyimpan ke Cloud...";
+
+    // 1. Simpan di Local Storage (untuk kegunaan pantas browser)
+    localStorage.setItem("sesiAktif", sesi);
+    localStorage.setItem("tahunAktif", tahun);
+
+    // 2. Hantar ke Google Apps Script
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: "simpanSesiGlobal", sesi: sesi, tahun: tahun })
+    })
+    .then(res => res.json()) // Baca respons dari Google Script
+    .then(data => {
+        if (data.status === "BERJAYA") {
+            // Paparkan mesej berjaya
+            pesanan.innerText = "✅ Tetapan Tahun Semasa dan Sesi telah dikemaskini!";
+            pesanan.className = "text-center p-2 rounded text-xs font-bold bg-green-100 text-green-700 mt-3";
+            pesanan.classList.remove('hidden');
+
+            // Proses tutup modal & reload selepas 1.5 saat
+            setTimeout(() => {
+                tutupModalSesi();
+                pesanan.classList.add('hidden');
+                btn.disabled = false;
+                btn.innerText = "Simpan Tetapan";
+                
+                // Segarkan semula halaman agar sistem menggunakan sesi yang baru
+                window.location.reload(); 
+            }, 1500);
+            
+        } else {
+            // Ralat dari Google Apps Script (contoh: Tab SISTEM tidak wujud)
+            alert("Gagal: " + data.mesej);
+            btn.disabled = false;
+            btn.innerText = "Simpan Tetapan";
+        }
+    })
+    .catch(err => {
+        // Ralat rangkaian (contoh: tiada internet / SCRIPT_URL salah)
+        console.error("Ralat Fetch:", err);
+        alert("Ralat sistem. Gagal berhubung dengan pangkalan data.");
+        
+        // Pastikan butang kembali aktif jika berlaku ralat
+        btn.disabled = false;
+        btn.innerText = "Simpan Tetapan";
+    });
+}
+
+// Fungsi utama untuk kemaskini tajuk tahun pada header dari localStorage
+function kemaskiniTajukTahun() {
+    const tahunAktif = localStorage.getItem("tahunAktif");
+    const paparanTahun = document.getElementById('paparanTahunHeader');
+    
+    // Jika elemen tidak wujud di halaman ini, berhentikan fungsi untuk elak ralat (error)
+    if (!paparanTahun) return;
+    
+    // Kemaskini paparan jika ada tahun, jika tidak letak status memuat turun
+    if (tahunAktif) {
+        paparanTahun.innerText = `BAGI TAHUN ${tahunAktif}`;
+    } else {
+        paparanTahun.innerText = "⏳ Menyemak Tahun..."; 
+    }
+}
+
+// Fungsi BARU: Menyedut tahun terkini dari Google Sheet (ambilSesiGlobal)
+function semakTahunDariServer() {
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: "ambilSesiGlobal" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'BERJAYA') {
+            // Ambil tahun dari response (menyokong huruf kecil atau besar)
+            const tahunServer = data.tahun || data.TAHUN;
+            
+            // Jika tahun dari server wujud dan BERBEZA dengan localStorage, kemaskini!
+            if (tahunServer && tahunServer !== localStorage.getItem("tahunAktif")) {
+                
+                // Kemaskini data dalam sistem pelayar (browser)
+                localStorage.setItem("tahunAktif", tahunServer);
+                
+                // (Pilihan) Anda juga boleh simpan sesiAktif jika perlu
+                const sesiServer = data.sesi || data.SESI;
+                if (sesiServer) localStorage.setItem("sesiAktif", sesiServer);
+                
+                // Arahkan sistem kemaskini paparan serta-merta tanpa perlu refresh!
+                window.dispatchEvent(new Event("kemaskiniTahunSertaMerta"));
+            }
+        }
+    })
+    .catch(error => {
+        console.error("Gagal menyemak tahun dari pangkalan data:", error);
+        // Jika ralat (contoh: tiada internet), ia kekal guna data localStorage sedia ada
+    });
+}
+
+// 1. Jalankan fungsi secara automatik apabila halaman mula dimuatkan
+document.addEventListener("DOMContentLoaded", function() {
+    // Paparkan data sedia ada dari localStorage SEGERA (untuk kelajuan UI)
+    kemaskiniTajukTahun(); 
+    
+    // Tarik data terkini dari pangkalan data secara senyap (Background check)
+    semakTahunDariServer();
+});
+
+// 2. Auto-update jika tahun ditukar di Tab/Tetingkap browser yang lain (Cross-tab)
+window.addEventListener("storage", function(e) {
+    if (e.key === "tahunAktif") {
+        kemaskiniTajukTahun();
+    }
+});
+
+// 3. Auto-update jika tahun ditukar di dalam tab/halaman yang sama (Custom Event)
+window.addEventListener("kemaskiniTahunSertaMerta", kemaskiniTajukTahun);
+
+
+
+
+
+
+
+
+
+
+</script>
+
 </body>
 </html>
