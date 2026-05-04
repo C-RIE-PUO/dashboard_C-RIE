@@ -15,9 +15,9 @@
         }
     </script>
 </head>
-<body class="bg-gray-100 p-6 font-sans">
+<body class="bg-gray-100 p-4 md:p-6 font-sans">
 
-    <div class="max-w-7xl mx-auto">
+    <div class="w-[98%] max-w-[1800px] mx-auto">
         
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
             <div>
@@ -57,9 +57,9 @@
                     📥 CSV
                 </button>
 
-             	 <a href="sijil-inovasi.html" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-1">
-    		🏅 Sijil
-		</a>
+                 <a href="sijil-inovasi.html" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-1">
+            🏅 Sijil
+        </a>
 
                 <a href="tambah-inovasi.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md">➕ Tambah</a>
                 <button onclick="logKeluar()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md">Log Keluar</button>
@@ -87,11 +87,11 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-80">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px]">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Projek mengikut Jabatan</h2>
                     <canvas id="jabatanChart"></canvas>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-80">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px]">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Pecahan Pingat</h2>
                     <canvas id="pingatChart"></canvas>
                 </div>
@@ -100,14 +100,14 @@
 
         <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
             <div class="p-6 border-b flex justify-between items-center bg-gray-50">
-                <h2 class="text-xl font-bold text-gray-800">📋 Senarai Rekod Inovasi <span id="tajukJadual" class="text-blue-600"></span></h2>
+                <h2 class="text-2xl font-bold text-gray-800">📋 Senarai Rekod Inovasi <span id="tajukJadual" class="text-blue-600"></span></h2>
                 <button onclick="ambilData()" class="text-blue-600 hover:underline text-sm font-semibold">🔄 Refresh Data</button>
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[1050px]">
+                <table class="w-full text-left border-collapse min-w-[1500px]">
                     <thead>
-                        <tr class="bg-blue-600 text-white text-xs uppercase">
+                        <tr class="bg-blue-600 text-white text-sm uppercase">
                             <th class="p-4 border-b">BIL</th>
                             <th class="p-4 border-b">INNOVATOR</th>
                             <th class="p-4 border-b">AHLI KUMPULAN</th>
@@ -121,13 +121,13 @@
                             <th id="headerTindakan" class="p-4 border-b text-center hidden">TINDAKAN</th> 
                         </tr>
                     </thead>
-                    <tbody id="isiJadual" class="text-gray-700 text-sm bg-white">
+                    <tbody id="isiJadual" class="text-gray-700 text-base bg-white">
                         <tr><td colspan="11" class="p-10 text-center font-semibold text-gray-500 animate-pulse">⏳ Sedang memuatkan data dari Spreadsheet...</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <div id="paginationControls" class="p-4 border-t bg-gray-50 flex justify-between items-center text-sm text-gray-700"></div>
+            <div id="paginationControls" class="p-5 border-t bg-gray-50 flex justify-between items-center text-sm text-gray-700"></div>
 
         </div>
     </div>
