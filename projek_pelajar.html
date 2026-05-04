@@ -96,8 +96,6 @@
                 </div>
             </div>
 			
-			
-			
         </div>
     </main>
 
@@ -113,11 +111,15 @@
                 <div id="seksyenUploadCSV" class="mb-6 p-4 bg-emerald-50 rounded-xl border border-emerald-200 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h4 class="font-bold text-emerald-800 text-sm">📥 Daftar Pukal (Muat Naik CSV)</h4>
-                        <p class="text-xs text-emerald-600 mt-1">Sila pastikan header CSV anda sepadan dengan nama lajur seperti: JABATAN, NAMA_PROJEK, NAMA_KETUA, MATRIK_KETUA dll.</p>
+                        <p class="text-xs text-emerald-600 mt-1">Sila pastikan header CSV anda sepadan. Klik "Download Template" untuk memuat turun format CSV yang betul.</p>
                     </div>
-                    <div class="flex-shrink-0">
+                    <div class="flex-shrink-0 flex flex-col md:flex-row gap-2">
+                        <button type="button" onclick="downloadTemplateCSV()" class="bg-teal-100 hover:bg-teal-200 text-teal-800 border border-teal-300 px-4 py-2.5 rounded-lg font-bold shadow-sm text-sm transition flex items-center justify-center gap-2">
+                            📄 Download Template
+                        </button>
+
                         <input type="file" id="csvFileInputProjek" accept=".csv" class="hidden" onchange="importCSVProjek(event)">
-                        <button type="button" onclick="document.getElementById('csvFileInputProjek').click()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold shadow text-sm transition flex items-center gap-2">
+                        <button type="button" onclick="document.getElementById('csvFileInputProjek').click()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold shadow text-sm transition flex items-center justify-center gap-2">
                             📤 Upload Fail CSV
                         </button>
                     </div>
@@ -146,7 +148,7 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori Projek <span class="text-red-500">*</span></label>
                             <select id="in_kategori" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 uppercase transition bg-white" required>
-                                <option value="" disabled selected>-- SILA PILIH KATEGORI --</option>
+                                <option value="" disabled selected>-- SILA PILIH --</option>
                                 <option value="TEKNIKAL">TEKNIKAL</option>
                                 <option value="SAINS SOSIAL">SAINS SOSIAL</option>
                             </select>
@@ -160,6 +162,12 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Tahun</label>
                             <input type="number" id="in_tahun" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Pencapaian Jabatan</label>
+                            <select id="in_pencapaian" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase bg-gray-50">
+                                <option value="">-- PILIH PENCAPAIAN --</option>
+                            </select>
                         </div>
                     </div>
 
@@ -222,10 +230,10 @@
                         </div>
                     </div>
 
-                    <h4 class="font-bold text-indigo-800 border-b-2 border-indigo-100 pb-2 mb-4 uppercase text-sm">📎 Dokumen Lampiran (Maksimum 5 Fail)</h4>
+                    <h4 class="font-bold text-indigo-800 border-b-2 border-indigo-100 pb-2 mb-4 uppercase text-sm">📎 Dokumen Lampiran (Maksimum 5 Fail - Tidak Wajib)</h4>
                     <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl">
                         <input type="file" id="in_dokumen" multiple accept=".pdf,application/pdf" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white" onchange="prosesPilihanDokumen(event)">
-						<p class="text-xs text-red-500 mt-2 font-semibold">Format dibenarkan: PDF sahaja (Maksimum 5 dokumen).</p>
+						<p class="text-xs text-red-500 mt-2 font-semibold">Format dibenarkan: PDF sahaja. Sila muat naik sekiranya ada dokumen sokongan projek.</p>
                         <ul id="senaraiDokumenUI" class="mt-3 space-y-1"></ul>
                     </div>
 
@@ -261,7 +269,7 @@
             muatDataProjek();
         };
 
-      function muatDropdownJabatan() {
+        function muatDropdownJabatan() {
             fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
             .then(res => res.json()).then(data => {
                 if(data.status === "BERJAYA") {
@@ -284,7 +292,7 @@
                         document.getElementById('filterJabatan').disabled = true;
                     }
 
-                    // 2. 🌟 TAMBAHAN: Logik untuk Autocomplete Program
+                    // 2. Logik untuk Autocomplete Program
                     if (data.PROGRAM) {
                         let htmlProgram = '';
                         data.PROGRAM.forEach(p => {
@@ -292,7 +300,17 @@
                         });
                         document.getElementById('senaraiProgramDatalist').innerHTML = htmlProgram;
                     }
-					if (typeof renderJadual() === "function") {
+
+                    // 3. Logik untuk Dropdown Pencapaian Peringkat Jabatan
+                    if (data.PENCAPAIAN_JABATAN) {
+                        let htmlPencapaian = '<option value="">-- PILIH PENCAPAIAN --</option>';
+                        data.PENCAPAIAN_JABATAN.forEach(p => {
+                            htmlPencapaian += `<option value="${p}">${p}</option>`;
+                        });
+                        document.getElementById('in_pencapaian').innerHTML = htmlPencapaian;
+                    }
+
+					if (typeof renderJadual === "function") {
                         renderJadual(); 
                     }
                 }
@@ -321,13 +339,11 @@
             tahunUnik.forEach(t => selTahun.innerHTML += `<option value="${t}">${t}</option>`);
         }
 
-		// 🌟 FUNGSI BARU: Set muka surat ke 1 apabila filter diubah
         function tapisData() {
             currentPage = 1; 
             renderJadual();
         }
 		
-   // 🌟 KEMASKINI: Fungsi renderJadual dengan logik Pagination (10 baris)
         function renderJadual() {
             const tbody = document.getElementById('isiJadual');
             const valTahun = document.getElementById('filterTahun').value;
@@ -393,8 +409,6 @@
             kemaskiniPagination(startIndex + 1, endIndex, totalRecords, totalPages);
         }
 
-
-		// 🌟 FUNGSI BARU: Kemaskini UI Pagination
         function kemaskiniPagination(start, end, total, totalPages) {
             const info = document.getElementById('infoHalaman');
             const btnPrev = document.getElementById('btnPrev');
@@ -413,10 +427,32 @@
             }
         }
 
-        // 🌟 FUNGSI BARU: Tukar muka surat
         function tukarHalaman(arah) {
             currentPage += arah;
             renderJadual();
+        }
+
+// ================= FUNGSI DOWNLOAD TEMPLATE CSV =================
+        function downloadTemplateCSV() {
+            // Tajuk (Headers) bertepatan dengan apa yang sistem baca pada backend GS
+            const headers = "JABATAN,KATEGORI,TAJUK PROJEK,NAMA PROGRAM,EMAIL KETUA,NAMA KETUA,MATRIK KETUA,IC KETUA,NAMA 2,MATRIK 2,IC 2,NAMA 3,MATRIK 3,IC 3,NAMA 4,MATRIK 4,IC 4,PENYELIA,IC PENYELIA,HP PENYELIA,EMAIL PENYELIA,TAHUN,PENCAPAIAN JABATAN,DOKUMEN LAMPIRAN\n";
+            
+            // Dummy Data (Satu baris sahaja supaya pengguna faham struktur fail)
+            // KEMASKINI: Susunan dibetulkan mengikut header (Email -> Nama -> Matrik -> IC)
+            const contohData = 'JTMK,TEKNIKAL,SISTEM E-KOKURIKULUM PELAJAR,DIPLOMA TEKNOLOGI MAKLUMAT (TEKNOLOGI DIGITAL),ali@gmail.com,ALI BIN ABU,01DDT21F1001,010101010101,SITI BINTI AWANG,01DDT21F1002,020202020202,ABU BIN BAKAR,01DDT21F1003,030303030303,MINAH BINTI KASSIM,01DDT21F1004,040404040404,EN. AHMAD TARMIZI,780101015555,0123456789,ahmad@politeknik.edu.my,2024,JOHAN,"https://drive.google.com/file/d/ContohSatu..., https://drive.google.com/file/d/ContohDua..."\n';
+
+            // Menambahkan UTF-8 BOM supaya Excel boleh baca huruf besar kecil / special character dengan betul
+            const csvContent = "\uFEFF" + headers + contohData; 
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", "Template_Upload_Pukal_Projek_Pelajar.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
 
@@ -429,12 +465,12 @@
 
             paparToast("⏳ Menyediakan fail untuk dimuat turun...", "blue");
 
-            let csvContent = "PROJEK ID,JABATAN,KATEGORI,NAMA PROJEK,NAMA PROGRAM,EMAIL KETUA,NAMA KETUA,MATRIK KETUA,IC KETUA,NAMA AHLI 2,IC AHLI 2,MATRIK AHLI 2,NAMA AHLI 3,IC AHLI 3,MATRIK AHLI 3,NAMA AHLI 4,IC AHLI 4,MATRIK AHLI 4,PENYELIA,IC PENYELIA,HP PENYELIA,EMAIL PENYELIA,TAHUN\n";
+            let csvContent = "PROJEK ID,JABATAN,KATEGORI,NAMA PROJEK,NAMA PROGRAM,EMAIL KETUA,NAMA KETUA,MATRIK KETUA,IC KETUA,NAMA AHLI 2,IC AHLI 2,MATRIK AHLI 2,NAMA AHLI 3,IC AHLI 3,MATRIK AHLI 3,NAMA AHLI 4,IC AHLI 4,MATRIK AHLI 4,PENYELIA,IC PENYELIA,HP PENYELIA,EMAIL PENYELIA,TAHUN,PENCAPAIAN JABATAN\n";
             
             dataDitapisGlobal.forEach(r => {
                 let clean = (str) => `"${(str || "").replace(/"/g, '""')}"`;
                 
-                csvContent += `${clean(r.id)},${clean(r.jabatan)},${clean(r.kategori)},${clean(r.tajuk)},${clean(r.program)},${clean(r.emailKetua)},${clean(r.namaKetua)},${clean(r.matrikKetua)},${clean(r.icKetua)},${clean(r.nama2)},${clean(r.ic2)},${clean(r.matrik2)},${clean(r.nama3)},${clean(r.ic3)},${clean(r.matrik3)},${clean(r.nama4)},${clean(r.ic4)},${clean(r.matrik4)},${clean(r.penyelia)},${clean(r.icPenyelia)},${clean(r.hpPenyelia)},${clean(r.emailPenyelia)},${clean(r.tahun)}\n`;
+                csvContent += `${clean(r.id)},${clean(r.jabatan)},${clean(r.kategori)},${clean(r.tajuk)},${clean(r.program)},${clean(r.emailKetua)},${clean(r.namaKetua)},${clean(r.matrikKetua)},${clean(r.icKetua)},${clean(r.nama2)},${clean(r.ic2)},${clean(r.matrik2)},${clean(r.nama3)},${clean(r.ic3)},${clean(r.matrik3)},${clean(r.nama4)},${clean(r.ic4)},${clean(r.matrik4)},${clean(r.penyelia)},${clean(r.icPenyelia)},${clean(r.hpPenyelia)},${clean(r.emailPenyelia)},${clean(r.tahun)},${clean(r.pencapaianJabatan)}\n`;
             });
 
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -453,57 +489,47 @@
         // ================= FUNGSI PROSES FAIL DOKUMEN (PDF SAHAJA & HAD 5MB) =================
         function prosesPilihanDokumen(event) {
             const files = event.target.files;
-            if (files.length === 0) return; // Abaikan jika pengguna tekan 'Cancel'
+            if (files.length === 0) return; 
 
             let fileBaruArray = Array.from(files);
 
-            // 🌟 Tetapan Had Saiz: 5MB
             const HAD_SAIZ_MB = 5;
             const HAD_SAIZ_BYTES = HAD_SAIZ_MB * 1024 * 1024;
 
-            // Variabel penanda ralat
             let ralatFormat = false;
             let ralatSaiz = false;
-            let senaraiFailBesar = []; // Simpan nama fail yang lebih 5MB
+            let senaraiFailBesar = []; 
 
             fileBaruArray.forEach(file => {
-                // Semak Format
                 if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
                     ralatFormat = true;
                 }
-                // Semak Saiz
                 if (file.size > HAD_SAIZ_BYTES) {
                     ralatSaiz = true;
-                    senaraiFailBesar.push(file.name); // Rekod nama fail yang besar
+                    senaraiFailBesar.push(file.name); 
                 }
             });
 
-            // Tembak Alert jika format salah
             if (ralatFormat) {
                 alert("❌ Ralat: Anda hanya dibenarkan memuat naik fail berformat PDF sahaja!");
-                event.target.value = ''; // Reset input
+                event.target.value = ''; 
                 return;
             }
 
-            // Tembak Alert jika saiz lebih besar dari yang ditetapkan
             if (ralatSaiz) {
                 alert(`❌ Ralat Saiz: Fail berikut melebihi had maksimum ${HAD_SAIZ_MB}MB:\n\n📄 ` + senaraiFailBesar.join("\n📄 ") + `\n\nSila mampatkan (compress) fail anda terlebih dahulu.`);
-                event.target.value = ''; // Reset input
+                event.target.value = ''; 
                 return;
             }
 
-            // Semak jika jumlah keseluruhan fail melebihi 5
             if (senaraiDokumenBase64.length + fileBaruArray.length > 5) {
                 alert("⚠️ Anda hanya dibenarkan memuat naik maksimum 5 dokumen secara keseluruhan.");
                 event.target.value = ''; 
                 return;
             }
 
-            // Proses setiap fail baru ke format Base64 dan simpan jika semuanya LULUS
             let filesProcessed = 0;
             fileBaruArray.forEach(file => {
-                
-                // Halang fail 'duplicate' dimasukkan berkali-kali
                 if (senaraiDokumenBase64.some(f => f.nama === file.name)) {
                     filesProcessed++;
                     if (filesProcessed === fileBaruArray.length) {
@@ -524,16 +550,14 @@
                     
                     filesProcessed++;
                     
-                    // Apabila semua berjaya, kemaskini UI
                     if (filesProcessed === fileBaruArray.length) {
                         renderSenaraiDokumenUI();
-                        event.target.value = ''; // Buka ruang untuk pilih fail lain
+                        event.target.value = ''; 
                     }
                 };
             });
         }
 
-        // ================= FUNGSI PAPARKAN SENARAI DOKUMEN & BUTANG BATAL =================
         function renderSenaraiDokumenUI() {
             const uiSenarai = document.getElementById('senaraiDokumenUI');
             uiSenarai.innerHTML = '';
@@ -542,7 +566,6 @@
                 const li = document.createElement('li');
                 li.className = "text-sm font-semibold text-red-700 bg-red-50 border border-red-200 px-3 py-1.5 rounded inline-flex items-center gap-2 mr-2 mt-2";
                 
-                // Masukkan nama fail dan butang (X)
                 li.innerHTML = `
                     <span class="truncate max-w-[200px]" title="${fail.nama}">📄 ${fail.nama}</span>
                     <button type="button" onclick="buangDokumen(${index})" class="text-red-500 hover:text-white bg-red-100 hover:bg-red-500 rounded-full w-5 h-5 flex items-center justify-center font-bold transition focus:outline-none ml-1" title="Padam Dokumen">
@@ -553,10 +576,9 @@
             });
         }
 
-        // ================= FUNGSI BUANG DOKUMEN DARI SENARAI TERKUMPUL =================
         function buangDokumen(index) {
-            senaraiDokumenBase64.splice(index, 1); // Padam fail pada posisi 'index' dalam array
-            renderSenaraiDokumenUI(); // Paparkan semula UI senarai fail yang telah dikemaskini
+            senaraiDokumenBase64.splice(index, 1); 
+            renderSenaraiDokumenUI(); 
         }
 
         // ================= KAWALAN BORANG & UPLOAD CSV =================
@@ -565,7 +587,6 @@
             document.getElementById('edit_id').value = ""; 
             document.getElementById('tajukModal').innerHTML = "➕ Pendaftaran Projek Pelajar";
             
-            // Reset fail UI
             document.getElementById('in_dokumen').value = '';
             document.getElementById('senaraiDokumenUI').innerHTML = '';
             senaraiDokumenBase64 = [];
@@ -576,7 +597,6 @@
                 dropJabatan.disabled = true; 
             }
             
-            // LOGIK SEKSYEN PUKAL: Sembunyikan jika role adalah STAF
             if (userPeranan === "STAF") {
                 document.getElementById('seksyenUploadCSV').classList.add('hidden');
                 document.getElementById('pemisahBorang').classList.add('hidden');
@@ -595,11 +615,9 @@
             document.getElementById('edit_id').value = r.id;
             document.getElementById('tajukModal').innerHTML = "✏️ Kemaskini Rekod Projek (" + r.id + ")";
             
-            // Sentiasa sembunyikan upload pukal dalam mod Edit
             document.getElementById('seksyenUploadCSV').classList.add('hidden');
             document.getElementById('pemisahBorang').classList.add('hidden');
             
-            // Reset fail UI
             document.getElementById('in_dokumen').value = '';
             document.getElementById('senaraiDokumenUI').innerHTML = '';
             senaraiDokumenBase64 = [];
@@ -617,6 +635,8 @@
             document.getElementById('in_program').value = r.program;
             document.getElementById('in_kategori').value = r.kategori;
             document.getElementById('in_tahun').value = r.tahun;
+            
+            document.getElementById('in_pencapaian').value = r.pencapaianJabatan || "";
             
             document.getElementById('in_namaKetua').value = r.namaKetua;
             document.getElementById('in_matrikKetua').value = r.matrikKetua;
@@ -654,6 +674,7 @@
                 KATEGORI: document.getElementById('in_kategori').value,
                 TAJUK: document.getElementById('in_tajuk').value,
                 PROGRAM: document.getElementById('in_program').value,
+                PENCAPAIAN_JABATAN: document.getElementById('in_pencapaian').value, 
                 EMAIL_KETUA: document.getElementById('in_emailKetua').value,
                 NAMA_KETUA: document.getElementById('in_namaKetua').value,
                 MATRIK_KETUA: document.getElementById('in_matrikKetua').value,
@@ -666,7 +687,6 @@
                 HP_PENYELIA: document.getElementById('in_hpPenyelia').value,
                 EMAIL_PENYELIA: document.getElementById('in_emailPenyelia').value,
                 TAHUN: document.getElementById('in_tahun').value,
-                // Data fail tambahan
                 DOKUMEN_LAMPIRAN: senaraiDokumenBase64
             };
 
@@ -677,7 +697,6 @@
             }).finally(() => { btn.disabled = false; btn.innerText = "Simpan Rekod"; });
         }
 
-        // FUNGSI IMPORT CSV PUKAL
         function importCSVProjek(event) {
             const file = event.target.files[0];
             if (!file) return;
