@@ -17,7 +17,7 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans p-4 md:p-8 min-h-screen flex justify-center items-start">
 
-    <div class="max-w-5xl w-full bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 print-border">
+    <div class="max-w-5xl w-full bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 print-border relative">
         
         <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 no-print flex flex-col md:flex-row justify-between items-center gap-4">
             <a href="dashboard-kpi.html" target="_parent" class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
@@ -26,6 +26,10 @@
 
             <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
                 
+                <div id="paparanTahunSemasa" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-100 text-blue-800 border border-blue-300 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm">
+                    📅 Tahun Semasa: <span id="teksTahun">...</span>
+                </div>
+
                 <a href="dokumen-inovasi.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-md border-2 border-teal-800 text-sm">
                     📁 Dokumen KPI
                 </a>
@@ -38,7 +42,9 @@
             </div>
         </div>
         
-        <div class="text-center pt-8 pb-6 px-8 border-b-4 border-yellow-500">
+        <div id="mesejUI" class="hidden p-4 text-center text-sm font-bold w-full relative z-10 no-print transition-all"></div>
+
+        <div class="text-center pt-8 pb-6 px-8 border-b-4 border-yellow-500 relative">
             <div class="flex justify-center mb-4">
                 <img src="Logo/JPPKK-logo.png" alt="Logo JPPKK" class="h-20 md:h-28 w-auto object-contain">
             </div>
@@ -204,12 +210,8 @@
 
             <div class="flex flex-col lg:flex-row justify-between gap-4 no-print border-t border-gray-200 pt-6 mt-6">
                 
-                <div class="flex flex-wrap gap-2 justify-center lg:justify-start">
+                <div class="flex flex-wrap gap-2 justify-center lg:justify-start" id="ruangButangDokumen">
                     
-                <button type="button" onclick="muatTurunTemplateAsal(this)" title="Muat Turun Template Kosong" class="px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow transition flex items-center gap-2 text-sm">
-            📄 Template Asal
-                </button>
-
                     <button type="button" onclick="window.print()" title="Cetak atau Simpan sebagai PDF" class="px-4 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded shadow transition flex items-center gap-2 text-sm">
                         🖨️ Cetak PDF
                     </button>
@@ -231,28 +233,153 @@
     </div>
 
     <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
+        let tahunSemasaSistem = "";
+
         window.addEventListener('DOMContentLoaded', function() {
             const userPeranan = sessionStorage.getItem("peranan") || "";
             const layakBulk = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "ADMIN", "KUPIK"];
             
-            // Semak jika peranan pengguna termasuk dalam senarai yang layak
             const adakahLayak = layakBulk.some(p => userPeranan.toUpperCase().includes(p));
-            
             if (adakahLayak) {
-                // Munculkan butang Muat Naik Pukal
                 document.getElementById('bahagianPukal').classList.remove('hidden');
+            }
+
+            // Mula Semak Tahun & Fail Google Drive pada awalnya
+            ambilTahunDanDokumen();
+        });
+
+        // 🌟 KEMASKINI BARU: Semak automatik jika pengguna kembali guna butang "Back" browser
+        window.addEventListener('pageshow', function(event) {
+            // event.persisted bermaksud halaman di-load dari memory cache (contoh: bila back dari halaman lain)
+            if (event.persisted) {
+                ambilTahunDanDokumen();
             }
         });
 
-        // Fungsi Buka Halaman Tambah KPI dengan isyarat Pukal
+        // 🌟 KEMASKINI BARU: Semak automatik bila pengguna tukar tab dan kembali semula ke tab ini
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                ambilTahunDanDokumen();
+            }
+        });
+
+        function paparNotis(teks, warna) {
+            const msgBox = document.getElementById('mesejUI');
+            const colorClass = (warna === 'hijau') ? 'bg-green-100 text-green-800 border-green-200' : 
+                               (warna === 'merah') ? 'bg-red-100 text-red-800 border-red-200' : 
+                               'bg-blue-100 text-blue-800 border-blue-200';
+            
+            msgBox.className = `mb-6 p-4 rounded-xl text-center text-sm font-bold shadow-sm border ${colorClass}`;
+            msgBox.innerHTML = teks;
+            msgBox.classList.remove('hidden');
+            
+            setTimeout(() => msgBox.classList.add('hidden'), 4000);
+        }
+
+        // 🌟 1. AMBIL TAHUN DARI SISTEM & SEMAK GOOGLE DRIVE
+        function ambilTahunDanDokumen() {
+            fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "BERJAYA" && data.TAHUN_SEMASA && data.TAHUN_SEMASA.length > 0) {
+                    tahunSemasaSistem = data.TAHUN_SEMASA[0];
+                    
+                    // Papar Tahun Pada Lencana (Badge)
+                    const lencana = document.getElementById("paparanTahunSemasa");
+                    if (lencana) {
+                        document.getElementById("teksTahun").innerText = tahunSemasaSistem;
+                        lencana.classList.remove("hidden");
+                    }
+                    
+                    // Teruskan semak fail Kamus KPI & Template di Drive
+                    semakStatusDariDrive();
+                }
+            })
+            .catch(err => console.log("Ralat mendapatkan tetapan tahun:", err));
+        }
+
+        // 🌟 2. SEMAK DRIVE (KAMUS KPI & TEMPLATE SENARAI SEMAK)
+        function semakStatusDariDrive() {
+            const payloadJSON = {
+                action: "semakDokumen",
+                folderIdDokumen: "1zYRQF7Ftd-9LYz_NWso93N0h66lXeZSA", // Folder Dokumen Biasa / Template
+                folderIdKamus: "1NYqDHUyaz1HTnbJh4_6kh1Axgu60WaoC" // Folder Kamus
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payloadJSON)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const failDariDrive = result.data; 
+                    let urlKamus = null;
+                    let urlTemplateSemak = null;
+
+                    // A) Cari Fail KAMUS KPI
+                    const namaKamus = Object.keys(failDariDrive).find(nama => nama.toUpperCase().includes("KAMUS KPI"));
+                    if (namaKamus) urlKamus = failDariDrive[namaKamus].url;
+
+                    // B) Cari Fail TEMPLATE SENARAI SEMAK
+                    const namaTemplate = Object.keys(failDariDrive).find(nama => 
+                        nama.toUpperCase().includes("TEMPLATE") && 
+                        nama.toUpperCase().includes("SENARAI SEMAK")
+                    );
+                    if (namaTemplate) urlTemplateSemak = failDariDrive[namaTemplate].url;
+
+                    // C) Jana Butang Jika Wujud
+                    renderButangDinamik(urlKamus, urlTemplateSemak);
+                }
+            })
+            .catch(error => {
+                console.log("Gagal menyemak status Drive untuk butang template.");
+            });
+        }
+
+        // 🌟 3. BINA BUTANG DINAMIK MUAT TURUN TERUS (DIRECT DOWNLOAD)
+        function renderButangDinamik(urlKamus, urlTemplateSemak) {
+            const bekasButang = document.getElementById("ruangButangDokumen");
+            
+            // Buang butang dinamik lama (jika ada) untuk elak duplicate masa refresh
+            const butangLama = document.querySelectorAll('.butang-dinamik-drive');
+            butangLama.forEach(btn => btn.remove());
+
+            let htmlButangBaru = "";
+
+            if (urlKamus) {
+                htmlButangBaru += `<button type="button" onclick="muatTurunDirectUrl('${urlKamus}')" class="butang-dinamik-drive px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded shadow transition flex items-center gap-2 text-sm">📘 Kamus KPI ${tahunSemasaSistem}</button>`;
+            }
+
+            if (urlTemplateSemak) {
+                htmlButangBaru += `<button type="button" onclick="muatTurunDirectUrl('${urlTemplateSemak}')" class="butang-dinamik-drive px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded shadow transition flex items-center gap-2 text-sm">📄 Template Senarai Semak</button>`;
+            }
+
+            // Masukkan butang baru di hadapan butang sedia ada
+            bekasButang.innerHTML = htmlButangBaru + bekasButang.innerHTML;
+        }
+
+        function muatTurunDirectUrl(url) {
+            const fileIdMatch = url.match(/[-\w]{25,}/);
+            if (fileIdMatch && fileIdMatch[0]) {
+                const directUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[0]}`;
+                const link = document.createElement("a");
+                link.href = directUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                window.open(url, '_blank'); // Fallback jika regex gagal
+            }
+        }
+
         function bukaUploadPukal() {
-            // Set penanda supaya halaman tambah-kpi.html tahu pengguna mahu pukal
             sessionStorage.setItem("bukaModPukal", "YA");
             window.location.href = "tambah-kpi.html";
         }
-    </script>
 
-    <script>
         function hantarBorang(e) {
             e.preventDefault(); 
             
@@ -266,16 +393,13 @@
             window.location.href = "tambah-kpi.html";
         }
 
-        // Fungsi bantuan untuk menukar jawapan kepada ikon ✓ atau ✗
         function dapatkanIkon(nilai) {
             if (nilai === 'ADA') return '<span style="color:green; font-weight:bold; font-size:12pt;">✓</span>';
             if (nilai === 'TIADA') return '<span style="color:red; font-weight:bold; font-size:12pt;">✗</span>';
-            return ''; // Kosong jika belum pilih
+            return ''; 
         }
 
-        // FUNGSI BAHARU: MUAT TURUN SENARAI SEMAK SEBAGAI FILE WORD (.doc)
         function muatTurunSemakan() {
-            // Ambil data semakan
             const s1a = document.getElementById('semak1a').value;
             const s1b = document.getElementById('semak1b').value;
             const s1ci = document.getElementById('semak1ci').value;
@@ -285,24 +409,18 @@
             const s2aii = document.getElementById('semak2aii').value;
             const s2b = document.getElementById('semak2b').value;
 
-            // FUNGSI KHAS: Tukar logo kepada Base64 & Kekalkan Nisbah (Aspect Ratio) Original!
             let imgElement = document.querySelector("img[alt='Logo JPPKK']");
             let imgDataURI = "";
-            
-            // Tetapkan lebar sasaran di dalam MS Word (contoh: 180 pixel)
             let sasaranLebar = 180; 
-            let sasaranTinggi = 100; // Tinggi *fallback* jika gagal
+            let sasaranTinggi = 100; 
 
             if (imgElement) {
                 try {
                     let lebarAsal = imgElement.naturalWidth || imgElement.width;
                     let tinggiAsal = imgElement.naturalHeight || imgElement.height;
-                    
-                    // KIRA NISBAH TEPAT UNTUK ELAK STRETCH
                     let nisbah = tinggiAsal / lebarAsal;
                     sasaranTinggi = Math.round(sasaranLebar * nisbah);
 
-                    // Lukis atas canvas untuk hasilkan Base64
                     let canvas = document.createElement("canvas");
                     canvas.width = lebarAsal;
                     canvas.height = tinggiAsal;
@@ -310,29 +428,25 @@
                     ctx.drawImage(imgElement, 0, 0, lebarAsal, tinggiAsal);
                     imgDataURI = canvas.toDataURL("image/png");
                 } catch (e) {
-                    // Jika dihalang keselamatan folder (CORS), guna link asal sahaja
                     imgDataURI = imgElement.src; 
                 }
             }
 
-            // Bina struktur HTML/Jadual yang akan dibaca oleh MS Word
             let htmlDoc = `
                 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
                 <meta charset='utf-8'>
                 <title>Senarai Semak KPI 18</title>
                 <style>
-                    /* SETUP UNTUK MS WORD - A4 & MARGIN KECIL SUPAYA MUAT 1 MUKA SURAT */
                     @page WordSection1 {
-                        size: 8.27in 11.69in; /* Saiz Kertas A4 */
-                        margin: 0.5in 0.5in 0.5in 0.5in; /* Margin Kiri, Kanan, Atas, Bawah */
+                        size: 8.27in 11.69in;
+                        margin: 0.5in 0.5in 0.5in 0.5in; 
                         mso-header-margin: 0.5in;
                         mso-footer-margin: 0.5in;
                         mso-paper-source: 0;
                     }
                     div.WordSection1 { page: WordSection1; }
                     
-                    /* GAYA TULISAN DAN JADUAL */
                     body { font-family: 'Arial', sans-serif; font-size: 10.5pt; color: black; }
                     .center { text-align: center; }
                     .bold { font-weight: bold; }
@@ -436,12 +550,7 @@
                 </html>
             `;
 
-            // Tukar HTML string kepada Blob berformat aplikasi Word
-            const blob = new Blob(['\ufeff', htmlDoc], {
-                type: 'application/msword'
-            });
-            
-            // Proses muat turun
+            const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
             const linkDownload = document.createElement('a');
             linkDownload.href = url;
@@ -450,43 +559,9 @@
             document.body.appendChild(linkDownload);
             linkDownload.click();
             
-            // Bersihkan memori selepas siap download
             document.body.removeChild(linkDownload);
             URL.revokeObjectURL(url);
         }
     </script>
-    
-    <script>
-    // FUNGSI MUAT TURUN KALIS BERBILANG AKAUN
-    function muatTurunTemplateAsal(btnElement) {
-        const teksAsal = btnElement.innerHTML;
-        btnElement.innerHTML = "⏳ Mencari Fail...";
-        btnElement.disabled = true;
-
-        // URL Bersih tanpa /u/2/
-        const scriptURL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec?action=downloadTemplate";
-
-        fetch(scriptURL)
-            .then(response => response.json())
-            .then(data => {
-                btnElement.innerHTML = teksAsal;
-                btnElement.disabled = false;
-
-                if (data.status === "BERJAYA") {
-                    // Paksa pelayar web terus muat turun fail Google Drive
-                    window.location.href = data.url; 
-                } else {
-                    alert("Ralat: " + data.mesej);
-                }
-            })
-            .catch(error => {
-                btnElement.innerHTML = teksAsal;
-                btnElement.disabled = false;
-                alert("Gagal berhubung dengan pelayan. Sila cuba sebentar lagi.");
-                console.error("Error Fetch:", error);
-            });
-    }
-</script>
-    
 </body>
 </html>
