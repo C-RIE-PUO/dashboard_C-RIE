@@ -66,18 +66,22 @@
                 <h2 class="text-xl font-bold text-teal-800">Maklumat Penyelidik</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Nama Ketua Projek <span class="text-red-500">*</span></label>
                     <input type="text" id="ketua_projek" required placeholder="NAMA PENUH" class="w-full px-4 py-2.5 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none uppercase bg-teal-50 transition">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">No. Kad Pengenalan (Ketua Projek) <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">No. Kad Pengenalan <span class="text-red-500">*</span></label>
                     <input type="text" id="ic_ketua" required pattern="[0-9]{12}" title="Sila masukkan 12 digit tanpa sempang" placeholder="Contoh: 880101025566" class="w-full px-4 py-2.5 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-teal-50 transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">E-mel Ketua Projek <span class="text-red-500">*</span></label>
+                    <input type="email" id="email_ketua" required placeholder="Contoh: ali@domain.com" class="w-full px-4 py-2.5 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-teal-50 transition">
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div><label class="block text-sm font-bold text-gray-700 mb-1">Nama Ahli 1</label><input type="text" id="ahli_1" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none uppercase transition bg-gray-50"></div>
                 <div><label class="block text-sm font-bold text-gray-700 mb-1">Nama Ahli 2</label><input type="text" id="ahli_2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none uppercase transition bg-gray-50"></div>
                 <div><label class="block text-sm font-bold text-gray-700 mb-1">Nama Ahli 3</label><input type="text" id="ahli_3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none uppercase transition bg-gray-50"></div>
@@ -132,10 +136,14 @@
                         <p id="prev_ic" class="font-bold font-mono"></p>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <p class="text-xs text-gray-400 font-bold uppercase mb-1">E-mel Ketua</p>
+                        <p id="prev_email" class="font-bold"></p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                         <p class="text-xs text-gray-400 font-bold uppercase mb-1">Jabatan</p>
                         <p id="prev_jabatan" class="font-bold uppercase"></p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
                         <p class="text-xs text-gray-400 font-bold uppercase mb-1">Tempoh Projek</p>
                         <p id="prev_tarikh" class="font-medium"></p>
                     </div>
@@ -172,6 +180,18 @@
             muatDropdownJabatan();
         });
 
+        // FUNGSI BARU UNTUK FORMAT TARIKH (Tukar YYYY-MM-DD -> DD-MMM-YYYY)
+        function formatTarikh(tarikhString) {
+            if (!tarikhString) return "";
+            const bulanArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const [tahun, bulan, hari] = tarikhString.split('-');
+            if (tahun && bulan && hari) {
+                const indeksBulan = parseInt(bulan, 10) - 1;
+                return `${hari}-${bulanArr[indeksBulan]}-${tahun}`;
+            }
+            return tarikhString;
+        }
+
         function muatDropdownJabatan() {
             fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
             .then(res => res.json())
@@ -196,7 +216,7 @@
             });
         }
 
-        // --- FUNGSI BARU UNTUK BACA FAIL SEBAGAI BASE64 ---
+        // --- FUNGSI UNTUK BACA FAIL SEBAGAI BASE64 ---
         function bacaFail(file) {
             return new Promise((resolve, reject) => {
                 if (!file) {
@@ -238,14 +258,19 @@
                 const dataFailMaklumat = await bacaFail(failMaklumat);
                 const dataFailProposal = await bacaFail(failProposal);
 
+                // Dapatkan dan format tarikh
+                const tarikhMulaBerformat = formatTarikh(document.getElementById('tarikh_mula').value);
+                const tarikhAkhirBerformat = formatTarikh(document.getElementById('tarikh_akhir').value);
+
                 payloadDataSemasa = {
                     action: "tambahPendaftaranProjek",
                     TAJUK: document.getElementById('tajuk').value.trim().toUpperCase(),
                     JABATAN: document.getElementById('jabatan').value,
-                    TARIKH_MULA: document.getElementById('tarikh_mula').value,
-                    TARIKH_AKHIR: document.getElementById('tarikh_akhir').value,
+                    TARIKH_MULA: tarikhMulaBerformat,
+                    TARIKH_AKHIR: tarikhAkhirBerformat,
                     KETUA: document.getElementById('ketua_projek').value.trim().toUpperCase(),
                     IC_KETUA: document.getElementById('ic_ketua').value.trim(), 
+                    EMAIL_KETUA: document.getElementById('email_ketua').value.trim(), // Data E-mel
                     AHLI_1: document.getElementById('ahli_1').value.trim().toUpperCase(),
                     AHLI_2: document.getElementById('ahli_2').value.trim().toUpperCase(),
                     AHLI_3: document.getElementById('ahli_3').value.trim().toUpperCase(),
@@ -262,6 +287,7 @@
                 document.getElementById('prev_tajuk').innerText = payloadDataSemasa.TAJUK;
                 document.getElementById('prev_ketua').innerText = payloadDataSemasa.KETUA;
                 document.getElementById('prev_ic').innerText = payloadDataSemasa.IC_KETUA;
+                document.getElementById('prev_email').innerText = payloadDataSemasa.EMAIL_KETUA;
                 document.getElementById('prev_jabatan').innerText = payloadDataSemasa.JABATAN;
                 document.getElementById('prev_tarikh').innerText = `${payloadDataSemasa.TARIKH_MULA} hingga ${payloadDataSemasa.TARIKH_AKHIR}`;
                 

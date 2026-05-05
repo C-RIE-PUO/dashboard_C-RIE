@@ -16,7 +16,7 @@
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
 
     <header class="bg-teal-700 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center">
+        <div class="max-w-[90rem] mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold tracking-wide">✉️ Surat Lantikan Penyelidik</h1>
                 <p class="text-teal-200 mt-1 text-sm">Pusat Muat Turun Surat Lantikan Rasmi (Hanya Projek Disahkan)</p>
@@ -29,7 +29,7 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+    <main class="max-w-[90rem] mx-auto px-4 py-8 flex-grow w-full">
         
         <div class="mb-8">
             <h2 class="text-lg font-bold text-gray-700 mb-3 border-b-2 border-teal-500 inline-block pb-1">Statistik Projek Disahkan Mengikut Jabatan</h2>
@@ -45,30 +45,46 @@
             <div class="bg-teal-50 p-5 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
                 <h2 class="text-lg font-bold text-teal-800 flex items-center gap-2">✅ Senarai Projek Yang Telah Disahkan</h2>
                 
-                <div class="flex items-center gap-3">
-                    <label class="text-sm font-bold text-gray-600">Tapisan Jabatan:</label>
-                    <select id="filterJabatan" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm focus:ring-teal-500 outline-none">
+                <div class="flex flex-wrap items-center gap-3">
+                    <label class="text-sm font-bold text-gray-600 hidden md:inline-block">Tapisan:</label>
+                    <select id="filterTahun" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700">
+                        <option value="">Semua Tahun</option>
+                    </select>
+                    <select id="filterJabatan" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700">
                         <option value="">Semua Jabatan</option>
                     </select>
+                    <button onclick="muatData()" class="bg-teal-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-sm">
+                        🔄 Refresh
+                    </button>
                 </div>
             </div>
             
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
+			<div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
                     <thead>
-                        <tr class="bg-teal-600 text-white uppercase tracking-wide text-xs">
+                        <tr class="bg-teal-600 text-white uppercase tracking-wide text-[11px]">
                             <th class="p-3 border-b text-center w-12">BIL</th>
-                            <th class="p-3 border-b w-1/4">TAJUK PROJEK</th>
-                            <th class="p-3 border-b">NAMA KETUA PROJEK</th>
-                            <th class="p-3 border-b text-center">JABATAN</th>
-                            <th class="p-3 border-b text-center">STATUS</th>
-                            <th class="p-3 border-b text-center">SURAT LANTIKAN</th>
+                            <th class="p-3 border-b min-w-[250px]">MAKLUMAT PROJEK & TEMPOH</th>
+                            <th class="p-3 border-b min-w-[200px]">SENARAI PENYELIDIK</th>
+                            <th class="p-3 border-b text-center border-l border-teal-500">JABATAN</th>
+                            <th class="p-3 border-b text-center border-l border-teal-500">NO RUJUKAN</th>
+                            <th class="p-3 border-b text-center border-l border-teal-500">TARIKH SURAT</th>
+                            <th class="p-3 border-b text-center border-l border-teal-500">STATUS</th>
+                            <th class="p-3 border-b text-center border-l border-teal-500">SURAT LANTIKAN</th>
                         </tr>
                     </thead>
                     <tbody id="isiJadual" class="text-gray-700 bg-white">
-                        <tr><td colspan="6" class="p-10 text-center font-bold text-teal-500 animate-pulse">⏳ Memuat turun senarai...</td></tr>
+                        <tr><td colspan="8" class="p-10 text-center font-bold text-teal-500 animate-pulse">⏳ Memuat turun senarai...</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 flex justify-between items-center bg-gray-50 text-sm">
+                <span class="text-gray-500 font-semibold" id="infoPaginasi">Papar 0 - 0 dari 0 rekod</span>
+                <div class="flex gap-2">
+                    <button onclick="ubahHalaman(-1)" id="btnPrev" class="px-4 py-1.5 bg-white border border-gray-300 rounded-lg font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition">Kiri</button>
+                    <button onclick="ubahHalaman(1)" id="btnNext" class="px-4 py-1.5 bg-white border border-gray-300 rounded-lg font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition">Kanan</button>
+                </div>
             </div>
         </div>
     </main>
@@ -86,7 +102,7 @@
                 
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Tahun Lantikan <span class="text-red-500">*</span></label>
-                    <select id="pilih_tahun" required class="w-full px-4 py-2 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none text-sm font-bold text-gray-700 bg-teal-50">
+                    <select id="pilih_tahun_surat" required class="w-full px-4 py-2 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none text-sm font-bold text-gray-700 bg-teal-50">
                         </select>
                 </div>
 
@@ -119,61 +135,161 @@
         </div>
     </div>
 
+
+<div id="modalGenerateSurat" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50 p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+        
+        <div class="bg-teal-700 px-6 py-4 rounded-t-xl flex justify-between items-center shrink-0">
+            <h3 class="text-white font-bold text-lg"><i class="fas fa-file-signature mr-2"></i> Jana & Kemaskini Maklumat Surat</h3>
+            <button onclick="document.getElementById('modalGenerateSurat').classList.add('hidden')" class="text-teal-200 hover:text-white transition">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto">
+            <input type="hidden" id="gen_bil_surat">
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+                <h4 class="font-bold text-teal-800 border-b border-teal-200 pb-2 mb-3">Maklumat Surat & Rujukan</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Prefix Rujukan</label>
+                        <input type="text" id="gen_ref_prefix" value="PUO/C-RIE/238/01" class="w-full p-2 border rounded bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Bilangan Urutan</label>
+                        <input type="number" id="gen_ref_nombor" class="w-full p-2 border rounded bg-white text-sm" oninput="kemaskiniPreviewNoRuj()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tarikh Surat</label>
+                        <input type="date" id="gen_tarikh" class="w-full p-2 border rounded bg-white text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                <h4 class="font-bold text-teal-800 border-b border-teal-200 pb-2 mb-3">Semak & Kemaskini Maklumat Projek</h4>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tajuk Projek</label>
+                        <textarea id="gen_tajuk" rows="2" class="w-full p-2 border border-gray-300 rounded text-sm uppercase"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Ketua Projek</label>
+                            <input type="text" id="gen_ketua" class="w-full p-2 border border-gray-300 rounded text-sm uppercase">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tarikh Mula</label>
+                                <input type="date" id="gen_mula" class="w-full p-2 border border-gray-300 rounded text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tarikh Akhir</label>
+                                <input type="date" id="gen_akhir" class="w-full p-2 border border-gray-300 rounded text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Ahli Kumpulan 1</label>
+                            <input type="text" id="gen_ahli1" class="w-full p-2 border border-gray-300 rounded text-sm uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Ahli Kumpulan 2</label>
+                            <input type="text" id="gen_ahli2" class="w-full p-2 border border-gray-300 rounded text-sm uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Ahli Kumpulan 3</label>
+                            <input type="text" id="gen_ahli3" class="w-full p-2 border border-gray-300 rounded text-sm uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Ahli Kumpulan 4</label>
+                            <input type="text" id="gen_ahli4" class="w-full p-2 border border-gray-300 rounded text-sm uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Ahli Kumpulan 5</label>
+                            <input type="text" id="gen_ahli5" class="w-full p-2 border border-gray-300 rounded text-sm uppercase">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bg-gray-100 px-6 py-4 rounded-b-xl flex justify-end gap-2 shrink-0 border-t border-gray-200">
+            <button onclick="document.getElementById('modalGenerateSurat').classList.add('hidden')" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded shadow-sm font-bold text-sm transition">Batal</button>
+            <button onclick="prosesJanaSurat(this)" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded shadow font-bold text-sm transition flex items-center">
+                <i class="fas fa-magic mr-2"></i> Simpan & Jana Surat
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+
     <script>
         // ⚠️ MASUKKAN URL APP SCRIPT ANDA DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
         const userJabatan = sessionStorage.getItem("jabatan") || "";
         const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
-        
         const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
+        
         let dataDisahkan = [];
+        let dataTapis = [];
+        
+        // Pembolehubah Paginasi
+        let halamanSemasa = 1;
+        const rekodPerHalaman = 10;
 
         window.onload = () => {
             muatDropdownJabatan();
+            janaTahunModalSurat();
             muatData();
-            janaTahunSemasa();
         };
 
-        // --- FUNGSI TAB & TAHUN ---
-        function janaTahunSemasa() {
-            const selectTahun = document.getElementById("pilih_tahun");
-            const tahunIni = new Date().getFullYear();
+        // ==========================================
+        // 🌟 FUNGSI PENCARIAN DATA PINTAR & TARIKH
+        // ==========================================
+        function dapatkanData(row, senaraiKunci) {
+            if (!row) return "";
+            for (let k of senaraiKunci) {
+                if (row[k] !== undefined && row[k] !== null && row[k] !== "") return row[k];
+            }
+            const rowKeys = Object.keys(row);
+            for (let k of senaraiKunci) {
+                const cleanK = k.replace(/[^a-z0-9]/gi, '').toLowerCase();
+                const foundKey = rowKeys.find(rk => rk.replace(/[^a-z0-9]/gi, '').toLowerCase() === cleanK);
+                if (foundKey && row[foundKey] !== undefined && row[foundKey] !== null && row[foundKey] !== "") {
+                    return row[foundKey];
+                }
+            }
+            return "";
+        }
+
+        function formatTarikhPaparan(tarikhString) {
+            if (!tarikhString) return "-";
+            if (/[a-zA-Z]/.test(tarikhString) && tarikhString.includes('-')) return tarikhString;
+
+            const t = new Date(tarikhString);
+            if(isNaN(t)) return tarikhString;
             
-            // Masukkan pilihan tahun (Tahun lepas, tahun semasa, dan tahun depan)
-            for(let i = tahunIni - 1; i <= tahunIni + 1; i++) {
-                let selected = (i === tahunIni) ? "selected" : "";
-                selectTahun.innerHTML += `<option value="${i}" ${selected}>${i}</option>`;
-            }
+            const bulanArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const hari = String(t.getDate()).padStart(2, '0');
+            const bulan = bulanArr[t.getMonth()];
+            const tahun = t.getFullYear();
+            
+            return `${hari}-${bulan}-${tahun}`;
         }
 
-        function tukarTab(tab) {
-            document.getElementById("tab_aktif").value = tab;
-            const btnFail = document.getElementById("btnTabFail");
-            const btnUrl = document.getElementById("btnTabUrl");
-            const divFail = document.getElementById("kandunganFail");
-            const divUrl = document.getElementById("kandunganUrl");
-
-            if(tab === "fail") {
-                divFail.classList.remove("hidden");
-                divUrl.classList.add("hidden");
-                
-                btnFail.classList.replace("border-transparent", "border-teal-600");
-                btnFail.classList.replace("text-gray-500", "text-teal-700");
-                btnUrl.classList.replace("border-teal-600", "border-transparent");
-                btnUrl.classList.replace("text-teal-700", "text-gray-500");
-            } else {
-                divUrl.classList.remove("hidden");
-                divFail.classList.add("hidden");
-
-                btnUrl.classList.replace("border-transparent", "border-teal-600");
-                btnUrl.classList.replace("text-gray-500", "text-teal-700");
-                btnFail.classList.replace("border-teal-600", "border-transparent");
-                btnFail.classList.replace("text-teal-700", "text-gray-500");
-            }
-        }
-
-        // MUAT TURUN SENARAI JABATAN
+        // ==========================================
+        // MUAT TURUN DATA & JABATAN
+        // ==========================================
         function muatDropdownJabatan() {
             fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
             .then(res => res.json())
@@ -192,44 +308,59 @@
             });
         }
 
-        // AMBIL DATA DARI SERVER
-        function muatData() {
+		function muatData() {
+            document.getElementById('isiJadual').innerHTML = `<tr><td colspan="8" class="p-10 text-center font-bold text-teal-500 animate-pulse">⏳ Memuat turun senarai...</td></tr>`;
+
             fetch(`${SCRIPT_URL}?action=ambilPendaftaranProjek`)
             .then(res => res.json())
             .then(result => {
                 if (result.status === "BERJAYA") {
-                    dataDisahkan = (result.data || []).filter(p => p.status.toUpperCase() === "DISAHKAN");
+                    const dataPenuh = result.data || [];
+                    dataDisahkan = dataPenuh.filter(p => {
+                        const statusProjek = dapatkanData(p, ["status", "STATUS", "statusProjek"]) || "";
+                        return statusProjek.toUpperCase() === "DISAHKAN";
+                    });
+                    
+                    janaPilihanTahun(dataDisahkan);
                     janaStatistik(dataDisahkan);
                     terapkanTapisan();
                 } else {
-                    document.getElementById('isiJadual').innerHTML = `<tr><td colspan="6" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`;
+                    document.getElementById('isiJadual').innerHTML = `<tr><td colspan="8" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`;
                 }
             })
             .catch(err => {
-                document.getElementById('isiJadual').innerHTML = `<tr><td colspan="6" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke pangkalan data.</td></tr>`;
+                document.getElementById('isiJadual').innerHTML = `<tr><td colspan="8" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke pangkalan data.</td></tr>`;
             });
         }
 
- 
+        function janaPilihanTahun(data) {
+            const selectTahun = document.getElementById('filterTahun');
+            let senaraiTahun = [];
+            data.forEach(p => {
+                const tarikhProjek = dapatkanData(p, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
+                if (tarikhProjek) {
+                    let tahun = new Date(tarikhProjek).getFullYear();
+                    if (!isNaN(tahun) && !senaraiTahun.includes(tahun)) senaraiTahun.push(tahun);
+                }
+            });
+            senaraiTahun.sort((a,b) => b - a); 
+            selectTahun.innerHTML = '<option value="">Semua Tahun</option>';
+            senaraiTahun.forEach(t => selectTahun.innerHTML += `<option value="${t}">${t}</option>`);
+        }
 
-		function janaStatistik(data) {
+        function janaStatistik(data) {
             const wadahStat = document.getElementById('paparStatistik');
             
-            // 1. Ekstrak nama jabatan yang unik terus dari data (Lajur L)
-            // .toUpperCase() memastikan tiada isu huruf besar/kecil (cth: "JTMK" dan "jtmk" dikira sama)
-            const senaraiJabatan = [...new Set(data.map(p => p.jabatan.toUpperCase()))].filter(jab => jab !== "");
-            
+            const senaraiJabatan = [...new Set(data.map(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase()))].filter(jab => jab !== "");
             let htmlStat = "";
 
-            // Jika tiada data
             if (senaraiJabatan.length === 0) {
                 wadahStat.innerHTML = '<div class="col-span-full text-center p-4 text-gray-500 text-sm">Tiada statistik untuk dipaparkan.</div>';
                 return;
             }
 
-            // 2. Susun ikut abjad dan jana kotak statistik
             senaraiJabatan.sort().forEach(jab => {
-                const jumlah = data.filter(p => p.jabatan.toUpperCase() === jab).length;
+                const jumlah = data.filter(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase() === jab).length;
                 htmlStat += `
                     <div class="bg-white p-3 rounded-xl shadow-sm border border-teal-100 text-center flex flex-col justify-center transform transition hover:scale-105">
                         <span class="text-xs font-bold text-gray-500 uppercase">${jab}</span>
@@ -241,57 +372,415 @@
             wadahStat.innerHTML = htmlStat;
         }
 
-
-
-
-
+        // ==========================================
+        // 1. FUNGSI TAPISAN (JABATAN & TAHUN)
+        // ==========================================
         function terapkanTapisan() {
             const valJab = document.getElementById('filterJabatan').value;
+            const valTahun = document.getElementById('filterTahun') ? document.getElementById('filterTahun').value : "";
+
+            dataTapis = dataDisahkan.filter(row => {
+                // Semakan Jabatan
+                const dbJabatan = dapatkanData(row, ["jabatan", "JABATAN"]);
+                let checkJabatan = (valJab === "" || dbJabatan === valJab);
+                if (!isApprover && userPeranan !== "PENYELARAS JABATAN") checkJabatan = (dbJabatan === userJabatan);
+
+                // Semakan Tahun
+                const checkTarikhMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
+                let checkTahun = true;
+                if (valTahun !== "") {
+                    if (checkTarikhMula) {
+                        checkTahun = new Date(checkTarikhMula).getFullYear().toString() === valTahun;
+                    } else {
+                        checkTahun = false;
+                    }
+                }
+                
+                return checkJabatan && checkTahun;
+            });
+
+            dataTapis.reverse(); // Susun jadual dari rekod terbaharu
+            halamanSemasa = 1;   // Reset kembali ke muka surat 1 setiap kali tapisan bertukar
+            paparJadual();
+        }
+
+// ==========================================
+        // FUNGSI TRANSLATE TARIKH KE FORMAT (Cth: 15 Oktober 2025)
+        // ==========================================
+        function formatTarikhMelayuPenuh(tarikhString) {
+            if (!tarikhString || tarikhString === "" || tarikhString === "-") return "";
+            
+            const t = new Date(tarikhString);
+            if (isNaN(t)) return tarikhString; // Jika bukan format tarikh, pulangkan teks asal
+            
+            const bulanArr = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+            const hari = t.getDate(); // Tanpa '0' di depan (cth: 2, bukan 02)
+            const bulan = bulanArr[t.getMonth()];
+            const tahun = t.getFullYear();
+            
+            return `${hari} ${bulan} ${tahun}`; 
+        }
+
+// ==========================================
+        // 2. FUNGSI CETAK JADUAL DENGAN PAGINASI (10 REKOD)
+        // ==========================================
+        function paparJadual() {
             const tbody = document.getElementById('isiJadual');
             tbody.innerHTML = "";
 
-            let dataTapis = dataDisahkan.filter(row => valJab === "" || row.jabatan === valJab);
-
             if (dataTapis.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-gray-500 font-medium">Tiada projek disahkan dijumpai.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-gray-500 font-medium">Tiada projek disahkan dijumpai.</td></tr>`;
+                document.getElementById('infoPaginasi').innerText = `Papar 0 - 0 dari 0 rekod`;
+                document.getElementById('btnPrev').disabled = true;
+                document.getElementById('btnNext').disabled = true;
                 return;
             }
 
-            dataTapis.forEach((row, index) => {
+            const Mula = (halamanSemasa - 1) * rekodPerHalaman;
+            const Akhir = Mula + rekodPerHalaman;
+            const dataHalaman = dataTapis.slice(Mula, Akhir);
+
+            dataHalaman.forEach((row, index) => {
+                const dbTajuk = dapatkanData(row, ["tajuk", "TAJUK", "tajukProjek"]);
+                const dbJabatan = dapatkanData(row, ["jabatan", "JABATAN"]);
+                const dbKetua = dapatkanData(row, ["ketua", "KETUA", "namaKetua"]);
+                const dbEmail = dapatkanData(row, ["emailKetua", "EMAIL_KETUA", "emelKetua", "email", "emel"]);
+                const dbMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
+                const dbAkhir = dapatkanData(row, ["tarikhAkhir", "TARIKH_AKHIR", "tarikhAkhirProjek", "tarikhTamat"]);
+                
+                // Ambil No Rujukan & Format Tarikh Surat
+                const dbNoRuj = row.noRujukan || dapatkanData(row, ["noRujukan", "NO_RUJUKAN"]) || "";
+                const tarikhSuratRaw = row.tarikhSurat || dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT"]) || "";
+                const dbTarikhSurat = tarikhSuratRaw !== "" ? formatTarikhMelayuPenuh(tarikhSuratRaw) : "";
+                
+                const a1 = dapatkanData(row, ["ahli1", "AHLI_1", "namaAhli1"]);
+                const a2 = dapatkanData(row, ["ahli2", "AHLI_2", "namaAhli2"]);
+                const a3 = dapatkanData(row, ["ahli3", "AHLI_3", "namaAhli3"]);
+                const a4 = dapatkanData(row, ["ahli4", "AHLI_4", "namaAhli4"]);
+                const a5 = dapatkanData(row, ["ahli5", "AHLI_5", "namaAhli5"]);
+                let senaraiAhli = [a1, a2, a3, a4, a5].filter(a => a && String(a).trim() !== "");
+
+                let tMula = formatTarikhPaparan(dbMula);
+                let tAkhir = formatTarikhPaparan(dbAkhir);
+
+                let htmlAhli = "";
+                if (senaraiAhli.length > 0) {
+                    htmlAhli = `<ul class="text-[10px] text-gray-600 list-disc pl-4 space-y-0.5 mt-1 uppercase">`;
+                    senaraiAhli.forEach(ahli => { htmlAhli += `<li>${ahli}</li>`; });
+                    htmlAhli += `</ul>`;
+                } else {
+                    htmlAhli = `<div class="text-[10px] text-gray-400 italic mt-1">Tiada ahli tambahan</div>`;
+                }
+
+                // STATUS SURAT LANTIKAN
                 let tindakanSurat = "";
-                // Andaikan link surat disimpan di row.suratLantikan (Pastikan Apps Script menghantar atribut ini)
-                let linkSurat = row.suratLantikan || ""; 
+                let linkSurat = dapatkanData(row, ["suratLantikan", "SURAT_LANTIKAN"]); 
 
                 if (linkSurat !== "") {
                     tindakanSurat += `<a href="${linkSurat}" target="_blank" class="bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 px-3 py-1.5 rounded-lg shadow-sm font-bold text-xs flex items-center justify-center gap-1 transition mx-auto w-32 mb-1">📄 Download PDF</a>`;
                 } else {
-                    tindakanSurat += `<span class="text-[10px] text-orange-500 font-bold mb-1 block">⏳ Menunggu Upload</span>`;
+                    tindakanSurat += `<span class="text-[10px] text-orange-500 font-bold mb-1 block text-center">⏳ Menunggu Lantikan</span>`;
                 }
 
                 if (isApprover) {
-                    tindakanSurat += `<button onclick="bukaModalSurat('${row.bil}', '${linkSurat}')" class="w-32 mx-auto bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 px-2 py-1 rounded font-bold text-[10px] transition shadow-sm flex justify-center items-center gap-1">⬆️ Upload Surat</button>`;
+                    const dbBil = dapatkanData(row, ["bil", "BIL"]);
+                    tindakanSurat += `<div class="flex flex-col gap-1 w-32 mx-auto mt-2 pt-2 border-t border-gray-100">`;
+                    
+					if (linkSurat === "") {
+					// Butang Generate untuk projek yang belum ada surat
+					tindakanSurat += `<button onclick="bukaModalGenerate('${dbBil}')" class="w-full bg-purple-100 hover:bg-purple-200 border border-purple-300 text-purple-700 px-2 py-1 rounded font-bold text-[10px] transition shadow-sm flex justify-center items-center gap-1">⚙️ Generate Surat</button>`;
+					} else {
+					// 🌟 BUTANG BARU: Jana Semula untuk projek yang sudah ada surat
+					tindakanSurat += `<button onclick="bukaModalGenerate('${dbBil}')" class="w-full bg-orange-100 hover:bg-orange-200 border border-orange-300 text-orange-700 px-2 py-1 rounded font-bold text-[10px] transition shadow-sm flex justify-center items-center gap-1">🔄 Jana Semula</button>`;
+				}
+                    
+                    tindakanSurat += `<button onclick="bukaModalSurat('${dbBil}', '${linkSurat}')" class="w-full bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 px-2 py-1 rounded font-bold text-[10px] transition shadow-sm flex justify-center items-center gap-1">⬆️ Upload Manual</button>`;
+                    tindakanSurat += `</div>`;
                 }
 
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-teal-50 transition";
                 tr.innerHTML = `
-                    <td class="p-3 text-center font-bold text-gray-600">${index + 1}</td>
-                    <td class="p-3 font-bold text-teal-800 uppercase text-xs">${row.tajuk}</td>
-                    <td class="p-3 font-semibold text-gray-700 text-xs uppercase">👤 ${row.ketua}</td>
-                    <td class="p-3 text-center font-bold text-gray-600 text-xs uppercase">${row.jabatan}</td>
-                    <td class="p-3 text-center"><span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded text-[10px] font-bold shadow-sm">✅ DISAHKAN</span></td>
-                    <td class="p-3 text-center">${tindakanSurat}</td>
+                    <td class="p-3 text-center font-bold text-gray-600 align-top">${Mula + index + 1}</td>
+                    <td class="p-3 whitespace-normal align-top min-w-[200px]">
+                        <div class="font-bold text-teal-800 text-xs uppercase leading-tight mb-2">${dbTajuk}</div>
+                        <div class="text-[10px] text-gray-600 font-semibold mt-1 flex gap-2 items-center flex-wrap">
+                            <span class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">Mula: ${tMula}</span> 
+                            <span class="text-gray-400">➡️</span>
+                            <span class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">Akhir: ${tAkhir}</span>
+                        </div>
+                    </td>
+                    <td class="p-3 whitespace-normal align-top min-w-[200px]">
+                        <div class="text-[11px] text-teal-700 font-bold uppercase mb-1 flex flex-col gap-0.5">
+                            <span>👑 ${dbKetua}</span>
+                            ${dbEmail ? `<span class="text-[10px] text-gray-500 lowercase font-normal flex items-center gap-1">📧 ${dbEmail}</span>` : ""}
+                        </div>
+                        ${htmlAhli}
+                    </td>
+                    <td class="p-3 text-center font-bold text-gray-600 text-[11px] uppercase border-l border-teal-50 align-top">${dbJabatan}</td>
+                    <td class="p-3 text-center font-mono text-gray-700 text-[10px] border-l border-teal-50 align-top">${dbNoRuj || '-'}</td>
+                    <td class="p-3 text-center font-bold text-teal-700 text-[10px] border-l border-teal-50 align-top">${dbTarikhSurat || '-'}</td>
+                    <td class="p-3 text-center border-l border-teal-50 align-top"><span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded text-[10px] font-bold shadow-sm">✅ DISAHKAN</span></td>
+                    <td class="p-3 text-center border-l border-teal-50 align-top">${tindakanSurat}</td>
                 `;
                 tbody.appendChild(tr);
             });
+
+            document.getElementById('infoPaginasi').innerText = `Papar ${Mula + 1} - ${Math.min(Akhir, dataTapis.length)} dari ${dataTapis.length} rekod`;
+            document.getElementById('btnPrev').disabled = halamanSemasa === 1;
+            document.getElementById('btnNext').disabled = Akhir >= dataTapis.length;
         }
 
-        // KAWALAN MODAL
+// ==========================================
+        // KAWALAN MODAL JANA SURAT & JANA PDF
+        // ==========================================
+        function bukaModalGenerate(bil, tajuk = "", sediaAdaNoRuj = "", sediaAdaTarikh = "") {
+            document.getElementById('gen_bil_surat').value = bil;
+            
+            // 🌟 1. CARI DATA PENUH PROJEK BERDASARKAN 'BIL'
+            let senaraiData = typeof dataTapis !== 'undefined' ? dataTapis : (typeof dataDisahkan !== 'undefined' ? dataDisahkan : []);
+            const row = senaraiData.find(r => (r.bil || r.BIL) == bil);
+
+            if (row) {
+                // Ekstrak maklumat dari rekod
+                const dbTajuk = dapatkanData(row, ["tajuk", "TAJUK", "tajukProjek"]) || tajuk;
+                const dbKetua = dapatkanData(row, ["ketua", "KETUA", "namaKetua"]) || "";
+                
+                // Tambah lebih banyak variasi ejaan Lajur untuk Tarikh
+                const dbMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek", "TARIKH MULA"]);
+                const dbAkhir = dapatkanData(row, ["tarikhAkhir", "TARIKH_AKHIR", "tarikhAkhirProjek", "tarikhTamat", "TARIKH_TAMAT", "TARIKH AKHIR", "TARIKH TAMAT"]);
+                
+                // Masukkan ke dalam input Modal supaya boleh diedit
+                if(document.getElementById('paparanTajukGen')) document.getElementById('paparanTajukGen').innerText = dbTajuk;
+                if(document.getElementById('gen_tajuk')) document.getElementById('gen_tajuk').value = dbTajuk;
+                if(document.getElementById('gen_ketua')) document.getElementById('gen_ketua').value = dbKetua;
+                if(document.getElementById('gen_ahli1')) document.getElementById('gen_ahli1').value = dapatkanData(row, ["ahli1", "AHLI_1", "namaAhli1"]) || "";
+                if(document.getElementById('gen_ahli2')) document.getElementById('gen_ahli2').value = dapatkanData(row, ["ahli2", "AHLI_2", "namaAhli2"]) || "";
+                if(document.getElementById('gen_ahli3')) document.getElementById('gen_ahli3').value = dapatkanData(row, ["ahli3", "AHLI_3", "namaAhli3"]) || "";
+                if(document.getElementById('gen_ahli4')) document.getElementById('gen_ahli4').value = dapatkanData(row, ["ahli4", "AHLI_4", "namaAhli4"]) || "";
+                if(document.getElementById('gen_ahli5')) document.getElementById('gen_ahli5').value = dapatkanData(row, ["ahli5", "AHLI_5", "namaAhli5"]) || "";
+                
+                // Format tarikh untuk paparan input jenis 'date' (YYYY-MM-DD)
+                if(document.getElementById('gen_mula')) document.getElementById('gen_mula').value = formatUntukInputTarikh(dbMula);
+                if(document.getElementById('gen_akhir')) document.getElementById('gen_akhir').value = formatUntukInputTarikh(dbAkhir);
+                
+                // Kemas kini jika parameter kosong tetapi data row ada
+                if (sediaAdaNoRuj === "") sediaAdaNoRuj = row.noRujukan || dapatkanData(row, ["noRujukan", "NO_RUJUKAN"]) || "";
+                if (sediaAdaTarikh === "") sediaAdaTarikh = row.tarikhSurat || dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT"]) || "";
+            } else {
+                if(document.getElementById('paparanTajukGen')) document.getElementById('paparanTajukGen').innerText = tajuk;
+                if(document.getElementById('gen_tajuk')) document.getElementById('gen_tajuk').value = tajuk;
+            }
+
+            // 🌟 2. TETAPKAN TARIKH SURAT (Waktu Tempatan Komputer - Dibaiki)
+            if (sediaAdaTarikh !== "") {
+                const tarikhLama = formatUntukInputTarikh(sediaAdaTarikh);
+                // Jika tarikh lama sah, guna tarikh lama. Jika tidak, guna tarikh hari ini.
+                document.getElementById('gen_tarikh').value = tarikhLama !== "" ? tarikhLama : formatUntukInputTarikh(new Date());
+            } else {
+                // Untuk surat baharu, wajib guna tarikh hari ini
+                document.getElementById('gen_tarikh').value = formatUntukInputTarikh(new Date());
+            }
+            
+            // 🌟 3. TETAPKAN NO RUJUKAN (Atau Auto-Kira)
+            if (sediaAdaNoRuj !== "") {
+                const match = sediaAdaNoRuj.match(/^(.*?)\((\d+)\)$/);
+                if (match) {
+                    document.getElementById('gen_ref_prefix').value = match[1];
+                    document.getElementById('gen_ref_nombor').value = match[2];
+                } else {
+                    document.getElementById('gen_ref_nombor').value = ""; 
+                }
+            } else {
+                let maxNombor = 0;
+                if (typeof dataDisahkan !== 'undefined' && dataDisahkan.length > 0) {
+                    dataDisahkan.forEach(r => {
+                        let ruj = r.noRujukan || dapatkanData(r, ["noRujukan", "NO_RUJUKAN"]) || "";
+                        if (ruj !== "") {
+                            let match = ruj.match(/\((\d+)\)$/);
+                            if (match && match[1]) {
+                                let nomSemasa = parseInt(match[1]);
+                                if (nomSemasa > maxNombor) {
+                                    maxNombor = nomSemasa;
+                                }
+                            }
+                        }
+                    });
+                }
+                let nomborSeterusnya = maxNombor === 0 ? 1 : maxNombor + 1;
+                document.getElementById('gen_ref_nombor').value = nomborSeterusnya; 
+            }
+            
+            kemaskiniPreviewNoRuj();
+            document.getElementById('modalGenerateSurat').classList.remove('hidden');
+        }
+
+        // --- Fungsi Bantuan Penukar Tarikh (DIKEMAS KINI AGAR LEBIH TEPAT) ---
+        function formatUntukInputTarikh(tarikhRaw) {
+            if (!tarikhRaw || tarikhRaw === "" || tarikhRaw === "-") return "";
+            try {
+                // Cuba tukar menjadi Objek Tarikh (Date Object)
+                let d = new Date(tarikhRaw);
+                
+                // Jika Google hantar format pelik (cth DD/MM/YYYY) yang tidak difahami JavaScript
+                if (isNaN(d)) {
+                    const stringTarikh = String(tarikhRaw).trim();
+                    // Semak jika format DD/MM/YYYY
+                    if (stringTarikh.includes('/')) {
+                        const parts = stringTarikh.split('/');
+                        if (parts.length === 3) {
+                            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                        }
+                    }
+                    return ""; // Jika masih gagal, biarkan kosong
+                }
+
+                // Dapatkan Tahun, Bulan, Hari mengikut Waktu Tempatan (Local Time)
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0'); // Bulan bermula dari 0
+                const day = String(d.getDate()).padStart(2, '0');
+                
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                return "";
+            }
+        }
+        
+        function tutupModalGenerate() {
+            document.getElementById('modalGenerateSurat').classList.add('hidden');
+        }
+
+        document.getElementById('gen_ref_prefix').addEventListener('input', kemaskiniPreviewNoRuj);
+        document.getElementById('gen_ref_nombor').addEventListener('input', kemaskiniPreviewNoRuj);
+
+        function kemaskiniPreviewNoRuj() {
+            const prefix = document.getElementById('gen_ref_prefix').value;
+            const nombor = document.getElementById('gen_ref_nombor').value || "xxx";
+            if(document.getElementById('previewNoRuj')) {
+                document.getElementById('previewNoRuj').innerText = `${prefix}(${nombor})`;
+            }
+        }
+
+        function formatTarikhSurat(tarikhInput) {
+            const t = new Date(tarikhInput);
+            const bulanArr = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+            const hari = String(t.getDate()).padStart(2, '0');
+            const bulan = bulanArr[t.getMonth()];
+            const tahun = t.getFullYear();
+            return `${hari} ${bulan} ${tahun}`; 
+        }
+
+        // ==========================================
+        // FUNGSI HANTAR DATA YANG TELAH DIEDIT KE SERVER
+        // ==========================================
+        function prosesJanaSurat(btnElement) {
+            // Jika butang dipanggil tanpa submit form event, kita halang event default
+            const bil = document.getElementById('gen_bil_surat').value;
+            const prefix = document.getElementById('gen_ref_prefix').value.trim();
+            const nombor = document.getElementById('gen_ref_nombor').value.trim();
+            const tarikhRaw = document.getElementById('gen_tarikh').value;
+            
+            const noRujukanGabungan = `${prefix}(${nombor})`;
+            const tarikhSurat = formatTarikhSurat(tarikhRaw); 
+
+            if(!confirm(`JANA SURAT LANTIKAN PDF?\n\nNo. Ruj: ${noRujukanGabungan}\nTarikh: ${tarikhSurat}\n\nPerhatian: Maklumat projek yang diedit akan dikemas kini.`)) return;
+
+            if (btnElement) {
+                btnElement.disabled = true;
+                btnElement.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Menjana PDF...`;
+            }
+
+            tutupModalGenerate();
+            paparUI('⚙️ Sedang mengemas kini rekod dan menjana Surat Lantikan PDF...', 'bg-purple-100 text-purple-800 border-purple-200');
+            
+            // Kumpul semua data yang mungkin diedit oleh pengguna
+            const payload = {
+                action: "janaSuratLantikan", 
+                BIL: bil,
+                NO_RUJUKAN: noRujukanGabungan,
+                TARIKH_SURAT: tarikhSurat,
+                // --- Data Kemas Kini Maklumat Projek ---
+                TAJUK: document.getElementById('gen_tajuk') ? document.getElementById('gen_tajuk').value.trim() : "",
+                KETUA: document.getElementById('gen_ketua') ? document.getElementById('gen_ketua').value.trim() : "",
+                AHLI1: document.getElementById('gen_ahli1') ? document.getElementById('gen_ahli1').value.trim() : "",
+                AHLI2: document.getElementById('gen_ahli2') ? document.getElementById('gen_ahli2').value.trim() : "",
+                AHLI3: document.getElementById('gen_ahli3') ? document.getElementById('gen_ahli3').value.trim() : "",
+                AHLI4: document.getElementById('gen_ahli4') ? document.getElementById('gen_ahli4').value.trim() : "",
+                AHLI5: document.getElementById('gen_ahli5') ? document.getElementById('gen_ahli5').value.trim() : "",
+                TARIKH_MULA: document.getElementById('gen_mula') ? document.getElementById('gen_mula').value : "",
+                TARIKH_AKHIR: document.getElementById('gen_akhir') ? document.getElementById('gen_akhir').value : ""
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "BERJAYA") { 
+                    paparUI("✅ " + data.mesej, 'bg-green-100 text-green-800 border-green-200'); 
+                    muatData(); // Refresh jadual
+                } else {
+                    paparUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
+                }
+            })
+            .catch(err => paparUI("⚠️ Gagal menghubungi server.", 'bg-red-100 text-red-800 border-red-200'))
+            .finally(() => {
+                if (btnElement) {
+                    btnElement.disabled = false;
+                    btnElement.innerHTML = `<i class="fas fa-magic mr-2"></i> Simpan & Jana Surat`;
+                }
+            });
+        }
+
+        // ==========================================
+        // 3. FUNGSI BUTANG PAGINASI KIRI/KANAN
+        // ==========================================
+        function ubahHalaman(arah) { 
+            halamanSemasa += arah; 
+            paparJadual(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll naik atas perlahan-lahan
+        }
+
+        // ==========================================
+        // KAWALAN MODAL SURAT LANTIKAN
+        // ==========================================
+        function janaTahunModalSurat() {
+            const selectTahun = document.getElementById("pilih_tahun_surat");
+            const tahunIni = new Date().getFullYear();
+            
+            for(let i = tahunIni - 1; i <= tahunIni + 1; i++) {
+                let selected = (i === tahunIni) ? "selected" : "";
+                selectTahun.innerHTML += `<option value="${i}" ${selected}>${i}</option>`;
+            }
+        }
+
+        function tukarTab(tab) {
+            document.getElementById("tab_aktif").value = tab;
+            const btnFail = document.getElementById("btnTabFail");
+            const btnUrl = document.getElementById("btnTabUrl");
+            const divFail = document.getElementById("kandunganFail");
+            const divUrl = document.getElementById("kandunganUrl");
+
+            if(tab === "fail") {
+                divFail.classList.remove("hidden"); divUrl.classList.add("hidden");
+                btnFail.classList.replace("border-transparent", "border-teal-600");
+                btnFail.classList.replace("text-gray-500", "text-teal-700");
+                btnUrl.classList.replace("border-teal-600", "border-transparent");
+                btnUrl.classList.replace("text-teal-700", "text-gray-500");
+            } else {
+                divUrl.classList.remove("hidden"); divFail.classList.add("hidden");
+                btnUrl.classList.replace("border-transparent", "border-teal-600");
+                btnUrl.classList.replace("text-gray-500", "text-teal-700");
+                btnFail.classList.replace("border-teal-600", "border-transparent");
+                btnFail.classList.replace("text-teal-700", "text-gray-500");
+            }
+        }
+
         function bukaModalSurat(bil, urlSemasa) {
             document.getElementById('upload_bil_surat').value = bil;
-            document.getElementById('in_url_surat').value = urlSemasa !== "undefined" ? urlSemasa : "";
-            
-            // Reset input file setiap kali modal dibuka
+            document.getElementById('in_url_surat').value = (urlSemasa !== "undefined" && urlSemasa !== "") ? urlSemasa : "";
             document.getElementById('in_fail_surat').value = ""; 
             
             document.getElementById('modalUploadSurat').classList.remove('hidden');
@@ -301,26 +790,23 @@
             document.getElementById('modalUploadSurat').classList.add('hidden');
         }
 
-        // PENGHANTARAN KE BACKEND
         function hantarSuratLantikan(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSimpanSurat');
             const tabAktif = document.getElementById('tab_aktif').value;
             const bil = document.getElementById('upload_bil_surat').value;
-            const tahun = document.getElementById('pilih_tahun').value;
+            const tahun = document.getElementById('pilih_tahun_surat').value;
 
-            // Rangka Objek Data Utama
             let payloadData = {
                 action: "simpanSuratLantikan", 
                 BIL: bil,
                 TAHUN: tahun,
-                JENIS_UPLOAD: tabAktif // Untuk bagitahu backend adakah fail base64 atau url biasa
+                JENIS_UPLOAD: tabAktif
             };
 
             btn.disabled = true; 
             btn.innerText = "⏳ Menyimpan...";
 
-            // Jika pilih Tab URL
             if(tabAktif === "url") {
                 const urlInput = document.getElementById('in_url_surat').value;
                 if(!urlInput) {
@@ -331,7 +817,6 @@
                 payloadData.URL_SURAT = urlInput;
                 prosesHantarServer(payloadData, btn);
             } 
-            // Jika pilih Tab Fail (Base64)
             else {
                 const failInput = document.getElementById('in_fail_surat');
                 if(failInput.files.length === 0) {
@@ -356,7 +841,6 @@
             }
         }
 
-        // FUNGSI EXECUTE KE APPS SCRIPT
         function prosesHantarServer(payload, btn) {
             fetch(SCRIPT_URL, {
                 method: 'POST', 
@@ -368,13 +852,13 @@
                 if(data.status === "BERJAYA") { 
                     paparUI("✅ " + data.mesej, 'bg-green-100 text-green-800 border-green-200'); 
                     tutupModalSurat();
-                    muatData(); // Refresh jadual 
+                    muatData(); 
                 } 
                 else {
                     paparUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
                 }
             })
-            .catch(err => paparUI("⚠️ Gagal menghubungi server. Sila semak sambungan internet anda.", 'bg-red-100 text-red-800 border-red-200'))
+            .catch(err => paparUI("⚠️ Gagal menghubungi server.", 'bg-red-100 text-red-800 border-red-200'))
             .finally(() => { 
                 btn.disabled = false; 
                 btn.innerText = "💾 Simpan Surat"; 

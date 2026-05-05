@@ -102,7 +102,7 @@
                 </div>
             </div>
 
-            <div>
+            <div class="mb-8">
                 <h3 class="text-lg font-bold text-gray-800 border-b-2 border-teal-200 pb-2 mb-4">
                     Untuk Diisi Oleh Penilai Proposal
                 </h3>
@@ -119,6 +119,30 @@
                                 <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'REVIEWER EVALUATION FORM')">
                             </label>
                             <a href="#" data-borang="REVIEWER EVALUATION FORM" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition">
+                                <i class="fas fa-download mr-2"></i> Muat Turun
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold text-gray-800 border-b-2 border-teal-200 pb-2 mb-4">
+                    Templat Dokumen Rasmi / Pentadbiran
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
+                        <div class="mb-3 md:mb-0 pr-4">
+                            <h4 class="font-bold text-gray-700 text-md">Template Surat Lantikan Penyelidik</h4>
+                            <p class="text-sm text-gray-500 mt-1">Muat naik fail .DOCX. Sistem akan menukarkannya kepada format Google Docs secara automatik.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
+                                <i class="fas fa-upload mr-2"></i> Muat Naik
+                                <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'TEMPLATE SURAT LANTIKAN PENYELIDIK')">
+                            </label>
+                            <a href="#" data-borang="TEMPLATE SURAT LANTIKAN PENYELIDIK" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition">
                                 <i class="fas fa-download mr-2"></i> Muat Turun
                             </a>
                         </div>
@@ -154,6 +178,7 @@
             butangMuatTurun.forEach(btn => {
                 btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Memuatkan...`;
                 btn.classList.add('pointer-events-none', 'opacity-75');
+                btn.classList.remove('hidden'); // Tunjuk status memuatkan sementara
             });
 
             fetch(`${SCRIPT_URL}?action=ambilPautanBorang&folderId=${FOLDER_ID_MASTER}`)
@@ -167,14 +192,17 @@
                         const failDitemui = Object.keys(failData).find(key => key.startsWith(namaBorangTarget));
 
                         if (failDitemui) {
+                            // 🌟 KEMAS KINI: Jika fail wujud, butang HIJAU TEAL (Boleh klik)
                             btn.href = failData[failDitemui];
                             btn.innerHTML = `<i class="fas fa-download mr-2"></i> Muat Turun`;
-                            btn.classList.remove('pointer-events-none', 'opacity-75', 'bg-gray-400');
-                            btn.classList.add('bg-teal-600');
+                            btn.classList.remove('pointer-events-none', 'opacity-75', 'bg-gray-400', 'hidden');
+                            btn.classList.add('bg-teal-600', 'inline-flex');
                         } else {
+                            // 🌟 KEMAS KINI: Jika fail tiada, butang KELABU (Tidak boleh klik)
                             btn.href = "#";
                             btn.innerHTML = `<i class="fas fa-times-circle mr-2"></i> Tiada Fail`;
-                            btn.classList.replace('bg-teal-600', 'bg-gray-400');
+                            btn.classList.remove('bg-teal-600', 'hidden');
+                            btn.classList.add('bg-gray-400', 'pointer-events-none', 'inline-flex');
                         }
                     });
                 } else {
@@ -185,6 +213,8 @@
                 console.error("Gagal berhubung dengan server:", err);
                 butangMuatTurun.forEach(btn => {
                     btn.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> Ralat Rangkaian`;
+                    btn.classList.replace('bg-teal-600', 'bg-red-500');
+                    btn.classList.remove('pointer-events-none', 'opacity-75');
                 });
             });
         }
@@ -201,6 +231,7 @@
 
             const ext = fail.name.split('.').pop();
             const namaFailStandard = `${namaBorangAsal}.${ext}`;
+            const isTemplateSurat = (namaBorangAsal === 'TEMPLATE SURAT LANTIKAN PENYELIDIK'); // 🌟 Semak jika ia adalah Surat Lantikan
 
             const labelButang = inputElemen.parentElement;
             const teksAsal = labelButang.innerHTML;
@@ -218,7 +249,8 @@
                     FAIL: {
                         dataBase64: base64Data,
                         mimeType: fail.type
-                    }
+                    },
+                    TUKAR_KE_DOCS: isTemplateSurat // 🌟 Hantar arahan ke Google Script untuk menukar ke Docs
                 };
 
                 fetch(SCRIPT_URL, {
@@ -229,8 +261,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === "BERJAYA") {
-                        paparUI(`✅ "${namaBorangAsal}" berjaya dimuat naik ke Google Drive!`, 'bg-green-100 text-green-800 border-green-200');
-                        // Kemaskini butang muat turun secara automatik tanpa perlu refresh page
+                        paparUI(`✅ "${namaBorangAsal}" berjaya dimuat naik dan dikemas kini!`, 'bg-green-100 text-green-800 border-green-200');
                         muatTurunDinamik(); 
                     } else {
                         paparUI(`❌ Ralat: ${data.mesej}`, 'bg-red-100 text-red-800 border-red-200');
