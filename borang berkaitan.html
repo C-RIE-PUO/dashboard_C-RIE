@@ -126,7 +126,7 @@
                 </div>
             </div>
 
-            <div>
+            <div id="seksyenTemplatRasmi" class="hidden">
                 <h3 class="text-lg font-bold text-gray-800 border-b-2 border-teal-200 pb-2 mb-4">
                     Templat Dokumen Rasmi / Pentadbiran
                 </h3>
@@ -168,6 +168,12 @@
         window.onload = () => {
             if (isUploader) {
                 document.querySelectorAll('.btn-kemaskini').forEach(btn => btn.classList.remove('hidden'));
+                
+                // 🌟 JIKA PENGGUNA ADALAH ADMIN/KUPIK/PENYELARAS, BARU PAPARKAN RUANGAN INI
+                const seksyenTemplat = document.getElementById('seksyenTemplatRasmi');
+                if (seksyenTemplat) {
+                    seksyenTemplat.classList.remove('hidden');
+                }
             }
             muatTurunDinamik(); // Panggil fungsi ini sewaktu page loading
         };
@@ -192,17 +198,15 @@
                         const failDitemui = Object.keys(failData).find(key => key.startsWith(namaBorangTarget));
 
                         if (failDitemui) {
-                            // 🌟 KEMAS KINI: Jika fail wujud, butang HIJAU TEAL (Boleh klik)
+                            // Jika fail wujud, paparkan butang Muat Turun
                             btn.href = failData[failDitemui];
                             btn.innerHTML = `<i class="fas fa-download mr-2"></i> Muat Turun`;
                             btn.classList.remove('pointer-events-none', 'opacity-75', 'bg-gray-400', 'hidden');
                             btn.classList.add('bg-teal-600', 'inline-flex');
                         } else {
-                            // 🌟 KEMAS KINI: Jika fail tiada, butang KELABU (Tidak boleh klik)
-                            btn.href = "#";
-                            btn.innerHTML = `<i class="fas fa-times-circle mr-2"></i> Tiada Fail`;
-                            btn.classList.remove('bg-teal-600', 'hidden');
-                            btn.classList.add('bg-gray-400', 'pointer-events-none', 'inline-flex');
+                            // Sembunyikan butang terus jika fail tidak wujud
+                            btn.classList.add('hidden');
+                            btn.classList.remove('inline-flex');
                         }
                     });
                 } else {
@@ -231,7 +235,7 @@
 
             const ext = fail.name.split('.').pop();
             const namaFailStandard = `${namaBorangAsal}.${ext}`;
-            const isTemplateSurat = (namaBorangAsal === 'TEMPLATE SURAT LANTIKAN PENYELIDIK'); // 🌟 Semak jika ia adalah Surat Lantikan
+            const isTemplateSurat = (namaBorangAsal === 'TEMPLATE SURAT LANTIKAN PENYELIDIK'); 
 
             const labelButang = inputElemen.parentElement;
             const teksAsal = labelButang.innerHTML;
@@ -250,7 +254,7 @@
                         dataBase64: base64Data,
                         mimeType: fail.type
                     },
-                    TUKAR_KE_DOCS: isTemplateSurat // 🌟 Hantar arahan ke Google Script untuk menukar ke Docs
+                    TUKAR_KE_DOCS: isTemplateSurat 
                 };
 
                 fetch(SCRIPT_URL, {
