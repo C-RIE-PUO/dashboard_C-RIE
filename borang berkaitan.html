@@ -26,7 +26,7 @@
 
         <div id="statusMesejUI" class="hidden m-6 mb-0 p-4 rounded-xl text-center text-sm font-bold shadow-sm"></div>
 
-        <div class="p-6">
+       <div class="p-6">
             <div class="mb-8">
                 <h3 class="text-lg font-bold text-gray-800 border-b-2 border-teal-200 pb-2 mb-4">
                     Untuk Diisi Oleh Penyelidik
@@ -34,13 +34,13 @@
                 
                 <div class="space-y-4">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
-                        <div class="mb-3 md:mb-0 pr-4">
+                        <div class="mb-3 md:mb-0 pr-4 flex-1">
                             <h4 class="font-bold text-gray-700 text-md">Borang Maklumat Penyelidikan</h4>
                             <p class="text-sm text-gray-500 mt-1">
                                 <span class="font-semibold text-teal-600">Nota Bahagian C:</span> Penyokong boleh terdiri daripada Penyelaras Penyelidikan / Inovasi / COT Jabatan. Pelulus pula adalah Ketua UPIK PUO.
                             </p>
                         </div>
-                        <div class="flex flex-wrap gap-2">
+                        <div class="flex flex-wrap gap-2 shrink-0 md:justify-end">
                             <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
                                 <i class="fas fa-upload mr-2"></i> Muat Naik
                                 <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'BORANG MAKLUMAT PENYELIDIKAN')">
@@ -52,13 +52,13 @@
                     </div>
 
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
-                        <div class="mb-3 md:mb-0 pr-4">
+                        <div class="mb-3 md:mb-0 pr-4 flex-1">
                             <h4 class="font-bold text-gray-700 text-md">Borang PPP</h4>
                             <p class="text-sm text-gray-500 mt-1">
                                 Bagi Penyelidik dari Agensi Luar / Pensyarah PolyCC yang sedang sambung belajar (Kategori IV dan V sahaja).
                             </p>
                         </div>
-                        <div class="flex flex-wrap gap-2">
+                        <div class="flex flex-wrap gap-2 shrink-0 md:justify-end">
                             <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
                                 <i class="fas fa-upload mr-2"></i> Muat Naik
                                 <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'BORANG PPP')">
@@ -70,10 +70,10 @@
                     </div>
 
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
-                        <div class="mb-3 md:mb-0 pr-4">
+                        <div class="mb-3 md:mb-0 pr-4 flex-1">
                             <h4 class="font-bold text-gray-700 text-md">Borang Projek Proposal</h4>
                         </div>
-                        <div class="flex flex-wrap gap-2">
+                        <div class="flex flex-wrap gap-2 shrink-0 md:justify-end">
                             <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
                                 <i class="fas fa-upload mr-2"></i> Muat Naik
                                 <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'BORANG PROJEK PROPOSAL')">
@@ -85,16 +85,40 @@
                     </div>
 
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
-                        <div class="mb-3 md:mb-0 pr-4">
+                        <div class="mb-3 md:mb-0 pr-4 flex-1">
                             <h4 class="font-bold text-gray-700 text-md">Borang Laporan Kemajuan Projek</h4>
                             <p class="text-sm text-gray-500 mt-1">Untuk diisi semasa kajian sedang dijalankan.</p>
                         </div>
-                        <div class="flex flex-wrap gap-2">
+                        <div class="flex flex-wrap gap-2 shrink-0 md:justify-end">
                             <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
                                 <i class="fas fa-upload mr-2"></i> Muat Naik
                                 <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'BORANG LAPORAN KEMAJUAN PENYELIDIKAN')">
                             </label>
                             <a href="#" data-borang="BORANG LAPORAN KEMAJUAN PENYELIDIKAN" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition">
+                                <i class="fas fa-download mr-2"></i> Muat Turun
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-gray-800 border-b-2 border-teal-200 pb-2 mb-4">
+                    Untuk Diisi Oleh Penilai Proposal
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
+                        <div class="mb-3 md:mb-0 pr-4 flex-1">
+                            <h4 class="font-bold text-gray-700 text-md">Borang Penilaian Reviewer</h4>
+                            <p class="text-sm text-gray-500 mt-1">Garis panduan dan rubrik penilaian untuk menyemak proposal projek.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 shrink-0 md:justify-end">
+                            <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
+                                <i class="fas fa-upload mr-2"></i> Muat Naik
+                                <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'REVIEWER EVALUATION FORM')">
+                            </label>
+                            <a href="#" data-borang="REVIEWER EVALUATION FORM" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition">
                                 <i class="fas fa-download mr-2"></i> Muat Turun
                             </a>
                         </div>
