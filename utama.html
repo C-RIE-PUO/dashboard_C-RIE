@@ -863,15 +863,31 @@ function kiraStatsPenyelidikan(data) {
     let statsJabatan = {};
     let statsIndex = {};
     let totalDisahkan = 0;
+    
     data.forEach(r => {
-        let jbt = String(r.jabatan || 'TIADA JABATAN').trim();
+        let jbtAsal = String(r.jabatan || 'TIADA JABATAN').trim();
+        
+        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
+        // Cari perkataan di dalam kurungan cth: (JKA)
+        let match = jbtAsal.match(/\(([^)]+)\)/); 
+        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
+        let jbt = match ? match[1].trim() : jbtAsal;
+
         let idx = String(r.indexStatus || 'LAIN-LAIN').trim().toUpperCase();
         let status = String(r.statusPengesahan || '').toUpperCase();
+        
         statsJabatan[jbt] = (statsJabatan[jbt] || 0) + 1;
         statsIndex[idx] = (statsIndex[idx] || 0) + 1;
+        
         if(status.includes('DISAHKAN')) totalDisahkan++;
     });
-    return { jabatan: statsJabatan, index: statsIndex, disahkan: totalDisahkan, total: data.length };
+    
+    return { 
+        jabatan: statsJabatan, 
+        index: statsIndex, 
+        disahkan: totalDisahkan, 
+        total: data.length 
+    };
 }
 
 function renderKadPenyelidikan(stats) {
@@ -971,15 +987,31 @@ function kiraStatsHI(data) {
     let statsJabatan = {};
     let statsJenis = {};
     let totalDisahkan = 0;
+    
     data.forEach(r => {
-        let jbt = String(r.jabatan || 'TIADA JABATAN').trim();
+        let jbtAsal = String(r.jabatan || 'TIADA JABATAN').trim();
+        
+        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
+        // Cari perkataan di dalam kurungan cth: (JTMK)
+        let match = jbtAsal.match(/\(([^)]+)\)/); 
+        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
+        let jbt = match ? match[1].trim() : jbtAsal;
+
         let jenis = String(r.jenis || 'HAK CIPTA').trim().toUpperCase();
         let status = String(r.statusHI || '').toUpperCase();
+        
         statsJabatan[jbt] = (statsJabatan[jbt] || 0) + 1;
         statsJenis[jenis] = (statsJenis[jenis] || 0) + 1;
+        
         if(status.includes('DISAHKAN')) totalDisahkan++;
     });
-    return { jabatan: statsJabatan, jenis: statsJenis, disahkan: totalDisahkan, total: data.length };
+    
+    return { 
+        jabatan: statsJabatan, 
+        jenis: statsJenis, 
+        disahkan: totalDisahkan, 
+        total: data.length 
+    };
 }
 
 function renderKadHI(stats) {
@@ -1067,14 +1099,30 @@ function kiraStatsKPI(data) {
     let statsJabatan = {};
     let pecahanHakcipta = {};
     let setJabatanUnik = new Set();
+    
     data.forEach(r => {
-        let jbt = String(r[6] || 'TIADA JABATAN').trim(); 
+        let jbtAsal = String(r[6] || 'TIADA JABATAN').trim(); 
+        
+        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
+        // Cari perkataan di dalam kurungan cth: (JTMK)
+        let match = jbtAsal.match(/\(([^)]+)\)/); 
+        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
+        let jbt = match ? match[1].trim() : jbtAsal;
+        
         let jenis = String(r[8] || 'TIADA DATA').trim().toUpperCase(); 
+        
         if(jbt !== 'TIADA JABATAN') setJabatanUnik.add(jbt);
+        
         statsJabatan[jbt] = (statsJabatan[jbt] || 0) + 1;
         pecahanHakcipta[jenis] = (pecahanHakcipta[jenis] || 0) + 1;
     });
-    return { jabatan: statsJabatan, hakcipta: pecahanHakcipta, totalJabatan: setJabatanUnik.size, totalProduk: data.length };
+    
+    return { 
+        jabatan: statsJabatan, 
+        hakcipta: pecahanHakcipta, 
+        totalJabatan: setJabatanUnik.size, 
+        totalProduk: data.length 
+    };
 }
 
 function renderKadKPI(stats) {
@@ -1148,14 +1196,24 @@ function renderChartsKPI(stats) {
 function kiraStats(data) {
     let emas = 0, perak = 0, gangsa = 0;
     let statsJabatan = {};
+    
     data.forEach(r => {
         let pingat = String(r[7]).toUpperCase();
-        let j = String(r[3]);
+        let jAsal = String(r[3]);
+        
+        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
+        // Cari perkataan di dalam kurungan cth: (JTMK)
+        let match = jAsal.match(/\(([^)]+)\)/); 
+        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
+        let j = match ? match[1].trim() : jAsal.trim(); 
+
         if (!statsJabatan[j]) statsJabatan[j] = { emas: 0, perak: 0, gangsa: 0 };
+        
         if (pingat.includes('EMAS')) { emas++; statsJabatan[j].emas++; }
         else if (pingat.includes('PERAK')) { perak++; statsJabatan[j].perak++; }
         else if (pingat.includes('GANGSA')) { gangsa++; statsJabatan[j].gangsa++; }
     });
+    
     return { overall: {emas, perak, gangsa}, jabatan: statsJabatan };
 }
 
@@ -1190,7 +1248,7 @@ function renderCharts(statsJabatan, overall) {
     barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
-            labels: labels,
+            labels: labels, // Label kini akan memaparkan singkatan seperti JTMK, JKA dll.
             datasets: [
                 { label: 'Emas', data: labels.map(l => statsJabatan[l].emas), backgroundColor: '#EAB308' },
                 { label: 'Perak', data: labels.map(l => statsJabatan[l].perak), backgroundColor: '#94A3B8' },
@@ -1209,7 +1267,6 @@ function renderCharts(statsJabatan, overall) {
         options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
     });
 }
-
 // ==========================================
 // FUNGSI STATISTIK (GERAN)
 // ==========================================
@@ -1219,7 +1276,14 @@ function kiraStatsGeran(data) {
     let totalNilai = 0;
     
     data.forEach(r => {
-        let jbt = String(r[3] || 'TIADA JABATAN').trim();
+        let jbtAsal = String(r[3] || 'TIADA JABATAN').trim();
+        
+        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
+        // Cari perkataan di dalam kurungan cth: (JTMK)
+        let match = jbtAsal.match(/\(([^)]+)\)/); 
+        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
+        let jbt = match ? match[1].trim() : jbtAsal;
+
         let jenis = String(r[6] || 'LAIN-LAIN').trim().toUpperCase();
         let nilai = r[7] ? parseFloat(r[7]) : 0;
 
