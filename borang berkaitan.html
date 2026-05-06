@@ -127,32 +127,74 @@
             </div>
 
 
-            <div id="seksyenTemplatRasmi" class="hidden">
-                <h3 class="text-lg font-bold text-gray-800 border-b-2 border-teal-200 pb-2 mb-4">
-                    Templat Dokumen Rasmi / Pentadbiran
-                </h3>
-                
-                <div class="space-y-4">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
-                        <div class="mb-3 md:mb-0 pr-4">
-                            <h4 class="font-bold text-gray-700 text-md">Template Surat Lantikan Penyelidik</h4>
-                            <p class="text-sm text-gray-500 mt-1">Muat naik fail .DOCX. Sistem akan menukarkannya kepada format Google Docs secara automatik.</p>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
-                                <i class="fas fa-upload mr-2"></i> Muat Naik
-                                <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'TEMPLATE SURAT LANTIKAN PENYELIDIK')">
-                            </label>
-                            <a href="#" data-borang="TEMPLATE SURAT LANTIKAN PENYELIDIK" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition">
-                                <i class="fas fa-download mr-2"></i> Muat Turun
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<div id="seksyenTemplatRasmi" class="hidden mt-6 border-t border-gray-300 pt-6">
+    <div class="flex items-center justify-between border-b-2 border-teal-200 pb-2 mb-4">
+        <h3 class="text-lg font-bold text-gray-800">
+            ⚙️ Pengurusan Templat Rasmi
+        </h3>
+        <button onclick="bukaModalBantuan()" class="text-teal-600 hover:text-teal-800 text-sm font-medium flex items-center gap-1 bg-teal-50 px-3 py-1 rounded-full transition-all shadow-sm">
+            <i class="fas fa-question-circle"></i> Bantuan Kod
+        </button>
+    </div>
+    
+    <div class="space-y-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition">
+            <div class="mb-3 md:mb-0 pr-4">
+                <h4 class="font-bold text-gray-700 text-md">Template Surat Lantikan Penyelidik</h4>
+                <p class="text-sm text-gray-500 mt-1">Muat naik fail .DOCX. Sistem akan menggantikan kod secara automatik semasa cetakan PDF.</p>
             </div>
-
+            
+            <div class="flex flex-wrap gap-2">
+                <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
+                    <i class="fas fa-upload mr-2"></i> Muat Naik
+                    <input type="file" class="hidden" accept=".doc,.docx" onchange="prosesUpload(this, 'TEMPLATE SURAT LANTIKAN PENYELIDIK')">
+                </label>
+                
+                <a href="#" data-borang="TEMPLATE SURAT LANTIKAN PENYELIDIK" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition">
+                    <i class="fas fa-download mr-2"></i> Muat Turun
+                </a>
+            </div>
         </div>
     </div>
+</div>
+
+<div id="modalBantuanKod" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden flex items-center justify-center p-4 transition-opacity">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-5 border-b flex justify-between items-center bg-teal-700 text-white sticky top-0">
+            <h3 class="text-lg font-bold"><i class="fas fa-info-circle mr-2"></i> Panduan Kod Auto-Generate</h3>
+            <button onclick="tutupModalBantuan()" class="text-white hover:text-teal-200 text-3xl leading-none">&times;</button>
+        </div>
+        <div class="p-6">
+            <p class="mb-4 text-gray-600 text-sm">Sila masukkan kod di bawah ke dalam template <b>Microsoft Word (.docx)</b> anda di posisi yang dikehendaki sebelum memuat naik templat baharu.</p>
+            
+            <div class="overflow-hidden rounded-lg border border-gray-200">
+                <table class="w-full text-sm border-collapse bg-white">
+                    <thead>
+                        <tr class="bg-gray-100 text-left">
+                            <th class="p-3 border-b border-gray-200 text-gray-700">Kod (Tag)</th>
+                            <th class="p-3 border-b border-gray-200 text-gray-700">Penerangan Data</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{KETUA}}</td><td class="p-3 text-gray-600">Nama penuh Ketua Penyelidik</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{AHLI_1}} - {{AHLI_5}}</td><td class="p-3 text-gray-600">Nama Ahli Penyelidik 1 hingga 5</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{JABATAN}}</td><td class="p-3 text-gray-600">Jabatan asal pemohon</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{TAJUK}}</td><td class="p-3 text-gray-600">Tajuk penuh projek penyelidikan/inovasi</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{TARIKH_MULA}}</td><td class="p-3 text-gray-600">Tarikh projek mula dilaksanakan</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{NO_RUJUKAN}}</td><td class="p-3 text-gray-600">No. Rujukan rasmi surat</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{TARIKH_SURAT}}</td><td class="p-3 text-gray-600">Tarikh surat dikeluarkan</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-5 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r text-yellow-800 text-xs shadow-sm">
+                <strong>Nota Penting:</strong> Pastikan kod ditaip dengan <b>huruf besar</b> dan menggunakan <b>double curly braces</b> <code class="bg-yellow-200 px-1 rounded">{{ }}</code>. Sistem akan menggantikan kod ini secara automatik semasa memproses surat.
+            </div>
+            
+            <button onclick="tutupModalBantuan()" class="mt-6 w-full bg-gray-800 text-white py-3 rounded-xl font-bold hover:bg-gray-900 transition-all shadow">Faham & Tutup</button>
+        </div>
+    </div>
+</div>
 
     <script>
         // ⚠️ MASUKKAN URL APP SCRIPT ANDA DI SINI
@@ -324,6 +366,15 @@
             window.scrollTo(0, 0); 
             setTimeout(() => sm.classList.add('hidden'), 8000);
         }
+		function bukaModalBantuan() {
+    document.getElementById('modalBantuanKod').classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Elak scroll latar belakang
+}
+
+function tutupModalBantuan() {
+    document.getElementById('modalBantuanKod').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
     </script>
 </body>
 </html>
