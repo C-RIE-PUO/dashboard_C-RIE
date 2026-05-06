@@ -281,6 +281,40 @@
             };
             reader.readAsDataURL(fail);
         }
+		
+		function ambilPautanBorang(folderId) {
+  try {
+    var folder = DriveApp.getFolderById(folderId);
+    var files = folder.getFiles();
+    var pautanData = {};
+
+    while (files.hasNext()) {
+      var file = files.next();
+      var id = file.getId();
+      var mime = file.getMimeType();
+      var pautan = "";
+
+      // Jika fail ialah Google Doc (Native), kita tukar kepada format export Docx
+      if (mime === "application/vnd.google-apps.document") {
+        pautan = "https://docs.google.com/document/d/" + id + "/export?format=docx";
+      } 
+      // Jika fail ialah Google Sheet, kita tukar kepada format export Excel
+      else if (mime === "application/vnd.google-apps.spreadsheet") {
+        pautan = "https://docs.google.com/spreadsheets/d/" + id + "/export?format=xlsx";
+      }
+      // Jika fail biasa (PDF, Word dimuat naik), guna pautan download terus
+      else {
+        pautan = "https://drive.google.com/uc?export=download&id=" + id;
+      }
+
+      pautanData[file.getName()] = pautan;
+    }
+
+    return { "status": "BERJAYA", "data": pautanData };
+  } catch (e) {
+    return { "status": "GAGAL", "mesej": e.toString() };
+  }
+}
 
         // Fungsi Papar Notifikasi
         function paparUI(teks, warnaClass) {
