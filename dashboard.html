@@ -450,9 +450,20 @@
             document.getElementById('statGangsa').innerText = data.filter(r => String(r[7]).toUpperCase().includes("GANGSA")).length;
         }
 
-        function kemaskiniCarta(data) {
+	function kemaskiniCarta(data) {
             const rekodJabatan = {};
-            data.forEach(r => { let j = r[3] || "N/A"; rekodJabatan[j] = (rekodJabatan[j] || 0) + 1; });
+            
+            data.forEach(r => { 
+                let jAsal = String(r[3] || "N/A").trim(); 
+                
+                // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
+                // Cari perkataan di dalam kurungan cth: (JKA)
+                let match = jAsal.match(/\(([^)]+)\)/); 
+                // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
+                let j = match ? match[1].trim() : jAsal;
+                
+                rekodJabatan[j] = (rekodJabatan[j] || 0) + 1; 
+            });
 
             const warnaBar = [
                 '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', 
