@@ -59,6 +59,28 @@
                 </div>
             </div>
             
+			
+<div class="bg-white p-4 mb-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row gap-3 items-center justify-between">
+    <div class="text-gray-600 font-medium">
+        <i class="fas fa-filter text-teal-600 mr-2"></i>Tapis Maklumat
+    </div>
+    
+    <div class="w-full md:w-1/2 flex gap-2">
+        <input type="text" id="inputCarian" placeholder="Cari nama ketua, tajuk, jabatan..." 
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all">
+        
+        <button onclick="laksanakanCarian()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2">
+            <i class="fas fa-search"></i> Cari
+        </button>
+
+        <button onclick="resetCarian()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2" title="Set Semula">
+            <i class="fas fa-arrows-rotate"></i>
+        </button>
+    </div>
+</div>
+			
+			
+			
 			<div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
                     <thead>
@@ -880,6 +902,41 @@
             sm.innerText = teks; sm.classList.remove('hidden');
             window.scrollTo(0, 0); setTimeout(() => sm.classList.add('hidden'), 5000);
         }
+		
+		
+		// ==========================================
+        // FUNGSI: CARIAN UMUM PADA JADUAL
+        // ==========================================
+        function laksanakanCarian() {
+            const kataKunci = document.getElementById('inputCarian').value.toLowerCase();
+            // Pastikan ID 'isiJadual' sepadan dengan ID pada <tbody> jadual anda
+            const barisJadual = document.querySelectorAll('#isiJadual tr'); 
+
+            barisJadual.forEach(baris => {
+                // Abaikan baris loading atau baris mesej kosong (yang biasanya di-colspan penuh)
+                if (baris.cells.length <= 1) return; 
+
+                const teksBaris = baris.textContent.toLowerCase();
+                
+                // Jika teks baris mengandungi kata kunci carian, paparkan. Jika tidak, sembunyikan.
+                if (teksBaris.includes(kataKunci)) {
+                    baris.style.display = ''; // Tunjuk
+                } else {
+                    baris.style.display = 'none'; // Sembunyi
+                }
+            });
+        }
+
+        function resetCarian() {
+            document.getElementById('inputCarian').value = ''; // Kosongkan input
+            laksanakanCarian(); // Panggil semula fungsi untuk tunjuk semua data asal
+        }
+
+        // Tambahan: Bolehkan carian dengan menekan butang 'Enter' pada keyboard
+        document.getElementById('inputCarian').addEventListener('keyup', function(event) {
+            // Laksanakan carian secara live setiap kali menaip (pilihan)
+            laksanakanCarian(); 
+        });
     </script>
 </body>
 </html>
