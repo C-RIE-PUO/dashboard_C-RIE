@@ -159,15 +159,17 @@
 </div>
 
 <div id="modalBantuanKod" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden flex items-center justify-center p-4 transition-opacity">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-5 border-b flex justify-between items-center bg-teal-700 text-white sticky top-0">
-            <h3 class="text-lg font-bold"><i class="fas fa-info-circle mr-2"></i> Panduan Kod Auto-Generate</h3>
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        
+        <div class="p-5 border-b flex justify-between items-center bg-teal-700 text-white sticky top-0 z-10">
+            <h3 class="text-lg font-bold"><i class="fas fa-info-circle mr-2"></i> Panduan Kod & Preview</h3>
             <button onclick="tutupModalBantuan()" class="text-white hover:text-teal-200 text-3xl leading-none">&times;</button>
         </div>
+        
         <div class="p-6">
-            <p class="mb-4 text-gray-600 text-sm">Sila masukkan kod di bawah ke dalam template <b>Microsoft Word (.docx)</b> anda di posisi yang dikehendaki sebelum memuat naik templat baharu.</p>
+            <p class="mb-4 text-gray-600 text-sm">Sila masukkan kod di bawah ke dalam template <b>Microsoft Word (.docx) / Google Doc</b> anda di posisi yang dikehendaki.</p>
             
-            <div class="overflow-hidden rounded-lg border border-gray-200">
+            <div class="overflow-hidden rounded-lg border border-gray-200 mb-4">
                 <table class="w-full text-sm border-collapse bg-white">
                     <thead>
                         <tr class="bg-gray-100 text-left">
@@ -177,18 +179,51 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{KETUA}}</td><td class="p-3 text-gray-600">Nama penuh Ketua Penyelidik</td></tr>
-                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{AHLI_1}} - {{AHLI_5}}</td><td class="p-3 text-gray-600">Nama Ahli Penyelidik 1 hingga 5</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{AHLI_1}} - {{AHLI_5}}</td><td class="p-3 text-gray-600">Nama Ahli 1 hingga 5</td></tr>
                         <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{JABATAN}}</td><td class="p-3 text-gray-600">Jabatan asal pemohon</td></tr>
-                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{TAJUK}}</td><td class="p-3 text-gray-600">Tajuk penuh projek penyelidikan/inovasi</td></tr>
-                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{TARIKH_MULA}}</td><td class="p-3 text-gray-600">Tarikh projek mula dilaksanakan</td></tr>
-                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{NO_RUJUKAN}}</td><td class="p-3 text-gray-600">No. Rujukan rasmi surat</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{TAJUK}}</td><td class="p-3 text-gray-600">Tajuk penuh projek</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{TARIKH_MULA}}</td><td class="p-3 text-gray-600">Tarikh mula dilaksanakan</td></tr>
+                        <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{NO_RUJUKAN}}</td><td class="p-3 text-gray-600">No. Rujukan surat</td></tr>
                         <tr class="hover:bg-gray-50"><td class="p-3 font-mono text-teal-700 font-bold whitespace-nowrap">{{TARIKH_SURAT}}</td><td class="p-3 text-gray-600">Tarikh surat dikeluarkan</td></tr>
                     </tbody>
                 </table>
             </div>
+
+			<div class="flex flex-wrap gap-2 mb-4 border-b pb-4">
+                <button onclick="togglePreview()" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                    <i class="fas fa-eye"></i> Papar Preview Surat
+                </button>
+                
+                <button onclick="bukaEditTemplate(event)" id="btnEditTemplate" class="hidden bg-orange-100 text-orange-700 hover:bg-orange-200 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 cursor-pointer">
+                    <i class="fas fa-file-word"></i> Edit Templat (Google Doc)
+                </button>
+            </div>
+
+            <div id="ruanganPreview" class="hidden mb-6">
+                <p class="text-xs text-gray-500 mb-2 font-bold uppercase tracking-wider">Simulasi Dokumen: TEMPLATE SURAT LANTIKAN PENYELIDIK</p>
+                <div class="bg-gray-50 border border-gray-300 p-6 rounded shadow-inner text-sm font-serif leading-relaxed text-gray-800">
+                    <div class="flex justify-between items-start mb-6">
+                        <span>Ruj. Kami: <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded">{{NO_RUJUKAN}}</span></span>
+                        <span>Tarikh: <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded">{{TARIKH_SURAT}}</span></span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded">{{KETUA}}</span><br>
+                        <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded">{{AHLI_1}}</span><br>
+                        <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded">{{AHLI_2}}</span><br>
+                        <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded">{{AHLI_3}}</span><br>
+                        <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded">{{JABATAN}}</span>
+                    </div>
+                    
+                    <p class="mb-4">Ts./Dr./Tuan/Puan,</p>
+                    <p class="font-bold mb-4">PELANTIKAN MENJALANKAN PENYELIDIKAN/INOVASI DI POLITEKNIK UNGKU OMAR</p>
+                    <p class="mb-2">Dengan segala hormatnya, perkara di atas adalah dirujuk.</p>
+                    <p class="mb-2">2. Sukacita dimaklumkan bahawa Ts./Dr./Tuan/Puan telah dilantik untuk menjalankan penyelidikan/inovasi bertajuk <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded leading-loose">{{TAJUK}}</span> yang bermula <span class="bg-yellow-200 text-yellow-800 font-bold px-1 rounded">{{TARIKH_MULA}}</span>.</p>
+                </div>
+            </div>
             
-            <div class="mt-5 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r text-yellow-800 text-xs shadow-sm">
-                <strong>Nota Penting:</strong> Pastikan kod ditaip dengan <b>huruf besar</b> dan menggunakan <b>double curly braces</b> <code class="bg-yellow-200 px-1 rounded">{{ }}</code>. Sistem akan menggantikan kod ini secara automatik semasa memproses surat.
+            <div class="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r text-yellow-800 text-xs shadow-sm">
+                <strong>Nota Penting:</strong> Pastikan kod ditaip dengan <b>huruf besar</b> dan <b>kurungan berkembar</b> <code class="bg-yellow-200 px-1 rounded">{{ }}</code>. Sistem akan menggantikan kod ini secara automatik.
             </div>
             
             <button onclick="tutupModalBantuan()" class="mt-6 w-full bg-gray-800 text-white py-3 rounded-xl font-bold hover:bg-gray-900 transition-all shadow">Faham & Tutup</button>
@@ -366,15 +401,85 @@
             window.scrollTo(0, 0); 
             setTimeout(() => sm.classList.add('hidden'), 8000);
         }
-		function bukaModalBantuan() {
-    document.getElementById('modalBantuanKod').classList.remove('hidden');
-    document.body.style.overflow = 'hidden'; // Elak scroll latar belakang
-}
 
-function tutupModalBantuan() {
-    document.getElementById('modalBantuanKod').classList.add('hidden');
-    document.body.style.overflow = 'auto';
-}
+// Fungsi Buka / Tutup Modal
+        function bukaModalBantuan() {
+            document.getElementById('modalBantuanKod').classList.remove('hidden');
+            
+            // 🌟 Semak peranan (Role-based access) untuk butang EDIT
+            const userRole = (sessionStorage.getItem("peranan") || "").toUpperCase();
+            const isUploader = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"].includes(userRole);
+            
+            const btnEdit = document.getElementById('btnEditTemplate');
+            if (isUploader && btnEdit) {
+                btnEdit.classList.remove('hidden'); // Munculkan butang edit
+            }
+        }
+
+        function tutupModalBantuan() {
+            document.getElementById('modalBantuanKod').classList.add('hidden');
+            // Sembunyikan kembali preview jika pengguna tutup modal
+            document.getElementById('ruanganPreview').classList.add('hidden');
+        }
+
+        // Fungsi Toggle Ruangan Preview
+        function togglePreview() {
+            const ruang = document.getElementById('ruanganPreview');
+            if (ruang.classList.contains('hidden')) {
+                ruang.classList.remove('hidden');
+            } else {
+                ruang.classList.add('hidden');
+            }
+        }
+		
+// ==========================================
+        // FUNGSI BUKA TEMPLAT EDIT SECARA DINAMIK
+        // ==========================================
+        function bukaEditTemplate(e) {
+            e.preventDefault(); // Elak browser melompat ke atas
+            
+            const btn = document.getElementById('btnEditTemplate');
+            const ikonAsal = btn.innerHTML; // Simpan teks butang asal
+            
+            // Papar status loading
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Mencari fail terkini...`;
+            btn.classList.add('pointer-events-none', 'opacity-70');
+
+            const folderID = '1w48C0gfP-m7LhrqfYILXNOBYlc-QaCpB';
+            const namaFail = 'TEMPLATE SURAT LANTIKAN PENYELIDIK';
+
+            // Panggil Google Apps Script menggunakan kaedah POST
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ 
+                    action: "dapatkanIDFail", 
+                    folderId: folderID, 
+                    namaFail: namaFail 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // Kembalikan butang kepada keadaan asal
+                btn.innerHTML = ikonAsal;
+                btn.classList.remove('pointer-events-none', 'opacity-70');
+                
+                if(data.status === "BERJAYA" && data.id) {
+                    // Berjaya dapatkan ID, buka tab baharu untuk edit
+                    const urlEdit = `https://docs.google.com/document/d/${data.id}/edit`;
+                    window.open(urlEdit, '_blank');
+                } else {
+                    // Tunjuk mesej ralat sebenar dari server
+                    alert("Ralat dari server: " + (data.mesej || "Fail tidak dijumpai."));
+                }
+            })
+            .catch(err => {
+                btn.innerHTML = ikonAsal;
+                btn.classList.remove('pointer-events-none', 'opacity-70');
+                alert("⚠️ Gagal berhubung dengan pelayan. Sila periksa rangkaian anda.");
+                console.error("Ralat Fetch:", err);
+            });
+        }
     </script>
 </body>
 </html>
