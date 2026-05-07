@@ -61,43 +61,56 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+		<div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
             
-			<div class="bg-teal-50 p-5 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
-                <h2 class="text-lg font-bold text-teal-800 flex items-center gap-2">📊 Senarai Pendaftaran Projek</h2>
+            <div class="bg-teal-50 py-3 px-4 border-b border-gray-200 flex flex-col xl:flex-row justify-between items-center gap-4">
                 
-                <div class="flex flex-wrap items-center gap-3">
-                    <select id="filterTahun" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700">
+                <div class="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto flex-grow">
+                    <h2 class="text-base md:text-lg font-bold text-teal-800 flex items-center gap-2 whitespace-nowrap">
+                        📊 Senarai Projek
+                    </h2>
+                    
+                    <div class="relative w-full sm:max-w-xs xl:max-w-sm flex-grow">
+                        <input type="text" id="inputCarian" onkeyup="terapkanTapisan()" placeholder="Cari tajuk, ketua atau ahli..." 
+                               class="w-full px-3 py-1.5 pl-8 border border-teal-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none text-gray-700 shadow-sm transition-all">
+                        <span class="absolute left-2.5 top-1.5 text-teal-500 text-sm">🔍</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap sm:flex-nowrap items-center justify-end gap-2 w-full xl:w-auto">
+                    
+                    <select id="filterTahun" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700 cursor-pointer min-w-[120px]">
                         <option value="">Semua Tahun</option>
                     </select>
                     
-                    <select id="filterJabatan" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700">
-                        <option value="">⏳ Muat Turun Jabatan...</option>
+                    <select id="filterJabatan" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700 cursor-pointer w-full sm:w-auto max-w-[200px]">
+                        <option value="">⏳ Jabatan...</option>
                     </select>
 
-                    <select id="filterStatus" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700">
+                    <select id="filterStatus" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700 cursor-pointer min-w-[140px]">
                         <option value="">Semua Status</option>
                         <option value="MENUNGGU PENGESAHAN">Menunggu Pengesahan</option>
                         <option value="DISAHKAN">Disahkan</option>
                     </select>
 
-                    <button onclick="muatDataStatus()" class="bg-teal-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-sm">
+                    <button onclick="muatDataStatus()" class="bg-teal-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-sm cursor-pointer whitespace-nowrap">
                         🔄 Refresh
                     </button>
+                    
                 </div>
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
+                <table class="w-full text-left border-collapse text-[13px] md:text-sm whitespace-nowrap">
                     <thead>
-                        <tr class="bg-teal-600 text-white uppercase tracking-wide text-[11px]">
-                            <th class="p-3 border-b text-center w-12">BIL</th>
-                            <th class="p-3 border-b min-w-[250px]">MAKLUMAT PROJEK & TEMPOH</th>
-                            <th class="p-3 border-b min-w-[200px]">SENARAI PENYELIDIK</th>
-                            <th class="p-3 border-b text-center">JABATAN</th>
-                            <th class="p-3 border-b text-center border-l border-teal-500">DOKUMEN</th>
-                            <th class="p-3 border-b text-center border-l border-teal-500">STATUS</th>
-                            <th id="thTindakan" class="p-3 border-b text-center hidden">TINDAKAN</th>
+                        <tr class="bg-teal-600 text-white uppercase tracking-wide text-xs">
+                            <th class="p-4 border-b text-center w-12 font-semibold">BIL</th>
+                            <th class="p-4 border-b min-w-[300px] font-semibold">MAKLUMAT PROJEK & TEMPOH</th>
+                            <th class="p-4 border-b min-w-[250px] font-semibold">SENARAI PENYELIDIK</th>
+                            <th class="p-4 border-b text-center font-semibold">JABATAN</th>
+                            <th class="p-4 border-b text-center border-l border-teal-500 font-semibold">DOKUMEN</th>
+                            <th class="p-4 border-b text-center border-l border-teal-500 font-semibold">STATUS</th>
+                            <th id="thTindakan" class="p-4 border-b text-center hidden font-semibold">TINDAKAN</th>
                         </tr>
                     </thead>
                     <tbody id="isiJadualStatus" class="text-gray-700 bg-white">
@@ -109,8 +122,8 @@
             <div class="p-4 border-t border-gray-100 flex justify-between items-center bg-gray-50 text-sm">
                 <span class="text-gray-500 font-semibold" id="infoPaginasi">Papar 0 - 0 dari 0 rekod</span>
                 <div class="flex gap-2">
-                    <button onclick="ubahHalaman(-1)" id="btnPrev" class="px-4 py-1.5 bg-white border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50">Kiri</button>
-                    <button onclick="ubahHalaman(1)" id="btnNext" class="px-4 py-1.5 bg-white border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50">Kanan</button>
+                    <button onclick="ubahHalaman(-1)" id="btnPrev" class="px-5 py-2 bg-white border border-gray-300 font-bold text-gray-600 rounded-lg hover:bg-gray-100 disabled:opacity-50 transition cursor-pointer">Kiri</button>
+                    <button onclick="ubahHalaman(1)" id="btnNext" class="px-5 py-2 bg-white border border-gray-300 font-bold text-gray-600 rounded-lg hover:bg-gray-100 disabled:opacity-50 transition cursor-pointer">Kanan</button>
                 </div>
             </div>
         </div>
@@ -340,14 +353,24 @@
             return `${year}-${month}-${day}`;
         }
 
+		// ==========================================
+        // FUNGSI: MUAT TURUN SENARAI JABATAN
+        // ==========================================
         function muatDropdownJabatan() {
             fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
             .then(res => res.json())
             .then(data => {
                 const fJabatan = document.getElementById('filterJabatan');
                 fJabatan.innerHTML = '<option value="">Semua Jabatan</option>';
+                
                 if(data.status === "BERJAYA" && data.JABATAN) {
-                    data.JABATAN.forEach(jab => { fJabatan.innerHTML += `<option value="${jab}">${jab}</option>`; });
+                    data.JABATAN.forEach(jab => { 
+                        // 🌟 Panggil fungsi singkatan di sini
+                        let namaSingkatan = dapatkanSingkatanJabatan(jab);
+                        
+                        // value="${jab}" kekal nama penuh untuk filter, tapi paparan guna ${namaSingkatan}
+                        fJabatan.innerHTML += `<option value="${jab}">${namaSingkatan}</option>`; 
+                    });
                 }
 
                 if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
@@ -356,6 +379,23 @@
                     fJabatan.classList.add("bg-gray-200");
                 }
             });
+        }
+        
+        // ==========================================
+        // FUNGSI BANTUAN: AMBIL SINGKATAN JABATAN
+        // ==========================================
+        function dapatkanSingkatanJabatan(namaPenuh) {
+            if (!namaPenuh) return "";
+    
+            // Cari perkataan di dalam kurungan (cth: "JABATAN KEJURUTERAAN AWAM (JKA)")
+            const match = namaPenuh.match(/\(([^)]+)\)/);
+    
+            if (match) {
+                return match[1].trim(); // Akan pulangkan "JKA"
+            }
+    
+            // Jika tiada kurungan dijumpai, ia akan papar nama asal yang dipendekkan (maksimum 15 huruf)
+            return namaPenuh.length > 15 ? namaPenuh.substring(0, 15) + "..." : namaPenuh; 
         }
 
         function muatDataStatus() {
@@ -396,8 +436,10 @@
 		function terapkanTapisan() {
             const valTahun = document.getElementById('filterTahun').value;
             const valJab = document.getElementById('filterJabatan').value;
-            // 🌟 TAMBAHAN BARU: Dapatkan nilai filter status
             const valStatus = document.getElementById('filterStatus').value;
+            
+            // 🌟 TAMBAHAN: Ambil nilai carian dan tukar ke huruf kecil
+            const valCari = document.getElementById('inputCarian').value.toLowerCase().trim();
 
             let cMenunggu = 0;
             let cDisahkan = 0;
@@ -416,11 +458,32 @@
                 const dbStatus = dapatkanData(row, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN";
                 let checkStatus = (valStatus === "" || dbStatus.toUpperCase() === valStatus.toUpperCase());
 
+                // 4. 🌟 TAMBAHAN: Semakan Carian (Tajuk, Ketua, Ahli 1-5)
+                let checkCarian = true;
+                if (valCari !== "") {
+                    const dbTajuk = String(dapatkanData(row, ["tajuk", "TAJUK", "tajukProjek"])).toLowerCase();
+                    const dbKetua = String(dapatkanData(row, ["ketua", "KETUA", "namaKetua"])).toLowerCase();
+                    const a1 = String(dapatkanData(row, ["ahli1", "AHLI_1", "namaAhli1"])).toLowerCase();
+                    const a2 = String(dapatkanData(row, ["ahli2", "AHLI_2", "namaAhli2"])).toLowerCase();
+                    const a3 = String(dapatkanData(row, ["ahli3", "AHLI_3", "namaAhli3"])).toLowerCase();
+                    const a4 = String(dapatkanData(row, ["ahli4", "AHLI_4", "namaAhli4"])).toLowerCase();
+                    const a5 = String(dapatkanData(row, ["ahli5", "AHLI_5", "namaAhli5"])).toLowerCase();
+
+                    // Jika kata kunci dijumpai di mana-mana bahagian di bawah, ia akan melepasi tapisan
+                    checkCarian = dbTajuk.includes(valCari) || 
+                                  dbKetua.includes(valCari) || 
+                                  a1.includes(valCari) || 
+                                  a2.includes(valCari) || 
+                                  a3.includes(valCari) || 
+                                  a4.includes(valCari) || 
+                                  a5.includes(valCari);
+                }
+
                 // Gabungkan semua tapisan
-                let isSesuai = checkTahun && checkJabatan && checkStatus;
+                let isSesuai = checkTahun && checkJabatan && checkStatus && checkCarian;
                 
-                // Pengiraan untuk kad ringkasan di atas jadual (Hanya kira yang melepasi tapisan tahun & jabatan)
-                if(checkTahun && checkJabatan) {
+                // Pengiraan untuk kad ringkasan di atas jadual (Akan update secara dinamik berdasarkan carian)
+                if(isSesuai) {
                     if(dbStatus.toUpperCase() === "DISAHKAN") cDisahkan++;
                     else cMenunggu++;
                 }
