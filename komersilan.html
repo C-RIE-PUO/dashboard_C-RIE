@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Komersialan R&D</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        // Semakan Peranan
+        const userJabatan = sessionStorage.getItem("jabatan") || "";
+        const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
+        const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .table-container { max-height: 500px; overflow-y: auto; }
+        thead th { position: sticky; top: 0; z-index: 10; background-color: #f1f5f9; }
+        
+        /* Spinner CSS */
+        .loader {
+            border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #6366f1;
+            width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-indigo-700 text-white shadow-md">
+        <div class="max-w-[95rem] mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl md:text-4xl">🚀</span>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-wide">Dashboard Komersialan</h1>
+                    <p class="text-indigo-200 mt-1 text-xs md:text-sm">Analisis dan Rekod Komersialan Produk Inovasi</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+                <button id="btnRefresh" onclick="muatTurunDataPenuh()" class="bg-indigo-600 hover:bg-indigo-800 border border-indigo-400 text-white px-4 py-2.5 rounded-lg font-bold shadow transition text-sm flex items-center gap-2">
+                    <i class="fas fa-sync-alt"></i> Muat Semula
+                </button>
+                <button id="btnBulkUpload" onclick="bukaModalUpload()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg font-bold shadow transition text-sm flex items-center gap-2">
+                    <i class="fas fa-file-upload"></i> Muat Naik Pukal
+                </button>
+                <a href="utama.html" class="bg-white text-indigo-800 px-4 py-2.5 rounded-lg font-bold shadow hover:bg-indigo-50 transition text-sm flex items-center gap-2">
+                    <i class="fas fa-home"></i> Laman Utama
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[95rem] mx-auto px-4 py-8 flex-grow w-full">
+        
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row gap-4 items-end">
+            <div class="w-full md:w-1/3">
+                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Jabatan</label>
+                <select id="filterJabatan" onchange="kemaskiniDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="SEMUA">Semua Jabatan</option>
+                </select>
+            </div>
+		<div class="w-full md:w-1/3">
+			<label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Tahun</label>
+			<input 
+			type="text" 
+			id="filterTahun"
+			onkeyup="kemaskiniDashboard()"
+			placeholder="Contoh: 2024"
+			class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+		</div>
+            <div class="w-full md:w-1/3">
+                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Carian</label>
+                <input type="text" id="carian" onkeyup="kemaskiniDashboard()" placeholder="Cari Nama Produk / Syarikat / Jabatan..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 border-l-4 border-l-indigo-500">
+                <div class="bg-indigo-100 p-3 rounded-lg text-indigo-600"><i class="fas fa-boxes fa-2x"></i></div>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">Jumlah Produk</p>
+                    <h2 id="statProduk" class="text-2xl font-black text-slate-800">0</h2>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 border-l-4 border-l-emerald-500">
+                <div class="bg-emerald-100 p-3 rounded-lg text-emerald-600"><i class="fas fa-check-circle fa-2x"></i></div>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">Berjaya Komersial</p>
+                    <h2 id="statKomersial" class="text-2xl font-black text-slate-800">0</h2>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 border-l-4 border-l-amber-500">
+                <div class="bg-amber-100 p-3 rounded-lg text-amber-600"><i class="fas fa-hand-holding-usd fa-2x"></i></div>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">Pendapatan Janaan</p>
+                    <h2 id="statPendapatan" class="text-xl font-black text-slate-800">RM 0</h2>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4 border-l-4 border-l-sky-500">
+                <div class="bg-sky-100 p-3 rounded-lg text-sky-600"><i class="fas fa-chart-line fa-2x"></i></div>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">Jumlah Pelaburan</p>
+                    <h2 id="statPelaburan" class="text-xl font-black text-slate-800">RM 0</h2>
+                </div>
+            </div>
+        </div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+    
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <h3 class="text-[10px] font-bold text-slate-700 mb-2 uppercase">Statistik Jabatan</h3>
+        <div class="h-48 relative"> <canvas id="jabatanChart"></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <h3 class="text-[10px] font-bold text-slate-700 mb-2 uppercase">Status Komersialan</h3>
+        <div class="h-48 relative">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <h3 class="text-[10px] font-bold text-slate-700 mb-2 uppercase">Bentuk Komersialan</h3>
+        <div class="h-48 relative">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+</div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-slate-800 uppercase"><i class="fas fa-table text-indigo-500 mr-2"></i> Rekod Terperinci</h3>
+                <span id="rekodCount" class="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">Memuat turun...</span>
+            </div>
+            <div class="table-container">
+                <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+                    <thead>
+                        <tr class="text-slate-500 uppercase tracking-wide border-b border-slate-200">
+                            <th class="p-3 font-semibold">Tahun Dikomersialkan</th>
+                            <th class="p-3 font-semibold">Institusi</th>
+                            <th class="p-3 font-semibold text-indigo-600">Jabatan</th> 
+                            <th class="p-3 font-semibold min-w-[250px]">Nama Produk / Ketua</th>
+                            <th class="p-3 font-semibold text-center">Status</th>
+                            <th class="p-3 font-semibold">Bentuk Komersilan</th>
+                            <th class="p-3 font-semibold text-right">Pelaburan (RM)</th>
+                            <th class="p-3 font-semibold text-right text-emerald-600">Pendapatan (RM)</th>
+                            <th class="p-3 font-semibold">Syarikat Terlibat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiJadual" class="text-slate-700">
+                        <tr><td colspan="9" class="p-8 text-center text-slate-500 font-medium"><div class="loader mr-2 align-middle"></div> Sedang menyemak pangkalan data...</td></tr>
+                    </tbody>
+                </table>
+				<div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+    <button id="btnPrev" onclick="halamanSebelum()" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
+        <i class="fas fa-chevron-left mr-1"></i> Sebelumnya
+    </button>
+    <span id="pageInfo" class="text-xs font-bold text-slate-600 uppercase tracking-widest">Halaman 1</span>
+    <button id="btnNext" onclick="halamanSeterusnya()" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
+        Seterusnya <i class="fas fa-chevron-right ml-1"></i>
+    </button>
+</div>
+            </div>
+        </div>
+    </main>
+
+    <div id="modalUpload" class="fixed inset-0 bg-slate-900 bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fas fa-file-upload mr-2"></i> Muat Naik Data Pukal</h3>
+                <button onclick="tutupModalUpload()" class="text-indigo-200 hover:text-white text-2xl font-bold leading-none">&times;</button>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+    <p class="text-sm text-slate-600">Sila muat naik fail Excel (.xlsx) atau CSV mengikut format lajur yang telah ditetapkan.</p>
+    <button type="button" onclick="muatTurunTemplateCSV()" class="bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded shadow-sm text-xs font-bold hover:bg-indigo-200 transition flex items-center gap-1 whitespace-nowrap">
+        <i class="fas fa-file-csv"></i> Muat Turun Template
+    </button>
+</div>
+                
+                <div class="border-2 border-dashed border-indigo-300 rounded-xl p-8 text-center bg-indigo-50 mb-6 relative">
+                    <i class="fas fa-file-excel text-4xl text-emerald-500 mb-3"></i>
+                    <p class="text-sm font-bold text-indigo-800 mb-1" id="fileStatusText">Seret & Lepas fail di sini</p>
+                    <p class="text-xs text-slate-500 mb-4" id="fileStatusSub">atau klik butang di bawah untuk memilih fail</p>
+                    <input type="file" id="fileUpload" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="hidden" onchange="kemaskiniNamaFail()">
+                    <button onclick="document.getElementById('fileUpload').click()" class="bg-white border border-indigo-300 text-indigo-700 px-4 py-2 rounded shadow-sm text-sm font-bold hover:bg-indigo-100 transition">
+                        Pilih Fail
+                    </button>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="tutupModalUpload()" class="px-5 py-2.5 bg-slate-200 text-slate-700 rounded-lg font-bold hover:bg-slate-300 transition text-sm">Batal</button>
+                    <button type="button" id="btnProsesUpload" onclick="prosesUploadPukal()" class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition shadow-md text-sm flex items-center gap-2">
+                        <i class="fas fa-cloud-upload-alt"></i> Muat Naik
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MASUKKAN URL APP SCRIPT ANDA DI SINI
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
+        
+        let dataMentah = []; 
+        let chartStatus = null;
+        let chartTahun = null;
+		let chartJabatan = null;
+
+        window.onload = () => {
+            if (isApprover || true) { 
+                document.getElementById('btnBulkUpload').classList.remove('hidden');
+            }
+            muatTurunDataPenuh();
+        };
+
+        async function muatTurunDataPenuh() {
+            await muatTurunDataKomersialan();
+            
+            binaFilterJabatan();
+            
+            kemaskiniDashboard();
+        }
+
+        // ==========================================
+        // FETCH DATA KOMERSIALAN 
+        // ==========================================
+        async function muatTurunDataKomersialan() {
+            const tbody = document.getElementById('isiJadual');
+            tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-500 font-medium"><div class="loader mr-2 align-middle"></div> Sedang memuat turun data dari pelayan...</td></tr>`;
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getData`);
+                if (!response.ok) throw new Error("Gagal menyambung ke Apps Script");
+                
+                const result = await response.json();
+                dataMentah = result.data ? result.data : result; 
+                
+                if(!Array.isArray(dataMentah)) {
+                    dataMentah = []; 
+                }
+            } catch (error) {
+                console.error("Ralat muat turun Data Komersialan:", error);
+                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-red-500 font-medium">Ralat memuat turun data. Sila semak pautan Apps Script atau CORS.</td></tr>`;
+                document.getElementById('rekodCount').innerText = "Ralat";
+            }
+        }
+
+        // ==========================================
+        // JANA FILTER JABATAN DARI DATA KOMERSIALAN
+        // ==========================================
+        function binaFilterJabatan() {
+            const selectJabatan = document.getElementById("filterJabatan");
+            selectJabatan.innerHTML = '<option value="SEMUA">Semua Jabatan</option>';
+
+            if (dataMentah.length === 0) return;
+
+            const senaraiJabatan = [];
+            dataMentah.forEach(row => {
+                let jab = String(row['JABATAN'] || row['Jabatan'] || '').trim();
+                
+                if (jab !== "" && !senaraiJabatan.includes(jab)) {
+                    senaraiJabatan.push(jab);
+                }
+            });
+
+            senaraiJabatan.sort();
+            senaraiJabatan.forEach(jab => {
+                selectJabatan.innerHTML += `<option value="${jab}">${jab}</option>`;
+            });
+        }
+
+
+
+        // ==========================================
+        // KEMASKINI DASHBOARD (KAD & CARTA)
+        // ==========================================
+// 1. Tambah pemboleh ubah global baru
+let dataDitapisGlobal = []; 
+let halamanSemasa = 1;
+const rekodPerHalaman = 10;
+
+// 2. Kemaskini fungsi kemaskiniDashboard()
+function kemaskiniDashboard() {
+    const fJab = document.getElementById('filterJabatan').value;
+    const fTah = document.getElementById('filterTahun').value.trim();
+    const cari = document.getElementById('carian').value.toLowerCase();
+
+    // Tapis data
+    dataDitapisGlobal = dataMentah.filter(row => {
+        let rowJabatan = String(row['JABATAN'] || row['Jabatan'] || '').trim();
+        const matchJab = (fJab === "SEMUA" || rowJabatan === fJab);
+        const matchTah = (fTah === "" || String(row['Tahun Dikomersilkan'] || '').includes(fTah));
+        const matchCari = cari === "" || 
+                          String(row['Nama Produk'] || '').toLowerCase().includes(cari) || 
+                          String(row['Nama Syarikat'] || '').toLowerCase().includes(cari) ||
+                          rowJabatan.toLowerCase().includes(cari);
+        return matchJab && matchTah && matchCari;
+    });
+
+    // Reset ke halaman 1 setiap kali filter berubah
+    halamanSemasa = 1;
+
+    // Statistik Kad
+    document.getElementById('statProduk').innerText = dataDitapisGlobal.length;
+    const bilKomersial = dataDitapisGlobal.filter(r => String(r['Status Komersilan']).includes('TELAH')).length;
+    document.getElementById('statKomersial').innerText = bilKomersial;
+
+    const totalPendapatan = dataDitapisGlobal.reduce((sum, r) => sum + (parseFloat(r['Pendapatan']) || 0), 0);
+    const totalPelaburan = dataDitapisGlobal.reduce((sum, r) => sum + (parseFloat(r['Jumlah Pelaburan(RM)']) || 0), 0);
+    
+    document.getElementById('statPendapatan').innerText = "RM " + totalPendapatan.toLocaleString('ms-MY', {minimumFractionDigits:2});
+    document.getElementById('statPelaburan').innerText = "RM " + totalPelaburan.toLocaleString('ms-MY', {minimumFractionDigits:2});
+    document.getElementById('rekodCount').innerText = dataDitapisGlobal.length + " Rekod";
+
+    // Papar jadual & carta
+    tunjukHalaman(); 
+    binaCartaStatus(dataDitapisGlobal);
+    binaCartaTahun(dataDitapisGlobal);
+    binaCartaJabatan(dataDitapisGlobal);
+}
+
+// 3. Tambah fungsi navigasi baru
+function tunjukHalaman() {
+    const startIndex = (halamanSemasa - 1) * rekodPerHalaman;
+    const endIndex = startIndex + rekodPerHalaman;
+    const dataHalaman = dataDitapisGlobal.slice(startIndex, endIndex);
+
+    binaJadual(dataHalaman);
+
+    // Kemaskini butang dan teks info
+    const totalPages = Math.ceil(dataDitapisGlobal.length / rekodPerHalaman) || 1;
+    document.getElementById('pageInfo').innerText = `Halaman ${halamanSemasa} dari ${totalPages}`;
+    document.getElementById('btnPrev').disabled = (halamanSemasa === 1);
+    document.getElementById('btnNext').disabled = (halamanSemasa === totalPages);
+}
+
+function halamanSebelum() {
+    if (halamanSemasa > 1) {
+        halamanSemasa--;
+        tunjukHalaman();
+    }
+}
+
+function halamanSeterusnya() {
+    const totalPages = Math.ceil(dataDitapisGlobal.length / rekodPerHalaman);
+    if (halamanSemasa < totalPages) {
+        halamanSemasa++;
+        tunjukHalaman();
+    }
+}
+
+        function binaJadual(data) {
+            const tbody = document.getElementById('isiJadual');
+            tbody.innerHTML = "";
+
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-500 font-medium">Tiada rekod ditemui.</td></tr>`;
+                return;
+            }
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 transition";
+                
+                let statusBadge = "";
+                let status = String(row['Status Komersilan'] || '').toUpperCase();
+                if(status.includes("TELAH")) {
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold">✅ TELAH KOMERSIAL</span>`;
+                } else if (status.includes("PROSES")) {
+                    statusBadge = `<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-[10px] font-bold">⏳ DALAM PROSES</span>`;
+                } else {
+                    statusBadge = `<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-bold">${status || '-'}</span>`;
+                }
+
+                let jabatan = row['JABATAN'] || row['Jabatan'] || '-';
+
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-600">${row['Tahun Dikomersilkan'] || '-'}</td>
+                    <td class="p-3 text-slate-600">${row['Institusi'] || '-'}</td>
+                    <td class="p-3 text-indigo-700 font-bold">${jabatan}</td>
+                    <td class="p-3 whitespace-normal min-w-[250px]">
+                        <div class="font-bold text-slate-800">${row['Nama Produk'] || '-'}</div>
+                        <div class="text-[10px] text-slate-500 mt-0.5">Ketua: ${row['Nama'] || '-'}</div>
+                    </td>
+                    <td class="p-3 text-center">${statusBadge}</td>
+                    <td class="p-3 text-slate-600">${row['Bentuk Komersilan'] || '-'}</td>
+                    <td class="p-3 text-right font-mono text-slate-700">${(parseFloat(row['Jumlah Pelaburan(RM)']) || 0).toLocaleString('ms-MY',{minimumFractionDigits:2})}</td>
+                    <td class="p-3 text-right font-mono text-emerald-600 font-bold">${(parseFloat(row['Pendapatan']) || 0).toLocaleString('ms-MY',{minimumFractionDigits:2})}</td>
+                    <td class="p-3 text-slate-600 whitespace-normal text-[11px]">${row['Nama Syarikat'] || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+// Untuk Pie Chart (kecilkan font legend)
+function binaCartaStatus(data) {
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    if(chartStatus) chartStatus.destroy();
+
+    const statusCounts = {};
+    data.forEach(r => {
+        let stat = String(r['Status Komersilan']) || "TIDAK DIKETAHUI";
+        statusCounts[stat] = (statusCounts[stat] || 0) + 1;
+    });
+
+    chartStatus = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(statusCounts),
+            datasets: [{
+                data: Object.values(statusCounts),
+                backgroundColor: ['#10b981', '#f59e0b', '#6366f1', '#ef4444', '#8b5cf6'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { 
+                    position: 'bottom', // Letak di bawah untuk lebih ruang
+                    labels: { boxWidth: 10, font: { size: 8 } } 
+                } 
+            }
+        }
+    });
+}
+
+function binaCartaTahun(data) {
+    const ctx = document.getElementById('barChart').getContext('2d');
+    if(chartTahun) chartTahun.destroy();
+
+    const bentukData = {};
+    data.forEach(r => {
+        let bentuk = String(r['Bentuk Komersilan'] || 'Tiada').trim();
+        if (bentuk !== '') { bentukData[bentuk] = (bentukData[bentuk] || 0) + 1; }
+    });
+
+    chartTahun = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(bentukData),
+            datasets: [{
+                label: 'Jumlah',
+                data: Object.values(bentukData),
+                backgroundColor: '#6366f1',
+                borderRadius: 4,
+                barPercentage: 0.6, // Mengecilkan saiz lebar bar
+                categoryPercentage: 0.8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { font: { size: 9 }, precision: 0 } },
+                x: { ticks: { font: { size: 9 } }, grid: { display: false } }
+            }
+        }
+    });
+}
+
+function binaCartaJabatan(data) {
+    const ctx = document.getElementById('jabatanChart').getContext('2d');
+    if (chartJabatan) chartJabatan.destroy();
+
+    const jabatanCounts = {};
+    data.forEach(row => {
+        let jab = String(row['JABATAN'] || row['Jabatan'] || 'Lain-lain').trim();
+        if (jab) { jabatanCounts[jab] = (jabatanCounts[jab] || 0) + 1; }
+    });
+
+    chartJabatan = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(jabatanCounts),
+            datasets: [{
+                label: 'Jumlah',
+                data: Object.values(jabatanCounts),
+                backgroundColor: '#8b5cf6',
+                borderRadius: 4,
+                barPercentage: 0.6, // Mengecilkan saiz lebar bar
+                categoryPercentage: 0.8
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, ticks: { font: { size: 9 } } },
+                y: { ticks: { font: { size: 9 } }, grid: { display: false } }
+            }
+        }
+    });
+}
+        function bukaModalUpload() { 
+            document.getElementById('modalUpload').classList.remove('hidden'); 
+            document.getElementById('fileUpload').value = ""; 
+            document.getElementById('fileStatusText').innerText = "Seret & Lepas fail di sini";
+            document.getElementById('fileStatusSub').innerText = "atau klik butang di bawah untuk memilih fail";
+        }
+        function tutupModalUpload() { document.getElementById('modalUpload').classList.add('hidden'); }
+
+        function kemaskiniNamaFail() {
+            const input = document.getElementById('fileUpload');
+            if(input.files.length > 0) {
+                document.getElementById('fileStatusText').innerText = input.files[0].name;
+                document.getElementById('fileStatusSub').innerText = "Fail sedia untuk diproses.";
+            }
+        }
+
+function prosesUploadPukal() {
+    const fileInput = document.getElementById('fileUpload');
+    if(fileInput.files.length === 0) {
+        alert("Sila pilih fail Excel atau CSV terlebih dahulu.");
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    const btnProses = document.getElementById('btnProsesUpload');
+    
+    btnProses.innerHTML = `<div class="loader mr-2"></div> Memproses...`;
+    btnProses.disabled = true;
+
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            
+            // PENTING: Tambah { defval: "" } supaya lajur yang kosong 
+            // (seperti JABATAN di baris pertama) tetap dibaca
+            const rawJsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+            
+            if(rawJsonData.length === 0) {
+                alert("Fail ini kosong atau format tidak tepat.");
+                resetBtnUpload(btnProses);
+                return;
+            }
+
+            // Bersihkan semua tajuk lajur (buang \r, \n, atau ruang kosong) untuk SETIAP baris
+            const jsonData = rawJsonData.map(row => {
+                const cleanRow = {};
+                for (let key in row) {
+                    const cleanKey = key.replace(/[\r\n]+/g, '').trim();
+                    cleanRow[cleanKey] = row[key];
+                }
+                return cleanRow;
+            });
+
+            const requiredColumns = [
+                "Institusi",
+                "Nama",
+                "No. Telefon",
+                "Nama Produk",
+                "Bentuk Komersilan",
+                "Jenis Industri",
+                "Nama Syarikat",
+                "Tahun Dikomersilkan",
+                "Jumlah Pelaburan(RM)",
+                "Pendapatan",
+                "Peratus Ekuiti",
+                "Kegunaan Produk",
+                "Status Komersilan",
+                "JABATAN"
+            ];
+
+            const firstRow = jsonData[0];
+            const actualColumns = Object.keys(firstRow);
+
+            // Semak adakah lajur yang diwajibkan wujud di dalam fail
+            const missingColumns = requiredColumns.filter(
+                col => !actualColumns.includes(col)
+            );
+
+            if (missingColumns.length > 0) {
+                alert(
+                    "Template tidak sah.\n\nLajur hilang:\n- " +
+                    missingColumns.join("\n- ")
+                );
+                resetBtnUpload(btnProses);
+                return;
+            }
+            
+            // Jika semuanya sah, hantar data ke Google Apps Script
+            hantarKeAppsScript(jsonData, btnProses);
+
+        } catch (err) {
+            console.error("Ralat membaca fail:", err);
+            alert("Ralat semasa membaca fail. Pastikan ia fail Excel (.xlsx) atau .csv yang sah.");
+            resetBtnUpload(btnProses);
+        }
+    };
+    
+    reader.readAsArrayBuffer(file);
+}
+
+        async function hantarKeAppsScript(jsonData, btn) {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "upload", data: jsonData })
+                });
+
+                const result = await response.json();
+                
+                if(result.status === "success" || result.status === "BERJAYA" || response.ok) {
+                    alert(`Berjaya muat naik ${jsonData.length} rekod ke pangkalan data.`);
+                    tutupModalUpload();
+                    muatTurunDataPenuh(); // Refresh senarai dan jadual selepas upload
+                } else {
+                    throw new Error(result.mesej || "Gagal menyimpan ke Google Sheet");
+                }
+            } catch (error) {
+                console.error("Ralat Muat Naik:", error);
+                alert("Ralat pelayan / CORS. Sila pastikan Apps Script dideploy (Execute as: Me, Who has access: Anyone) dan mempunyai fungsi doPost yang sah.");
+            } finally {
+                resetBtnUpload(btn);
+            }
+        }
+
+        function resetBtnUpload(btn) {
+            btn.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> Muat Naik`;
+            btn.disabled = false;
+        }
+		
+		// ==========================================
+// FUNGSI MUAT TURUN TEMPLATE CSV
+// ==========================================
+function muatTurunTemplateCSV() {
+    // Senarai lajur yang wajib ada mengikut format yang anda tetapkan
+    const requiredColumns = [
+        "Institusi",
+        "Nama",
+        "No. Telefon",
+        "Nama Produk",
+        "Bentuk Komersilan",
+        "Jenis Industri",
+        "Nama Syarikat",
+        "Tahun Dikomersilkan",
+        "Jumlah Pelaburan(RM)",
+        "Pendapatan",
+        "Peratus Ekuiti",
+        "Kegunaan Produk",
+        "Status Komersilan",
+        "JABATAN"
+    ];
+
+    // Gabungkan array menjadi format CSV (dipisahkan dengan koma)
+    const csvContent = requiredColumns.join(",") + "\n";
+
+    // Cipta Blob untuk fail CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    // Tetapkan atribut muat turun
+    link.setAttribute("href", url);
+    link.setAttribute("download", "Template_Muat_Naik_Komersialan.csv");
+    link.style.visibility = 'hidden';
+    
+    // Klik secara automatik untuk muat turun
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+		
+		
+		
+    </script>
+</body>
+</html>
