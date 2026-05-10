@@ -55,7 +55,7 @@
   
   <div id="loader">
     <div class="spinner-border text-primary" role="status"></div>
-    <p>Sedang memuat turun data...</p>
+    <p id="loaderTeks">Sedang memuat turun data...</p>
   </div>
 
   <div class="table-container table-responsive">
@@ -106,6 +106,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+  // MASUKKAN URL GOOGLE APPS SCRIPT
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
   let dataInovasiLulus = []; 
   const modalUploadEl = new bootstrap.Modal(document.getElementById('modalUpload'));
@@ -114,6 +115,7 @@
 
   function loadData() {
     document.getElementById("loader").style.display = "block";
+    document.getElementById("loaderTeks").innerText = "Sedang memuat turun data...";
     document.getElementById("bodyJadual").innerHTML = "";
 
     fetch(SCRIPT_URL + "?action=ambilData")
@@ -121,14 +123,12 @@
       .then(response => {
         document.getElementById("loader").style.display = "none";
         if (response.status === "BERJAYA") {
-          // Ambil data yang disahkan
           let senaraiAsal = response.data.filter(rekod => rekod[9] === "DISAHKAN");
           
-          // 2. TAPISAN DATA BERDASARKAN PERANAN (STAF HANYA LIHAT JABATAN SENDIRI)
           if (!isPengurusSijil && perananUpper === "STAF") {
               dataInovasiLulus = senaraiAsal.filter(rekod => rekod[3] === jabatanPengguna);
           } else {
-              dataInovasiLulus = senaraiAsal; // Admin/Penyelaras lihat semua
+              dataInovasiLulus = senaraiAsal; 
           }
           
           binaFilter(dataInovasiLulus);
@@ -161,7 +161,6 @@
     setJabatan.forEach(jab => selectJabatan.innerHTML += `<option value="${jab}">${jab}</option>`);
     setTahun.forEach(thn => selectTahun.innerHTML += `<option value="${thn}">${thn}</option>`);
 
-    // Jika Staf login, kunci dropdown jabatan kepada jabatan dia sahaja
     if (!isPengurusSijil && perananUpper === "STAF") {
         selectJabatan.value = jabatanPengguna;
         selectJabatan.disabled = true;
@@ -193,33 +192,37 @@
     data.forEach(rekod => {
       let tr = document.createElement("tr");
       
-      // 🌟 TUKAR KEPADA rekod[11] (Indeks untuk Lajur L - Sijil Penghargaan)
-      let linkSijilPenghargaan = rekod[11] || ""; 
+      let linkSijilPenghargaan = rekod[11] || ""; // Lajur L
       
-      // Status Sijil
       let statusSijil = linkSijilPenghargaan 
           ? `<span class="badge bg-success">Tersedia</span>` 
-          : `<span class="badge bg-secondary">Belum Dimuat Naik</span>`;
+          : `<span class="badge bg-secondary">Belum Dijana</span>`;
       
       let butangAksi = "";
 
-      // 3. LOGIK PAPARAN BUTANG BERDASARKAN PERANAN
       if (isPengurusSijil) {
-          // ADMIN / KUPIK / PENYELARAS boleh buat semua
           if (!linkSijilPenghargaan) {
-            // Jika tiada link di Lajur L, tunjuk butang Upload
-            butangAksi = `<button class="btn btn-primary btn-sm" onclick="bukaModalUpload('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">⬆ Upload Sijil</button>`;
-          } else {
-            // Jika dah ada link di Lajur L, tunjuk butang Download & Tukar
+            // JIKA BELUM ADA SIJIL (Upload Manual & Jana Automatik)
             butangAksi = `
-              <div class="d-flex gap-1">
-                <a href="${linkSijilPenghargaan}" target="_blank" class="btn btn-success btn-sm">⬇ Download</a>
-                <button class="btn btn-warning btn-sm" onclick="bukaModalUpload('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">🔄 Tukar Sijil</button>
+              <div class="d-flex flex-column gap-2">
+                <button class="btn btn-outline-primary btn-sm" onclick="bukaModalUpload('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">⬆ Upload Manual</button>
+                <button class="btn btn-info btn-sm text-white fw-bold" onclick="janaSijilAuto('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">✨ Jana Automatik</button>
+              </div>
+            `;
+          } else {
+            // JIKA SUDAH ADA SIJIL (Boleh download, Upload semula, Jana semula)
+            butangAksi = `
+              <div class="d-flex flex-column gap-1">
+                <a href="${linkSijilPenghargaan}" target="_blank" class="btn btn-success btn-sm w-100">⬇ Download Sijil</a>
+                <div class="d-flex gap-1 mt-1">
+                  <button class="btn btn-outline-warning btn-sm w-50" title="Upload Manual Baru" onclick="bukaModalUpload('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">🔄 Upload</button>
+                  <button class="btn btn-info btn-sm text-white fw-bold w-50" title="Jana Semula Sijil" onclick="janaSijilAuto('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">✨ Jana</button>
+                </div>
               </div>
             `;
           }
       } else {
-          // STAF HANYA boleh download jika sijil ada
+          // STAF HANYA Boleh Download Jika Ada
           if (linkSijilPenghargaan) {
               butangAksi = `<a href="${linkSijilPenghargaan}" target="_blank" class="btn btn-success btn-sm">⬇ Download Sijil</a>`;
           } else {
@@ -239,6 +242,41 @@
       `;
       tbody.appendChild(tr);
     });
+  }
+
+  // FUNGSI JANA SIJIL AUTOMATIK
+  function janaSijilAuto(bil, tahun, jabatan) {
+      if(!confirm("Anda pasti mahu sistem menjana sijil penghargaan secara automatik berdasarkan data ini?")) return;
+      
+      document.getElementById("loaderTeks").innerText = "Sistem sedang menjana sijil. Sila tunggu, proses ini mengambil sedikit masa...";
+      document.getElementById("loader").style.display = "block";
+
+      const payload = {
+          action: "janaSijilAutomatikInovasi",
+          bil: bil,
+          tahun: tahun,
+          jabatan: jabatan
+      };
+
+      fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "text/plain;charset=utf-8" }
+      })
+      .then(res => res.json())
+      .then(response => {
+          document.getElementById("loader").style.display = "none";
+          if (response.status === "BERJAYA") {
+              alert("✅ Berjaya! Sijil telah siap dijana dan disimpan dalam sistem.");
+              loadData(); 
+          } else {
+              alert("❌ Ralat: " + response.mesej);
+          }
+      })
+      .catch(err => {
+          document.getElementById("loader").style.display = "none";
+          alert("⚠️ Ralat pelayan: Gagal menjana sijil.");
+      });
   }
 
   function bukaModalUpload(bil, tahun, jabatan) {
