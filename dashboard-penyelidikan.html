@@ -53,6 +53,13 @@
                         <option value="">⏳ Semua Jabatan</option>
                     </select>
 
+                    <select id="filterStatus" onchange="applyFilters()" class="border border-gray-300 px-3 py-1.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none flex-grow md:flex-grow-0">
+                        <option value="">⏳ Semua Status</option>
+                        <option value="MENUNGGU">Menunggu</option>
+                        <option value="DISAHKAN">Disahkan</option>
+                        <option value="DITOLAK">Ditolak</option>
+                    </select>
+
                     <button onclick="ambilDataPenyelidikan()" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 transition shadow-sm">🔄 Refresh</button>
                     <button onclick="downloadCSV()" class="bg-emerald-600 text-white hover:bg-emerald-700 px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 transition shadow-md">📊 Eksport CSV</button>
                 </div>
@@ -63,33 +70,33 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[1700px]">
+                <table class="w-full text-left border-collapse min-w-[1000px]">
                     <thead>
                         <tr class="bg-slate-800 text-white text-xs uppercase tracking-wider">
                             <th class="p-4 border-b w-12 text-center">BIL</th>
                             <th class="p-4 border-b w-64">TAJUK</th>
                             <th class="p-4 border-b w-48">PENULIS</th>
-                            <th class="p-4 border-b">PUBLISHER</th>
-                            <th class="p-4 border-b text-center">VOL/ISSUE</th>
-                            <th class="p-4 border-b text-center">TARIKH</th>
-                            <th class="p-4 border-b text-center">DOI/URL</th>
+                            <th class="p-4 border-b w-40">PUBLISHER</th>
                             <th class="p-4 border-b text-center">JABATAN</th>
-                            <th class="p-4 border-b text-center">TAHAP SEBARAN</th>
-                            <th class="p-4 border-b text-center">SUKUAN</th>
-                            <th class="p-4 border-b text-center">TAHUN</th>
-                            <th class="p-4 border-b text-center">BAHASA</th>
-                            <th class="p-4 border-b text-center">INDEX STATUS</th>
+                            <th class="p-4 border-b text-center w-24">SUKUAN</th>
+                            <th class="p-4 border-b text-center w-24">TAHUN</th>
                             <th class="p-4 border-b text-center w-28">STATUS</th>
                         </tr>
                     </thead>
                     <tbody id="isiJadual" class="text-gray-700 text-sm bg-white">
                         <tr>
-                            <td colspan="14" class="p-10 text-center font-semibold text-gray-500 animate-pulse">
+                            <td colspan="8" class="p-10 text-center font-semibold text-gray-500 animate-pulse">
                                 ⏳ Sedang memuatkan data...
                             </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="p-4 flex justify-between items-center bg-gray-50 border-t">
+                <button id="btnPrev" onclick="tukarMukaSurat(-1)" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold transition disabled:opacity-50">⬅️ Previous</button>
+                <span class="text-sm font-semibold text-gray-600">Muka Surat <span id="currentMukaSurat">1</span> / <span id="totalMukaSurat">1</span></span>
+                <button id="btnNext" onclick="tukarMukaSurat(1)" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold transition disabled:opacity-50">Next ➡️</button>
             </div>
         </div>
     </div>
@@ -106,6 +113,10 @@
         
         let rekodPenuh = []; // Simpan data asal dari database
         let rekodDitapis = []; // Simpan data selepas filter (untuk CSV)
+        
+        // Pembolehubah untuk Pagination
+        let mukaSuratSemasa = 1;
+        const saizMukaSurat = 10;
 
         document.getElementById('namaPengguna').innerText = userNama;
         document.getElementById('perananPengguna').innerText = userPeranan;
@@ -161,7 +172,7 @@
         // --- 3. AMBIL DATA PENYELIDIKAN ---
         function ambilDataPenyelidikan() {
             const tbody = document.getElementById('isiJadual');
-            tbody.innerHTML = `<tr><td colspan="14" class="p-10 text-center font-semibold text-blue-500 animate-pulse">🔄 Menyemak pangkalan data penyelidikan...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center font-semibold text-blue-500 animate-pulse">🔄 Menyemak pangkalan data penyelidikan...</td></tr>`;
 
             fetch(SCRIPT_URL + "?action=ambilKPIPenyelidikan")
             .then(res => res.json())
@@ -175,11 +186,11 @@
 
                     applyFilters(); // Jalankan tapisan awal
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="14" class="p-6 text-center text-red-600 font-bold">Ralat: ${data.mesej}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-red-600 font-bold">Ralat: ${data.mesej}</td></tr>`;
                 }
             })
             .catch(err => {
-                tbody.innerHTML = `<tr><td colspan="14" class="p-6 text-center text-red-600 font-bold">⚠️ Gagal menghubungi server.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-red-600 font-bold">⚠️ Gagal menghubungi server.</td></tr>`;
                 console.error("Ralat Fetch:", err);
             });
         }
@@ -189,6 +200,7 @@
             let fTahun = document.getElementById('filterTahun').value;
             let fSukuan = document.getElementById('filterSukuan').value;
             let fJabatan = document.getElementById('filterJabatan').value;
+            let fStatus = document.getElementById('filterStatus').value;
 
             // Keselamatan tambahan untuk staf: Paksa jabatan mereka
             if (perananUpper === "STAF" && userJabatan) {
@@ -201,23 +213,34 @@
                 let matchTahun = fTahun === "" || row.tahun == fTahun;
                 let matchSukuan = fSukuan === "" || row.laporanKpi === fSukuan;
                 let matchJabatan = fJabatan === "" || row.jabatan === fJabatan;
-                return matchTahun && matchSukuan && matchJabatan;
+                let matchStatus = fStatus === "" || (row.statusPengesahan || "MENUNGGU").toUpperCase() === fStatus;
+                
+                return matchTahun && matchSukuan && matchJabatan && matchStatus;
             });
 
+            mukaSuratSemasa = 1; // Reset ke muka surat pertama selepas filter
             paparkanJadualPenyelidikan(rekodDitapis);
         }
 
-        // --- 5. PAPAR DATA KE DALAM JADUAL ---
+        // --- 5. PAPAR DATA KE DALAM JADUAL (PAGINATION) ---
         function paparkanJadualPenyelidikan(senarai) {
             const tbody = document.getElementById('isiJadual');
             tbody.innerHTML = "";
             
             if (senarai.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="14" class="p-10 text-center text-gray-500 font-medium">✨ Tiada rekod dijumpai berdasarkan tapisan anda.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-gray-500 font-medium">✨ Tiada rekod dijumpai berdasarkan tapisan anda.</td></tr>`;
+                kemaskiniPagination(0);
                 return;
             }
 
-            senarai.forEach((row, index) => {
+            // Pengiraan Muka Surat (Pagination)
+            const jumlahMukaSurat = Math.ceil(senarai.length / saizMukaSurat);
+            const indeksMula = (mukaSuratSemasa - 1) * saizMukaSurat;
+            const indeksTamat = Math.min(indeksMula + saizMukaSurat, senarai.length);
+            
+            const senaraiDipapar = senarai.slice(indeksMula, indeksTamat);
+
+            senaraiDipapar.forEach((row, index) => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-slate-50 transition";
                 
@@ -232,30 +255,52 @@
                     statusBadge = `<span class="bg-yellow-100 text-yellow-800 border border-yellow-300 px-2 py-1 rounded text-[10px] font-bold">MENUNGGU</span>`;
                 }
 
-                let pautanDoi = `<span class="text-gray-400">-</span>`;
-                if (row.doiUrl && row.doiUrl.length > 3) {
-                    let linkValid = row.doiUrl.startsWith("http") ? row.doiUrl : "https://" + row.doiUrl;
-                    pautanDoi = `<a href="${linkValid}" target="_blank" class="text-blue-600 hover:underline font-semibold text-xs flex items-center justify-center gap-1" title="${row.doiUrl}">Buka URL</a>`;
-                }
-
                 tr.innerHTML = `
-                    <td class="p-4 text-center font-bold text-gray-600">${index + 1}</td>
+                    <td class="p-4 text-center font-bold text-gray-600">${indeksMula + index + 1}</td>
                     <td class="p-4 font-semibold text-gray-900 leading-tight">${row.tajuk || '-'}</td>
                     <td class="p-4 text-sm text-gray-700">${row.penulis || '-'}</td>
-                    <td class="p-4 text-xs text-gray-600">${row.publisher || '-'}</td>
-                    <td class="p-4 text-center font-mono text-xs text-gray-600">${row.volIssue || '-'}</td>
-                    <td class="p-4 text-center text-xs whitespace-nowrap">${row.tarikhTerbit || '-'}</td>
-                    <td class="p-4 text-center">${pautanDoi}</td>
+                    <td class="p-4 text-xs text-gray-600 max-w-[250px] break-words">${row.publisher || '-'}</td>
                     <td class="p-4 text-center font-bold text-slate-700 text-xs">${row.jabatan || '-'}</td>
-                    <td class="p-4 text-center"><span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-[10px] font-bold uppercase">${row.tahapSebaran || '-'}</span></td>
                     <td class="p-4 text-center text-xs font-semibold text-gray-600">${row.laporanKpi || '-'}</td>
                     <td class="p-4 text-center text-sm font-bold text-purple-700">${row.tahun || '-'}</td>
-                    <td class="p-4 text-center text-xs font-bold text-gray-700">${row.bahasa || '-'}</td>
-                    <td class="p-4 text-center"><span class="px-2 py-1 bg-teal-100 text-teal-800 rounded text-[10px] font-bold uppercase">${row.indexStatus || '-'}</span></td>
                     <td class="p-4 text-center">${statusBadge}</td>
                 `;
                 tbody.appendChild(tr);
             });
+
+            kemaskiniPagination(jumlahMukaSurat);
+        }
+
+        // --- FUNGSI KEMASKINI UI PAGINATION ---
+        function kemaskiniPagination(jumlahMukaSurat) {
+            document.getElementById('currentMukaSurat').innerText = mukaSuratSemasa || 1;
+            document.getElementById('totalMukaSurat').innerText = jumlahMukaSurat || 1;
+
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+
+            if (mukaSuratSemasa <= 1 || jumlahMukaSurat === 0) {
+                btnPrev.disabled = true;
+            } else {
+                btnPrev.disabled = false;
+            }
+
+            if (mukaSuratSemasa >= jumlahMukaSurat || jumlahMukaSurat === 0) {
+                btnNext.disabled = true;
+            } else {
+                btnNext.disabled = false;
+            }
+        }
+
+        // --- FUNGSI TUKAR MUKA SURAT ---
+        function tukarMukaSurat(arah) {
+            const jumlahMukaSurat = Math.ceil(rekodDitapis.length / saizMukaSurat);
+            mukaSuratSemasa += arah;
+
+            if (mukaSuratSemasa < 1) mukaSuratSemasa = 1;
+            if (mukaSuratSemasa > jumlahMukaSurat) mukaSuratSemasa = jumlahMukaSurat;
+
+            paparkanJadualPenyelidikan(rekodDitapis);
         }
 
         // --- 6. EKSPORT / DOWNLOAD CSV ---
@@ -266,7 +311,7 @@
             }
 
             // Tajuk Lajur CSV
-            let csvContent = "Bil,Tajuk,Penulis,Publisher,Vol/Issue,Tarikh Terbit,DOI/URL,Jabatan,Tahap Sebaran,Sukuan,Tahun,Bahasa,Index Status,Status Pengesahan\n";
+            let csvContent = "Bil,Tajuk,Penulis,Publisher,Jabatan,Sukuan,Tahun,Status Pengesahan\n";
 
             // Loop untuk setiap baris rekod yang ditapis
             rekodDitapis.forEach((row, index) => {
@@ -276,15 +321,9 @@
                     `"${(row.tajuk || '').replace(/"/g, '""')}"`,
                     `"${(row.penulis || '').replace(/"/g, '""')}"`,
                     `"${(row.publisher || '').replace(/"/g, '""')}"`,
-                    `"${(row.volIssue || '').replace(/"/g, '""')}"`,
-                    `"${row.tarikhTerbit || ''}"`,
-                    `"${row.doiUrl || ''}"`,
                     `"${row.jabatan || ''}"`,
-                    `"${row.tahapSebaran || ''}"`,
                     `"${row.laporanKpi || ''}"`,
                     `"${row.tahun || ''}"`,
-                    `"${row.bahasa || ''}"`,
-                    `"${row.indexStatus || ''}"`,
                     `"${row.statusPengesahan || 'MENUNGGU'}"`
                 ];
                 csvContent += rowData.join(",") + "\n";
