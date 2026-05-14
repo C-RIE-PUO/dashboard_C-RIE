@@ -31,12 +31,12 @@
 
     <main class="max-w-[90rem] mx-auto px-4 py-8 flex-grow w-full">
         
-        <div class="mb-8">
-            <h2 class="text-lg font-bold text-gray-700 mb-3 border-b-2 border-teal-500 inline-block pb-1">Statistik Projek Disahkan Mengikut Jabatan</h2>
-            <div id="paparStatistik" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mt-3">
-                <div class="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-200 animate-pulse text-sm">Memuatkan data...</div>
-            </div>
-        </div>
+<div class="mb-8">
+    <h2 class="text-lg font-bold text-gray-700 mb-3 border-b-2 border-teal-500 inline-block pb-1">Ringkasan Statistik Projek & Surat Lantikan</h2>
+    <div id="paparStatistik" class="grid grid-cols-2 md:grid-cols-4 lg:flex lg:flex-wrap gap-3 mt-3">
+        <div class="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-200 animate-pulse text-sm w-full">Memuatkan data...</div>
+    </div>
+</div>
 
         <div id="statusMesejUI" class="hidden mb-4 p-4 rounded-xl text-center text-sm font-bold shadow-sm"></div>
 
@@ -53,6 +53,7 @@
                     <select id="filterJabatan" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-teal-300 rounded-lg text-sm font-bold focus:ring-teal-500 outline-none text-gray-700">
                         <option value="">Semua Jabatan</option>
                     </select>
+
                     <button onclick="muatData()" class="bg-teal-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-sm">
                         🔄 Refresh
                     </button>
@@ -66,6 +67,15 @@
     </div>
     
     <div class="w-full md:w-1/2 flex gap-2">
+	
+					<select id="filterStatusSurat" onchange="terapkanTapisan()" class="p-2 border rounded-md text-sm">
+					<option value="">Surat Lantikan</option>
+					<option value="MENUNGGU">Menunggu Lantikan (Belum Ada Surat)</option>
+					<option value="SELESAI">Selesai (Sudah Ada Surat)</option>
+					</select>	
+	
+	
+	
         <input type="text" id="inputCarian" placeholder="Cari nama ketua, tajuk, jabatan..." 
                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all">
         
@@ -370,70 +380,115 @@
             senaraiTahun.forEach(t => selectTahun.innerHTML += `<option value="${t}">${t}</option>`);
         }
 
-		function janaStatistik(data) {
-            const wadahStat = document.getElementById('paparStatistik');
-            
-            const senaraiJabatan = [...new Set(data.map(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase()))].filter(jab => jab !== "");
-            let htmlStat = "";
+function janaStatistik(data) {
+    const wadahStat = document.getElementById('paparStatistik');
+    
+    const senaraiJabatan = [...new Set(data.map(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase()))].filter(jab => jab !== "");
+    let htmlStat = "";
 
-            if (data.length === 0) {
-                wadahStat.innerHTML = '<div class="col-span-full text-center p-4 text-gray-500 text-sm">Tiada statistik untuk dipaparkan.</div>';
-                return;
+    if (data.length === 0) {
+        wadahStat.innerHTML = '<div class="col-span-full text-center p-4 text-gray-500 text-sm">Tiada statistik untuk dipaparkan.</div>';
+        return;
+    }
+
+    // 🌟 TAMBAHAN KIRAAN: Status Surat Lantikan
+    let suratSelesai = 0;
+    let suratMenunggu = 0;
+
+    data.forEach(p => {
+        const linkSurat = dapatkanData(p, ["suratLantikan", "SURAT_LANTIKAN"]) || "";
+        if (linkSurat.trim() !== "") {
+            suratSelesai++;
+        } else {
+            suratMenunggu++;
+        }
+    });
+
+    // Kad Statistik Keseluruhan
+    htmlStat += `
+        <div class="bg-teal-700 p-3 rounded-xl shadow-sm border border-teal-800 text-center flex flex-col justify-center transform transition hover:scale-105">
+            <span class="text-xs font-bold text-teal-200 uppercase">Keseluruhan</span>
+            <span class="text-2xl font-extrabold text-white">${data.length}</span>
+        </div>
+    `;
+
+    // 🌟 KAD BARU: Surat Dijana (Warna Hijau)
+    htmlStat += `
+        <div class="bg-green-50 p-3 rounded-xl shadow-sm border border-green-200 text-center flex flex-col justify-center transform transition hover:scale-105">
+            <span class="text-[10px] font-bold text-green-700 uppercase tracking-wide">Surat Dijana</span>
+            <span class="text-2xl font-extrabold text-green-800">${suratSelesai}</span>
+        </div>
+    `;
+
+    // 🌟 KAD BARU: Menunggu Surat (Warna Oren)
+    htmlStat += `
+        <div class="bg-orange-50 p-3 rounded-xl shadow-sm border border-orange-200 text-center flex flex-col justify-center transform transition hover:scale-105">
+            <span class="text-[10px] font-bold text-orange-700 uppercase tracking-wide">Menunggu</span>
+            <span class="text-2xl font-extrabold text-orange-800">${suratMenunggu}</span>
+        </div>
+    `;
+
+    // Kad Statistik mengikut Jabatan
+    senaraiJabatan.sort().forEach(jab => {
+        const jumlah = data.filter(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase() === jab).length;
+        htmlStat += `
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-teal-100 text-center flex flex-col justify-center transform transition hover:scale-105">
+                <span class="text-xs font-bold text-gray-500 uppercase">${jab}</span>
+                <span class="text-2xl font-extrabold text-teal-600">${jumlah}</span>
+            </div>
+        `;
+    });
+    
+    wadahStat.innerHTML = htmlStat;
+}
+
+// ==========================================
+// 1. FUNGSI TAPISAN (JABATAN, TAHUN & STATUS SURAT)
+// ==========================================
+function terapkanTapisan() {
+    const valJab = document.getElementById('filterJabatan').value;
+    const valTahun = document.getElementById('filterTahun') ? document.getElementById('filterTahun').value : "";
+    
+    // 🌟 KEMASKINI 1: Ambil nilai dari filter baharu
+    const valStatus = document.getElementById('filterStatusSurat') ? document.getElementById('filterStatusSurat').value : "";
+
+    dataTapis = dataDisahkan.filter(row => {
+        // Semakan Jabatan
+        const dbJabatan = dapatkanData(row, ["jabatan", "JABATAN"]);
+        let checkJabatan = (valJab === "" || dbJabatan === valJab);
+        if (!isApprover && userPeranan !== "PENYELARAS JABATAN") checkJabatan = (dbJabatan === userJabatan);
+
+        // Semakan Tahun
+        const checkTarikhMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
+        let checkTahun = true;
+        if (valTahun !== "") {
+            if (checkTarikhMula) {
+                checkTahun = new Date(checkTarikhMula).getFullYear().toString() === valTahun;
+            } else {
+                checkTahun = false;
             }
-
-            // 🌟 TAMBAHAN: Kad Statistik Keseluruhan (Warna gelap sedikit supaya menonjol)
-            htmlStat += `
-                <div class="bg-teal-700 p-3 rounded-xl shadow-sm border border-teal-800 text-center flex flex-col justify-center transform transition hover:scale-105">
-                    <span class="text-xs font-bold text-teal-200 uppercase">Keseluruhan</span>
-                    <span class="text-2xl font-extrabold text-white">${data.length}</span>
-                </div>
-            `;
-
-            // Kad Statistik mengikut Jabatan
-            senaraiJabatan.sort().forEach(jab => {
-                const jumlah = data.filter(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase() === jab).length;
-                htmlStat += `
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-teal-100 text-center flex flex-col justify-center transform transition hover:scale-105">
-                        <span class="text-xs font-bold text-gray-500 uppercase">${jab}</span>
-                        <span class="text-2xl font-extrabold text-teal-600">${jumlah}</span>
-                    </div>
-                `;
-            });
+        }
+        
+        // 🌟 KEMASKINI 2: Logik Semakan Status Surat
+        let checkStatus = true;
+        if (valStatus !== "") {
+            const linkSurat = dapatkanData(row, ["suratLantikan", "SURAT_LANTIKAN"]) || "";
             
-            wadahStat.innerHTML = htmlStat;
+            if (valStatus === "MENUNGGU") {
+                checkStatus = (linkSurat.trim() === ""); // Lulus jika pautan surat KOSONG
+            } else if (valStatus === "SELESAI") {
+                checkStatus = (linkSurat.trim() !== ""); // Lulus jika pautan surat ADA
+            }
         }
+        
+        // Return true jika melepasi KETIGA-TIGA tapisan
+        return checkJabatan && checkTahun && checkStatus;
+    });
 
-        // ==========================================
-        // 1. FUNGSI TAPISAN (JABATAN & TAHUN)
-        // ==========================================
-        function terapkanTapisan() {
-            const valJab = document.getElementById('filterJabatan').value;
-            const valTahun = document.getElementById('filterTahun') ? document.getElementById('filterTahun').value : "";
-
-            dataTapis = dataDisahkan.filter(row => {
-                // Semakan Jabatan
-                const dbJabatan = dapatkanData(row, ["jabatan", "JABATAN"]);
-                let checkJabatan = (valJab === "" || dbJabatan === valJab);
-                if (!isApprover && userPeranan !== "PENYELARAS JABATAN") checkJabatan = (dbJabatan === userJabatan);
-
-                // Semakan Tahun
-                const checkTarikhMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
-                let checkTahun = true;
-                if (valTahun !== "") {
-                    if (checkTarikhMula) {
-                        checkTahun = new Date(checkTarikhMula).getFullYear().toString() === valTahun;
-                    } else {
-                        checkTahun = false;
-                    }
-                }
-                
-                return checkJabatan && checkTahun;
-            });
-
-            dataTapis.reverse(); // Susun jadual dari rekod terbaharu
-            halamanSemasa = 1;   // Reset kembali ke muka surat 1 setiap kali tapisan bertukar
-            paparJadual();
-        }
+    dataTapis.reverse(); // Susun jadual dari rekod terbaharu
+    halamanSemasa = 1;   // Reset kembali ke muka surat 1 setiap kali tapisan bertukar
+    paparJadual();
+}
 
 // ==========================================
         // FUNGSI TRANSLATE TARIKH KE FORMAT (Cth: 15 Oktober 2025)
