@@ -383,36 +383,47 @@
 function janaStatistik(data) {
     const wadahStat = document.getElementById('paparStatistik');
     
-    const senaraiJabatan = [...new Set(data.map(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase()))].filter(jab => jab !== "");
-    let htmlStat = "";
+    if (!wadahStat) return;
 
-    if (data.length === 0) {
-        wadahStat.innerHTML = '<div class="col-span-full text-center p-4 text-gray-500 text-sm">Tiada statistik untuk dipaparkan.</div>';
-        return;
+    // Dapatkan elemen dropdown jabatan untuk senarai penuh
+    const elemenDropdownJab = document.getElementById('filterJabatan');
+
+    // Sentiasa papar SEMUA JABATAN tanpa mengira filter yang dipilih.
+    let senaraiJabatan = [];
+    if (elemenDropdownJab && elemenDropdownJab.options.length > 1) {
+        senaraiJabatan = Array.from(elemenDropdownJab.options)
+                              .map(opt => opt.value.toUpperCase())
+                              .filter(val => val !== ""); 
+    } else {
+        const sumberData = (typeof dataDisahkan !== 'undefined' && dataDisahkan.length > 0) ? dataDisahkan : data;
+        senaraiJabatan = [...new Set(sumberData.map(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase()))].filter(jab => jab !== "");
     }
 
-    // 🌟 TAMBAHAN KIRAAN: Status Surat Lantikan
+    let htmlStat = "";
     let suratSelesai = 0;
     let suratMenunggu = 0;
 
-    data.forEach(p => {
-        const linkSurat = dapatkanData(p, ["suratLantikan", "SURAT_LANTIKAN"]) || "";
-        if (linkSurat.trim() !== "") {
-            suratSelesai++;
-        } else {
-            suratMenunggu++;
-        }
-    });
+    // Kira Status Surat Lantikan 
+    if (data && data.length > 0) {
+        data.forEach(p => {
+            const linkSurat = dapatkanData(p, ["suratLantikan", "SURAT_LANTIKAN"]) || "";
+            if (linkSurat.trim() !== "") {
+                suratSelesai++;
+            } else {
+                suratMenunggu++;
+            }
+        });
+    }
 
     // Kad Statistik Keseluruhan
     htmlStat += `
         <div class="bg-teal-700 p-3 rounded-xl shadow-sm border border-teal-800 text-center flex flex-col justify-center transform transition hover:scale-105">
             <span class="text-xs font-bold text-teal-200 uppercase">Keseluruhan</span>
-            <span class="text-2xl font-extrabold text-white">${data.length}</span>
+            <span class="text-2xl font-extrabold text-white">${data ? data.length : 0}</span>
         </div>
     `;
 
-    // 🌟 KAD BARU: Surat Dijana (Warna Hijau)
+    // Kad Statistik: Surat Dijana
     htmlStat += `
         <div class="bg-green-50 p-3 rounded-xl shadow-sm border border-green-200 text-center flex flex-col justify-center transform transition hover:scale-105">
             <span class="text-[10px] font-bold text-green-700 uppercase tracking-wide">Surat Dijana</span>
@@ -420,7 +431,7 @@ function janaStatistik(data) {
         </div>
     `;
 
-    // 🌟 KAD BARU: Menunggu Surat (Warna Oren)
+    // Kad Statistik: Menunggu Surat
     htmlStat += `
         <div class="bg-orange-50 p-3 rounded-xl shadow-sm border border-orange-200 text-center flex flex-col justify-center transform transition hover:scale-105">
             <span class="text-[10px] font-bold text-orange-700 uppercase tracking-wide">Menunggu</span>
@@ -428,28 +439,41 @@ function janaStatistik(data) {
         </div>
     `;
 
+    // 🌟 KEMASKINI: Senarai Palet Warna untuk Jabatan
+    const senaraiWarna = [
+        { bg: 'bg-blue-50', border: 'border-blue-200', textTitle: 'text-blue-700', textVal: 'text-blue-800' },
+        { bg: 'bg-purple-50', border: 'border-purple-200', textTitle: 'text-purple-700', textVal: 'text-purple-800' },
+        { bg: 'bg-pink-50', border: 'border-pink-200', textTitle: 'text-pink-700', textVal: 'text-pink-800' },
+        { bg: 'bg-indigo-50', border: 'border-indigo-200', textTitle: 'text-indigo-700', textVal: 'text-indigo-800' },
+        { bg: 'bg-cyan-50', border: 'border-cyan-200', textTitle: 'text-cyan-700', textVal: 'text-cyan-800' },
+        { bg: 'bg-rose-50', border: 'border-rose-200', textTitle: 'text-rose-700', textVal: 'text-rose-800' },
+        { bg: 'bg-amber-50', border: 'border-amber-200', textTitle: 'text-amber-700', textVal: 'text-amber-800' },
+        { bg: 'bg-sky-50', border: 'border-sky-200', textTitle: 'text-sky-700', textVal: 'text-sky-800' }
+    ];
+
     // Kad Statistik mengikut Jabatan
-    senaraiJabatan.sort().forEach(jab => {
-        const jumlah = data.filter(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase() === jab).length;
+    senaraiJabatan.sort().forEach((jab, index) => {
+        const jumlah = (data && data.length > 0) ? data.filter(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase() === jab).length : 0;
+        
+        // Pilih warna berdasarkan susunan index (akan berulang jika jabatan > 8)
+        const warna = senaraiWarna[index % senaraiWarna.length];
+        
         htmlStat += `
-            <div class="bg-white p-3 rounded-xl shadow-sm border border-teal-100 text-center flex flex-col justify-center transform transition hover:scale-105">
-                <span class="text-xs font-bold text-gray-500 uppercase">${jab}</span>
-                <span class="text-2xl font-extrabold text-teal-600">${jumlah}</span>
+            <div class="${warna.bg} p-3 rounded-xl shadow-sm border ${warna.border} text-center flex flex-col justify-center transform transition hover:scale-105">
+                <span class="text-[10px] font-bold ${warna.textTitle} uppercase tracking-wide">${jab}</span>
+                <span class="text-2xl font-extrabold ${warna.textVal}">${jumlah}</span>
             </div>
         `;
     });
     
     wadahStat.innerHTML = htmlStat;
 }
-
 // ==========================================
 // 1. FUNGSI TAPISAN (JABATAN, TAHUN & STATUS SURAT)
 // ==========================================
 function terapkanTapisan() {
     const valJab = document.getElementById('filterJabatan').value;
     const valTahun = document.getElementById('filterTahun') ? document.getElementById('filterTahun').value : "";
-    
-    // 🌟 KEMASKINI 1: Ambil nilai dari filter baharu
     const valStatus = document.getElementById('filterStatusSurat') ? document.getElementById('filterStatusSurat').value : "";
 
     dataTapis = dataDisahkan.filter(row => {
@@ -458,36 +482,47 @@ function terapkanTapisan() {
         let checkJabatan = (valJab === "" || dbJabatan === valJab);
         if (!isApprover && userPeranan !== "PENYELARAS JABATAN") checkJabatan = (dbJabatan === userJabatan);
 
-        // Semakan Tahun
-        const checkTarikhMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
+        // 🌟 KEMASKINI: Semakan Tahun (Berdasarkan tarikh surat dikeluarkan)
+        // Nota: Pastikan ["tarikhSurat", "TARIKH_SURAT"] sepadan dengan nama kolum sebenar anda
+        const tarikhSurat = dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT", "tarikhSuratDikeluarkan", "TARIKH"]);
         let checkTahun = true;
+        
         if (valTahun !== "") {
-            if (checkTarikhMula) {
-                checkTahun = new Date(checkTarikhMula).getFullYear().toString() === valTahun;
+            if (tarikhSurat) {
+                // Gunakan Regex /\d{4}/ untuk mencari sebarang 4 digit berturut-turut (Tahun)
+                // Ini membolehkan sistem mengekstrak "2026" daripada "13 Mei 2026" dengan tepat
+                const cariTahun = String(tarikhSurat).match(/\d{4}/);
+                
+                if (cariTahun && cariTahun[0]) {
+                    checkTahun = (cariTahun[0] === valTahun);
+                } else {
+                    checkTahun = false; // Format tarikh tidak sah / tiada tahun
+                }
             } else {
-                checkTahun = false;
+                checkTahun = false; // Jika tiada tarikh surat, ia tidak melepasi tapisan tahun
             }
         }
         
-        // 🌟 KEMASKINI 2: Logik Semakan Status Surat
+        // Semakan Status Surat
         let checkStatus = true;
         if (valStatus !== "") {
             const linkSurat = dapatkanData(row, ["suratLantikan", "SURAT_LANTIKAN"]) || "";
-            
             if (valStatus === "MENUNGGU") {
-                checkStatus = (linkSurat.trim() === ""); // Lulus jika pautan surat KOSONG
+                checkStatus = (linkSurat.trim() === "");
             } else if (valStatus === "SELESAI") {
-                checkStatus = (linkSurat.trim() !== ""); // Lulus jika pautan surat ADA
+                checkStatus = (linkSurat.trim() !== "");
             }
         }
         
-        // Return true jika melepasi KETIGA-TIGA tapisan
         return checkJabatan && checkTahun && checkStatus;
     });
 
     dataTapis.reverse(); // Susun jadual dari rekod terbaharu
-    halamanSemasa = 1;   // Reset kembali ke muka surat 1 setiap kali tapisan bertukar
+    halamanSemasa = 1;   // Reset kembali ke muka surat 1
     paparJadual();
+    
+    // Panggil fungsi statistik setiap kali filter berjalan!
+    janaStatistik(dataTapis);
 }
 
 // ==========================================
