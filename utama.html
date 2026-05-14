@@ -221,8 +221,8 @@
                 <input type="text" id="carianInput" onkeyup="laksanaFilter()" placeholder="Carian Ketua, Tajuk atau Jabatan..." 
                     class="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium text-slate-700">
             </div>
-            <select id="filterTahun" onchange="laksanaFilter()" class="p-3.5 rounded-2xl border border-slate-200 shadow-sm outline-none bg-white font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10"></select>
-            <select id="filterJabatan" onchange="laksanaFilter()" class="p-3.5 rounded-2xl border border-slate-200 shadow-sm outline-none bg-white font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10"></select>
+            <input type="text" id="filterTahun" placeholder="Cari Tahun (cth: 2023)" oninput="laksanaFilter()" class="p-2 border rounded-md text-sm">
+			<select id="filterJabatan" onchange="laksanaFilter()" class="p-3.5 rounded-2xl border border-slate-200 shadow-sm outline-none bg-white font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10"></select>
         </div>
 
         <div id="kpiCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8"></div>
@@ -517,38 +517,31 @@ function fetchDataDariServer(tabName) {
 }
 
 function janaPilihanFilter(rawData) {
-    let setTahun = new Set();
+    // let setTahun = new Set(); // ❌ Tidak perlu lagi kumpul tahun untuk dropdown
     let setJabatan = new Set();
     
     rawData.forEach(r => {
         if (tabSemasa === 'HARTA_INTELEK' || tabSemasa === 'KPI_PENYELIDIKAN') {
-            if (r.tahun) setTahun.add(String(r.tahun).trim());
             if (r.jabatan) setJabatan.add(String(r.jabatan).trim());
         } else {
-            let idxTahun, idxJabatan;
+            let idxJabatan;
             
+            // Kita hanya perlukan indeks jabatan sekarang
             if (tabSemasa === 'KPI_INOVASI') {
-                idxTahun = 10;
                 idxJabatan = 6;
             } else if (tabSemasa === 'GERAN') {
-                idxTahun = 5;  
                 idxJabatan = 3; 
             } else { 
-                idxTahun = 8;
                 idxJabatan = 3;
             }
 
-            if (r[idxTahun]) setTahun.add(String(r[idxTahun]).trim());
             if (r[idxJabatan]) setJabatan.add(String(r[idxJabatan]).trim());
         }
     });
     
-    const fTahun = document.getElementById('filterTahun');
     const fJabatan = document.getElementById('filterJabatan');
     
-    fTahun.innerHTML = '<option value="SEMUA">Semua Tahun</option>';
-    Array.from(setTahun).sort((a,b) => b-a).forEach(t => fTahun.innerHTML += `<option value="${t}">${t}</option>`);
-    
+    // Hanya render pilihan untuk Jabatan sahaja
     fJabatan.innerHTML = '<option value="SEMUA">Semua Jabatan</option>';
     Array.from(setJabatan).sort().forEach(j => fJabatan.innerHTML += `<option value="${j}">${j}</option>`);
 }
@@ -557,36 +550,42 @@ function laksanaFilter() {
     let rawData = rawDataCache[tabSemasa];
     if (!rawData) return;
     
-    let thn = document.getElementById('filterTahun').value;
-    let jbt = document.getElementById('filterJabatan').value;
-    let cari = document.getElementById('carianInput').value.toLowerCase();
+    // 🌟 Ambil nilai dari textbox Tahun
+    let thn = document.getElementById('filterTahun').value.trim();
+    let jbt = document.getElementById('filterJabatan').value.trim().toUpperCase();
+    let cari = document.getElementById('carianInput').value.trim().toLowerCase();
 
     let dataFiltered = rawData.filter(r => {
-        let valTahun, valJabatan;
+        let pTahun = false;
+        let valJabatan = "";
 
+        // 1. Logik untuk HARTA INTELEK & KPI PENYELIDIKAN (Objek JSON)
         if (tabSemasa === 'HARTA_INTELEK' || tabSemasa === 'KPI_PENYELIDIKAN') {
-            valTahun = String(r.tahun || '');
-            valJabatan = String(r.jabatan || '');
-        } else {
-            let idxTahun, idxJabatan;
+            let valTahun = String(r.tahun || '').trim();
+            pTahun = (thn === "" || valTahun.includes(thn));
+            valJabatan = String(r.jabatan || '').trim().toUpperCase();
+        } 
+        // 2. 🌟 KEMASKINI: Logik Khas untuk GERAN (Cari di Lajur J dan K)
+        else if (tabSemasa === 'GERAN') {
+            let tahunMula = String(r[9] || '').trim();  // Lajur J (Indeks 9)
+            let tahunTamat = String(r[10] || '').trim(); // Lajur K (Indeks 10)
             
-            if (tabSemasa === 'KPI_INOVASI') {
-                idxTahun = 10;
-                idxJabatan = 6;
-            } else if (tabSemasa === 'GERAN') {
-                idxTahun = 5;
-                idxJabatan = 3;
-            } else {
-                idxTahun = 8;
-                idxJabatan = 3;
-            }
+            // Sah jika input teks sepadan dengan Tahun Mula ATAU Tahun Tamat
+            pTahun = (thn === "" || tahunMula.includes(thn) || tahunTamat.includes(thn));
+            valJabatan = String(r[3] || '').trim().toUpperCase(); // Lajur D (Indeks 3)
+        } 
+        // 3. Logik untuk INOVASI & KPI INOVASI (Array Biasa)
+        else {
+            let idxTahun = (tabSemasa === 'KPI_INOVASI') ? 10 : 8;
+            let idxJabatan = (tabSemasa === 'KPI_INOVASI') ? 6 : 3;
             
-            valTahun = String(r[idxTahun] || '');
-            valJabatan = String(r[idxJabatan] || '');
+            let valTahun = String(r[idxTahun] || '').trim();
+            pTahun = (thn === "" || valTahun.includes(thn));
+            valJabatan = String(r[idxJabatan] || '').trim().toUpperCase();
         }
 
-        let pTahun = (thn === "SEMUA" || valTahun === thn);
-        let pJabatan = (jbt === "SEMUA" || valJabatan === jbt);
+        // Semakan untuk Jabatan & Carian Teks Umum
+        let pJabatan = (jbt === "SEMUA" || jbt === "" || valJabatan === jbt);
         let pCari = JSON.stringify(r).toLowerCase().includes(cari);
         
         return pTahun && pJabatan && pCari;
@@ -595,7 +594,6 @@ function laksanaFilter() {
     halamanSemasa = 1; 
     prosesDanRender(tabSemasa, dataFiltered, 1);
 }
-
 function prosesDanRender(tab, data, page = 1) {
     dataGlobal = data;
     tabGlobal = tab;
@@ -724,38 +722,164 @@ function prosesDanRender(tab, data, page = 1) {
         renderChartsKPI(statsKPI);
         renderKadKPI(statsKPI);
 
-    } else if (tab === 'GERAN') {
+} else if (tab === 'GERAN') {
         document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-money-bill-trend-up mr-2 text-blue-600"></i> Nilai Geran Mengikut Jabatan (RM)`;
         document.getElementById('tajukCartaPie').innerText = `Pecahan Jenis Geran`;
 
-        let headerHtml = `<tr class="bg-blue-900 text-white">
-            <th class="p-4 border-b">BIL</th>
-            <th class="p-4 border-b">KETUA & AHLI</th>
-            <th class="p-4 border-b w-1/4">TAJUK PROJEK</th>
-            <th class="p-4 border-b text-center">JABATAN</th>
-            <th class="p-4 border-b text-center">TAHUN</th>
-            <th class="p-4 border-b">JENIS GERAN</th>
-            <th class="p-4 border-b text-right">NILAI (RM)</th>
+        let headerHtml = `<tr class="bg-slate-900 text-white">
+            <th class="p-4 border-b text-center w-12 text-xs">BIL</th>
+            <th class="p-4 border-b text-left text-xs">KETUA & PENYELIDIK</th>
+            <th class="p-4 border-b text-left text-xs w-1/4">MAKLUMAT PROJEK</th>
+            <th class="p-4 border-b text-center text-xs">TEMPOH</th>
+            <th class="p-4 border-b text-center text-xs w-48">JENIS GERAN</th>
+            <th class="p-4 border-b text-center text-xs">PERATUS BELANJA</th>
+            <th class="p-4 border-b text-right text-xs">JUMLAH (RM)</th>
+            <th class="p-4 border-b text-center text-xs">STATUS</th>
         </tr>`;
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
-        let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = r[0] || (indeksMula + index + 1);
-            let nilai = r[7] ? parseFloat(r[7]).toLocaleString('en-MY', {minimumFractionDigits: 2}) : '0.00';
+        // 🌟 KEMASKINI C: Logik Pengumpulan pada KESELURUHAN DATA (Bukan dataTerhad)
+        let semuaProjekKumpulan = [];
+        let projekSemasa = null;
+
+        // ❗️ GUNA 'data' bukan 'dataTerhad' supaya ahli tidak terpotong awal
+        data.forEach((r) => {
+            let bilRaw = String(r[0] || '').trim(); 
+            let ketuaRaw = String(r[1] || '').trim();
+            let tajukRaw = String(r[6] || '').trim();
+            let namaAhli = String(r[4] || '').trim();
+            let jabatanAhli = String(r[5] || '').trim();
+
+            let isProjekBaru = (bilRaw !== '' && bilRaw !== '-') || (ketuaRaw !== '' && ketuaRaw !== '-') || (tajukRaw !== '' && tajukRaw !== '-');
+
+            if (isProjekBaru || !projekSemasa) {
+                let rowBaru = [...r];
+                rowBaru.senaraiAhliGabungan = []; 
+                
+                if (namaAhli && namaAhli !== '-') {
+                    let listAhli = namaAhli.split(/\r?\n|,|;/).map(a => a.trim()).filter(a => a !== "");
+                    let listJab = jabatanAhli.split(/\r?\n|,|;/).map(j => j.trim()).filter(j => j !== "");
+                    
+                    listAhli.forEach((a, i) => {
+                        rowBaru.senaraiAhliGabungan.push({ 
+                            nama: a, 
+                            jabatan: listJab[i] || String(r[3] || '').trim() || '-' 
+                        });
+                    });
+                }
+                projekSemasa = rowBaru;
+                semuaProjekKumpulan.push(projekSemasa);
+
+            } else {
+                if (namaAhli && namaAhli !== '-') {
+                    let listAhli = namaAhli.split(/\r?\n|,|;/).map(a => a.trim()).filter(a => a !== "");
+                    let listJab = jabatanAhli.split(/\r?\n|,|;/).map(j => j.trim()).filter(j => j !== "");
+                    
+                    listAhli.forEach((a, i) => {
+                        projekSemasa.senaraiAhliGabungan.push({ 
+                            nama: a, 
+                            jabatan: listJab[i] || String(projekSemasa[3] || '').trim() || '-' 
+                        });
+                    });
+                }
+            }
+        });
+
+        // 🌟 KINI: Potong data untuk Pagination (Had 10 Projek)
+        let startIdx = typeof indeksMula !== 'undefined' ? indeksMula : 0;
+        let limitRecords = 10; 
+        
+        if (typeof rekodPerHalaman !== 'undefined') {
+            limitRecords = rekodPerHalaman;
+        } else if (typeof indeksTamat !== 'undefined' && typeof indeksMula !== 'undefined') {
+            limitRecords = indeksTamat - indeksMula;
+        }
+        
+        let projekKumpulan = semuaProjekKumpulan.slice(startIdx, startIdx + limitRecords);
+
+        // 🌟 BINA JADUAL
+        let bodyHtml = projekKumpulan.map((r, index) => {
             
-            return `<tr class="hover:bg-slate-50 transition-colors">
-                <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
-                <td class="p-4 border-b">
-                    <div class="font-bold text-blue-900 text-xs uppercase">${r[1] || '-'}</div>
-                    <div class="text-[9px] text-slate-500 mt-1">${r[2] || '-'}</div>
+            let noBil = String(r[0] || '').trim() !== '' ? String(r[0]).trim() : '-';
+            let ketuaRaw = String(r[1] || '-');        
+            let jabatanUtama = String(r[3] || '-').toUpperCase(); 
+            let tajuk = String(r[6] || '-').toUpperCase(); 
+            let jenisGeran = String(r[7] || '-').toUpperCase(); 
+            let noRuj = String(r[8] || '-');           
+            let tahunMula = String(r[9] || '-');       
+            let tahunTamat = String(r[10] || '-');     
+            let nilaiRaw = String(r[11] || '0').replace(/[^0-9.-]+/g, "");              
+            let peratusRaw = String(r[12] || '0').trim(); 
+            let status = String(r[13] || '-').toUpperCase(); 
+
+            let nilai = parseFloat(nilaiRaw || 0).toLocaleString('en-MY', {minimumFractionDigits: 2});
+            let peratus = peratusRaw.includes('%') ? peratusRaw : peratusRaw + '%';
+            
+            let pctVal = parseFloat(peratusRaw) || 0;
+            let warnaPct = pctVal >= 90 ? 'border-green-200 bg-green-50 text-green-600' : (pctVal > 0 ? 'border-yellow-200 bg-yellow-50 text-yellow-600' : 'border-red-200 bg-red-50 text-red-600');
+
+            let namaKetua = ketuaRaw.replace(/^\d+[\.\)\-\s]+/g, '').trim(); 
+            
+            let htmlAhli = '-';
+            if (r.senaraiAhliGabungan && r.senaraiAhliGabungan.length > 0) {
+                htmlAhli = r.senaraiAhliGabungan.slice(0, 5).map(a => {
+                    let namaAhliBersih = a.nama.replace(/^\d+[\.\)\-\s]+/g, '').trim();
+                    let jabatanAhli = a.jabatan.toUpperCase();
+                    return `
+                    <div class="flex items-center mt-1.5">
+                        <i class="fa-solid fa-user text-slate-300 text-[10px] mr-2"></i>
+                        <span class="text-slate-500 text-[11px] font-semibold mr-2">${namaAhliBersih}</span>
+                        <span class="border border-slate-200 bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded text-[8px] font-bold">${jabatanAhli}</span>
+                    </div>`;
+                }).join('');
+            }
+            
+            return `<tr class="hover:bg-blue-50/50 transition-colors border-b border-slate-100">
+                <td class="p-4 font-bold text-slate-400 text-center align-top text-sm">${noBil}</td>
+                
+                <td class="p-4 align-top uppercase">
+                    <div class="mb-4">
+                        <div class="font-bold text-blue-900 text-[11px] flex items-center">
+                            <i class="fa-solid fa-user text-blue-600 mr-2 text-sm"></i>
+                            <span>${namaKetua}</span>
+                        </div>
+                        <div class="mt-1.5 ml-6">
+                            <span class="border border-blue-200 bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[9px] font-bold">${jabatanUtama}</span>
+                        </div>
+                    </div>
+                    <div class="ml-1 uppercase">
+                        ${htmlAhli !== '-' ? htmlAhli : '<span class="italic opacity-50 text-[10px] text-slate-500 font-medium">TIADA AHLI</span>'}
+                    </div>
                 </td>
-                <td class="p-4 border-b font-bold text-slate-700 uppercase text-xs">${r[4] || '-'}</td>
-                <td class="p-4 border-b font-black text-blue-700 text-center text-[10px] uppercase">${r[3] || '-'}</td>
-                <td class="p-4 border-b text-center font-bold text-xs">${r[5] || '-'}</td>
-                <td class="p-4 border-b"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[9px] font-bold uppercase">${r[6] || '-'}</span></td>
-                <td class="p-4 border-b text-right font-mono font-bold text-emerald-700">RM ${nilai}</td>
+                
+                <td class="p-4 align-top">
+                    <div class="font-bold text-slate-800 uppercase text-xs leading-relaxed mb-3">${tajuk}</div>
+                    <span class="border border-blue-100 bg-blue-50/80 text-blue-500 px-2.5 py-1 rounded text-[10px] font-mono whitespace-nowrap shadow-sm"><i class="fa-regular fa-file-lines mr-1.5"></i>${noRuj}</span>
+                </td>
+                
+                <td class="p-4 align-top text-center space-y-2">
+                    <div><span class="border border-emerald-200 bg-emerald-50 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap shadow-sm">Mula: ${tahunMula}</span></div>
+                    <div><span class="border border-rose-200 bg-rose-50 text-rose-700 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap shadow-sm">Tamat: ${tahunTamat}</span></div>
+                </td>
+                
+                <td class="p-4 align-top text-center">
+                    <div class="border border-indigo-100 bg-indigo-50 text-indigo-700 p-2 rounded-lg text-[9px] font-bold uppercase w-full mx-auto leading-relaxed shadow-sm">${jenisGeran}</div>
+                </td>
+                
+                <td class="p-4 align-top text-center">
+                    <span class="border ${warnaPct} px-2.5 py-1 rounded-md text-[11px] font-bold shadow-sm">${peratus}</span>
+                </td>
+                
+                <td class="p-4 text-right font-mono font-bold text-emerald-600 align-top text-sm whitespace-nowrap">
+                    RM ${nilai}
+                </td>
+
+                <td class="p-4 align-top text-center">
+                    <span class="border border-amber-300 bg-amber-50 text-amber-600 px-2.5 py-1 rounded text-[9px] font-extrabold uppercase whitespace-nowrap shadow-sm">${status}</span>
+                </td>
             </tr>`;
         }).join('');
+        
         document.getElementById('bodyJadual').innerHTML = bodyHtml;
 
         let statsGeran = kiraStatsGeran(data);
@@ -1268,103 +1392,157 @@ function renderCharts(statsJabatan, overall) {
     });
 }
 // ==========================================
-// FUNGSI STATISTIK (GERAN)
+// FUNGSI STATISTIK (GERAN) - DITAMBAH BAIK 🚀
 // ==========================================
 function kiraStatsGeran(data) {
     let statsJabatan = {};
     let statsJenis = {};
     let totalNilai = 0;
+    let totalProjek = 0; 
     
     data.forEach(r => {
-        let jbtAsal = String(r[3] || 'TIADA JABATAN').trim();
-        
-        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
-        // Cari perkataan di dalam kurungan cth: (JTMK)
-        let match = jbtAsal.match(/\(([^)]+)\)/); 
-        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
-        let jbt = match ? match[1].trim() : jbtAsal;
+        let bilRaw = String(r[0] || '').trim();
+        let ketuaRaw = String(r[1] || '').trim();
+        let tajukRaw = String(r[6] || '').trim();
+        let isProjekBaru = (bilRaw !== '' && bilRaw !== '-') || (ketuaRaw !== '' && ketuaRaw !== '-') || (tajukRaw !== '' && tajukRaw !== '-');
 
-        let jenis = String(r[6] || 'LAIN-LAIN').trim().toUpperCase();
-        let nilai = r[7] ? parseFloat(r[7]) : 0;
+        if (isProjekBaru) {
+            let jbtAsal = String(r[3] || 'TIADA JABATAN').trim();
+            
+            let match = jbtAsal.match(/\(([^)]+)\)/); 
+            let jbt = match ? match[1].trim() : jbtAsal;
 
-        statsJabatan[jbt] = (statsJabatan[jbt] || 0) + nilai;
-        statsJenis[jenis] = (statsJenis[jenis] || 0) + 1;
-        totalNilai += nilai;
+            let jenis = String(r[7] || 'LAIN-LAIN').trim().toUpperCase(); 
+            
+            // 🌟 KEMASKINI: Buang semua koma, huruf, ruang kosong atau simbol sebelum diproses
+            let nilaiBersih = String(r[11] || '0').replace(/[^0-9.-]+/g, ""); 
+            let nilai = parseFloat(nilaiBersih) || 0; 
+
+            statsJabatan[jbt] = (statsJabatan[jbt] || 0) + nilai;
+            statsJenis[jenis] = (statsJenis[jenis] || 0) + 1;
+            totalNilai += nilai;
+            totalProjek++; 
+        }
     });
 
     return { 
         jabatan: statsJabatan, 
         jenis: statsJenis, 
         totalNilai: totalNilai, 
-        totalProjek: data.length 
+        totalProjek: totalProjek 
     };
 }
 
 function renderKadGeran(stats) {
     const kpiContainer = document.getElementById('kpiCards');
+    
+    // Elakkan ralat "Divide by Zero" jika tiada projek
+    let purataNilai = stats.totalProjek > 0 ? (stats.totalNilai / stats.totalProjek) : 0;
+    let jumlahJenisUnik = Object.keys(stats.jenis).length;
+
     kpiContainer.innerHTML = `
-        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
-            <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Nilai Geran</p><h4 class="text-2xl font-black text-emerald-700">RM ${stats.totalNilai.toLocaleString('en-MY')}</h4></div>
-            <div class="bg-emerald-50 p-3 rounded-xl"><i class="fa-solid fa-comments-dollar text-emerald-700 text-2xl"></i></div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-[5px] border-emerald-500 flex items-center justify-between hover:shadow-md transition-shadow">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Jumlah Nilai Geran</p>
+                <h4 class="text-2xl font-black text-emerald-700 leading-none">RM ${stats.totalNilai.toLocaleString('en-MY', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h4>
+            </div>
+            <div class="bg-emerald-50 w-12 h-12 flex items-center justify-center rounded-xl"><i class="fa-solid fa-comments-dollar text-emerald-600 text-xl"></i></div>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500 flex items-center justify-between">
-            <div><p class="text-xs font-bold text-slate-500 uppercase">Bilangan Projek</p><h4 class="text-3xl font-black text-slate-800">${stats.totalProjek}</h4></div>
-            <div class="bg-indigo-50 p-3 rounded-xl"><i class="fa-solid fa-diagram-project text-indigo-600 text-2xl"></i></div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-[5px] border-indigo-500 flex items-center justify-between hover:shadow-md transition-shadow">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Bilangan Projek</p>
+                <h4 class="text-3xl font-black text-slate-800 leading-none">${stats.totalProjek}</h4>
+            </div>
+            <div class="bg-indigo-50 w-12 h-12 flex items-center justify-center rounded-xl"><i class="fa-solid fa-diagram-project text-indigo-600 text-xl"></i></div>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-purple-500 flex items-center justify-between">
-            <div><p class="text-xs font-bold text-slate-500 uppercase">Purata Nilai</p><h4 class="text-xl font-black text-slate-800">RM ${(stats.totalNilai / (stats.totalProjek || 1)).toLocaleString('en-MY', {maximumFractionDigits:0})}</h4></div>
-            <div class="bg-purple-50 p-3 rounded-xl"><i class="fa-solid fa-calculator text-purple-600 text-2xl"></i></div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-[5px] border-purple-500 flex items-center justify-between hover:shadow-md transition-shadow">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Purata Nilai Projek</p>
+                <h4 class="text-xl font-black text-slate-800 leading-none">RM ${purataNilai.toLocaleString('en-MY', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h4>
+            </div>
+            <div class="bg-purple-50 w-12 h-12 flex items-center justify-center rounded-xl"><i class="fa-solid fa-calculator text-purple-600 text-xl"></i></div>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-orange-500 flex items-center justify-between">
-            <div><p class="text-xs font-bold text-slate-500 uppercase">Jenis Geran Unik</p><h4 class="text-3xl font-black text-slate-800">${Object.keys(stats.jenis).length}</h4></div>
-            <div class="bg-orange-50 p-3 rounded-xl"><i class="fa-solid fa-tags text-orange-600 text-2xl"></i></div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-[5px] border-orange-500 flex items-center justify-between hover:shadow-md transition-shadow">
+            <div>
+                <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Jenis Geran Unik</p>
+                <h4 class="text-3xl font-black text-slate-800 leading-none">${jumlahJenisUnik}</h4>
+            </div>
+            <div class="bg-orange-50 w-12 h-12 flex items-center justify-center rounded-xl"><i class="fa-solid fa-tags text-orange-600 text-xl"></i></div>
         </div>`;
 }
 
 function renderChartsGeran(stats) {
-    if (barChartInstance) barChartInstance.destroy();
-    if (pieChartInstance) pieChartInstance.destroy();
+    if (typeof barChartInstance !== 'undefined' && barChartInstance) barChartInstance.destroy();
+    if (typeof pieChartInstance !== 'undefined' && pieChartInstance) pieChartInstance.destroy();
 
-    // 1. Sediakan senarai warna yang pelbagai untuk jabatan
+    // 1. Palet warna ceria & moden untuk Carta Bar
     const senaraiWarna = [
-        '#3b82f6', // Biru
-        '#10b981', // Zamrud (Emerald)
-        '#8b5cf6', // Ungu
-        '#f59e0b', // Jingga (Amber)
-        '#ef4444', // Merah
-        '#06b6d4', // Sian (Cyan)
-        '#f43f5e', // Merah Jambu (Rose)
-        '#84cc16', // Hijau Limau (Lime)
-        '#6366f1', // Indigo
-        '#14b8a6'  // Teal
+        'rgba(59, 130, 246, 0.85)', // Biru
+        'rgba(16, 185, 129, 0.85)', // Hijau Emerald
+        'rgba(139, 92, 246, 0.85)', // Ungu
+        'rgba(245, 158, 11, 0.85)', // Jingga
+        'rgba(239, 68, 68, 0.85)',  // Merah
+        'rgba(6, 182, 212, 0.85)',  // Cyan
+        'rgba(244, 63, 94, 0.85)',  // Rose
+        'rgba(132, 204, 22, 0.85)', // Lime
     ];
 
-    // 2. Petakan warna mengikut jumlah jabatan
     const labelJabatan = Object.keys(stats.jabatan);
+    const dataJabatan = Object.values(stats.jabatan);
     const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
 
+    // Render Carta Bar (Nilai Ikut Jabatan)
     barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
             labels: labelJabatan,
             datasets: [{ 
                 label: 'Jumlah Nilai (RM)', 
-                data: Object.values(stats.jabatan), 
-                backgroundColor: warnaBar, // <-- Array warna telah dimasukkan di sini
-                borderRadius: 8 
+                data: dataJabatan, 
+                backgroundColor: warnaBar,
+                borderRadius: 6,
+                borderSkipped: false,
+                maxBarThickness: 50 // 🌟 KEMASKINI: Hadkan kelebaran maksimum bar supaya tidak terlalu gemuk
             }]
         },
         options: { 
             responsive: true, 
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false // Disembunyikan supaya carta nampak lebih kemas apabila banyak warna
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: false, // Paksa papar semua label
+                        maxRotation: 45, // Sendengkan tulisan jika terlalu panjang
+                        minRotation: 0,
+                        font: { size: 11 }
+                    }
                 },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            // Ringkaskan nombor besar (Contoh: RM 100k atau RM 1M)
+                            if (value >= 1000000000) return 'RM ' + (value / 1000000000).toFixed(1) + 'B';
+                            if (value >= 1000000) return 'RM ' + (value / 1000000).toFixed(1) + 'M';
+                            if (value >= 1000) return 'RM ' + (value / 1000).toFixed(1) + 'k';
+                            return 'RM ' + value;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
                 tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleFont: { size: 13 },
+                    bodyFont: { size: 13 },
+                    padding: 10,
                     callbacks: {
                         label: function(context) {
-                            return 'RM ' + context.parsed.y.toLocaleString('en-MY');
+                            return ' RM ' + context.parsed.y.toLocaleString('en-MY', {minimumFractionDigits: 2});
                         }
                     }
                 }
@@ -1372,20 +1550,39 @@ function renderChartsGeran(stats) {
         }
     });
 
+    // Render Carta Pie (Pecahan Jenis Geran)
     pieChartInstance = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
         data: {
             labels: Object.keys(stats.jenis),
             datasets: [{ 
                 data: Object.values(stats.jenis), 
-                backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] 
+                backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'],
+                borderWidth: 2,
+                borderColor: '#ffffff'
             }]
         },
         options: { 
             responsive: true, 
             maintainAspectRatio: false, 
-            cutout: '70%',
-            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } }
+            cutout: '65%', // Kurangkan sikit ruang tengah supaya cincin lebih tebal
+            plugins: { 
+                legend: { 
+                    position: 'bottom', 
+                    labels: { boxWidth: 12, padding: 15, font: { size: 10, family: "'Inter', sans-serif" } } 
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            let val = context.parsed;
+                            let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            let percent = Math.round((val / total) * 100);
+                            return ` ${label}: ${val} Projek (${percent}%)`;
+                        }
+                    }
+                }
+            }
         }
     });
 }

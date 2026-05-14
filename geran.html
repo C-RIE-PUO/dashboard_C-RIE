@@ -13,257 +13,496 @@
             window.location.href = "login.html"; 
         }
     </script>
+    <style>
+        /* Custom scrollbar untuk table */
+        ::-webkit-scrollbar { height: 8px; width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
+    </style>
 </head>
 <body class="bg-slate-50 text-gray-800 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-white shadow-sm border-b border-gray-200">
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
         <div class="max-w-[90rem] mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-wide text-blue-900"><i class="fa-solid fa-hand-holding-dollar mr-2"></i> Dashboard Geran Penyelidikan</h1>
-                <p class="text-gray-500 text-sm mt-1">Analisis dan Pemantauan Penerimaan Geran</p>
+                <h1 class="text-2xl font-bold tracking-tight text-blue-900 flex items-center">
+                    <div class="bg-blue-100 p-2 rounded-lg mr-3"><i class="fa-solid fa-hand-holding-dollar text-blue-600"></i></div>
+                    Dashboard Geran
+                </h1>
+                <p class="text-gray-500 text-sm mt-1 ml-12">Analisis & Pemantauan Peruntukan Geran Penyelidikan</p>
             </div>
-            <div class="flex gap-3">
-                <button id="btnMuatNaikPukal" onclick="bukaModalPukal()" class="hidden bg-orange-500 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-orange-600 transition text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-upload"></i> Muat Naik Pukal
+            <div class="flex flex-wrap justify-center gap-3">
+                <button id="btnMuatNaikPukal" onclick="bukaModalPukal()" class="hidden bg-orange-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Data
                 </button>
-                <a href="utama.html" class="bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-gray-200 transition text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i> Kembali
+                <a href="utama.html" class="bg-white text-gray-700 border border-gray-300 px-5 py-2.5 rounded-xl font-bold shadow-sm hover:bg-gray-50 transition-all text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-house"></i> Utama
                 </a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-[90rem] mx-auto px-4 py-6 flex-grow w-full space-y-6">
+    <main class="max-w-[90rem] mx-auto px-4 py-8 flex-grow w-full space-y-8">
         
-        <div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-            <div class="relative w-full md:w-1/3">
-                <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
-                <input type="text" id="carianTeks" onkeyup="terapkanTapisan()" placeholder="Carian Ketua, Tajuk atau Jabatan..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
-            </div>
-            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                <select id="filterTahun" onchange="terapkanTapisan()" class="w-full sm:w-48 px-4 py-2 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                    <option value="">Semua Tahun</option>
-                </select>
-                <select id="filterJabatan" onchange="terapkanTapisan()" class="w-full sm:w-64 px-4 py-2 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                    <option value="">Semua Jabatan</option>
-                </select>
-            </div>
+<div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+    <div class="relative w-full md:w-2/5">
+        <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
+        <input type="text" id="carianTeks" onkeyup="terapkanTapisan()" placeholder="Cari nama ketua, ahli, tajuk atau No. Rujukan..." class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+        
+        <div class="relative">
+            <i class="fa-regular fa-calendar absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
+            <input type="text" id="filterTahun" onkeyup="terapkanTapisan()" placeholder="Tahun..." class="w-full sm:w-32 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
         </div>
+        
+        <div class="relative">
+            <i class="fa-solid fa-building absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
+            <select id="filterJabatan" onchange="terapkanTapisan()" class="w-full sm:w-48 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none transition-all">
+                <option value="">Semua Jabatan</option>
+            </select>
+        </div>
+        
+        <div class="relative">
+            <i class="fa-solid fa-list-check absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
+            <select id="filterStatus" onchange="terapkanTapisan()" class="w-full sm:w-40 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none transition-all">
+                <option value="">Semua Status</option>
+            </select>
+        </div>
+        
+    </div>
+</div>
 
-        <div id="mesejStatus" class="hidden p-4 rounded-xl text-center text-sm font-bold shadow-sm"></div>
-
-        <div id="kpiCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500 animate-pulse col-span-full">Memuatkan statistik...</div>
+        <div id="kpiCards" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500 animate-pulse col-span-full">Menyemak pangkalan data...</div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-                <h3 class="text-sm font-bold text-gray-700 uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-column text-blue-600"></i> Nilai Geran Mengikut Jabatan (RM)</h3>
-                <div class="relative h-64 w-full flex-grow">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col card-hover">
+                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-6 flex items-center gap-2">
+                    <span class="bg-blue-100 text-blue-600 p-1.5 rounded"><i class="fa-solid fa-chart-column"></i></span> 
+                    Nilai Geran Mengikut Jabatan
+                </h3>
+                <div class="relative h-72 w-full flex-grow">
                     <canvas id="barChart"></canvas>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-                <h3 class="text-sm font-bold text-gray-700 uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-600"></i> Pecahan Jenis Geran</h3>
-                <div class="relative h-64 w-full flex-grow">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col card-hover">
+                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-6 flex items-center gap-2">
+                    <span class="bg-indigo-100 text-indigo-600 p-1.5 rounded"><i class="fa-solid fa-chart-pie"></i></span> 
+                    Pecahan Mengikut Jenis Geran
+                </h3>
+                <div class="relative h-72 w-full flex-grow">
                     <canvas id="pieChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-table-list text-gray-400"></i> Senarai Projek Geran</h3>
+                <button onclick="muatDataGeran()" class="text-blue-600 hover:text-blue-800 text-sm font-semibold transition flex items-center gap-1"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+            </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
-                    <thead>
-                        <tr class="bg-blue-900 text-white uppercase tracking-wider text-[11px]">
-                            <th class="p-4 border-b border-blue-800 text-center w-12">Bil</th>
-                            <th class="p-4 border-b border-blue-800 min-w-[200px]">Ketua & Ahli</th>
-                            <th class="p-4 border-b border-blue-800 min-w-[300px]">Tajuk Projek</th>
-                            <th class="p-4 border-b border-blue-800 text-center">Jabatan</th>
-                            <th class="p-4 border-b border-blue-800 text-center">Tahun</th>
-                            <th class="p-4 border-b border-blue-800 text-center">Jenis Geran</th>
-                            <th class="p-4 border-b border-blue-800 text-right pr-6">Nilai (RM)</th>
+                <table class="w-full text-left border-collapse whitespace-nowrap min-w-[1200px]">
+					<thead>
+                        <tr class="bg-slate-800 text-slate-100 uppercase tracking-wider text-[11px]">
+                            <th class="p-4 text-center w-16">Bil</th>
+                            <th class="p-4 w-[400px]">Ketua & Penyelidik</th>
+                            <th class="p-4 w-[350px]">Maklumat Projek</th>
+                            <th class="p-4 text-center w-32">Tempoh</th>
+                            <th class="p-4 text-center w-36">Jenis Geran</th>
+                            <th class="p-4 text-center w-24 leading-tight">Peratus Belanja</th>
+                            <th class="p-4 text-right pr-6 w-32">Jumlah (RM)</th>
+                            <th class="p-4 text-center w-28">Status</th>
                         </tr>
                     </thead>
-                    <tbody id="isiJadual" class="text-gray-700 bg-white">
-                        <tr><td colspan="7" class="p-10 text-center font-bold text-blue-500 animate-pulse">⏳ Memuat turun data geran...</td></tr>
+                    <tbody id="isiJadual" class="text-gray-700 bg-white divide-y divide-gray-100">
+                        <tr><td colspan="8" class="p-12 text-center font-bold text-blue-500 animate-pulse"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memuat turun data geran...</td></tr>
                     </tbody>
                 </table>
             </div>
-            <div class="p-4 border-t border-gray-100 flex justify-between items-center bg-slate-50 text-sm">
-                <span class="text-gray-500 font-semibold" id="infoPaginasi">Papar 0 - 0 dari 0 rekod</span>
+            
+            <div class="p-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-gray-50 gap-4">
+                <span class="text-gray-500 font-medium text-sm" id="infoPaginasi">Papar 0 - 0 dari 0 rekod</span>
                 <div class="flex gap-2">
-                    <button onclick="ubahHalaman(-1)" id="btnPrev" class="px-4 py-1.5 bg-white border border-gray-300 rounded-lg font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition">Kiri</button>
-                    <button onclick="ubahHalaman(1)" id="btnNext" class="px-4 py-1.5 bg-white border border-gray-300 rounded-lg font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition">Kanan</button>
+                    <button onclick="ubahHalaman(-1)" id="btnPrev" class="px-4 py-2 bg-white border border-gray-300 rounded-lg font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Sblm</button>
+                    <button onclick="ubahHalaman(1)" id="btnNext" class="px-4 py-2 bg-white border border-gray-300 rounded-lg font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition flex items-center gap-2">Strus <i class="fa-solid fa-chevron-right"></i></button>
                 </div>
             </div>
         </div>
     </main>
 
-    <div id="modalUploadPukal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-            <div class="bg-blue-900 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-file-excel mr-2"></i> Muat Naik Data Pukal</h3>
-                <button onclick="tutupModalPukal()" class="text-white hover:text-blue-200 text-2xl font-bold leading-none">&times;</button>
+    <div id="modalUploadPukal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
+            <div class="bg-gradient-to-r from-blue-800 to-blue-900 p-5 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center"><i class="fa-solid fa-file-excel mr-3 text-2xl opacity-80"></i> Muat Naik Data Pukal</h3>
+                <button onclick="tutupModalPukal()" class="text-white hover:text-red-300 text-2xl font-bold leading-none transition">&times;</button>
             </div>
-            
-            <div class="p-6 space-y-4">
-                <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-sm text-blue-800">
-                    <p class="font-bold mb-1">Arahan:</p>
-                    <ol class="list-decimal ml-4 space-y-1">
-                        <li>Muat turun templat CSV/Excel.</li>
-                        <li>Isi data mengikut format lajur yang ditetapkan.</li>
-                        <li>Muat naik fail yang telah lengkap diisi di bawah.</li>
+            <div class="p-6 space-y-5">
+                <div class="bg-blue-50/50 border border-blue-100 p-4 rounded-xl text-sm text-blue-800">
+                    <p class="font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-info text-blue-500"></i> Arahan Muat Naik:</p>
+                    <ol class="list-decimal ml-5 space-y-1.5 text-gray-700">
+                        <li>Muat turun templat CSV di bawah.</li>
+                        <li>Pastikan maklumat diisi mengikut struktur templat dengan betul.</li>
+                        <li>Format nilai <b>Mesti</b> dalam bentuk nombor sahaja (Cth: 52000).</li>
                     </ol>
                 </div>
-
-                <div class="flex justify-center my-4">
-                    <button onclick="muatTurunTemplate()" class="bg-green-100 text-green-700 border border-green-300 px-4 py-2 rounded-lg font-bold hover:bg-green-200 transition text-sm flex items-center gap-2">
+                
+                <div class="flex justify-center my-2">
+                    <button onclick="muatTurunTemplate()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-5 py-2.5 rounded-xl font-bold hover:bg-emerald-100 transition text-sm flex items-center gap-2 w-full justify-center">
                         <i class="fa-solid fa-download"></i> Muat Turun Templat (.csv)
                     </button>
                 </div>
 
-                <hr class="border-gray-200">
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-gray-200"></div>
+                    <span class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase font-bold tracking-wider">Upload Fail</span>
+                    <div class="flex-grow border-t border-gray-200"></div>
+                </div>
 
-                <form onsubmit="hantarDataPukal(event)" class="space-y-4 pt-2">
+                <form onsubmit="hantarDataPukal(event)" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Fail CSV / Excel <span class="text-red-500">*</span></label>
-                        <input type="file" id="in_fail_pukal" accept=".csv, .xlsx, .xls" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="file" id="in_fail_pukal" accept=".csv, .xlsx, .xls" required class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-600 bg-gray-50 focus:border-blue-500 focus:bg-blue-50 outline-none transition cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     </div>
-
                     <div class="pt-4 flex justify-end gap-3">
-                        <button type="button" onclick="tutupModalPukal()" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition text-sm">Batal</button>
-                        <button type="submit" id="btnUploadPukal" class="px-5 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow text-sm">
-                            <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Mula Muat Naik
+                        <button type="button" onclick="tutupModalPukal()" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition text-sm">Batal</button>
+                        <button type="submit" id="btnUploadPukal" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-md hover:shadow-lg text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Sekarang
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+	
+	<div id="modalEditGeran" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all scale-100">
+            <div class="bg-gradient-to-r from-blue-700 to-blue-800 p-5 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center"><i class="fa-solid fa-pen-to-square mr-3 text-xl opacity-80"></i> Kemaskini Maklumat Geran</h3>
+                <button onclick="tutupModalEdit()" class="text-white hover:text-red-300 text-2xl font-bold leading-none transition">&times;</button>
+            </div>
+            
+            <form id="formEditGeran" onsubmit="hantarEditGeran(event)" class="p-6 space-y-5 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                <input type="hidden" id="edit_idRekod">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Nama Ketua</label>
+                        <input type="text" id="edit_ketua" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Jabatan/Unit</label>
+                        <input type="text" id="edit_jabatan" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Tajuk Projek</label>
+                        <textarea id="edit_tajuk" rows="2" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Jenis Geran</label>
+                        <input type="text" id="edit_jenis" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">No. Rujukan (ID)</label>
+                        <input type="text" id="edit_noRuj" class="w-full px-4 py-2.5 bg-gray-200 border border-gray-300 text-gray-500 rounded-xl text-sm cursor-not-allowed" readonly title="No rujukan tidak boleh diubah">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Tahun Mula</label>
+                            <input type="text" id="edit_mula" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Tahun Tamat</label>
+                            <input type="text" id="edit_tamat" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Nilai (RM)</label>
+                            <input type="number" step="0.01" id="edit_nilai" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none font-mono font-bold text-emerald-600">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Peratus (%)</label>
+                            <input type="number" step="0.1" id="edit_peratus" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none font-mono font-bold text-blue-600">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pt-5 flex justify-end gap-3 border-t border-gray-100">
+                    <button type="button" onclick="tutupModalEdit()" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition text-sm">Batal</button>
+                    <button type="submit" id="btnSubmitEdit" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-md hover:shadow-lg text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan Maklumat
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalStatusGeran" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100">
+            <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center"><i class="fa-solid fa-rotate mr-3 text-xl opacity-80"></i> Kemaskini Status</h3>
+                <button onclick="tutupModalStatus()" class="text-white hover:text-amber-200 text-2xl font-bold leading-none transition">&times;</button>
+            </div>
+            
+            <form id="formStatusGeran" onsubmit="hantarStatusGeran(event)" class="p-6 space-y-5">
+                <input type="hidden" id="status_idRekod">
+                
+                <div class="text-center mb-4">
+                    <p class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">No. Rujukan Geran</p>
+                    <p id="label_status_noRuj" class="font-mono text-sm font-bold text-amber-600 bg-amber-50 py-1.5 px-3 rounded-lg inline-block border border-amber-200"></p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Pilih Status Baru</label>
+                    <div class="relative">
+                        <select id="status_pilihan" class="w-full pl-4 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none appearance-none cursor-pointer transition-all">
+                            <option value="AKTIF">AKTIF / SEDANG BERJALAN</option>
+                            <option value="SELESAI">SELESAI / LULUS</option>
+                            <option value="TUNGGU">TUNGGU / DALAM PROSES</option>
+                            <option value="TOLAK">TOLAK / BATAL / GAGAL</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-3.5 text-gray-400 pointer-events-none"></i>
+                    </div>
+                </div>
+                
+                <div class="pt-5 flex justify-end gap-3 border-t border-gray-100">
+                    <button type="button" onclick="tutupModalStatus()" class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition text-sm flex-1">Batal</button>
+                    <button type="submit" id="btnSubmitStatus" class="px-5 py-2.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition shadow-md hover:shadow-lg text-sm flex items-center justify-center gap-2 flex-1">
+                        <i class="fa-solid fa-check"></i> Kemaskini
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
-        // ⚠️ MASUKKAN URL APP SCRIPT ANDA DI SINI
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
+       const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
         const userJabatan = sessionStorage.getItem("jabatan") || "";
         const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
         
-        // Cek sekiranya pengguna adalah Approver untuk fungsi Upload Pukal
-        const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN", "PENYELARAS GERAN"].includes(userPeranan);
+        // Mempunyai akses muat naik pukal (Penyelaras, Kupik, Admin)
+        const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "PENYELARAS GERAN", "KUPIK", "ADMIN"].includes(userPeranan);
+        
+        // 🌟 KEMASKINI BARU: Superpower hanya untuk ADMIN & KUPIK
+        const isSuperAdmin = ["ADMIN", "KUPIK"].includes(userPeranan);
 
         let dataGeranPenuh = [];
         let dataTapis = [];
-        
         let barChartInstance = null;
         let pieChartInstance = null;
-
-        // Paginasi
         let halamanSemasa = 1;
         const rekodPerHalaman = 10;
 
         window.onload = () => {
-            if(isApprover) {
-                document.getElementById('btnMuatNaikPukal').classList.remove('hidden');
+            if(isApprover) document.getElementById('btnMuatNaikPukal').classList.remove('hidden');
+            
+            // 🌟 KEMASKINI BARU: Tambah lajur "Tindakan" pada tajuk jadual (Header) secara automatik jika pengguna adalah Super Admin
+            if (isSuperAdmin) {
+                const headerRow = document.querySelector("#isiJadual").previousElementSibling.querySelector("tr");
+                if (headerRow) {
+                    const thTindakan = document.createElement("th");
+                    thTindakan.className = "p-4 text-center w-28";
+                    thTindakan.innerHTML = "Tindakan";
+                    headerRow.appendChild(thTindakan);
+                }
             }
+            
             muatDataGeran();
         };
 
-		// ==========================================
-        // 1. FETCH DATA DARI GOOGLE SCRIPT
         // ==========================================
-        function muatDataGeran() {
-            document.getElementById('isiJadual').innerHTML = `<tr><td colspan="7" class="p-10 text-center font-bold text-blue-500 animate-pulse">⏳ Memuat turun data geran...</td></tr>`;
+// 1. FETCH DATA DARI GOOGLE SCRIPT & PREPROCESS (MENGGABUNGKAN BARIS KOSONG)
+// ==========================================
+function muatDataGeran() {
+    // Papar indikator loading
+    document.getElementById('isiJadual').innerHTML = `
+        <tr>
+            <td colspan="7" class="p-12 text-center font-bold text-blue-500 animate-pulse">
+                <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memuat turun data geran...
+            </td>
+        </tr>`;
+    
+    // Fungsi pembantu untuk membuang format nombor di awal nama (cth: "1. ", "2) ")
+    const bersihkanNama = (nama) => {
+        if (!nama) return "";
+        // Regex ini membuang digit diikuti titik/kurungan dan ruang kosong di awal teks
+        return nama.replace(/^\d+[\.\)]\s*/, "").trim();
+    };
 
-            // 🌟 TUKAR URL ACTION DI SINI SUPAYA SAMA DENGAN GOOGLE SCRIPT ('ambilGeran')
-            fetch(`${SCRIPT_URL}?action=ambilGeran`)
-            .then(res => res.json())
-            .then(result => {
-                if (result.status === "BERJAYA") {
-                    dataGeranPenuh = result.data || [];
-                    
-                    // Jika data kosong
-                    if (dataGeranPenuh.length === 0) {
-                        document.getElementById('isiJadual').innerHTML = `<tr><td colspan="7" class="p-10 text-center text-gray-500 font-medium">Tiada data geran ditemui di dalam rekod.</td></tr>`;
-                        return;
-                    }
-
-                    // Isi Dropdown Filter
-                    janaPilihanFilter(dataGeranPenuh);
-                    
-                    // Terap tapisan awal
-                    terapkanTapisan();
-                } else {
-                    paparRalat(`❌ Gagal: ${result.mesej}`);
-                }
-            })
-            .catch(err => {
-                paparRalat("⚠️ Ralat rangkaian: Gagal berhubung dengan pangkalan data.");
-                console.error(err);
-            });
-        }
-
-        function janaPilihanFilter(data) {
-            const setTahun = new Set();
-            const setJabatan = new Set();
-
-            data.forEach(r => {
-                if(r[5]) setTahun.add(String(r[5]).trim()); // Lajur F: TAHUN
-                if(r[3]) setJabatan.add(String(r[3]).trim()); // Lajur D: JABATAN
-            });
-
-            const selTahun = document.getElementById('filterTahun');
-            const selJabatan = document.getElementById('filterJabatan');
+    fetch(`${SCRIPT_URL}?action=ambilGeran`)
+    .then(res => res.json())
+    .then(result => {
+        if (result.status === "BERJAYA") {
+            let rawData = result.data || [];
+            if (rawData.length === 0) {
+                document.getElementById('isiJadual').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-10 text-center text-gray-500 font-medium">
+                            Tiada data geran ditemui.
+                        </td>
+                    </tr>`;
+                return;
+            }
             
-            // Render Tahun (Susunan Menurun)
-            [...setTahun].sort((a,b) => b - a).forEach(t => {
-                selTahun.innerHTML += `<option value="${t}">${t}</option>`;
+            // PREPROCESS: Gabungkan nama penyelidik yang berada pada baris kosong di bawah ketua yang sama
+            let processedData = [];
+            let currentProject = null;
+
+            rawData.forEach(row => {
+                // Jika ada 'Bil' (Lajur A/Indeks 0), bermaksud ini rekod ketua/projek baru
+                if (String(row[0]).trim() !== "") {
+                    // Masukkan projek sebelumnya ke dalam senarai sebelum mulakan yang baru
+                    if (currentProject) processedData.push(currentProject);
+                    
+                    // Salin data baris tersebut
+                    currentProject = [...row]; 
+                    
+                    let ahliAsal = String(row[4] || "").trim();
+                    let jabatanAhliAsal = String(row[5] || "").trim();
+                    
+                    // Tukar Lajur E (Indeks 4) daripada String kepada Array untuk simpan ramai ahli
+                    currentProject[4] = []; 
+                    
+                    if (ahliAsal) {
+                        currentProject[4].push({ 
+                            nama: bersihkanNama(ahliAsal), // Bersihkan nama di sini
+                            jabatan: jabatanAhliAsal 
+                        });
+                    }
+                } 
+                // Jika 'Bil' kosong, bermaksud ini adalah baris sambungan ahli untuk projek di atasnya
+                else if (currentProject) {
+                    let ahliSambungan = String(row[4] || "").trim();
+                    let jabatanSambungan = String(row[5] || "").trim();
+                    
+                    if(ahliSambungan) {
+                        currentProject[4].push({ 
+                            nama: bersihkanNama(ahliSambungan), // Bersihkan nama di sini
+                            jabatan: jabatanSambungan 
+                        });
+                    }
+                }
             });
 
-            // Render Jabatan (Susunan Menaik)
-            [...setJabatan].sort().forEach(j => {
-                selJabatan.innerHTML += `<option value="${j}">${j}</option>`;
-            });
+            // Push projek terakhir yang diproses dalam loop
+            if (currentProject) processedData.push(currentProject);
 
-            // Auto-pilih jabatan jika pengguna biasa
+            // Simpan data dalam pembolehubah global
+            dataGeranPenuh = processedData;
+            
+            // Jana dropdown filter & papar data ke jadual
+            janaPilihanFilter(dataGeranPenuh);
+            terapkanTapisan();
+            
+        } else {
+            paparRalat(`❌ Gagal: ${result.mesej}`);
+        }
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        paparRalat("⚠️ Ralat rangkaian: Gagal berhubung dengan pangkalan data.");
+    });
+}
+		// ==========================================
+        // 2. DROPDOWN & FILTER LOGIC
+        // ==========================================
+        function janaPilihanFilter(data) {
+            const setJabatan = new Set();
+            const setStatus = new Set(); 
+            
+            data.forEach(r => {
+                if(r[3]) setJabatan.add(String(r[3]).trim()); // Jabatan Ketua
+                if(r[13]) setStatus.add(String(r[13]).trim().toUpperCase()); // Status
+            });
+            
+            const selJabatan = document.getElementById('filterJabatan');
+            const selStatus = document.getElementById('filterStatus'); 
+            
+            selJabatan.innerHTML = '<option value="">Semua Jabatan</option>';
+            if(selStatus) selStatus.innerHTML = '<option value="">Semua Status</option>'; 
+
+            [...setJabatan].sort().forEach(j => selJabatan.innerHTML += `<option value="${j}">${j}</option>`);
+            
+            if(selStatus) {
+                [...setStatus].sort().forEach(s => {
+                    if(s !== "" && s !== "-") { 
+                        selStatus.innerHTML += `<option value="${s}">${s}</option>`;
+                    }
+                });
+            }
+            
             if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
                 selJabatan.value = userJabatan;
                 selJabatan.disabled = true;
-                selJabatan.classList.add("bg-gray-100", "cursor-not-allowed");
+                selJabatan.classList.add('bg-gray-200', 'cursor-not-allowed', 'opacity-70');
             }
         }
 
-        // ==========================================
-        // 2. TAPISAN DATA (SEARCH, TAHUN, JABATAN)
-        // ==========================================
         function terapkanTapisan() {
-            const txtCari = document.getElementById('carianTeks').value.toLowerCase();
-            const valTahun = document.getElementById('filterTahun').value;
-            const valJabatan = document.getElementById('filterJabatan').value;
+    const txtCari = document.getElementById('carianTeks').value.toLowerCase().trim();
+    const valTahun = document.getElementById('filterTahun').value.trim(); 
+    
+    // 🌟 KEMASKINI 1: Buang jarak kosong (trim) dan tukar ke huruf besar
+    let valJabatan = document.getElementById('filterJabatan').value.trim().toUpperCase();
+    const elStatus = document.getElementById('filterStatus');
+    const valStatus = elStatus ? elStatus.value.trim().toUpperCase() : "";
 
-            dataTapis = dataGeranPenuh.filter(row => {
-                const dbKetua = String(row[1] || "").toLowerCase();
-                const dbTajuk = String(row[4] || "").toLowerCase();
-                const dbJabatan = String(row[3] || "");
-                const dbTahun = String(row[5] || "");
+    if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
+        // Seragamkan juga userJabatan jika ia diambil dari session
+        valJabatan = (userJabatan || "").trim().toUpperCase();
+    }
 
-                // Carian (Match Ketua, Tajuk, atau Jabatan)
-                let matchCari = txtCari === "" || dbKetua.includes(txtCari) || dbTajuk.includes(txtCari) || dbJabatan.toLowerCase().includes(txtCari);
-                
-                // Tapisan Tahun
-                let matchTahun = valTahun === "" || dbTahun === valTahun;
-                
-                // Tapisan Jabatan
-                let matchJabatan = valJabatan === "" || dbJabatan === valJabatan;
-                if (!isApprover && userPeranan !== "PENYELARAS JABATAN") matchJabatan = (dbJabatan === userJabatan);
-
-                return matchCari && matchTahun && matchJabatan;
-            });
-
-            halamanSemasa = 1;
-            kemaskiniDashboard(dataTapis);
+    dataTapis = dataGeranPenuh.filter(row => {
+        const dbKetua = String(row[1] || "").toLowerCase();
+        
+        // 🌟 KEMASKINI 2: Bersihkan data dari database (buang jarak & huruf besar)
+        const dbJabatanRaw = String(row[3] || "").trim().toUpperCase(); 
+        const dbJabatanLow = dbJabatanRaw.toLowerCase();
+        
+        const dbTajuk = String(row[6] || "").toLowerCase();
+        const dbJenis = String(row[7] || "").toLowerCase();
+        const dbNoRuj = String(row[8] || "").toLowerCase();
+        const dbTahun = String(row[9] || "");
+        const dbStatus = String(row[13] || "").trim().toUpperCase(); 
+        
+        let matchAhli = false;
+        if(Array.isArray(row[4])) {
+            matchAhli = row[4].some(a => String(a.nama).toLowerCase().includes(txtCari));
         }
 
+        // Semakan Carian Bebas
+        let matchCari = txtCari === "" || 
+                        dbKetua.includes(txtCari) || 
+                        dbTajuk.includes(txtCari) || 
+                        dbNoRuj.includes(txtCari) || 
+                        dbJabatanLow.includes(txtCari) || 
+                        dbJenis.includes(txtCari) || 
+                        matchAhli;
+
+        // Semakan Tahun menggunakan includes() untuk partial matching
+        let matchTahun = valTahun === "" || dbTahun.includes(valTahun);
+        
+        // 🌟 KEMASKINI 3: Sekarang ia membandingkan rentetan yang telah bersih
+        let matchJabatan = valJabatan === "" || dbJabatanRaw === valJabatan;
+        let matchStatus = valStatus === "" || dbStatus === valStatus;
+
+        return matchCari && matchTahun && matchJabatan && matchStatus;
+    });
+
+    halamanSemasa = 1;
+    kemaskiniDashboard(dataTapis);
+}
+
+        // ==========================================
+        // 3. STATISTIK & CARTA (KPI CARDS & CHARTS)
+        // ==========================================
         function kemaskiniDashboard(data) {
             const stats = kiraStatsGeran(data);
             renderKadKPI(stats);
@@ -271,215 +510,349 @@
             paparJadual();
         }
 
-        // ==========================================
-        // 3. LOGIK STATISTIK & CARTA
-        // ==========================================
         function kiraStatsGeran(data) {
             let statsJabatan = {};
             let statsJenis = {};
             let totalNilai = 0;
             
             data.forEach(r => {
-                let jbtAsal = String(r[3] || 'TIADA JABATAN').trim();
-                
-                // --- LOGIK EKSTRAK SINGKATAN JABATAN (Regex) ---
+                let jbtAsal = String(r[3] || 'LAIN-LAIN').trim();
+                // Ekstrak Singkatan (Cth: JABATAN KEJURUTERAAN AWAM (JKA) -> JKA)
                 let match = jbtAsal.match(/\(([^)]+)\)/); 
                 let jbt = match ? match[1].trim() : jbtAsal;
 
-                let jenis = String(r[6] || 'LAIN-LAIN').trim().toUpperCase();
-                
-                // Lajur H: NILAI. Buang simbol 'RM' dan koma jika ada.
-                let nilaiRaw = String(r[7] || "0").replace(/[^0-9.-]+/g,"");
+                let jenis = String(r[7] || 'TIADA JENIS').trim().toUpperCase();
+                let nilaiRaw = String(r[11] || "0").replace(/[^0-9.-]+/g,"");
                 let nilai = parseFloat(nilaiRaw) || 0;
 
                 statsJabatan[jbt] = (statsJabatan[jbt] || 0) + nilai;
                 statsJenis[jenis] = (statsJenis[jenis] || 0) + 1;
                 totalNilai += nilai;
             });
-
             return { jabatan: statsJabatan, jenis: statsJenis, totalNilai: totalNilai, totalProjek: data.length };
         }
 
         function renderKadKPI(stats) {
             const kpiContainer = document.getElementById('kpiCards');
-            const purata = stats.totalProjek > 0 ? (stats.totalNilai / stats.totalProjek) : 0;
-
+            const purata = stats.totalProjek ? stats.totalNilai/stats.totalProjek : 0;
             kpiContainer.innerHTML = `
-                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-[5px] border-emerald-500 flex items-center justify-between">
-                    <div><p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Jumlah Nilai Geran</p><h4 class="text-2xl font-black text-emerald-700 mt-1">RM ${stats.totalNilai.toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2})}</h4></div>
-                    <div class="bg-emerald-50 p-3 rounded-xl"><i class="fa-solid fa-comments-dollar text-emerald-600 text-xl"></i></div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-[6px] border-l-emerald-500 flex items-center justify-between card-hover">
+                    <div><p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jumlah Peruntukan</p><h4 class="text-2xl font-black text-slate-800">RM ${stats.totalNilai.toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2})}</h4></div>
+                    <div class="bg-emerald-50/80 p-4 rounded-2xl"><i class="fa-solid fa-sack-dollar text-emerald-600 text-2xl"></i></div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-[5px] border-indigo-500 flex items-center justify-between">
-                    <div><p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Bilangan Projek</p><h4 class="text-2xl font-black text-gray-800 mt-1">${stats.totalProjek}</h4></div>
-                    <div class="bg-indigo-50 p-3 rounded-xl"><i class="fa-solid fa-diagram-project text-indigo-600 text-xl"></i></div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-[6px] border-l-blue-500 flex items-center justify-between card-hover">
+                    <div><p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Bilangan Projek</p><h4 class="text-2xl font-black text-slate-800">${stats.totalProjek}</h4></div>
+                    <div class="bg-blue-50/80 p-4 rounded-2xl"><i class="fa-solid fa-list-check text-blue-600 text-2xl"></i></div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-[5px] border-purple-500 flex items-center justify-between">
-                    <div><p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Purata Nilai</p><h4 class="text-xl font-black text-gray-800 mt-1">RM ${purata.toLocaleString('en-MY', {maximumFractionDigits:0})}</h4></div>
-                    <div class="bg-purple-50 p-3 rounded-xl"><i class="fa-solid fa-calculator text-purple-600 text-xl"></i></div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-[6px] border-l-purple-500 flex items-center justify-between card-hover">
+                    <div><p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Purata Nilai Geran</p><h4 class="text-xl font-black text-slate-800 mt-1">RM ${purata.toLocaleString('en-MY', {maximumFractionDigits:0})}</h4></div>
+                    <div class="bg-purple-50/80 p-4 rounded-2xl"><i class="fa-solid fa-scale-balanced text-purple-600 text-2xl"></i></div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-[5px] border-orange-500 flex items-center justify-between">
-                    <div><p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Jenis Geran Unik</p><h4 class="text-2xl font-black text-gray-800 mt-1">${Object.keys(stats.jenis).length}</h4></div>
-                    <div class="bg-orange-50 p-3 rounded-xl"><i class="fa-solid fa-tags text-orange-600 text-xl"></i></div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-[6px] border-l-orange-500 flex items-center justify-between card-hover">
+                    <div><p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jenis Kategori</p><h4 class="text-2xl font-black text-slate-800">${Object.keys(stats.jenis).length}</h4></div>
+                    <div class="bg-orange-50/80 p-4 rounded-2xl"><i class="fa-solid fa-tags text-orange-600 text-2xl"></i></div>
                 </div>`;
         }
 
         function renderCarta(stats) {
             if (barChartInstance) barChartInstance.destroy();
             if (pieChartInstance) pieChartInstance.destroy();
+            
+            // Palet Warna Menarik
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
 
-            const senaraiWarna = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#f43f5e', '#84cc16'];
-            const labelJabatan = Object.keys(stats.jabatan);
-            const warnaBar = labelJabatan.map((_, idx) => senaraiWarna[idx % senaraiWarna.length]);
-
-            // BAR CHART
             barChartInstance = new Chart(document.getElementById('barChart'), {
                 type: 'bar',
                 data: {
-                    labels: labelJabatan,
-                    datasets: [{ 
-                        label: 'Jumlah Nilai (RM)', 
-                        data: Object.values(stats.jabatan), 
-                        backgroundColor: warnaBar, 
-                        borderRadius: 6 
-                    }]
+                    labels: Object.keys(stats.jabatan),
+                    datasets: [{ label: 'Jumlah (RM)', data: Object.values(stats.jabatan), backgroundColor: colors, borderRadius: 6, maxBarThickness: 50 }]
                 },
                 options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'RM ' + ctx.parsed.y.toLocaleString('en-MY') } } }
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'RM ' + ctx.parsed.y.toLocaleString('en-MY') } } },
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f1f5f9' } }, x: { grid: { display: false } } },
+                    animation: { duration: 1500, easing: 'easeOutQuart' }
                 }
             });
 
-            // PIE CHART
             pieChartInstance = new Chart(document.getElementById('pieChart'), {
                 type: 'doughnut',
                 data: {
                     labels: Object.keys(stats.jenis),
-                    datasets: [{ 
-                        data: Object.values(stats.jenis), 
-                        backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] 
-                    }]
+                    datasets: [{ data: Object.values(stats.jenis), backgroundColor: colors, borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4 }]
                 },
                 options: { 
                     responsive: true, maintainAspectRatio: false, cutout: '65%',
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { family: "'Inter', sans-serif" } } } },
+                    animation: { animateScale: true, animateRotate: true, duration: 1500 }
                 }
             });
         }
 
-        // ==========================================
+       // ==========================================
         // 4. JADUAL & PAGINASI
         // ==========================================
         function paparJadual() {
             const tbody = document.getElementById('isiJadual');
             tbody.innerHTML = "";
-
+            
+            // ... (Kekalkan kod semakan dataTapis.length === 0 seperti sedia ada)
             if (dataTapis.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-gray-500 font-medium">Tiada data dijumpai.</td></tr>`;
+                // Pastikan colspan ditambah 1 jika SuperAdmin (8 + 1 = 9)
+                let colSpan = isSuperAdmin ? 9 : 8;
+                tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-12 text-center text-gray-500 font-medium bg-gray-50/50"><i class="fa-solid fa-folder-open text-2xl text-gray-300 mb-2 block"></i> Tiada data dijumpai berdasarkan carian.</td></tr>`;
                 document.getElementById('infoPaginasi').innerText = `Papar 0 - 0 dari 0 rekod`;
-                document.getElementById('btnPrev').disabled = true;
-                document.getElementById('btnNext').disabled = true;
+                if(document.getElementById('btnPrev')) document.getElementById('btnPrev').disabled = true;
+                if(document.getElementById('btnNext')) document.getElementById('btnNext').disabled = true;
                 return;
             }
 
-            const Mula = (halamanSemasa - 1) * rekodPerHalaman;
-            const Akhir = Mula + rekodPerHalaman;
-            const dataHalaman = dataTapis.slice(Mula, Akhir);
+            const mula = (halamanSemasa - 1) * rekodPerHalaman;
+            const dataHalaman = dataTapis.slice(mula, mula + rekodPerHalaman);
 
-            dataHalaman.forEach((row, index) => {
-                // Berdasarkan lajur TAB "GERAN": A=0(Bil), B=1(Ketua), C=2(Ahli), D=3(Jabatan), E=4(Tajuk), F=5(Tahun), G=6(Jenis), H=7(Nilai)
-                const dbKetua = row[1] || "-";
-                const dbAhli = row[2] || "";
-                const dbTajuk = row[4] || "-";
+            dataHalaman.forEach((row, idx) => {
+                const ketua = row[1] || "-";
+                const jbtKetua = row[3] || "-";
                 
-                // Singkatan Jabatan
-                let jAsal = String(row[3] || "-");
-                let m = jAsal.match(/\(([^)]+)\)/);
-                const dbJabatan = m ? m[1].trim() : jAsal;
+                let htmlAhli = "";
+                if(Array.isArray(row[4]) && row[4].length > 0) {
+                    htmlAhli = `<div class="mt-2.5 pt-2.5 border-t border-gray-200 flex flex-col gap-1.5">`;
+                    row[4].forEach(a => {
+                        htmlAhli += `
+                            <div class="flex items-start text-[11px] text-gray-600 uppercase">
+                                <i class="fa-solid fa-user-tag text-gray-400 mr-2 mt-0.5"></i> 
+                                <div class="flex-1 leading-tight">
+                                    ${a.nama} 
+                                    <span class="ml-1 inline-block text-[9px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">${a.jabatan || '?'}</span>
+                                </div>
+                            </div>`;
+                    });
+                    htmlAhli += `</div>`;
+                }
 
-                const dbTahun = row[5] || "-";
-                const dbJenis = row[6] || "-";
+                const tajuk = row[6] || "-";
+                const noRuj = row[8] ? `<div class="mt-2.5 font-mono text-[11px] text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-lg inline-block"><i class="fa-regular fa-file-lines mr-1.5"></i> ${row[8]}</div>` : "";
+                const thnMula = row[9] || "-";
+                const thnTamat = row[10] || "-";
+                const jenis = row[7] || "-";
+                const nilai = parseFloat(String(row[11] || "0").replace(/[^0-9.-]+/g,"")) || 0;
                 
-                // Format Nilai RM
-                let rawNilai = String(row[7] || "0").replace(/[^0-9.-]+/g,"");
-                let valNilai = parseFloat(rawNilai) || 0;
-                let textNilai = "RM " + valNilai.toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2});
+                let peratusVal = parseFloat(String(row[12] || "0").replace(/[^0-9.-]+/g,"")) || 0;
+                let colorPeratus = peratusVal >= 80 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 
+                                  (peratusVal >= 40 ? 'text-amber-700 bg-amber-50 border-amber-200' : 
+                                  'text-red-700 bg-red-50 border-red-200');
+
+                const statusGeran = String(row[13] || "-").trim().toUpperCase();
+                let colorStatus = "text-gray-600 bg-gray-100 border-gray-200"; 
+                if (statusGeran === "SELESAI" || statusGeran.includes("LULUS")) colorStatus = "text-emerald-700 bg-emerald-50 border-emerald-200";
+                else if (statusGeran === "AKTIF" || statusGeran.includes("SEDANG") || statusGeran.includes("ONGOING")) colorStatus = "text-blue-700 bg-blue-50 border-blue-200";
+                else if (statusGeran.includes("TOLAK") || statusGeran.includes("BATAL") || statusGeran.includes("GAGAL")) colorStatus = "text-red-700 bg-red-50 border-red-200";
+                else if (statusGeran.includes("TUNGGU") || statusGeran.includes("PROSES")) colorStatus = "text-amber-700 bg-amber-50 border-amber-200";
+
+                // 🌟 KEMASKINI BARU: Butang Tindakan Khas Super Admin
+                let htmlTindakan = "";
+                if (isSuperAdmin) {
+                    // ID Baris atau No Rujukan digunakan untuk trigger function edit (contoh: row[8] sebagai No Rujukan)
+                    let idRekod = row[8] || idx; 
+                    htmlTindakan = `
+                    <td class="p-4 text-center align-top">
+                        <div class="flex flex-col gap-1.5">
+                            <button onclick="editGeran('${idRekod}')" class="w-full bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1.5 rounded-md text-[10px] font-bold hover:bg-blue-100 transition shadow-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </button>
+                            <button onclick="kemaskiniStatusGeran('${idRekod}')" class="w-full bg-amber-50 text-amber-600 border border-amber-200 px-2 py-1.5 rounded-md text-[10px] font-bold hover:bg-amber-100 transition shadow-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-rotate"></i> Status
+                            </button>
+                            <button onclick="padamGeran('${idRekod}')" class="w-full bg-red-50 text-red-600 border border-red-200 px-2 py-1.5 rounded-md text-[10px] font-bold hover:bg-red-100 transition shadow-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-trash-can"></i> Padam
+                            </button>
+                        </div>
+                    </td>`;
+                }
 
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-slate-50 transition";
+                tr.className = "hover:bg-blue-50/40 transition-colors duration-200";
                 tr.innerHTML = `
-                    <td class="p-4 text-center font-bold text-gray-500 text-xs">${Mula + index + 1}</td>
-                    <td class="p-4 whitespace-normal">
-                        <div class="font-bold text-blue-800 text-xs uppercase">${dbKetua}</div>
-                        <div class="text-[10px] text-gray-500 uppercase mt-0.5">${dbAhli}</div>
+                    <td class="p-4 text-center font-bold text-gray-400 align-top">${mula + idx + 1}</td>
+                    <td class="p-4 whitespace-normal align-top">
+                        <div class="font-bold text-slate-800 text-[13px] uppercase flex items-start gap-2">
+                            <i class="fa-solid fa-user-tie text-blue-500 mt-0.5"></i> 
+                            <div class="leading-tight">${ketua}</div>
+                        </div>
+                        <div class="mt-1.5 ml-5">
+                            <span class="text-[10px] font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded uppercase border border-blue-200">${jbtKetua}</span>
+                        </div>
+                        ${htmlAhli}
                     </td>
-                    <td class="p-4 whitespace-normal font-semibold text-gray-700 text-xs uppercase leading-tight">${dbTajuk}</td>
-                    <td class="p-4 text-center font-bold text-blue-600 text-xs uppercase">${dbJabatan}</td>
-                    <td class="p-4 text-center font-bold text-gray-800 text-xs">${dbTahun}</td>
-                    <td class="p-4 text-center">
-                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">${dbJenis}</span>
+                    <td class="p-4 whitespace-normal align-top">
+                        <div class="font-bold text-slate-700 text-[12px] uppercase leading-relaxed">${tajuk}</div>
+                        ${noRuj}
                     </td>
-                    <td class="p-4 text-right font-mono font-bold text-emerald-600 text-xs tracking-tight pr-6">${textNilai}</td>
-                `;
+                    <td class="p-4 text-center align-top">
+                        <div class="flex flex-col items-center justify-center gap-1.5 w-full max-w-[120px] mx-auto">
+                            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200 w-full text-center shadow-sm">Mula: ${thnMula}</span>
+                            <span class="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-1 rounded-md border border-rose-200 w-full text-center shadow-sm">Tamat: ${thnTamat}</span>
+                        </div>
+                    </td>
+                    <td class="p-4 text-center align-top">
+                        <span class="inline-block bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wide whitespace-normal max-w-[150px] leading-tight shadow-sm">${jenis}</span>
+                    </td>
+                    <td class="p-4 text-center align-top">
+                        <span class="inline-block border px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm ${colorPeratus}">${peratusVal}%</span>
+                    </td>
+                    <td class="p-4 text-right align-top pr-6">
+                        <div class="font-mono font-bold text-emerald-600 text-[14px] tracking-tight">RM ${nilai.toLocaleString('en-MY', {minimumFractionDigits:2})}</div>
+                    </td>
+                    <td class="p-4 text-center align-top">
+                        <span class="inline-block border px-2.5 py-1.5 rounded-md text-[10px] font-bold tracking-wide shadow-sm uppercase ${colorStatus}">
+                            ${statusGeran}
+                        </span>
+                    </td>
+                    ${htmlTindakan} `;
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('infoPaginasi').innerText = `Papar ${Mula + 1} - ${Math.min(Akhir, dataTapis.length)} dari ${dataTapis.length} rekod`;
-            document.getElementById('btnPrev').disabled = halamanSemasa === 1;
-            document.getElementById('btnNext').disabled = Akhir >= dataTapis.length;
+            document.getElementById('infoPaginasi').innerText = `Papar ${mula + 1} - ${Math.min(mula + rekodPerHalaman, dataTapis.length)} dari ${dataTapis.length} rekod`;
+            if(document.getElementById('btnPrev')) document.getElementById('btnPrev').disabled = halamanSemasa === 1;
+            if(document.getElementById('btnNext')) document.getElementById('btnNext').disabled = (mula + rekodPerHalaman) >= dataTapis.length;
         }
 
-        function ubahHalaman(arah) { 
-            halamanSemasa += arah; 
-            paparJadual(); 
-        }
-
-        function paparRalat(teks) {
-            document.getElementById('isiJadual').innerHTML = `<tr><td colspan="7" class="p-10 text-center text-red-500 font-bold">${teks}</td></tr>`;
-        }
-
+// ==========================================
+        // 5. FUNGSI TINDAKAN (EDIT, STATUS, PADAM)
         // ==========================================
-        // 5. MODAL UPLOAD PUKAL
-        // ==========================================
-        function bukaModalPukal() { document.getElementById('modalUploadPukal').classList.remove('hidden'); }
-        function tutupModalPukal() { document.getElementById('modalUploadPukal').classList.add('hidden'); }
-
-        function muatTurunTemplate() {
-            // Hasilkan fail CSV ringkas berdasarkan struktur lajur A - H
-            const headerArr = ["BIL", "KETUA", "AHLI", "JABATAN", "TAJUK", "TAHUN", "JENIS_GERAN", "NILAI"];
-            const csvContent = "data:text/csv;charset=utf-8," + headerArr.join(",") + "\n";
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Template_Data_Geran.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function hantarDataPukal(e) {
-            e.preventDefault();
-            const failInput = document.getElementById('in_fail_pukal');
-            const btn = document.getElementById('btnUploadPukal');
-
-            if(failInput.files.length === 0) return;
+        
+        // ---------- A. FUNGSI EDIT GERAN ----------
+        function editGeran(id) {
+            // Cari data asal dari array dataGeranPenuh menggunakan id (row[8] atau index)
+            let row = dataGeranPenuh.find((r, index) => (r[8] || index) == id);
+            if(!row) return alert("Rekod tidak dijumpai!");
             
-            const fail = failInput.files[0];
-            const reader = new FileReader();
+            // Masukkan data ke dalam borang
+            document.getElementById('edit_idRekod').value = id;
+            document.getElementById('edit_ketua').value = row[1] || "";
+            document.getElementById('edit_jabatan').value = row[3] || "";
+            document.getElementById('edit_tajuk').value = row[6] || "";
+            document.getElementById('edit_jenis').value = row[7] || "";
+            document.getElementById('edit_noRuj').value = row[8] || "TIADA NO RUJUKAN";
+            document.getElementById('edit_mula').value = row[9] || "";
+            document.getElementById('edit_tamat').value = row[10] || "";
+            document.getElementById('edit_nilai').value = row[11] ? String(row[11]).replace(/[^0-9.-]+/g,"") : "";
+            document.getElementById('edit_peratus').value = row[12] ? String(row[12]).replace(/[^0-9.-]+/g,"") : "";
+            
+            // Buka Modal
+            document.getElementById('modalEditGeran').classList.remove('hidden');
+        }
+        
+        function tutupModalEdit() { 
+            document.getElementById('modalEditGeran').classList.add('hidden'); 
+        }
 
+        function hantarEditGeran(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitEdit');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Sedang Muat Naik...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
 
-            reader.onload = function(e_read) {
-                const base64Data = e_read.target.result.split(',')[1];
-                const payload = {
-                    action: "muatNaikPukalGeran", // Pastikan fungsi ini dibina di Kod.gs
-                    FAIL: {
-                        dataBase64: base64Data,
-                        mimeType: fail.type,
-                        namaFail: fail.name
-                    }
-                };
+            // Struktur data yang akan dihantar ke Google Script (doPost)
+            const payload = {
+                action: "editGeran",
+                idRekod: document.getElementById('edit_idRekod').value,
+                ketua: document.getElementById('edit_ketua').value,
+                jabatan: document.getElementById('edit_jabatan').value,
+                tajuk: document.getElementById('edit_tajuk').value,
+                jenis: document.getElementById('edit_jenis').value,
+                mula: document.getElementById('edit_mula').value,
+                tamat: document.getElementById('edit_tamat').value,
+                nilai: document.getElementById('edit_nilai').value,
+                peratus: document.getElementById('edit_peratus').value
+            };
 
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "BERJAYA") {
+                    alert("✅ Maklumat geran berjaya dikemaskini.");
+                    tutupModalEdit();
+                    muatDataGeran(); // Refresh jadual
+                } else {
+                    alert("❌ Ralat: " + data.mesej);
+                }
+            })
+            .catch(err => alert("⚠️ Gagal berhubung dengan pelayan."))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Maklumat`;
+            });
+        }
+
+        // ---------- B. FUNGSI STATUS GERAN ----------
+        function kemaskiniStatusGeran(id) {
+            let row = dataGeranPenuh.find((r, index) => (r[8] || index) == id);
+            if(!row) return alert("Rekod tidak dijumpai!");
+            
+            document.getElementById('status_idRekod').value = id;
+            document.getElementById('label_status_noRuj').innerText = row[8] || "TIADA NO RUJUKAN";
+            
+            // Padankan status semasa dengan pilihan dropdown
+            let statusSemasa = String(row[13] || "").toUpperCase();
+            let elSelect = document.getElementById('status_pilihan');
+            
+            if(statusSemasa.includes("SELESAI") || statusSemasa.includes("LULUS")) elSelect.value = "SELESAI";
+            else if(statusSemasa.includes("AKTIF") || statusSemasa.includes("SEDANG")) elSelect.value = "AKTIF";
+            else if(statusSemasa.includes("TOLAK") || statusSemasa.includes("BATAL") || statusSemasa.includes("GAGAL")) elSelect.value = "TOLAK";
+            else elSelect.value = "TUNGGU";
+            
+            document.getElementById('modalStatusGeran').classList.remove('hidden');
+        }
+        
+        function tutupModalStatus() { 
+            document.getElementById('modalStatusGeran').classList.add('hidden'); 
+        }
+
+        function hantarStatusGeran(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitStatus');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+
+            const payload = {
+                action: "kemaskiniStatusGeran",
+                idRekod: document.getElementById('status_idRekod').value,
+                status: document.getElementById('status_pilihan').value
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "BERJAYA") {
+                    alert("✅ Status geran berjaya dikemaskini.");
+                    tutupModalStatus();
+                    muatDataGeran(); // Refresh jadual
+                } else {
+                    alert("❌ Ralat: " + data.mesej);
+                }
+            })
+            .catch(err => alert("⚠️ Gagal berhubung dengan pelayan."))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Kemaskini`;
+            });
+        }
+
+        // ---------- C. FUNGSI PADAM GERAN ----------
+        function padamGeran(id) {
+            if(confirm("AWAS! Adakah anda pasti mahu memadam rekod ini secara kekal?\nTindakan ini tidak boleh dipulihkan.")) {
+                
+                const payload = { action: "padamGeran", idRekod: id };
+                
                 fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -488,18 +861,125 @@
                 .then(res => res.json())
                 .then(data => {
                     if(data.status === "BERJAYA") {
-                        alert("✅ Data Geran berjaya dimuat naik!");
-                        tutupModalPukal();
-                        muatDataGeran(); // Refresh data
+                        alert("✅ Rekod geran telah dipadam.");
+                        muatDataGeran(); // Refresh jadual
                     } else {
-                        alert("❌ Ralat: " + data.mesej);
+                        alert("❌ Ralat pemadaman: " + data.mesej);
                     }
                 })
-                .catch(err => alert("⚠️ Gagal berhubung dengan pelayan."))
+                .catch(err => alert("⚠️ Gagal berhubung dengan pelayan."));
+            }
+        }
+        function ubahHalaman(arah) { halamanSemasa += arah; paparJadual(); }
+        function paparRalat(t) { document.getElementById('isiJadual').innerHTML = `<tr><td colspan="7" class="p-12 text-center text-red-500 font-bold bg-red-50"><i class="fa-solid fa-triangle-exclamation mr-2"></i> ${t}</td></tr>`; }
+        
+        // ==========================================
+        // 5. MODAL UPLOAD PUKAL
+        // ==========================================
+        function bukaModalPukal() { 
+            const modal = document.getElementById('modalUploadPukal');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.firstElementChild.classList.remove('scale-95', 'opacity-0'); }, 10);
+        }
+        function tutupModalPukal() { 
+            const modal = document.getElementById('modalUploadPukal');
+            modal.firstElementChild.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+        }
+
+		function muatTurunTemplate() {
+            // 1. Definisi Header (Tambah 'Status' di hujung sekali - Lajur N)
+            const headerArr = [
+                "Bil", 
+                "Nama Ketua Geran", 
+                "NO HP", 
+                "Jabatan/Unit (Ketua)", 
+                "Ahli Kumpulan Penyelidik", 
+                "Jabatan/Unit (Ahli)", 
+                "Tajuk Projek", 
+                "Jenis Geran", 
+                "No. Rujukan Geran", 
+                "Tahun Mula", 
+                "Tahun Tamat", 
+                "Jumlah Peruntukan Diluluskan (RM)", 
+                "Peratus Perbelanjaan",
+                "Status" // <-- Lajur N Baru
+            ];
+
+            // 2. Tambah satu baris contoh (Optional) untuk memudahkan pengguna
+            const contohData = [
+                "1",
+                "Dr. Ahmad Bin Ali",
+                "0123456789",
+                "JKM",
+                "Ali Bin Abu",
+                "JKM",
+                "Tajuk Projek Contoh",
+                "T-AIGS",
+                "PKS/2024/01",
+                "2024",
+                "2025",
+                "50000",
+                "10",
+                "AKTIF"
+            ];
+
+            // Gabungkan header dan data contoh
+            // \ufeff adalah BOM (Byte Order Mark) supaya Excel kesan format UTF-8 dengan betul
+            const csvContent = "\ufeff" + 
+                               headerArr.join(",") + "\n" + 
+                               contohData.join(",");
+
+            // 3. Gunakan Blob untuk kestabilan muat turun (lebih baik daripada data:text/csv)
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            // 4. Proses muat turun
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "Template_Data_Geran_Status.csv");
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Bersihkan URL objek daripada memori
+            URL.revokeObjectURL(url);
+        }
+
+        function hantarDataPukal(e) {
+            e.preventDefault();
+            const failInput = document.getElementById('in_fail_pukal');
+            const btn = document.getElementById('btnUploadPukal');
+            if(!failInput.files.length) return;
+            
+            const fail = failInput.files[0];
+            const reader = new FileReader();
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Sedang Memproses...`;
+
+            reader.onload = function(e_read) {
+                const base64Data = e_read.target.result.split(',')[1];
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: "muatNaikPukalGeran",
+                        FAIL: { dataBase64: base64Data, mimeType: fail.type, namaFail: fail.name }
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === "BERJAYA") {
+                        alert("✅ Data berjaya dimuat naik dan dikemas kini.");
+                        tutupModalPukal();
+                        muatDataGeran();
+                    } else alert("❌ Ralat Pelayan: " + data.mesej);
+                })
                 .finally(() => {
                     btn.disabled = false;
-                    btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> Mula Muat Naik`;
-                    failInput.value = "";
+                    btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Sekarang`;
                 });
             };
             reader.readAsDataURL(fail);
