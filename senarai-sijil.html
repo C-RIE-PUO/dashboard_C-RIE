@@ -22,9 +22,9 @@
                 <p class="text-sm text-gray-500 mt-1">Senarai sijil KPI yang sedia dimuat turun dan diuruskan.</p>
             </div>
             <div class="flex flex-wrap gap-2 items-center">
-                <select id="filterTahun" onchange="tapisData()" class="px-4 py-2 border rounded-lg bg-gray-50 text-gray-700 font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-                    <option value="Semua">Semua Tahun</option>
-                </select>
+               <input type="text" id="filterTahun" list="senaraiTahun" onkeyup="tapisData()" placeholder="Cari Tahun..." class="...">
+               <datalist id="senaraiTahun"></datalist>
+                
                 <select id="filterJabatan" onchange="tapisData()" class="px-4 py-2 border rounded-lg bg-gray-50 text-gray-700 font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                     <option value="Semua">Semua Jabatan</option>
                 </select>
@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <script>
+  <script>
         // ⚠️ MASUKKAN URL WEB APP ANDA DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
         let rekodDisahkan = [];
@@ -143,6 +143,12 @@
         // Pembolehubah Global Baru untuk Kawal Paparan Penyelaras
         let stafPenyelarasSemasa = [];
         let indexPenyelaras = 0;
+
+        // --- PEMBOLEHUBAH PAGINATION (BARU) ---
+        let halamanSemasa = 1;
+        const rekodSetiapHalaman = 10;
+        let dataTapisSemasa = []; 
+        // --------------------------------------
 
         const userNama = sessionStorage.getItem("namaPengguna") || "";
         const userJabatan = sessionStorage.getItem("jabatan") || "";
@@ -219,36 +225,48 @@
             }
         }
 
-        function binaFilterTahunDanJabatan(data) {
-            const dropTahun = document.getElementById('filterTahun');
-            const dropJabatan = document.getElementById('filterJabatan');
-            
-            const pilTahunSemasa = dropTahun.value;
-            const pilJabatanSemasa = dropJabatan.value;
+function binaFilterTahunDanJabatan(data) {
+    const inputTahun = document.getElementById('filterTahun');
+    const dataListTahun = document.getElementById('senaraiTahun'); // Untuk cadangan (auto-complete)
+    const dropJabatan = document.getElementById('filterJabatan');
+    
+    // Simpan nilai semasa supaya tidak hilang apabila data dimuat semula
+    const nilaiTahunSemasa = inputTahun.value;
+    const pilJabatanSemasa = dropJabatan.value;
 
-            const tahunUnik = [...new Set(data.map(r => String(r[10]).trim()).filter(t => t !== "" && t !== "null"))].sort((a,b)=>b-a);
-            const jabatanUnik = [...new Set(data.map(r => String(r[6]).trim()).filter(j => j !== "" && j !== "null"))].sort();
+    // 1. PENGURUSAN TAHUN (Datalist)
+    // Ambil tahun unik untuk dijadikan cadangan dalam textbox
+    const tahunUnik = [...new Set(data.map(r => String(r[10]).trim()).filter(t => t !== "" && t !== "null"))].sort((a,b) => b-a);
+    
+    if (dataListTahun) {
+        dataListTahun.innerHTML = ''; // Kosongkan cadangan lama
+        tahunUnik.forEach(t => {
+            const option = document.createElement('option');
+            option.value = t;
+            dataListTahun.appendChild(option);
+        });
+    }
 
-            dropTahun.innerHTML = '<option value="Semua">Semua Tahun</option>';
-            tahunUnik.forEach(t => dropTahun.innerHTML += `<option value="${t}">${t}</option>`);
-            
-            if(tahunUnik.includes(pilTahunSemasa) || pilTahunSemasa === "Semua") {
-                dropTahun.value = pilTahunSemasa;
-            }
+    // 2. PENGURUSAN JABATAN (Kekal kod sedia ada anda)
+    const jabatanUnik = [...new Set(data.map(r => String(r[6]).trim()).filter(j => j !== "" && j !== "null"))].sort();
 
-            if (!isUploader) {
-                dropJabatan.innerHTML = `<option value="${userJabatan}">${userJabatan}</option>`;
-                dropJabatan.disabled = true; 
-                dropJabatan.classList.add('bg-gray-200', 'cursor-not-allowed', 'text-gray-500');
-            } else {
-                dropJabatan.innerHTML = '<option value="Semua">Semua Jabatan</option>';
-                jabatanUnik.forEach(j => dropJabatan.innerHTML += `<option value="${j}">${j}</option>`);
-                
-                if(jabatanUnik.includes(pilJabatanSemasa) || pilJabatanSemasa === "Semua") {
-                    dropJabatan.value = pilJabatanSemasa;
-                }
-            }
+    if (!isUploader) {
+        dropJabatan.innerHTML = `<option value="${userJabatan}">${userJabatan}</option>`;
+        dropJabatan.disabled = true; 
+        dropJabatan.classList.add('bg-gray-200', 'cursor-not-allowed', 'text-gray-500');
+    } else {
+        dropJabatan.innerHTML = '<option value="Semua">Semua Jabatan</option>';
+        jabatanUnik.forEach(j => {
+            const selected = (j === pilJabatanSemasa) ? 'selected' : '';
+            dropJabatan.innerHTML += `<option value="${j}" ${selected}>${j}</option>`;
+        });
+        
+        // Kekalkan pilihan jabatan jika masih ada dalam senarai
+        if(jabatanUnik.includes(pilJabatanSemasa) || pilJabatanSemasa === "Semua") {
+            dropJabatan.value = pilJabatanSemasa;
         }
+    }
+}
 
         async function muatSijilPenyelaras() {
             try {
@@ -263,7 +281,8 @@
 
         function tapisData() {
             const tbody = document.getElementById('isiJadual');
-            const pilTahun = document.getElementById('filterTahun').value;
+            // KEMASKINI: Tambah .trim() untuk membuang jarak kosong (spaces) yang tidak sengaja ditaip
+            const pilTahun = document.getElementById('filterTahun').value.trim();
             const pilJabatan = document.getElementById('filterJabatan').value;
             
             // ===============================================
@@ -273,7 +292,8 @@
                 const btnPenyelaras = document.getElementById("btnDownloadPenyelaras");
                 const txtMesej = document.getElementById("mesejSijilPenyelaras");
                 
-                if (pilTahun !== "Semua") {
+                // KEMASKINI: Semak jika input tidak kosong
+                if (pilTahun !== "") {
                     // KEMASKINI PENTING: Padankan Tahun + Jabatan + IC Pengguna Semasa
                     const sijilDitemui = rekodSijilPenyelaras.find(r => 
                         String(r.tahun) === pilTahun && 
@@ -291,13 +311,14 @@
                     }
                 } else {
                     btnPenyelaras.classList.add("hidden");
-                    txtMesej.innerHTML = "* Sila pilih <b>TAHUN</b> di filter atas untuk menyemak sijil penghargaan anda.";
+                    txtMesej.innerHTML = "* Sila taip <b>TAHUN</b> di kotak carian atas untuk menyemak sijil penghargaan anda.";
                 }
             }
             else if (isUploader) {
                 const infoKotak = document.getElementById("infoPenyelarasSemasa"); 
                 
-                if(pilTahun !== "Semua" && pilJabatan !== "Semua") {
+                // KEMASKINI: Semak jika input tidak kosong
+                if(pilTahun !== "" && pilJabatan !== "Semua") {
                     // Cari SEMUA Penyelaras untuk Jabatan yang dipilih
                     stafPenyelarasSemasa = senaraiPenyelaras.filter(u => {
                         let jab = u.JABATAN || u.jabatan || u.Jabatan || u[2] || "";
@@ -309,7 +330,7 @@
                     kemaskiniPaparanPenyelarasAdmin(pilTahun, pilJabatan);
                     
                 } else {
-                    document.getElementById("statusSijilPenyelarasAdmin").innerHTML = "⏳ Sila pilih <b>Tahun</b> dan <b>Jabatan</b> secara spesifik (Bukan 'Semua').";
+                    document.getElementById("statusSijilPenyelarasAdmin").innerHTML = "⏳ Sila taip <b>Tahun</b> dan pilih <b>Jabatan</b> secara spesifik (Bukan 'Semua').";
                     document.getElementById("btnUploadPenyelaras").classList.add("hidden");
                     document.getElementById("btnDownloadPenyelarasAdmin").classList.add("hidden");
                     infoKotak.classList.add("hidden"); 
@@ -318,18 +339,39 @@
             }
 
             let dataDitapis = rekodDisahkan;
-            if (pilTahun !== "Semua") dataDitapis = dataDitapis.filter(r => String(r[10]) === pilTahun);
+            
+            // KEMASKINI: Guna .includes() untuk menapis input teks
+            if (pilTahun !== "") {
+                dataDitapis = dataDitapis.filter(r => String(r[10]).includes(pilTahun));
+            }
+            
             if (pilJabatan !== "Semua" && !document.getElementById('filterJabatan').disabled) {
                 dataDitapis = dataDitapis.filter(r => String(r[6]).trim() === pilJabatan);
             }
 
+            // --- PERUBAHAN PAGINATION DISINI ---
+            dataTapisSemasa = dataDitapis;
+            halamanSemasa = 1; // Kembali ke muka surat 1 setiap kali filter ditukar
+            paparJadualPaginasi();
+        }
+
+        // --- FUNGSI PAGINATION BARU ---
+        function paparJadualPaginasi() {
+            const tbody = document.getElementById('isiJadual');
             tbody.innerHTML = "";
-            if(dataDitapis.length === 0) {
+
+            if(dataTapisSemasa.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai untuk carian ini.</td></tr>`;
+                kemaskiniButangPaginasi(0);
                 return;
             }
 
-            dataDitapis.forEach(row => {
+            // Tentukan indeks bermula dan akhir mengikut halaman semasa
+            const indeksMula = (halamanSemasa - 1) * rekodSetiapHalaman;
+            const indeksAkhir = indeksMula + rekodSetiapHalaman;
+            const dataHalamanIni = dataTapisSemasa.slice(indeksMula, indeksAkhir);
+
+            dataHalamanIni.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-amber-50 transition";
                 
@@ -370,6 +412,54 @@
                 `;
                 tbody.appendChild(tr);
             });
+
+            kemaskiniButangPaginasi(dataTapisSemasa.length);
+        }
+
+        // --- FUNGSI KAWALAN BUTANG PAGINATION ---
+        function kemaskiniButangPaginasi(jumlahRekod) {
+            let kawasanPaginasi = document.getElementById("kawasanPaginasi");
+            
+            // Cipta kawasan div pagination jika belum wujud
+            if (!kawasanPaginasi) {
+                const tableLuar = document.getElementById("isiJadual").closest("table");
+                kawasanPaginasi = document.createElement("div");
+                kawasanPaginasi.id = "kawasanPaginasi";
+                kawasanPaginasi.className = "flex justify-end items-center gap-2 mt-4 p-4";
+                tableLuar.parentNode.insertBefore(kawasanPaginasi, tableLuar.nextSibling);
+            }
+
+            if (jumlahRekod === 0) {
+                kawasanPaginasi.innerHTML = "";
+                return;
+            }
+
+            const jumlahHalaman = Math.ceil(jumlahRekod / rekodSetiapHalaman);
+            
+            // Semak status disable butang
+            const btnPrevDisabled = halamanSemasa === 1 ? "disabled opacity-50 cursor-not-allowed" : "hover:bg-amber-100 cursor-pointer";
+            const btnNextDisabled = halamanSemasa === jumlahHalaman ? "disabled opacity-50 cursor-not-allowed" : "hover:bg-amber-100 cursor-pointer";
+
+            kawasanPaginasi.innerHTML = `
+                <span class="text-sm text-gray-600 font-medium mr-4">Halaman ${halamanSemasa} daripada ${jumlahHalaman} (${jumlahRekod} rekod)</span>
+                <button onclick="halamanSebelum()" class="px-3 py-1.5 border border-amber-600 text-amber-700 rounded font-bold text-sm transition-colors ${btnPrevDisabled}" ${halamanSemasa === 1 ? 'disabled' : ''}>⬅ Sebelum</button>
+                <button onclick="halamanSeterusnya()" class="px-3 py-1.5 border border-amber-600 text-amber-700 rounded font-bold text-sm transition-colors ${btnNextDisabled}" ${halamanSemasa === jumlahHalaman ? 'disabled' : ''}>Seterusnya ➡</button>
+            `;
+        }
+
+        function halamanSebelum() {
+            if (halamanSemasa > 1) {
+                halamanSemasa--;
+                paparJadualPaginasi();
+            }
+        }
+
+        function halamanSeterusnya() {
+            const jumlahHalaman = Math.ceil(dataTapisSemasa.length / rekodSetiapHalaman);
+            if (halamanSemasa < jumlahHalaman) {
+                halamanSemasa++;
+                paparJadualPaginasi();
+            }
         }
 
 	// FUNGSI BARU: Mengemaskini kotak hijau apabila butang Next ditekan
