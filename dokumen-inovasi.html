@@ -70,30 +70,54 @@
     </div>
 
 <script>
-        // URL GOOGLE APPS SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
+// URL GOOGLE APPS SCRIPT
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
 
-        // TETAPAN GOOGLE DRIVE FOLDER ID
-        const FOLDER_ID_KAMUS = "1NYqDHUyaz1HTnbJh4_6kh1Axgu60WaoC"; 
-        const FOLDER_ID_DOKUMEN = "1zYRQF7Ftd-9LYz_NWso93N0h66lXeZSA"; 
+// TETAPAN GOOGLE DRIVE FOLDER ID
+const FOLDER_ID_KAMUS = "1NYqDHUyaz1HTnbJh4_6kh1Axgu60WaoC"; 
+const FOLDER_ID_DOKUMEN = "1zYRQF7Ftd-9LYz_NWso93N0h66lXeZSA"; 
+const FOLDER_ID_SIJIL = "1wHiKrx1PQH47OxeZfJLqdAaN96m6CZr"; 
 
-        let failSementara = null;
-        let idDokumenSementara = null;
+let failSementara = null;
+let idDokumenSementara = null;
 
-        // SEMAKAN PERANAN PENGGUNA UNTUK KAWALAN BUTANG
-        const userPeranan = sessionStorage.getItem("peranan") || "";
-        const perananLayakUpload = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "ADMIN", "KUPIK"];
-        const layakUpload = perananLayakUpload.some(p => userPeranan.toUpperCase().includes(p));
+// ==========================================
+// 1. SEMAKAN PERANAN & KAWALAN AKSES
+// ==========================================
+const userPeranan = sessionStorage.getItem("peranan") || "";
+const perananLayakUpload = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "ADMIN", "KUPIK"];
+const layakUpload = perananLayakUpload.some(p => userPeranan.toUpperCase().includes(p));
 
-        const senaraiDokumen = [
-            { id: "doc1", tajuk: "GARIS PANDUAN PENYEDIAAN LAPORAN INOVASI PRODUK", failDitemui: [], hasTemplate: false },
-            { id: "doc2", tajuk: "SURAT APLIKASI PRODUK_AGENSI KERAJAAN", failDitemui: [], hasTemplate: true },
-            { id: "doc3", tajuk: "SURAT APLIKASI PRODUK_AGENSI SWASTA", failDitemui: [], hasTemplate: true },
-            { id: "doc4", tajuk: "LAPORAN INOVASI", failDitemui: [], hasTemplate: true },
-            { id: "doc5", tajuk: "KAMUS KPI", failDitemui: [], tahun: null, hasTemplate: false },
-            { id: "doc6", tajuk: "BORANG PENDAFTARAN HARTA INTELEK CR-1", failDitemui: [], hasTemplate: false },
-            { id: "doc7", tajuk: "BORANG SEMAKAN KPI", failDitemui: [], hasTemplate: true, templateKunci: "SENARAI SEMAK KPI 18_ RDICE" } 
-        ];
+// ==========================================
+// 2. SENARAI DOKUMEN (DINAMIK)
+// ==========================================
+const senaraiDokumen = [
+    { id: "doc1", tajuk: "GARIS PANDUAN PENYEDIAAN LAPORAN INOVASI PRODUK", failDitemui: [], hasTemplate: false },
+    { id: "doc2", tajuk: "SURAT APLIKASI PRODUK_AGENSI KERAJAAN", failDitemui: [], hasTemplate: true },
+    { id: "doc3", tajuk: "SURAT APLIKASI PRODUK_AGENSI SWASTA", failDitemui: [], hasTemplate: true },
+    { id: "doc4", tajuk: "LAPORAN INOVASI", failDitemui: [], hasTemplate: true },
+    { id: "doc5", tajuk: "KAMUS KPI", failDitemui: [], tahun: null, hasTemplate: false },
+    { id: "doc6", tajuk: "BORANG PENDAFTARAN HARTA INTELEK CR-1", failDitemui: [], hasTemplate: false },
+    { id: "doc7", tajuk: "BORANG SEMAKAN KPI", failDitemui: [], hasTemplate: true, templateKunci: "SENARAI SEMAK KPI 18_ RDICE" }
+];
+
+// 🌟 LOGIK KAWALAN: Hanya masukkan doc8 jika pengguna layak
+if (layakUpload) {
+    senaraiDokumen.push({ 
+        id: "doc8", 
+        tajuk: "TEMPLATE SIJIL PENGHARGAAN KPI", 
+        failDitemui: [], 
+        hasTemplate: false, 
+        folderIdKhas: FOLDER_ID_SIJIL, 
+        isSijil: true,
+        // 🌟 PENETAPAN NAMA KHAS: Backend (GAS) akan merujuk nama ini untuk penamaan fail
+        namaSimpanan: "TEMPLATE SIJIL KPI",
+        convertToSlides: true // Memberitahu backend untuk menukar format ke Google Slides
+    });
+}
+
+// Sekarang senaraiDokumen hanya akan mengandungi 8 item untuk Admin/Penyelaras, 
+// dan kekal 7 item untuk pengguna biasa.
 
         // 🌟 FUNGSI BARU: Ambil Tahun Semasa dari Tab SISTEM
         function ambilTahunSemasa() {

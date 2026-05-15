@@ -9,23 +9,20 @@
     body { background-color: #f8f9fa; }
     .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     #loader { display: none; text-align: center; margin: 20px 0; }
+    .pagination-wrapper { display: flex; justify-content: flex-end; margin-top: 15px; gap: 5px; }
   </style>
 </head>
 <body>
 
 <script>
-    // 1. DAPATKAN MAKLUMAT LOGIN DARI SESSION
     const userPeranan = sessionStorage.getItem("peranan") || "";
     const perananUpper = userPeranan.toUpperCase();
     const jabatanPengguna = sessionStorage.getItem("jabatan") || "";
-    
-    // Tentukan siapa Admin/Pengurus Sijil
     const isPengurusSijil = perananUpper.includes("INOVASI") || perananUpper === "KUPIK" || perananUpper === "ADMIN";
 
-    // Semua yang dah login (termasuk STAF) boleh masuk, tapi jika tak login, tendang ke luar
     if (sessionStorage.getItem("userLulus") !== "YA") {
         alert("Sila log masuk terlebih dahulu.");
-        window.location.href = "index.html"; // Tukar ke fail login sebenar anda
+        window.location.href = "index.html";
     }
 </script>
 
@@ -39,16 +36,22 @@
   </div>
 
   <div class="row mb-3 bg-white p-3 rounded shadow-sm border">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <label class="form-label fw-bold">Tapis Jabatan:</label>
       <select id="filterJabatan" class="form-select" onchange="tapisData()">
         <option value="SEMUA">Semua Jabatan</option>
       </select>
     </div>
-    <div class="col-md-6">
-      <label class="form-label fw-bold">Tapis Tahun:</label>
-      <select id="filterTahun" class="form-select" onchange="tapisData()">
-        <option value="SEMUA">Semua Tahun</option>
+    <div class="col-md-4">
+      <label class="form-label fw-bold">Cari Tahun:</label>
+      <input type="text" id="filterTahun" class="form-control" placeholder="Masukkan tahun (contoh: 2026)" onkeyup="tapisData()">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-bold">Status Sijil:</label>
+      <select id="filterStatus" class="form-select" onchange="tapisData()">
+        <option value="SEMUA">Semua Status</option>
+        <option value="BELUM_DIJANA">Belum Dijana</option>
+        <option value="TERSEDIA">Tersedia</option>
       </select>
     </div>
   </div>
@@ -63,7 +66,8 @@
       <thead class="table-dark">
         <tr>
           <th>Bil</th>
-          <th>Innovator</th>
+          <th>Ketua Inovator</th>
+          <th>Ahli Kumpulan</th>
           <th>Jabatan</th>
           <th>Produk</th>
           <th>Pertandingan</th>
@@ -72,9 +76,14 @@
           <th>Tindakan</th>
         </tr>
       </thead>
-      <tbody id="bodyJadual">
-        </tbody>
+      <tbody id="bodyJadual"></tbody>
     </table>
+
+    <div class="pagination-wrapper">
+        <span id="infoHalaman" class="me-3 align-self-center small text-muted"></span>
+        <button class="btn btn-outline-secondary btn-sm" id="btnPrev" onclick="halamanSebelum()">Sebelum</button>
+        <button class="btn btn-outline-secondary btn-sm" id="btnNext" onclick="halamanSeterusnya()">Seterusnya</button>
+    </div>
   </div>
 </div>
 
@@ -90,7 +99,6 @@
           <input type="hidden" id="uploadBil">
           <input type="hidden" id="uploadTahun">
           <input type="hidden" id="uploadJabatan">
-          
           <div class="mb-3">
             <label class="form-label fw-bold">Pilih Fail Sijil (PDF/Gambar):</label>
             <input class="form-control" type="file" id="failSijil" accept=".pdf, image/*" required>
@@ -106,16 +114,18 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // MASUKKAN URL GOOGLE APPS SCRIPT
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
   let dataInovasiLulus = []; 
+  let dataTapisSemasa = []; 
+  let halamanSemasa = 1;
+  const rekodSetiapHalaman = 10;
+
   const modalUploadEl = new bootstrap.Modal(document.getElementById('modalUpload'));
 
   window.onload = loadData;
 
   function loadData() {
     document.getElementById("loader").style.display = "block";
-    document.getElementById("loaderTeks").innerText = "Sedang memuat turun data...";
     document.getElementById("bodyJadual").innerHTML = "";
 
     fetch(SCRIPT_URL + "?action=ambilData")
@@ -131,7 +141,7 @@
               dataInovasiLulus = senaraiAsal; 
           }
           
-          binaFilter(dataInovasiLulus);
+          binaFilterJabatan(dataInovasiLulus);
           tapisData();
         } else {
           alert("Gagal mengambil data.");
@@ -143,24 +153,12 @@
       });
   }
 
-  function binaFilter(data) {
+  function binaFilterJabatan(data) {
     let setJabatan = new Set();
-    let setTahun = new Set();
-    
-    data.forEach(r => {
-      if(r[3]) setJabatan.add(r[3]); 
-      if(r[8]) setTahun.add(r[8]);   
-    });
-
+    data.forEach(r => { if(r[3]) setJabatan.add(r[3]); });
     let selectJabatan = document.getElementById("filterJabatan");
-    let selectTahun = document.getElementById("filterTahun");
-
     selectJabatan.innerHTML = '<option value="SEMUA">Semua Jabatan</option>';
-    selectTahun.innerHTML = '<option value="SEMUA">Semua Tahun</option>';
-
     setJabatan.forEach(jab => selectJabatan.innerHTML += `<option value="${jab}">${jab}</option>`);
-    setTahun.forEach(thn => selectTahun.innerHTML += `<option value="${thn}">${thn}</option>`);
-
     if (!isPengurusSijil && perananUpper === "STAF") {
         selectJabatan.value = jabatanPengguna;
         selectJabatan.disabled = true;
@@ -169,70 +167,77 @@
 
   function tapisData() {
     let fJabatan = document.getElementById("filterJabatan").value;
-    let fTahun = document.getElementById("filterTahun").value;
+    let fTahun = document.getElementById("filterTahun").value.trim().toLowerCase();
+    let fStatus = document.getElementById("filterStatus").value; // 🌟 KEMASKINI: Dapatkan nilai filter status
     
-    let dataDitapis = dataInovasiLulus.filter(r => {
+    dataTapisSemasa = dataInovasiLulus.filter(r => {
       let passJabatan = (fJabatan === "SEMUA" || r[3] == fJabatan);
-      let passTahun = (fTahun === "SEMUA" || String(r[8]) == fTahun);
-      return passJabatan && passTahun;
+      let passTahun = (fTahun === "" || String(r[8]).toLowerCase().includes(fTahun));
+      
+      // 🌟 KEMASKINI: Logik untuk menyemak status sijil pada lajur L (index 11)
+      let passStatus = true;
+      let adaSijil = (r[11] && r[11].trim() !== ""); // Jika lajur L tidak kosong
+      
+      if (fStatus === "BELUM_DIJANA") {
+          passStatus = !adaSijil;
+      } else if (fStatus === "TERSEDIA") {
+          passStatus = adaSijil;
+      }
+
+      return passJabatan && passTahun && passStatus;
     });
 
-    binaJadual(dataDitapis);
+    halamanSemasa = 1; 
+    binaJadual();
   }
 
-  function binaJadual(data) {
+  function binaJadual() {
     let tbody = document.getElementById("bodyJadual");
     tbody.innerHTML = "";
 
-    if (data.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='8' class='text-center'>Tiada rekod inovasi ditemui.</td></tr>";
+    if (dataTapisSemasa.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='9' class='text-center'>Tiada rekod inovasi ditemui.</td></tr>"; 
+      kemaskiniButangPagination(0);
       return;
     }
 
-    data.forEach(rekod => {
+    let indexMula = (halamanSemasa - 1) * rekodSetiapHalaman;
+    let indexAkhir = indexMula + rekodSetiapHalaman;
+    let dataHalaman = dataTapisSemasa.slice(indexMula, indexAkhir);
+
+    dataHalaman.forEach(rekod => {
       let tr = document.createElement("tr");
-      
-      let linkSijilPenghargaan = rekod[11] || ""; // Lajur L
-      
+      let linkSijilPenghargaan = rekod[11] || "";
       let statusSijil = linkSijilPenghargaan 
           ? `<span class="badge bg-success">Tersedia</span>` 
           : `<span class="badge bg-secondary">Belum Dijana</span>`;
       
       let butangAksi = "";
-
       if (isPengurusSijil) {
           if (!linkSijilPenghargaan) {
-            // JIKA BELUM ADA SIJIL (Upload Manual & Jana Automatik)
-            butangAksi = `
-              <div class="d-flex flex-column gap-2">
+            butangAksi = `<div class="d-flex flex-column gap-2">
                 <button class="btn btn-outline-primary btn-sm" onclick="bukaModalUpload('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">⬆ Upload Manual</button>
                 <button class="btn btn-info btn-sm text-white fw-bold" onclick="janaSijilAuto('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">✨ Jana Automatik</button>
-              </div>
-            `;
+              </div>`;
           } else {
-            // JIKA SUDAH ADA SIJIL (Boleh download, Upload semula, Jana semula)
-            butangAksi = `
-              <div class="d-flex flex-column gap-1">
+            butangAksi = `<div class="d-flex flex-column gap-1">
                 <a href="${linkSijilPenghargaan}" target="_blank" class="btn btn-success btn-sm w-100">⬇ Download Sijil</a>
                 <div class="d-flex gap-1 mt-1">
-                  <button class="btn btn-outline-warning btn-sm w-50" title="Upload Manual Baru" onclick="bukaModalUpload('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">🔄 Upload</button>
-                  <button class="btn btn-info btn-sm text-white fw-bold w-50" title="Jana Semula Sijil" onclick="janaSijilAuto('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">✨ Jana</button>
+                  <button class="btn btn-outline-warning btn-sm w-50" onclick="bukaModalUpload('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">🔄 Upload</button>
+                  <button class="btn btn-info btn-sm text-white fw-bold w-50" onclick="janaSijilAuto('${rekod[0]}', '${rekod[8]}', '${rekod[3]}')">✨ Jana</button>
                 </div>
-              </div>
-            `;
+              </div>`;
           }
       } else {
-          // STAF HANYA Boleh Download Jika Ada
-          if (linkSijilPenghargaan) {
-              butangAksi = `<a href="${linkSijilPenghargaan}" target="_blank" class="btn btn-success btn-sm">⬇ Download Sijil</a>`;
-          } else {
-              butangAksi = `<span class="text-muted small">Menunggu Sijil</span>`;
-          }
+          butangAksi = linkSijilPenghargaan 
+            ? `<a href="${linkSijilPenghargaan}" target="_blank" class="btn btn-success btn-sm">⬇ Download Sijil</a>`
+            : `<span class="text-muted small">Menunggu Sijil</span>`;
       }
 
       tr.innerHTML = `
         <td>${rekod[0]}</td>
         <td>${rekod[1]}</td>
+        <td>${rekod[2] || "-"}</td> 
         <td>${rekod[3]}</td>
         <td>${rekod[4]}</td>
         <td>${rekod[5]}</td>
@@ -242,22 +247,32 @@
       `;
       tbody.appendChild(tr);
     });
+
+    kemaskiniButangPagination(dataTapisSemasa.length);
   }
 
-  // FUNGSI JANA SIJIL AUTOMATIK
+  function kemaskiniButangPagination(totalRekod) {
+    let totalHalaman = Math.ceil(totalRekod / rekodSetiapHalaman) || 1;
+    document.getElementById("infoHalaman").innerText = `Halaman ${halamanSemasa} daripada ${totalHalaman} (${totalRekod} rekod)`;
+    document.getElementById("btnPrev").disabled = (halamanSemasa === 1);
+    document.getElementById("btnNext").disabled = (halamanSemasa === totalHalaman || totalRekod === 0);
+  }
+
+  function halamanSebelum() {
+    if (halamanSemasa > 1) { halamanSemasa--; binaJadual(); }
+  }
+
+  function halamanSeterusnya() {
+    let totalHalaman = Math.ceil(dataTapisSemasa.length / rekodSetiapHalaman);
+    if (halamanSemasa < totalHalaman) { halamanSemasa++; binaJadual(); }
+  }
+
+  // FUNGSI BACKEND (janaSijilAuto & uploadSijil) KEKAL SAMA
   function janaSijilAuto(bil, tahun, jabatan) {
-      if(!confirm("Anda pasti mahu sistem menjana sijil penghargaan secara automatik berdasarkan data ini?")) return;
-      
-      document.getElementById("loaderTeks").innerText = "Sistem sedang menjana sijil. Sila tunggu, proses ini mengambil sedikit masa...";
+      if(!confirm("Anda pasti mahu menjana sijil?")) return;
+      document.getElementById("loaderTeks").innerText = "Sistem sedang menjana sijil...";
       document.getElementById("loader").style.display = "block";
-
-      const payload = {
-          action: "janaSijilAutomatikInovasi",
-          bil: bil,
-          tahun: tahun,
-          jabatan: jabatan
-      };
-
+      const payload = { action: "janaSijilAutomatikInovasi", bil: bil, tahun: tahun, jabatan: jabatan };
       fetch(SCRIPT_URL, {
           method: "POST",
           body: JSON.stringify(payload),
@@ -266,17 +281,10 @@
       .then(res => res.json())
       .then(response => {
           document.getElementById("loader").style.display = "none";
-          if (response.status === "BERJAYA") {
-              alert("✅ Berjaya! Sijil telah siap dijana dan disimpan dalam sistem.");
-              loadData(); 
-          } else {
-              alert("❌ Ralat: " + response.mesej);
-          }
+          if (response.status === "BERJAYA") { alert("✅ Berjaya!"); loadData(); }
+          else { alert("❌ Ralat: " + response.mesej); }
       })
-      .catch(err => {
-          document.getElementById("loader").style.display = "none";
-          alert("⚠️ Ralat pelayan: Gagal menjana sijil.");
-      });
+      .catch(err => { document.getElementById("loader").style.display = "none"; alert("⚠️ Ralat pelayan."); });
   }
 
   function bukaModalUpload(bil, tahun, jabatan) {
@@ -289,19 +297,15 @@
 
   document.getElementById("formUploadSijil").addEventListener("submit", function(e) {
     e.preventDefault();
-    
     const fileInput = document.getElementById('failSijil');
     const file = fileInput.files[0];
-    if (!file) return alert("Sila pilih fail dahulu!");
-
     const btn = document.getElementById("btnUpload");
-    btn.innerText = "Sila tunggu... (Sedang memuat naik)";
+    btn.innerText = "Sila tunggu...";
     btn.disabled = true;
 
     const reader = new FileReader();
     reader.onload = function(event) {
       const base64Data = event.target.result.split(',')[1];
-      
       const payload = {
         action: "uploadSijilInovasi",
         bil: document.getElementById('uploadBil').value,
@@ -319,24 +323,12 @@
       })
       .then(res => res.json())
       .then(response => {
-        btn.innerText = "Mula Muat Naik";
-        btn.disabled = false;
-        
-        if (response.status === "BERJAYA") {
-          alert("Berjaya: Sijil telah diupload!");
-          modalUploadEl.hide();
-          loadData(); 
-        } else {
-          alert("Ralat: " + response.mesej);
-        }
+        btn.innerText = "Mula Muat Naik"; btn.disabled = false;
+        if (response.status === "BERJAYA") { alert("Berjaya!"); modalUploadEl.hide(); loadData(); }
+        else { alert("Ralat: " + response.mesej); }
       })
-      .catch(err => {
-        btn.innerText = "Mula Muat Naik";
-        btn.disabled = false;
-        alert("Ralat pelayan: Gagal memuat naik fail. Sila cuba fail bersaiz lebih kecil.");
-      });
+      .catch(err => { btn.innerText = "Mula Muat Naik"; btn.disabled = false; alert("Ralat pelayan."); });
     };
-    
     reader.readAsDataURL(file); 
   });
 </script>
