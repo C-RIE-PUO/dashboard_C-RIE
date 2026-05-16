@@ -36,9 +36,7 @@
 
                 <div class="flex items-center bg-gray-50 border rounded-lg px-3">
                     <label class="text-xs font-bold text-gray-500 mr-2 uppercase">Tahun:</label>
-                    <select id="filterTahun" onchange="tapisData()" class="bg-transparent py-2 focus:outline-none font-semibold text-blue-700">
-                        <option value="Semua">Semua</option>
-                    </select>
+                    <input type="text" id="filterTahun" onkeyup="tapisData()" placeholder="Cari Tahun..." class="bg-transparent py-2 focus:outline-none font-semibold text-blue-700 w-28" autocomplete="off">
                 </div>
                 
                 <a href="utama.html" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-1">
@@ -261,13 +259,7 @@
         }
 
         function binaFilter(data) {
-            const dropTahun = document.getElementById('filterTahun');
-            const tahunUnik = [...new Set(data.map(r => r[8]).filter(t => t !== "" && t !== null && t !== undefined))].sort((a, b) => b - a);
-            const pilTahunAsal = dropTahun.value;
-            dropTahun.innerHTML = '<option value="Semua">Semua</option>';
-            tahunUnik.forEach(thn => { dropTahun.innerHTML += `<option value="${thn}">${thn}</option>`; });
-            if (tahunUnik.includes(Number(pilTahunAsal)) || pilTahunAsal === "Semua") dropTahun.value = pilTahunAsal;
-
+            // KEMASKINI: Logik filter tahun diubah suai kerana text input tidak perlukan dropdown data
             if (userPeranan.toUpperCase() !== "STAF") {
                 const dropJabatan = document.getElementById('filterJabatan');
                 const jabatanUnik = [...new Set(data.map(r => String(r[3]).trim()).filter(j => j !== "" && j !== "-"))].sort();
@@ -279,13 +271,14 @@
         }
 
         function tapisData() {
-            const tahunDipilih = document.getElementById('filterTahun').value;
+            // KEMASKINI: Ambil input dari textbox dan guna .includes() untuk carian fleksibel
+            const tahunDipilih = document.getElementById('filterTahun').value.trim();
             const jabatanDipilih = document.getElementById('filterJabatan') ? document.getElementById('filterJabatan').value : "Semua";
             
             let dataDitapis = semuaData;
 
-            if (tahunDipilih !== "Semua") {
-                dataDitapis = dataDitapis.filter(r => String(r[8]) === String(tahunDipilih));
+            if (tahunDipilih !== "") {
+                dataDitapis = dataDitapis.filter(r => String(r[8]).includes(tahunDipilih));
             }
 
             if (jabatanDipilih !== "Semua" && userPeranan.toUpperCase() !== "STAF") {
@@ -357,7 +350,7 @@
             window.location.href = `edit-inovasi.html?id=${id}`;
         }
 
-		async function padamRekod(id) {
+        async function padamRekod(id) {
             const sahkan = confirm(`Adakah anda pasti mahu memadam rekod BIL: ${id} ini berserta dokumen lampirannya?`);
             
             if (sahkan) {
@@ -450,7 +443,7 @@
             document.getElementById('statGangsa').innerText = data.filter(r => String(r[7]).toUpperCase().includes("GANGSA")).length;
         }
 
-	function kemaskiniCarta(data) {
+    function kemaskiniCarta(data) {
             const rekodJabatan = {};
             
             data.forEach(r => { 
