@@ -68,7 +68,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700">Pingat / Pencapaian</label>
                     <select id="pingat" name="pingat" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
@@ -83,6 +83,10 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700">Tahun</label>
                     <input type="number" id="tahun" name="tahun" required min="2000" max="2100" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700">Yuran Penyertaan (RM)</label>
+                    <input type="text" id="yuran" name="yuran" placeholder="Contoh: 150.00" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
                 </div>
             </div>
 
@@ -180,7 +184,8 @@
                     dataDariSheet = result.map((r, i) => [
                         r.BIL || (i+1), r.INNOVATOR || "", r.AHLI || "", r.JABATAN || "", 
                         r.PRODUK || "", r.NAMAPERTANDINGAN || "", r.TARIKHTEMPATPERTANDINGAN || "", 
-                        r.PINGAT || "", r.TAHUN || "", r.STATUS || "MENUNGGU PENGESAHAN" 
+                        r.PINGAT || "", r.TAHUN || "", r.STATUS || "MENUNGGU PENGESAHAN",
+                        r.SIJIL || "", "", r.YURAN || "" // Memetakan Lajur K (10) dan Lajur M (12)
                     ]);
                 } else if (Array.isArray(result) && Array.isArray(result[0])) {
                     dataDariSheet = result;
@@ -198,6 +203,9 @@
                     document.getElementById('pertandingan').value = rekodJumpa[5] || '';
                     document.getElementById('tarikh_tempat').value = rekodJumpa[6] || '';
                     document.getElementById('tahun').value = rekodJumpa[8] || '';
+                    
+                    // MEMASUKKAN NILAI YURAN DARI LAJUR M (Index 12) KEDALAM TEXTBOX
+                    document.getElementById('yuran').value = rekodJumpa[12] || '';
 
                     let pingatValue = String(rekodJumpa[7] || '').trim();
                     let pingatSelect = document.getElementById('pingat');
@@ -318,9 +326,8 @@
         });
 
         fileInput.addEventListener('change', (e) => {
-            // Walaupun klik pilih fail akan replace files, kita semak jumlahnya
             if (!sahkanFail([], e.target.files)) {
-                fileInput.value = ""; // Kosongkan jika ada ralat
+                fileInput.value = ""; 
                 kemaskiniPaparanFail();
             } else {
                 kemaskiniPaparanFail();
@@ -354,13 +361,12 @@
         async function hantarKemaskini(event) {
             event.preventDefault(); 
             
-            // 🌟 SEMAKAN TERAKHIR: Halang jika lebih dari 2 fail
             const fileInput = document.getElementById('failPencapaian');
             const files = fileInput.files;
 
             if (files.length > 2) {
                 alert("❌ Had Maksimum: Anda hanya dibenarkan memuat naik maksimum 2 sijil sahaja. Sila buang fail yang berlebihan.");
-                return; // Berhentikan proses simpan
+                return;
             }
 
             const btnSimpan = document.getElementById('btnSimpan');
@@ -386,8 +392,9 @@
                 pingat: form.pingat.value,
                 tahun: form.tahun.value,
                 status: form.status.value,
+                yuran: form.yuran.value, // 🌟 MENAMBAH NILAI INPUT YURAN UNTUK DIHANTAR KE BACKEND
                 linkSijilPencapaian: form.linkSijilPencapaian.value,
-                failPencapaianBase64: [] // Array untuk fail Base64
+                failPencapaianBase64: [] 
             };
             
             if (wasDisabled) statusEl.disabled = true; 
@@ -421,7 +428,6 @@
             }
 
             try {
-                // Hantar sebagai JSON berbanding Multipart-FormData
                 const response = await fetch(scriptURL, {
                     method: 'POST',
                     headers: { "Content-Type": "text/plain;charset=utf-8" },

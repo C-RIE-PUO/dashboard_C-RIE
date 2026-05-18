@@ -79,7 +79,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Pingat / Pencapaian <span class="text-red-500">*</span></label>
                             <select name="pingat" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -95,22 +95,25 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
                             <input type="number" name="tahun" required placeholder="Contoh: 2024" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
-						
-					<div class="col-span-1 md:col-span-2 border-t pt-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Muat Naik Sijil Pencapaian (Maksimum 2 Sijil) <span class="text-xs text-gray-500 font-normal">- Pilihan</span></label>
-                        
-                        <div id="kawasanDrop" class="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 hover:bg-blue-100 transition cursor-pointer">
-                            <svg class="w-10 h-10 text-blue-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                            <p class="text-sm text-gray-700 font-bold">Klik untuk pilih ATAU seret & lepas fail di sini</p>
-                            
-                            <p class="text-xs text-red-500 mt-1 font-semibold">Format: PDF sahaja. (Maksimum 5 MB / fail)</p>
-                            
-                            <input type="file" id="sijilPencapaian" accept=".pdf, application/pdf" multiple class="hidden">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Yuran Penyertaan (RM) <span class="text-red-500">*</span></label>
+                            <input type="number" step="0.01" name="yuran_penyertaan" required placeholder="Contoh: 150.00" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
+                        
+                        <div class="col-span-1 md:col-span-3 border-t pt-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Muat Naik Sijil Pencapaian (Maksimum 2 Sijil) <span class="text-xs text-gray-500 font-normal">- Pilihan</span></label>
+                            
+                            <div id="kawasanDrop" class="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 hover:bg-blue-100 transition cursor-pointer">
+                                <svg class="w-10 h-10 text-blue-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <p class="text-sm text-gray-700 font-bold">Klik untuk pilih ATAU seret & lepas fail di sini</p>
+                                
+                                <p class="text-xs text-red-500 mt-1 font-semibold">Format: PDF sahaja. (Maksimum 5 MB / fail)</p>
+                                
+                                <input type="file" id="sijilPencapaian" accept=".pdf, application/pdf" multiple class="hidden">
+                            </div>
 
-                        <ul id="senaraiFailUI" class="mt-3 space-y-2"></ul>
-                    </div>
-					
+                            <ul id="senaraiFailUI" class="mt-3 space-y-2"></ul>
+                        </div>
                     </div>
 
                     <div class="pt-4 border-t">
@@ -127,10 +130,11 @@
                     <p class="text-sm text-gray-600 mb-2">Status data yang dimuat naik melalui fail CSV akan ditetapkan sebagai <strong class="text-green-600">DISAHKAN</strong> secara automatik.</p>
                     
                     <div class="bg-white p-4 border border-purple-200 rounded text-left mb-6 text-sm text-gray-700 shadow-sm">
-                        <span class="font-bold text-purple-700">💡 Panduan Sijil Pencapaian (Lajur K):</span><br>
-                        Anda boleh memasukkan sehingga maksimum <strong>2 pautan sijil</strong> (URL) bagi setiap rekod. Jika terdapat lebih daripada 1 pautan, pisahkannya menggunakan tanda koma (,) dan pastikan pautan tersebut <strong>diapit dengan tanda pembuka kata (" ")</strong> di dalam fail CSV anda. <br><br>
+                        <span class="font-bold text-purple-700">💡 Panduan Sijil & Yuran:</span><br>
+                        1. Anda boleh memasukkan pautan sijil (Lajur J). Jika terdapat lebih daripada 1 pautan, pisahkan dengan koma (,) dan apit dengan tanda pembuka kata (" ").<br>
+                        2. Masukkan maklumat <strong>Yuran Penyertaan di Lajur M</strong>. Jika tiada, biarkan kosong.<br><br>
                         <em>Contoh format dalam Excel/CSV:</em> <br>
-                        <code class="bg-gray-100 p-1 text-red-600 rounded">"https://drive.google.com/fail1, https://drive.google.com/fail2"</code>
+                        <code class="bg-gray-100 p-1 text-red-600 rounded">"https://drive.google.com/fail1, https://drive.google.com/fail2" , , , 150.00</code>
                     </div>
                     
                     <button id="btnDownloadTemplate" class="mb-6 inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 font-semibold py-2 px-4 rounded shadow-sm transition">
@@ -261,43 +265,37 @@
 
         // 3. Fungsi memproses fail (Semakan Jenis PDF, Saiz 5MB & Tukar ke Base64)
         function prosesFail(files) {
-            // Semak jika kuantiti fail melebihi had (maksimum 2)
             if (senaraiSijilBase64.length + files.length > 2) {
                 alert("⚠️ Anda hanya dibenarkan memuat naik maksimum 2 fail sijil sahaja.");
                 inputFail.value = ''; 
                 return;
             }
 
-            const maxSize = 5 * 1024 * 1024; // Had 5 MB (dikira dalam Bytes)
+            const maxSize = 5 * 1024 * 1024; // Had 5 MB
             let adaRalat = false;
 
-            // --- FASA 1: SEMAKAN KETAT SEMUA FAIL ---
             for (let i = 0; i < files.length; i++) {
                 let file = files[i];
 
-                // 1. Semak format fail (HANYA PDF)
                 if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith('.pdf')) {
                     alert(`❌ Ralat Format: Fail "${file.name}" tidak disokong. Hanya format PDF sahaja dibenarkan.`);
                     adaRalat = true;
-                    break; // Hentikan semakan serta merta
+                    break;
                 }
 
-                // 2. Semak saiz fail (MAKSIMUM 5 MB)
                 if (file.size > maxSize) {
                     let saizMB = (file.size / (1024 * 1024)).toFixed(2);
                     alert(`⚠️ Ralat Saiz: Fail "${file.name}" bersaiz ${saizMB} MB. Had maksimum setiap fail adalah 5 MB.`);
                     adaRalat = true;
-                    break; // Hentikan semakan serta merta
+                    break;
                 }
             }
 
-            // Jika terdapat ralat, batalkan keseluruhan pemilihan fail kali ini
             if (adaRalat) {
                 inputFail.value = ''; 
                 return; 
             }
 
-            // --- FASA 2: JIKA LULUS SEMAKAN, TUKAR KEPADA BASE64 ---
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -308,16 +306,15 @@
                         mimeType: file.type,
                         base64: reader.result.split(',')[1] 
                     });
-                    kemaskiniPaparanFail(); // Render semula senarai fail di skrin
+                    kemaskiniPaparanFail(); 
                 };
             });
             
-            inputFail.value = ''; // Reset input supaya fail yang sama boleh dipilih lagi jika sengaja dipadam
+            inputFail.value = ''; 
         }
 
-        // 4. Fungsi memaparkan senarai fail di skrin berserta butang Padam
         function kemaskiniPaparanFail() {
-            senaraiFailUI.innerHTML = ''; // Kosongkan paparan lama
+            senaraiFailUI.innerHTML = ''; 
             
             senaraiSijilBase64.forEach((sijil, indeks) => {
                 const li = document.createElement('li');
@@ -341,10 +338,9 @@
             });
         }
 
-        // 5. Fungsi memadam satu fail tertentu apabila butang sampah diklik
         window.padamSatuFail = function(indeks) {
-            senaraiSijilBase64.splice(indeks, 1); // Padam 1 data dari senarai
-            kemaskiniPaparanFail(); // Render semula paparan terkini
+            senaraiSijilBase64.splice(indeks, 1); 
+            kemaskiniPaparanFail(); 
         };
         
         function dapatkanDataBorang() {
@@ -358,43 +354,60 @@
                 tempat_pertandingan: document.querySelector('input[name="tempat_pertandingan"]').value,
                 pingat: document.querySelector('select[name="pingat"]').value,
                 tahun: document.querySelector('input[name="tahun"]').value,
-                // Tambahan data sijil
+                yuran_penyertaan: document.querySelector('input[name="yuran_penyertaan"]').value, // Tambahan Yuran
                 dataSijil: senaraiSijilBase64, 
                 bilSijil: senaraiSijilBase64.length
             };
         }
 
-        document.getElementById('btnSemakData').addEventListener('click', () => {
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-            const data = dapatkanDataBorang();
-            document.getElementById('senaraiPratonton').innerHTML = `
-                <li><strong>Jabatan:</strong> ${data.jabatan}</li>
-                <li><strong>Innovator Utama:</strong> ${data.innovator}</li>
-                <li><strong>Ahli Kumpulan:</strong> ${data.ahli_kumpulan || '-'}</li>
-                <li><strong>Produk Inovasi:</strong> ${data.produk_inovasi}</li>
-                <li><strong>Tajuk Pertandingan:</strong> ${data.tajuk_pertandingan}</li>
-                <li><strong>Tarikh Pertandingan:</strong> ${data.tarikh_pertandingan}</li>
-                <li><strong>Tempat Pertandingan:</strong> ${data.tempat_pertandingan}</li>
-                <li><strong>Pingat:</strong> ${data.pingat}</li>
-                <li><strong>Tahun:</strong> ${data.tahun}</li>
-                <li><strong class="text-blue-700">Lampiran Sijil:</strong> ${data.bilSijil > 0 ? data.bilSijil + ' Fail Disertakan' : 'Tiada Sijil'}</li>
-            `;
-            resetTabs();
-            tabPreview.classList.replace('text-gray-500', 'text-blue-600');
-            tabPreview.classList.add('border-b-2', 'border-blue-600');
-            bahagianPratonton.classList.remove('hidden');
-            window.scrollTo(0, 0);
-        });
+document.getElementById('btnSemakData').addEventListener('click', () => {
+    // Pastikan pembolehubah 'form' merujuk kepada borang anda
+    const form = document.getElementById('borangInovasi'); 
+
+    // 1. Semak validasi input bertulis bawaan HTML (Nama, Tarikh, Yuran dll)
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    // Ambil data borang menggunakan fungsi asal anda
+    const data = dapatkanDataBorang();
+
+    // 2. SUNTIKAN VALIDASI: Paksa sijil menjadi WAJIB di sini
+    // Jika tiada sijil diisi (bilSijil = 0), sekat proses dan keluar amaran!
+    if (!data.bilSijil || data.bilSijil === 0) {
+        alert("⚠️ Ralat: Muat Naik Sijil Pencapaian adalah WAJIB! Sila masukkan sekurang-kurangnya 1 fail sijil format PDF.");
+        return; // Hentikan fungsi di sini, skrin pratonton tidak akan dibuka
+    }
+
+    // 3. KEKALKAN KOD ASAL ANDA UNTUK PAPARAN PRATONTON
+    document.getElementById('senaraiPratonton').innerHTML = `
+        <li><strong>Jabatan:</strong> ${data.jabatan}</li>
+        <li><strong>Innovator Utama:</strong> ${data.innovator}</li>
+        <li><strong>Ahli Kumpulan:</strong> ${data.ahli_kumpulan || '-'}</li>
+        <li><strong>Produk Inovasi:</strong> ${data.produk_inovasi}</li>
+        <li><strong>Tajuk Pertandingan:</strong> ${data.tajuk_pertandingan}</li>
+        <li><strong>Tarikh Pertandingan:</strong> ${data.tarikh_pertandingan}</li>
+        <li><strong>Tempat Pertandingan:</strong> ${data.tempat_pertandingan}</li>
+        <li><strong>Pingat:</strong> ${data.pingat}</li>
+        <li><strong>Tahun:</strong> ${data.tahun}</li>
+        <li><strong>Yuran Penyertaan:</strong> RM ${data.yuran_penyertaan || '0.00'}</li>
+        <li><strong class="text-blue-700">Lampiran Sijil:</strong> ${data.bilSijil > 0 ? data.bilSijil + ' Fail Disertakan' : 'Tiada Sijil'}</li>
+    `;
+    
+    resetTabs();
+    tabPreview.classList.replace('text-gray-500', 'text-blue-600');
+    tabPreview.classList.add('border-b-2', 'border-blue-600');
+    bahagianPratonton.classList.remove('hidden');
+    window.scrollTo(0, 0);
+});
 
         document.getElementById('btnEditSemula').addEventListener('click', () => tabManual.click());
 
         document.getElementById('btnSahkanSimpan').addEventListener('click', () => {
             const btn = document.getElementById('btnSahkanSimpan');
             btn.disabled = true;
-            btn.innerHTML = 'Memproses & Memuat Naik... ⏳'; // Ditukar untuk tunjukkan proses upload
+            btn.innerHTML = 'Memproses & Memuat Naik... ⏳'; 
 
             const d = dapatkanDataBorang();
             const dataHantar = {
@@ -407,7 +420,8 @@
                 "TARIKH": d.tarikh_pertandingan + ' (' + d.tempat_pertandingan + ')',
                 "PINGAT": d.pingat,
                 "TAHUN": d.tahun,
-                "SIJIL_DATA": d.dataSijil // <--- Hantar fail yang telah ditukar ke Base64 ke server
+                "YURAN": d.yuran_penyertaan, // <--- Hantar Yuran ke backend
+                "SIJIL_DATA": d.dataSijil 
             };
             hantarKeGoogleSheet(dataHantar, btn, 'Sahkan & Simpan Data');
         });
@@ -415,8 +429,8 @@
         // ==========================================
         // FUNGSI UPLOAD PUKAL (CSV)
         // ==========================================
-        // 🌟 KEMASKINI TEMPLATE: Tambah Lajur 'LINK_SIJIL_PENCAPAIAN'
-        const csvTemplateData = "BIL,INNOVATOR,AHLI,JABATAN,PRODUK,NAMA,TARIKH,PINGAT,TAHUN,LINK_SIJIL_PENCAPAIAN\n1,Ali Bin Abu,\"Siti, Ahmad\",JTMK,Sistem Pintar,Inovasi Kebangsaan,2024-05-20 (PICC Putrajaya),EMAS,2024,\"https://link-sijil-1.com, https://link-sijil-2.com\"";
+        // 🌟 KEMASKINI TEMPLATE: Tambah Lajur K, L dan Lajur M (YURAN_PENYERTAAN)
+        const csvTemplateData = "BIL,INNOVATOR,AHLI,JABATAN,PRODUK,NAMA,TARIKH,PINGAT,TAHUN,LINK_SIJIL_PENCAPAIAN,KOSONG_K,KOSONG_L,YURAN_PENYERTAAN\n1,Ali Bin Abu,\"Siti, Ahmad\",JTMK,Sistem Pintar,Inovasi Kebangsaan,2024-05-20 (PICC Putrajaya),EMAS,2024,\"https://link-sijil-1.com, https://link-sijil-2.com\",,,150.00";
 
         document.getElementById('btnDownloadTemplate').addEventListener('click', () => {
             const blob = new Blob([csvTemplateData], { type: 'text/csv;charset=utf-8;' });
@@ -428,7 +442,7 @@
             document.body.removeChild(link);
         });
 
-        // Simple CSV Parser (Menguruskan koma di dalam teks (quotes))
+        // Simple CSV Parser
         function parseCSV(text) {
             let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
             for (l of text) {
@@ -466,7 +480,7 @@
                 // Bermula dari index 1 (Abaikan Tajuk/Header)
                 for (let i = 1; i < rows.length; i++) {
                     let d = rows[i];
-                    // 🌟 KEMASKINI PARSER: Baca sehingga lajur ke-10 (Index 9)
+                    // 🌟 KEMASKINI PARSER: Baca sehingga lajur ke-10 ke atas
                     if (d.length >= 9 && d[0].trim() !== "") {
                         
                         // Ekstrak dan potong jika lebih dari 2 link
@@ -475,8 +489,11 @@
                         
                         if (linkArray.length > 2) {
                             alert(`Amaran pada Baris ${i}: Terdapat lebih daripada 2 pautan sijil dikesan. Sistem hanya akan memproses 2 pautan yang pertama sahaja.`);
-                            linkArray = linkArray.slice(0, 2); // Ambil 2 yang pertama
+                            linkArray = linkArray.slice(0, 2); 
                         }
+
+                        // 🌟 Ekstrak Lajur M (Index ke-12) untuk Yuran
+                        let yuranCSV = d[12] ? d[12].trim() : "";
                         
                         dataPukal.push({
                             "BIL": d[0],
@@ -488,8 +505,9 @@
                             "TARIKH": d[6],
                             "PINGAT": d[7],
                             "TAHUN": d[8],
-                            "LINK_SIJIL": linkArray.join(", "), // 🌟 Hantar pautan yang telah disahkan ke backend
-                            "STATUS": "DISAHKAN" // Status Automatik
+                            "LINK_SIJIL": linkArray.join(", "),
+                            "YURAN": yuranCSV, // 🌟 Tangkapan Yuran dari CSV
+                            "STATUS": "DISAHKAN" 
                         });
                     }
                 }
@@ -555,29 +573,22 @@
             window.scrollTo(0, 0);
         }
 
-		document.getElementById('btnTambahLagi').addEventListener('click', () => {
-            // 1. Reset borang asas
+        document.getElementById('btnTambahLagi').addEventListener('click', () => {
             form.reset();
-            
-            // 2. Kekalkan nama Jabatan dari sesi log masuk
             document.getElementById('jabatan').value = userJabatan;
             
-            // 3. Bersihkan data sijil (Array dan Paparan UI)
             senaraiSijilBase64 = []; 
             document.getElementById('senaraiFailUI').innerHTML = ''; 
             document.getElementById('sijilPencapaian').value = ''; 
             
-            // 4. Reset juga butang simpan ke keadaan asal (jika tersangkut pada 'Memproses...')
             const btnSimpan = document.getElementById('btnSahkanSimpan');
             btnSimpan.disabled = false;
             btnSimpan.innerHTML = 'Sahkan & Simpan Data';
 
-            // 5. Kosongkan CSV dan tukar paparan
             document.getElementById('fileCsv').value = "";
             document.getElementById('tabMenu').classList.remove('hidden');
             bahagianBerjaya.classList.add('hidden');
             
-            // 6. Kembali ke tab isi borang
             tabManual.click();
         });
         

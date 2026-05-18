@@ -501,14 +501,14 @@
             });
         }
 
-        function eksportCSV() {
+		function eksportCSV() {
             if (!dataSemasa || dataSemasa.length === 0) {
                 alert("Tiada data untuk dieksport.");
                 return;
             }
 
-            // Tambah lajur STATUS untuk CSV
-            let csvContent = "BIL,INNOVATOR,AHLI KUMPULAN,JABATAN,PRODUK INOVASI,PERTANDINGAN,TARIKH & TEMPAT,PINGAT,TAHUN,STATUS\n";
+            // Kemaskini header CSV dengan tambahan Link Pencapaian, Link Penghargaan & Yuran
+            let csvContent = "BIL,INNOVATOR,AHLI KUMPULAN,JABATAN,PRODUK INOVASI,PERTANDINGAN,TARIKH & TEMPAT,PINGAT,TAHUN,STATUS,LINK PENCAPAIAN,LINK PENGHARGAAN,YURAN\n";
 
             dataSemasa.forEach(row => {
                 let rowData = row.map(cell => {
