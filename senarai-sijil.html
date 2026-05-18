@@ -356,65 +356,129 @@ function binaFilterTahunDanJabatan(data) {
         }
 
         // --- FUNGSI PAGINATION BARU ---
-        function paparJadualPaginasi() {
-            const tbody = document.getElementById('isiJadual');
-            tbody.innerHTML = "";
+function paparJadualPaginasi() {
+    const tbody = document.getElementById('isiJadual');
+    tbody.innerHTML = "";
 
-            if(dataTapisSemasa.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai untuk carian ini.</td></tr>`;
-                kemaskiniButangPaginasi(0);
-                return;
-            }
+    if(dataTapisSemasa.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai untuk carian ini.</td></tr>`;
+        kemaskiniButangPaginasi(0);
+        return;
+    }
 
-            // Tentukan indeks bermula dan akhir mengikut halaman semasa
-            const indeksMula = (halamanSemasa - 1) * rekodSetiapHalaman;
-            const indeksAkhir = indeksMula + rekodSetiapHalaman;
-            const dataHalamanIni = dataTapisSemasa.slice(indeksMula, indeksAkhir);
+    // Tentukan indeks bermula dan akhir mengikut halaman semasa
+    const indeksMula = (halamanSemasa - 1) * rekodSetiapHalaman;
+    const indeksAkhir = indeksMula + rekodSetiapHalaman;
+    const dataHalamanIni = dataTapisSemasa.slice(indeksMula, indeksAkhir);
 
-            dataHalamanIni.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b hover:bg-amber-50 transition";
-                
-                const sBil = String(row[0] || "");
-                const sProduk = String(row[1] || "").trim();
-                const sKetua = String(row[2] || "-").trim();
-                const sJabatan = String(row[6] || "-").trim();
-                const sJenis = String(row[8] || "-").trim();
-                const sDaftar = String(row[9] || "-").trim();
-                const sTahun = String(row[10] || "-").trim();
-                const urlSijilDrive = String(row[14] || "").trim();
+    dataHalamanIni.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b hover:bg-amber-50 transition";
+        
+        const sBil = String(row[0] || "");
+        const sProduk = String(row[1] || "").trim();
+        const sKetua = String(row[2] || "-").trim();
+        const sJabatan = String(row[6] || "-").trim();
+        const sJenis = String(row[8] || "-").trim();
+        const sDaftar = String(row[9] || "-").trim();
+        const sTahun = String(row[10] || "-").trim();
+        const urlSijilDrive = String(row[14] || "").trim();
 
-                let butangTindakan = `<div class="flex flex-col gap-2 justify-center items-center">`;
-                let adaSijil = (urlSijilDrive !== "" && urlSijilDrive.includes("http"));
+        let butangTindakan = `<div class="flex flex-col gap-1.5 justify-center items-center w-full">`;
+        let adaSijil = (urlSijilDrive !== "" && urlSijilDrive.includes("http"));
 
-                if (adaSijil) {
-                    butangTindakan += `<a href="${urlSijilDrive}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded font-bold shadow text-xs text-center w-full">📥 Download</a>`;
-                } else if (!isUploader) {
-                    butangTindakan += `<button disabled class="bg-gray-300 text-gray-500 px-4 py-1.5 rounded font-bold shadow-sm text-xs cursor-not-allowed w-full">⏳ Tiada Sijil</button>`;
-                }
-
-                if (isUploader) {
-                    let textUpload = adaSijil ? "🔄 Tukar Sijil" : "📤 Muat Naik";
-                    let colorUpload = adaSijil ? "bg-blue-500 hover:bg-blue-600" : "bg-emerald-600 hover:bg-emerald-700";
-                    butangTindakan += `<button onclick="bukaModalUpload('${sBil}', '${sProduk.replace(/'/g, "\\'")}', 'KPI', '${urlSijilDrive}')" class="${colorUpload} text-white px-4 py-1.5 rounded font-bold shadow text-xs text-center w-full">${textUpload}</button>`;
-                }
-
-                butangTindakan += `</div>`;
-
-                tr.innerHTML = `
-                    <td class="p-4 font-bold text-gray-600">${sTahun}</td>
-                    <td class="p-4 font-bold text-amber-700">${sProduk}</td>
-                    <td class="p-4 font-medium text-gray-800">${sKetua}</td>
-                    <td class="p-4 font-bold text-gray-600">${sJabatan}</td>
-                    <td class="p-4 text-gray-600">${sJenis}</td>
-                    <td class="p-4 font-mono text-gray-500">${sDaftar}</td>
-                    <td class="p-4">${butangTindakan}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            kemaskiniButangPaginasi(dataTapisSemasa.length);
+        if (adaSijil) {
+            butangTindakan += `<a href="${urlSijilDrive}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded font-bold shadow text-xs text-center w-full">📥 Download</a>`;
+        } else if (!isUploader) {
+            butangTindakan += `<button disabled class="bg-gray-300 text-gray-500 px-4 py-1.5 rounded font-bold shadow-sm text-xs cursor-not-allowed w-full">⏳ Tiada Sijil</button>`;
         }
+
+        if (isUploader) {
+            // OPTION 1: Muat Naik / Tukar Sijil Manual
+            let textUpload = adaSijil ? "🔄 Tukar Sijil" : "📤 Muat Naik";
+            let colorUpload = adaSijil ? "bg-blue-500 hover:bg-blue-600" : "bg-emerald-600 hover:bg-emerald-700";
+            butangTindakan += `<button onclick="bukaModalUpload('${sBil}', '${sProduk.replace(/'/g, "\\'")}', 'KPI', '${urlSijilDrive}')" class="${colorUpload} text-white px-4 py-1.5 rounded font-bold shadow text-xs text-center w-full">${textUpload}</button>`;
+            
+            // OPTION 2: Jana Automatik menggunakan Template Google Slides (Hanya muncul jika belum ada sijil)
+            if (!adaSijil) {
+                butangTindakan += `<button onclick="prosesJanaSijilAutomatik('${sBil}', '${sProduk.replace(/'/g, "\\'")}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded font-bold shadow text-xs text-center w-full">✨ Jana Sijil</button>`;
+            }
+        }
+
+        butangTindakan += `</div>`;
+
+        tr.innerHTML = `
+            <td class="p-4 font-bold text-gray-600">${sTahun}</td>
+            <td class="p-4 font-bold text-amber-700">${sProduk}</td>
+            <td class="p-4 font-medium text-gray-800">${sKetua}</td>
+            <td class="p-4 font-bold text-gray-600">${sJabatan}</td>
+            <td class="p-4 text-gray-600">${sJenis}</td>
+            <td class="p-4 font-mono text-gray-500">${sDaftar}</td>
+            <td class="p-4">${butangTindakan}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    kemaskiniButangPaginasi(dataTapisSemasa.length);
+}
+
+// Fungsi baharu untuk menghantar arahan jana sijil automatik menggunakan API Fetch (POST)
+async function prosesJanaSijilAutomatik(idBil, namaProduk) {
+    if (!confirm(`Adakah anda pasti ingin menjana sijil automatik bagi produk: "${namaProduk}"?`)) return;
+    
+    // Tunjuk cursor "Loading"
+    document.body.style.cursor = "wait"; 
+    console.log("Sistem sedang menjana sijil untuk: " + namaProduk);
+    
+    // Sediakan data mengikut struktur router backend (action & payload)
+    const dataDihantar = {
+        action: "janaSijilAutomatikKPIStaf",
+        payload: {
+            idBil: idBil
+        }
+    };
+    
+    try {
+        // Hantar arahan ke Web App menggunakan method POST
+        const respons = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            // Penggunaan text/plain penting untuk Google Web App bagi mengelakkan ralat CORS (Preflight)
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8', 
+            },
+            body: JSON.stringify(dataDihantar)
+        });
+
+        // Terima dan parse respons JSON dari backend
+        const res = await respons.json();
+        
+        // Kembalikan cursor kepada normal
+        document.body.style.cursor = "default"; 
+        
+        if (res.status === "BERJAYA") {
+            alert("✅ " + res.mesej);
+            
+            // Kemaskini data jadual tempatan supaya butang Download muncul
+            for (let i = 0; i < dataTapisSemasa.length; i++) {
+                if (String(dataTapisSemasa[i][0]) === String(idBil)) {
+                    dataTapisSemasa[i][14] = res.url; // Masukkan URL sijil baru di Lajur 14
+                    break;
+                }
+            }
+            
+            // Render semula jadual
+            if (typeof paparJadualPaginasi === "function") {
+                paparJadualPaginasi(); 
+            }
+        } else {
+            alert("❌ Ralat: " + (res.mesej || "Gagal dijana oleh pelayan."));
+        }
+        
+    } catch (ralat) {
+        document.body.style.cursor = "default"; // Kembalikan cursor normal
+        alert("⚠️ Gagal menghubungi pelayan. Sila semak sambungan internet anda. Butiran: " + ralat.message);
+    }
+}
 
         // --- FUNGSI KAWALAN BUTANG PAGINATION ---
         function kemaskiniButangPaginasi(jumlahRekod) {

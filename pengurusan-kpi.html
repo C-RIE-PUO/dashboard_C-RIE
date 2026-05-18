@@ -102,6 +102,9 @@
         .btn-danger { background-color: #dc3545; margin-bottom: 0; margin-right: 0;}
         .btn-danger:hover { background-color: #c82333; }
 
+        .btn-info { background-color: #17a2b8; color: white; }
+        .btn-info:hover { background-color: #138496; }
+
         /* Butang Baru Pemantauan */
         .btn-monitor { background-color: #003366; color: white; }
         .btn-monitor:hover { background-color: #002244; }
@@ -109,6 +112,14 @@
         /* Butang Dashboard Prestasi */
         .btn-prestasi { background-color: #fd7e14; color: white; }
         .btn-prestasi:hover { background-color: #e86e04; }
+
+        /* Butang Disabled */
+        .btn-action:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            border: 1px solid #999999;
+        }
 
         #statusUpload {
             font-weight: bold; color: blue; font-size: 14px; margin-left: 10px;
@@ -196,7 +207,19 @@
             <button class="btn-action btn-secondary" onclick="window.location.href='dokumen-inovasi.html'">📤 Pengurusan Dokumen</button>
             
         </div>
-    </div>
+
+        <div style="margin-top: 15px; padding: 15px; border: 1px dashed #ccc; border-radius: 5px; background-color: #f8f9fa;">
+            <h4 style="margin-top: 0;">Pengurusan Template Sijil Inovasi</h4>
+            
+            <input type="file" id="failTemplateUpload" style="display: none;" accept=".pptx,.pdf,application/vnd.google-apps.presentation" onchange="prosesMuatNaik(this)">
+            
+            <button class="btn-action" style="background-color: #dc3545;" onclick="document.getElementById('failTemplateUpload').click()">📤 Muat Naik Template</button>
+            
+            <button id="btnViewTemplate" class="btn-action btn-info" onclick="bukaTemplateSijil()">📝 Lihat/Edit Template Sijil</button>
+            
+            <span id="statusUpload"></span>
+        </div>
+        </div>
 </div>
 
 <script>
@@ -222,9 +245,31 @@
         }
     }
 
+    // Fungsi baru untuk buka template sijil
+    function bukaTemplateSijil() {
+        // Pautan terus ke fail yang diberikan
+        const linkTemplate = "https://docs.google.com/presentation/d/1REgxO5yUUNrDgP4kHpP4magSRAZsounT0Q5KUY2kn8g/edit?slide=id.p#slide=id.p";
+        window.open(linkTemplate, "_blank");
+    }
+
+    // Fungsi simulasi muat naik
+    function prosesMuatNaik(input) {
+        if(input.files && input.files[0]) {
+            const namaFail = input.files[0].name;
+            document.getElementById('statusUpload').innerText = "Fail dipiih: " + namaFail;
+            // Di sini anda perlu sambungkan kod ini dengan Google Apps Script 
+            // untuk hantar fail ke folder ID: 1wHiKrx1PQH47OxeZfJLqdAaN96m6CZr_
+            alert("Fail " + namaFail + " telah dipilih. Sila pautkan dengan fungsi backend/Apps Script untuk muat naik sebenar.");
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('paparNama').innerText = sessionStorage.getItem("nama") || "Pengguna Sistem";
         document.getElementById('paparPeranan').innerText = sessionStorage.getItem("peranan") || "Tiada Peranan";
+
+        // CONTOH KOD: Jika menggunakan Apps Script, anda boleh check jika fail wujud
+        // Kalau tak wujud, matikan butang:
+        // document.getElementById('btnViewTemplate').disabled = true;
     });
 </script>
 
