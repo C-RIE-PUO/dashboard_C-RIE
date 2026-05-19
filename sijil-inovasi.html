@@ -36,17 +36,21 @@
   </div>
 
   <div class="row mb-3 bg-white p-3 rounded shadow-sm border">
-    <div class="col-md-4">
+    <div class="col-md-3">
+      <label class="form-label fw-bold">Cari Nama:</label>
+      <input type="text" id="filterNama" class="form-control" placeholder="Ketua Inovator / Ahli" onkeyup="tapisData()">
+    </div>
+    <div class="col-md-3">
       <label class="form-label fw-bold">Tapis Jabatan:</label>
       <select id="filterJabatan" class="form-select" onchange="tapisData()">
         <option value="SEMUA">Semua Jabatan</option>
       </select>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label fw-bold">Cari Tahun:</label>
-      <input type="text" id="filterTahun" class="form-control" placeholder="Masukkan tahun (contoh: 2026)" onkeyup="tapisData()">
+      <input type="text" id="filterTahun" class="form-control" placeholder="Tahun (cth: 2026)" onkeyup="tapisData()">
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <label class="form-label fw-bold">Status Sijil:</label>
       <select id="filterStatus" class="form-select" onchange="tapisData()">
         <option value="SEMUA">Semua Status</option>
@@ -166,17 +170,21 @@
   }
 
   function tapisData() {
+    let fNama = document.getElementById("filterNama").value.trim().toLowerCase();
     let fJabatan = document.getElementById("filterJabatan").value;
     let fTahun = document.getElementById("filterTahun").value.trim().toLowerCase();
-    let fStatus = document.getElementById("filterStatus").value; // 🌟 KEMASKINI: Dapatkan nilai filter status
+    let fStatus = document.getElementById("filterStatus").value; 
     
     dataTapisSemasa = dataInovasiLulus.filter(r => {
+      let ketua = r[1] ? String(r[1]).toLowerCase() : "";
+      let ahli = r[2] ? String(r[2]).toLowerCase() : "";
+      let passNama = (fNama === "" || ketua.includes(fNama) || ahli.includes(fNama));
+
       let passJabatan = (fJabatan === "SEMUA" || r[3] == fJabatan);
       let passTahun = (fTahun === "" || String(r[8]).toLowerCase().includes(fTahun));
       
-      // 🌟 KEMASKINI: Logik untuk menyemak status sijil pada lajur L (index 11)
       let passStatus = true;
-      let adaSijil = (r[11] && r[11].trim() !== ""); // Jika lajur L tidak kosong
+      let adaSijil = (r[11] && r[11].trim() !== ""); 
       
       if (fStatus === "BELUM_DIJANA") {
           passStatus = !adaSijil;
@@ -184,7 +192,14 @@
           passStatus = adaSijil;
       }
 
-      return passJabatan && passTahun && passStatus;
+      return passNama && passJabatan && passTahun && passStatus;
+    });
+
+    // 🌟 KEMASKINI: Susun rekod mengikut tahun terkini (Descending)
+    dataTapisSemasa.sort((a, b) => {
+      let tahunA = parseInt(a[8]) || 0; // Lajur Tahun di index 8
+      let tahunB = parseInt(b[8]) || 0;
+      return tahunB - tahunA;
     });
 
     halamanSemasa = 1; 
@@ -267,7 +282,6 @@
     if (halamanSemasa < totalHalaman) { halamanSemasa++; binaJadual(); }
   }
 
-  // FUNGSI BACKEND (janaSijilAuto & uploadSijil) KEKAL SAMA
   function janaSijilAuto(bil, tahun, jabatan) {
       if(!confirm("Anda pasti mahu menjana sijil?")) return;
       document.getElementById("loaderTeks").innerText = "Sistem sedang menjana sijil...";
