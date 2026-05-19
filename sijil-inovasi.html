@@ -195,7 +195,7 @@
       return passNama && passJabatan && passTahun && passStatus;
     });
 
-    // 🌟 KEMASKINI: Susun rekod mengikut tahun terkini (Descending)
+    // Susun rekod mengikut tahun terkini (Descending)
     dataTapisSemasa.sort((a, b) => {
       let tahunA = parseInt(a[8]) || 0; // Lajur Tahun di index 8
       let tahunB = parseInt(b[8]) || 0;
@@ -220,13 +220,17 @@
     let indexAkhir = indexMula + rekodSetiapHalaman;
     let dataHalaman = dataTapisSemasa.slice(indexMula, indexAkhir);
 
-    dataHalaman.forEach(rekod => {
+    // 🌟 KEMASKINI: Ditambah hantaran parameter 'index' pada gelung forEach
+    dataHalaman.forEach((rekod, index) => {
       let tr = document.createElement("tr");
       let linkSijilPenghargaan = rekod[11] || "";
       let statusSijil = linkSijilPenghargaan 
           ? `<span class="badge bg-success">Tersedia</span>` 
           : `<span class="badge bg-secondary">Belum Dijana</span>`;
       
+      // 🌟 KEMASKINI: Mengira nombor Bil paparan secara berurutan dan menaik mengikut pagination
+      let displayBil = indexMula + index + 1;
+
       let butangAksi = "";
       if (isPengurusSijil) {
           if (!linkSijilPenghargaan) {
@@ -249,8 +253,9 @@
             : `<span class="text-muted small">Menunggu Sijil</span>`;
       }
 
+      // 🌟 KEMASKINI: Menggantikan ${rekod[0]} kepada ${displayBil} hanya pada kolum pertama (Bil)
       tr.innerHTML = `
-        <td>${rekod[0]}</td>
+        <td>${displayBil}</td>
         <td>${rekod[1]}</td>
         <td>${rekod[2] || "-"}</td> 
         <td>${rekod[3]}</td>
