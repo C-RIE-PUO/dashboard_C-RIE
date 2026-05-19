@@ -63,10 +63,8 @@
                 </select>
             </div>
             <div class="w-full md:w-1/4">
-                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tapis Tahun</label>
-                <select id="filterTahun" onchange="applyFilters()" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
-                    <option value="SEMUA">Semua Tahun</option>
-                </select>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Carian Tahun</label>
+                <input type="text" id="filterTahun" onkeyup="applyFilters()" placeholder="Cth: 2024" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
             </div>
             <div class="w-full md:w-1/4">
                 <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tapis Jabatan</label>
@@ -101,7 +99,7 @@
 						</tr>
 					</thead>
                     <tbody id="isiJadualPengguna" class="divide-y divide-gray-100">
-                        <tr><td colspan="8" class="p-8 text-center text-indigo-500 font-bold animate-pulse">⏳ Memuat turun senarai pengguna...</td></tr>
+                        <tr><td colspan="10" class="p-8 text-center text-indigo-500 font-bold animate-pulse">⏳ Memuat turun senarai pengguna...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -234,17 +232,20 @@
     </div>
 
     <script>
-        // ⚠️ MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
+		// ⚠️ MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
         let globalSistemData = { JABATAN: [], PERANAN: [], BAHAGIAN: [] };
         let dataPenggunaGlobal = [];
+        
+        // PEMBOLEHUBAH UNTUK PAGINATION
+        let currentPage = 1;
+        const rowsPerPage = 10;
 
         window.onload = () => {
             muatDropdownSistem();
             muatDataPengguna();
         };
-		
 		
 		// ====================================================================
         // 🌟 FUNGSI BARU: PENGURUSAN SARINGAN (FILTER) SESI, TAHUN & JABATAN
@@ -252,12 +253,11 @@
 
         function isiDropdownFilter(data) {
             const setSesi = new Set();
-            const setTahun = new Set();
             const setJabatan = new Set();
 
             data.forEach(row => {
                 if(row.sesi && String(row.sesi).trim() !== "") setSesi.add(String(row.sesi).toUpperCase().trim());
-                if(row.tahun && String(row.tahun).trim() !== "") setTahun.add(String(row.tahun).trim());
+                // Tahun telah dibuang dari dropdown kerana kita menggunakan carian teks
                 if(row.jabatan && String(row.jabatan).trim() !== "") setJabatan.add(String(row.jabatan).toUpperCase().trim());
             });
 
@@ -272,38 +272,41 @@
             };
 
             masukanKeSelect('filterSesi', setSesi, 'Semua Sesi');
-            masukanKeSelect('filterTahun', setTahun, 'Semua Tahun');
             masukanKeSelect('filterJabatan', setJabatan, 'Semua Jabatan');
         }
 
-        function applyFilters() {
+		// 🌟 KEMASKINI: Ditambah parameter resetPage untuk pagination
+        function applyFilters(resetPage = true) {
             const valSesi = document.getElementById('filterSesi').value;
-            const valTahun = document.getElementById('filterTahun').value;
+            const valTahun = document.getElementById('filterTahun').value.trim();
             const valJabatan = document.getElementById('filterJabatan').value;
 
-            // Tapis data menggunakan dataPenggunaGlobal
             const dataDitapis = dataPenggunaGlobal.filter(row => {
                 const matchSesi = (valSesi === "SEMUA") || (String(row.sesi).toUpperCase().trim() === valSesi);
-                const matchTahun = (valTahun === "SEMUA") || (String(row.tahun).trim() === valTahun);
+                // Carian menggunakan .includes untuk menangkap carian tahun separa atau penuh
+                const matchTahun = (valTahun === "") || (String(row.tahun).trim().includes(valTahun));
                 const matchJabatan = (valJabatan === "SEMUA") || (String(row.jabatan).toUpperCase().trim() === valJabatan);
 
                 return matchSesi && matchTahun && matchJabatan;
             });
 
-            // Hantar data yang telah ditapis ke jadual (reset ke muka surat 1)
-            renderJadual(dataDitapis, 1);
+            if(resetPage) {
+                currentPage = 1; // Kembali ke muka surat pertama jika filter berubah
+            }
+            
+            renderJadual(dataDitapis, currentPage);
         }
 
-        function resetFilters() {
+		function resetFilters() {
             document.getElementById('filterSesi').value = "SEMUA";
-            document.getElementById('filterTahun').value = "SEMUA";
+            document.getElementById('filterTahun').value = ""; // Kosongkan textbox
             document.getElementById('filterJabatan').value = "SEMUA";
             
-            // Kembalikan jadual ke paparan asal menggunakan data penuh
-            renderJadual(dataPenggunaGlobal, 1);
+            currentPage = 1;
+            renderJadual(dataPenggunaGlobal, currentPage);
         }
 
-        // FUNGSI 1: TARIK DROPDOWN JABATAN, PERANAN & BAHAGIAN
+		// FUNGSI 1: TARIK DROPDOWN JABATAN, PERANAN & BAHAGIAN
         function muatDropdownSistem() {
             fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
             .then(res => res.json())
@@ -328,179 +331,146 @@
                     document.getElementById('daftar_peranan').innerHTML = htmlPer;
                     document.getElementById('edit_peranan').innerHTML = htmlPer;
 
-                    // 🌟 TAMBAHAN: Pastikan id 'daftar_bahagian' juga diisi senarai Bahagian
                     document.getElementById('daftar_bahagian').innerHTML = htmlBah;
                     document.getElementById('edit_bahagian').innerHTML = htmlBah;
                 }
             });
         }
 
-        // FUNGSI 2: PAPAR SENARAI PENGGUNA
+// FUNGSI 2: PAPAR SENARAI PENGGUNA
         function muatDataPengguna() {
             const tbody = document.getElementById('isiJadualPengguna');
             
-            // Kemaskini colspan="10" kerana jadual kini ada 10 lajur
             tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-indigo-500 font-bold animate-pulse">⏳ Memuat turun data...</td></tr>`;
 
             fetch(`${SCRIPT_URL}?action=ambilSemuaPengguna`)
             .then(res => res.json())
             .then(result => {
                 if (result.status === "BERJAYA") {
-                    // 1. Simpan data ke dalam pembolehubah global
                     dataPenggunaGlobal = result.data || [];
                     
-                    // 2. 🌟 TAMBAHAN: Bina pilihan filter dari data yang baru ditarik
                     if (typeof isiDropdownFilter === 'function') {
                         isiDropdownFilter(dataPenggunaGlobal);
                     }
                     
-                    // 3. Papar jadual untuk mula-mula (Muka surat 1)
-                    renderJadual(dataPenggunaGlobal, 1);
+                    renderJadual(dataPenggunaGlobal, currentPage);
                     
                 } else {
                     tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`;
                 }
             }).catch(err => {
                 tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke server. Sila cuba lagi.</td></tr>`;
-                console.error("Ralat muatDataPengguna:", err); // Tambah log ke console untuk rujukan debug
+                console.error("Ralat muatDataPengguna:", err); 
             });
         }
 
- // PEMBOLEHUBAH UNTUK PAGINATION
-let currentPage = 1;
-const rowsPerPage = 10;
+
 
 function renderJadual(data, page = 1) {
-    const tbody = document.getElementById('isiJadualPengguna');
-    tbody.innerHTML = "";
+            const tbody = document.getElementById('isiJadualPengguna');
+            tbody.innerHTML = "";
 
-    // Kemaskini colspan kepada 10 kerana Sesi & Tahun ditambah
-    if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-gray-500 font-medium">Tiada pengguna dijumpai.</td></tr>`;
-        if (typeof kemaskiniPagination === 'function') kemaskiniPagination(0);
-        return;
-    }
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-gray-500 font-medium">Tiada pengguna dijumpai.</td></tr>`;
+                if (typeof kemaskiniPagination === 'function') kemaskiniPagination(0);
+                return;
+            }
 
-    // LOGIK PAGINATION & ELAK MUTASI ARRAY ASAL
-    const rowsPerPage = typeof window.rowsPerPage !== 'undefined' ? window.rowsPerPage : 10;
-    const jumlahData = data.length;
-    const totalPages = Math.ceil(jumlahData / rowsPerPage);
-    
-    if (page < 1) page = 1;
-    if (page > totalPages) page = totalPages;
-    if (typeof window.currentPage !== 'undefined') window.currentPage = page;
+            const jumlahData = data.length;
+            const totalPages = Math.ceil(jumlahData / rowsPerPage);
+            
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
 
-    const startIndex = (page - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    
-    // Susun dari terbaru (reverse) dan potong (slice) untuk muka surat semasa sahaja
-    const paparanData = [...data].reverse().slice(startIndex, endIndex);
+            const startIndex = (page - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            
+            const paparanData = [...data].reverse().slice(startIndex, endIndex);
 
-    // ==========================================
-    // DEFINISI HIERARKI KUASA (DI LUAR LOOP)
-    // ==========================================
-    const userRoleStr = typeof userPeranan !== 'undefined' ? userPeranan.toUpperCase().trim() : "";
-    
-    // 🌟 KEMASKINI: Tangkap apa-apa role yang ada perkataan "ADMIN" (contoh: ADMIN, SUPER ADMIN)
-    const isAdminLogin = userRoleStr.includes("ADMIN"); 
-    const isKupikLogin = userRoleStr === "KUPIK";
-    
-    const perananPengurusan = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-    const isPengurusanLogin = perananPengurusan.includes(userRoleStr);
+            const userRoleStr = typeof userPeranan !== 'undefined' ? userPeranan.toUpperCase().trim() : "";
+            const isAdminLogin = userRoleStr.includes("ADMIN"); 
+            const isKupikLogin = userRoleStr === "KUPIK";
+            
+            const perananPengurusan = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+            const isPengurusanLogin = perananPengurusan.includes(userRoleStr);
 
-    paparanData.forEach((row, index) => {
-        const stat = String(row.status || "").toUpperCase().trim();
-        let badge = `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-[10px] font-bold border border-orange-200">⏳ ${stat}</span>`;
-        if(stat === "AKTIF" || stat === "SAH") badge = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-[10px] font-bold border border-green-200">✅ AKTIF</span>`;
-        if(stat === "DIGANTUNG") badge = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200">⛔ DIGANTUNG</span>`;
+            paparanData.forEach((row, index) => {
+                const stat = String(row.status || "").toUpperCase().trim();
+                let badge = `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-[10px] font-bold border border-orange-200">⏳ ${stat}</span>`;
+                if(stat === "AKTIF" || stat === "SAH") badge = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-[10px] font-bold border border-green-200">✅ AKTIF</span>`;
+                if(stat === "DIGANTUNG") badge = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-[10px] font-bold border border-red-200">⛔ DIGANTUNG</span>`;
 
-        const perananSemasa = String(row.peranan || "").toUpperCase().trim();
-        const strBahagian = row.bahagian || "-";
-        
-        const safeBahagian = strBahagian.replace(/'/g, "\\'");
-        const safeNama = String(row.nama || "").replace(/'/g, "\\'");
-        const safeSesi = String(row.sesi || "").replace(/'/g, "\\'");
-        const safeTahun = String(row.tahun || "").replace(/'/g, "\\'");
+                const perananSemasa = String(row.peranan || "").toUpperCase().trim();
+                const strBahagian = row.bahagian || "-";
+                
+                const safeBahagian = strBahagian.replace(/'/g, "\\'");
+                const safeNama = String(row.nama || "").replace(/'/g, "\\'");
+                const safeSesi = String(row.sesi || "").replace(/'/g, "\\'");
+                const safeTahun = String(row.tahun || "").replace(/'/g, "\\'");
 
-        const paparSesi = row.sesi ? row.sesi : "-";
-        const paparTahun = row.tahun ? row.tahun : "-";
+                const paparSesi = row.sesi ? row.sesi : "-";
+                const paparTahun = row.tahun ? row.tahun : "-";
 
-        const barisIC = String(row.ic).trim(); 
-        
-        let isSelf = (typeof userICSemasa !== 'undefined' && userICSemasa !== "" && barisIC === userICSemasa);
-        let isSasaranPengurusanAtauTinggi = perananPengurusan.includes(perananSemasa) || perananSemasa === "KUPIK" || perananSemasa.includes("ADMIN");
+                const barisIC = String(row.ic).trim(); 
+                
+                let isSelf = (typeof userICSemasa !== 'undefined' && userICSemasa !== "" && barisIC === userICSemasa);
+                let isSasaranPengurusanAtauTinggi = perananPengurusan.includes(perananSemasa) || perananSemasa === "KUPIK" || perananSemasa.includes("ADMIN");
 
-        // ==========================================
-        // LOGIK BUTANG SAHKAN
-        // ==========================================
-        let btnSahkan = "";
-        if (stat === "MENUNGGU PENGESAHAN" || stat === "MENUNGGU") {
-            if (isPengurusanLogin && isSasaranPengurusanAtauTinggi) {
-                btnSahkan = `<button disabled class="bg-gray-300 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-400 cursor-not-allowed shadow-none" title="Anda tiada kuasa mengesahkan peranan ini">🔒 Sahkan</button>`;
-            } else {
-                btnSahkan = `<button onclick="sahkanPengguna('${barisIC}', '${safeNama}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded font-bold transition text-xs border border-emerald-700 shadow">✅ Sahkan</button>`;
+                let btnSahkan = "";
+                if (stat === "MENUNGGU PENGESAHAN" || stat === "MENUNGGU") {
+                    if (isPengurusanLogin && isSasaranPengurusanAtauTinggi) {
+                        btnSahkan = `<button disabled class="bg-gray-300 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-400 cursor-not-allowed shadow-none" title="Anda tiada kuasa mengesahkan peranan ini">🔒 Sahkan</button>`;
+                    } else {
+                        btnSahkan = `<button onclick="sahkanPengguna('${barisIC}', '${safeNama}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded font-bold transition text-xs border border-emerald-700 shadow">✅ Sahkan</button>`;
+                    }
+                }
+
+                let btnDelete = "";
+                if (isSelf) {
+                    btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tidak boleh memadam akaun sendiri">🔒 Kunci Diri</button>`;
+                } else if (isAdminLogin) {
+                    btnDelete = `<button onclick="padamPengguna('${barisIC}', '${safeNama}', '${perananSemasa}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded font-bold transition text-xs border border-red-200">🗑️ Padam</button>`;
+                } else if (isKupikLogin && perananSemasa.includes("ADMIN")) {
+                    btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tiada kuasa memadam akaun ADMIN">🔒 Kunci</button>`;
+                } else if (isPengurusanLogin && isSasaranPengurusanAtauTinggi) {
+                    btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tiada kuasa memadam akaun Pengurusan/Atasan">🔒 Kunci</button>`;
+                } else {
+                    btnDelete = `<button onclick="padamPengguna('${barisIC}', '${safeNama}', '${perananSemasa}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded font-bold transition text-xs border border-red-200">🗑️ Padam</button>`;
+                }
+
+                let btnReset = "";
+                if (stat === "AKTIF" || stat === "SAH") {
+                    btnReset = `<button onclick="resetPasswordJadual('${barisIC}')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold transition text-xs shadow border border-slate-900">🔑 Reset Pass</button>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-4 text-center font-bold text-gray-500 text-xs">${(page - 1) * rowsPerPage + index + 1}</td>
+                    <td class="p-4 font-mono font-bold text-sm text-indigo-700">${row.ic}</td>
+                    <td class="p-4 font-bold text-gray-800 uppercase text-xs">${row.nama}</td>
+                    <td class="p-4 text-center font-bold text-gray-600 text-xs uppercase">${row.jabatan}</td>
+                    <td class="p-4 text-center text-xs font-semibold text-slate-600 uppercase">${row.peranan}</td>
+                    <td class="p-4 text-center text-xs font-semibold text-slate-500 uppercase">${strBahagian}</td>
+                    <td class="p-4 text-center text-xs font-bold text-slate-700 uppercase">${paparSesi}</td>
+                    <td class="p-4 text-center text-xs font-bold text-slate-700 uppercase">${paparTahun}</td>
+                    <td class="p-4 text-center">${badge}</td>
+                    <td class="p-4 text-center">
+                        <div class="flex justify-center gap-1 flex-wrap">
+                            ${btnSahkan}
+                            ${btnReset}
+                            <button onclick="bukaModalEdit('${barisIC}', '${safeNama}', '${row.jabatan}', '${row.peranan}', '${stat}', '${safeBahagian}', '${safeSesi}', '${safeTahun}')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded font-bold transition text-xs border border-amber-300">✏️ Edit</button>
+                            ${btnDelete}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (typeof kemaskiniPagination === 'function') {
+                kemaskiniPagination(jumlahData);
             }
         }
-
-        // ==========================================
-        // LOGIK BUTANG DELETE (🌟 KEMASKINI)
-        // ==========================================
-        let btnDelete = "";
-        
-        if (isSelf) {
-            // 1. DIRI SENDIRI: Kunci (Admin pun tak boleh padam diri sendiri)
-            btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tidak boleh memadam akaun sendiri">🔒 Kunci Diri</button>`;
-        } else if (isAdminLogin) {
-            // 2. ADMIN LOG MASUK: Bypass semua, boleh padam semua orang
-            btnDelete = `<button onclick="padamPengguna('${barisIC}', '${safeNama}', '${perananSemasa}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded font-bold transition text-xs border border-red-200">🗑️ Padam</button>`;
-        } else if (isKupikLogin && perananSemasa.includes("ADMIN")) {
-            // 3. KUPIK LOG MASUK: Kunci jika baris itu adalah ADMIN
-            btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tiada kuasa memadam akaun ADMIN">🔒 Kunci</button>`;
-        } else if (isPengurusanLogin && isSasaranPengurusanAtauTinggi) {
-            // 4. PENGURUSAN LOG MASUK: Kunci jika baris itu Pengurusan / Atasan
-            btnDelete = `<button disabled class="bg-gray-200 text-gray-500 px-3 py-1.5 rounded font-bold text-xs border border-gray-300 cursor-not-allowed" title="Anda tiada kuasa memadam akaun Pengurusan/Atasan">🔒 Kunci</button>`;
-        } else {
-            // 5. BAKI: Boleh dipadam
-            btnDelete = `<button onclick="padamPengguna('${barisIC}', '${safeNama}', '${perananSemasa}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded font-bold transition text-xs border border-red-200">🗑️ Padam</button>`;
-        }
-
-        // ==========================================
-        // LOGIK BUTANG RESET
-        // ==========================================
-        let btnReset = "";
-        if (stat === "AKTIF" || stat === "SAH") {
-            btnReset = `<button onclick="resetPasswordJadual('${barisIC}')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded font-bold transition text-xs shadow border border-slate-900">🔑 Reset Pass</button>`;
-        }
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition";
-        tr.innerHTML = `
-            <td class="p-4 text-center font-bold text-gray-500 text-xs">${startIndex + index + 1}</td>
-            <td class="p-4 font-mono font-bold text-sm text-indigo-700">${row.ic}</td>
-            <td class="p-4 font-bold text-gray-800 uppercase text-xs">${row.nama}</td>
-            <td class="p-4 text-center font-bold text-gray-600 text-xs uppercase">${row.jabatan}</td>
-            <td class="p-4 text-center text-xs font-semibold text-slate-600 uppercase">${row.peranan}</td>
-            <td class="p-4 text-center text-xs font-semibold text-slate-500 uppercase">${strBahagian}</td>
-            <td class="p-4 text-center text-xs font-bold text-slate-700 uppercase">${paparSesi}</td>
-            <td class="p-4 text-center text-xs font-bold text-slate-700 uppercase">${paparTahun}</td>
-            <td class="p-4 text-center">${badge}</td>
-            <td class="p-4 text-center">
-                <div class="flex justify-center gap-1 flex-wrap">
-                    ${btnSahkan}
-                    ${btnReset}
-                    <button onclick="bukaModalEdit('${barisIC}', '${safeNama}', '${row.jabatan}', '${row.peranan}', '${stat}', '${safeBahagian}', '${safeSesi}', '${safeTahun}')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded font-bold transition text-xs border border-amber-300">✏️ Edit</button>
-                    ${btnDelete}
-                </div>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    if (typeof kemaskiniPagination === 'function') {
-        kemaskiniPagination(jumlahData);
-    }
-}
-
 // FUNGSI KAWALAN PAPARAN BUTANG NEXT / PREV
 function kemaskiniPagination(totalData) {
     let pagDiv = document.getElementById('paginationControls');
@@ -541,11 +511,11 @@ function kemaskiniPagination(totalData) {
     `;
 }
 
-// FUNGSI TUKAR MUKA SURAT BILA BUTANG DITEKAN
-function tukarPage(newPage) {
-    // dataPenggunaGlobal digunakan semula dari tetapan sedia ada anda
-    renderJadual(dataPenggunaGlobal, newPage);
-}
+// 🌟 FUNGSI BARU: Kawalan pertukaran muka surat (Pagination)
+        function tukarPage(newPage) {
+            currentPage = newPage;
+            applyFilters(false); // Apply filter sedia ada tanpa kembali ke muka surat 1
+        }
 
         // MUAT TURUN CSV
         function muatTurunCSV() {
