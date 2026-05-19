@@ -131,7 +131,7 @@
     </div>
 
     <script>
-        // ⚠️ JANGAN LUPA: TAMPAL URL WEB APP ANDA DI BAWAH INI
+// ⚠️ JANGAN LUPA: TAMPAL URL WEB APP ANDA DI BAWAH INI
         const scriptURL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
         
         let semuaData = []; 
@@ -284,6 +284,13 @@
             if (jabatanDipilih !== "Semua" && userPeranan.toUpperCase() !== "STAF") {
                 dataDitapis = dataDitapis.filter(r => String(r[3]).trim().toUpperCase() === jabatanDipilih.toUpperCase());
             }
+            
+            // Susun rekod mengikut tahun terkini secara menurun (Descending)
+            dataDitapis.sort((a, b) => {
+                let tahunA = parseInt(a[8]) || 0; // Index 8 ialah TAHUN
+                let tahunB = parseInt(b[8]) || 0;
+                return tahunB - tahunA;
+            });
 
             dataSemasa = dataDitapis; 
             currentPage = 1; 
@@ -309,17 +316,21 @@
             const dataPaginasi = data.slice(startIndex, endIndex);
 
             dataPaginasi.forEach((row, index) => {
-                const rowNum = row[0] || (startIndex + index + 1);
+                // 🌟 KEMASKINI: Paparan Bil. akan menggunakan indeks senarai jadual, bukan ID dari Sheet
+                const displayBil = startIndex + index + 1; 
+                
+                // 🌟 KEMASKINI: ID Sebenar dari Google Sheet akan digunakan khas untuk fungsi Edit/Padam
+                const recordID = row[0]; 
                 
                 let tindakanHTML = "";
                 // Paparkan lajur tindakan hanya jika peranan dibenarkan
                 if (adaAksesTindakan) {
                     tindakanHTML = `
                     <td class="p-4 text-center min-w-[150px]">
-                        <button onclick="editRekod('${rowNum}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-semibold mr-1 shadow-sm transition-colors mb-1 md:mb-0">
+                        <button onclick="editRekod('${recordID}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-semibold mr-1 shadow-sm transition-colors mb-1 md:mb-0">
                             ✏️ Edit
                         </button>
-                        <button onclick="padamRekod('${rowNum}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition-colors">
+                        <button onclick="padamRekod('${recordID}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition-colors">
                             🗑️ Padam
                         </button>
                     </td>`;
@@ -328,7 +339,7 @@
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-blue-50 transition text-sm";
                 tr.innerHTML = `
-                    <td class="p-4 font-bold text-gray-600">${rowNum}</td>
+                    <td class="p-4 font-bold text-gray-600">${displayBil}</td>
                     <td class="p-4 font-semibold text-gray-800">${row[1] || '-'}</td>
                     <td class="p-4 text-gray-600">${row[2] || '-'}</td>
                     <td class="p-4 font-bold text-blue-700">${row[3] || '-'}</td>
