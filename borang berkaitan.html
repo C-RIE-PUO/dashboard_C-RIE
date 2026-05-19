@@ -99,6 +99,39 @@
                             </a>
                         </div>
                     </div>
+
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
+                        <div class="mb-3 md:mb-0 pr-4 flex-1">
+                            <h4 class="font-bold text-gray-700 text-md">Garis Panduan Tatacara Pelaksanaan Kajian di POLYCC</h4>
+                            <p class="text-sm text-gray-500 mt-1">Garis panduan rasmi dan rujukan tatacara pelaksanaan penyelidikan/kajian di peringkat POLYCC.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 shrink-0 md:justify-end">
+                            <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
+                                <i class="fas fa-upload mr-2"></i> Muat Naik
+                                <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'GARIS PANDUAN TATACARA PELAKSANAAN KAJIAN DI POLYCC')">
+                            </label>
+                            <a href="#" data-borang="GARIS PANDUAN TATACARA PELAKSANAAN KAJIAN DI POLYCC" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition">
+                                <i class="fas fa-download mr-2"></i> Muat Turun
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition">
+                        <div class="mb-3 md:mb-0 pr-4 flex-1">
+                            <h4 class="font-bold text-gray-700 text-md">Prosedur Menjalankan Mini Kajian di JPPKK</h4>
+                            <p class="text-sm text-gray-500 mt-1">Garis panduan dan tatacara rasmi untuk menjalankan mini kajian di peringkat JPPKK.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 shrink-0 md:justify-end">
+                            <label class="btn-kemaskini hidden flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition cursor-pointer">
+                                <i class="fas fa-upload mr-2"></i> Muat Naik
+                                <input type="file" class="hidden" accept=".pdf,.doc,.docx" onchange="prosesUpload(this, 'PROSEDUR MENJALANKAN MINI KAJIAN DI JPPKK 2023')">
+                            </label>
+                            <a href="#" data-borang="PROSEDUR MENJALANKAN MINI KAJIAN DI JPPKK 2023" target="_blank" class="flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded shadow inline-flex items-center transition">
+                                <i class="fas fa-download mr-2"></i> Muat Turun
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -189,7 +222,7 @@
                 </table>
             </div>
 
-			<div class="flex flex-wrap gap-2 mb-4 border-b pb-4">
+            <div class="flex flex-wrap gap-2 mb-4 border-b pb-4">
                 <button onclick="togglePreview()" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
                     <i class="fas fa-eye"></i> Papar Preview Surat
                 </button>
@@ -223,7 +256,7 @@
             </div>
             
             <div class="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r text-yellow-800 text-xs shadow-sm">
-                <strong>Nota Penting:</strong> Pastikan kod ditaip dengan <b>huruf besar</b> dan <b>kurungan berkembar</b> <code class="bg-yellow-200 px-1 rounded">{{ }}</code>. Sistem akan menggantikan kod ini secara automatik.
+                <strong>Nota Penting:</strong> Pastikan kod ditaip dengan <b>huruf besar</b> and <b>kurungan berkembar</b> <code class="bg-yellow-200 px-1 rounded">{{ }}</code>. Sistem akan menggantikan kod ini secara automatik.
             </div>
             
             <button onclick="tutupModalBantuan()" class="mt-6 w-full bg-gray-800 text-white py-3 rounded-xl font-bold hover:bg-gray-900 transition-all shadow">Faham & Tutup</button>
@@ -256,50 +289,62 @@
             muatTurunDinamik(); // Panggil fungsi ini sewaktu page loading
         };
 
-        // --- FUNGSI BAHARU: Ambil pautan secara dinamik dari GAS ---
-        function muatTurunDinamik() {
-            const butangMuatTurun = document.querySelectorAll('[data-borang]');
+        // Tukar baris asal fungsi ini untuk menerima parameter isRefresh (default: false)
+function muatTurunDinamik(isRefresh = false) {
+    const butangMuatTurun = document.querySelectorAll('[data-borang]');
+    butangMuatTurun.forEach(btn => {
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Memuatkan...`;
+        btn.classList.add('pointer-events-none', 'opacity-75');
+        btn.classList.remove('hidden'); 
+    });
+
+    // Tambah logik dinamik pada URL: jika isRefresh true, masukkan '&refresh=true'
+    const urlTambahan = isRefresh ? '&refresh=true' : '';
+
+    fetch(`${SCRIPT_URL}?action=ambilPautanBorang&folderId=${FOLDER_ID_MASTER}${urlTambahan}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "BERJAYA") {
+            const failData = data.data;
+
             butangMuatTurun.forEach(btn => {
-                btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Memuatkan...`;
-                btn.classList.add('pointer-events-none', 'opacity-75');
-                btn.classList.remove('hidden'); // Tunjuk status memuatkan sementara
-            });
+                const namaBorangTarget = btn.getAttribute('data-borang').toUpperCase().trim();
 
-            fetch(`${SCRIPT_URL}?action=ambilPautanBorang&folderId=${FOLDER_ID_MASTER}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "BERJAYA") {
-                    const failData = data.data;
+                const failDitemui = Object.keys(failData).find(key => {
+                    let namaFailDrive = key.toUpperCase().trim();
+                    let namaTanpaExt = namaFailDrive;
+                    let titikTerakhir = namaFailDrive.lastIndexOf('.');
+                    
+                    if (titikTerakhir !== -1) {
+                        namaTanpaExt = namaFailDrive.substring(0, titikTerakhir).trim();
+                    }
 
-                    butangMuatTurun.forEach(btn => {
-                        const namaBorangTarget = btn.getAttribute('data-borang');
-                        const failDitemui = Object.keys(failData).find(key => key.startsWith(namaBorangTarget));
-
-                        if (failDitemui) {
-                            // Jika fail wujud, paparkan butang Muat Turun
-                            btn.href = failData[failDitemui];
-                            btn.innerHTML = `<i class="fas fa-download mr-2"></i> Muat Turun`;
-                            btn.classList.remove('pointer-events-none', 'opacity-75', 'bg-gray-400', 'hidden');
-                            btn.classList.add('bg-teal-600', 'inline-flex');
-                        } else {
-                            // Sembunyikan butang terus jika fail tidak wujud
-                            btn.classList.add('hidden');
-                            btn.classList.remove('inline-flex');
-                        }
-                    });
-                } else {
-                    console.error("Ralat dapatkan pautan:", data.mesej);
-                }
-            })
-            .catch(err => {
-                console.error("Gagal berhubung dengan server:", err);
-                butangMuatTurun.forEach(btn => {
-                    btn.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> Ralat Rangkaian`;
-                    btn.classList.replace('bg-teal-600', 'bg-red-500');
-                    btn.classList.remove('pointer-events-none', 'opacity-75');
+                    return namaTanpaExt === namaBorangTarget || namaFailDrive.startsWith(namaBorangTarget);
                 });
+
+                if (failDitemui) {
+                    btn.href = failData[failDitemui];
+                    btn.innerHTML = `<i class="fas fa-download mr-2"></i> Muat Turun`;
+                    btn.classList.remove('pointer-events-none', 'opacity-75', 'bg-gray-400', 'hidden');
+                    btn.classList.add('bg-teal-600', 'inline-flex');
+                } else {
+                    btn.classList.add('hidden');
+                    btn.classList.remove('inline-flex');
+                }
             });
+        } else {
+            console.error("Ralat dapatkan pautan:", data.mesej);
         }
+    })
+    .catch(err => {
+        console.error("Gagal berhubung dengan server:", err);
+        butangMuatTurun.forEach(btn => {
+            btn.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> Ralat Rangkaian`;
+            btn.classList.replace('bg-teal-600', 'bg-red-500');
+            btn.classList.remove('pointer-events-none', 'opacity-75');
+        });
+    });
+}
 
         // Fungsi yang dipanggil apabila dokumen dipilih untuk di-upload
         function prosesUpload(inputElemen, namaBorangAsal) {
@@ -341,14 +386,16 @@
                     body: JSON.stringify(payload)
                 })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.status === "BERJAYA") {
-                        paparUI(`✅ "${namaBorangAsal}" berjaya dimuat naik dan dikemas kini!`, 'bg-green-100 text-green-800 border-green-200');
-                        muatTurunDinamik(); 
-                    } else {
-                        paparUI(`❌ Ralat: ${data.mesej}`, 'bg-red-100 text-red-800 border-red-200');
-                    }
-                })
+              .then(data => {
+    if (data.status === "BERJAYA") {
+        paparUI(`✅ "${namaBorangAsal}" berjaya dimuat naik dan dikemas kini!`, 'bg-green-100 text-green-800 border-green-200');
+        
+        // SINI: Hantar 'true' untuk paksa sistem bakar cache lama dan ambil list PDF baru!
+        muatTurunDinamik(true);  
+    } else {
+        paparUI(`❌ Ralat: ${data.mesej}`, 'bg-red-100 text-red-800 border-red-200');
+    }
+})
                 .catch(err => paparUI("⚠️ Gagal menghubungi server. Sila cuba lagi.", 'bg-red-100 text-red-800 border-red-200'))
                 .finally(() => {
                     labelButang.innerHTML = teksAsal;
@@ -358,40 +405,41 @@
             };
             reader.readAsDataURL(fail);
         }
-		
-		function ambilPautanBorang(folderId) {
-  try {
-    var folder = DriveApp.getFolderById(folderId);
-    var files = folder.getFiles();
-    var pautanData = {};
+        
+        // FUNGSI INI KEKAL SEBAGAI RUJUKAN KAU
+        function ambilPautanBorang(folderId) {
+            try {
+                var folder = DriveApp.getFolderById(folderId);
+                var files = folder.getFiles();
+                var pautanData = {};
 
-    while (files.hasNext()) {
-      var file = files.next();
-      var id = file.getId();
-      var mime = file.getMimeType();
-      var pautan = "";
+                while (files.hasNext()) {
+                    var file = files.next();
+                    var id = file.getId();
+                    var mime = file.getMimeType();
+                    var pautan = "";
 
-      // Jika fail ialah Google Doc (Native), kita tukar kepada format export Docx
-      if (mime === "application/vnd.google-apps.document") {
-        pautan = "https://docs.google.com/document/d/" + id + "/export?format=docx";
-      } 
-      // Jika fail ialah Google Sheet, kita tukar kepada format export Excel
-      else if (mime === "application/vnd.google-apps.spreadsheet") {
-        pautan = "https://docs.google.com/spreadsheets/d/" + id + "/export?format=xlsx";
-      }
-      // Jika fail biasa (PDF, Word dimuat naik), guna pautan download terus
-      else {
-        pautan = "https://drive.google.com/uc?export=download&id=" + id;
-      }
+                    // Jika fail ialah Google Doc (Native), kita tukar kepada format export Docx
+                    if (mime === "application/vnd.google-apps.document") {
+                        pautan = "https://docs.google.com/document/d/" + id + "/export?format=docx";
+                    } 
+                    // Jika fail ialah Google Sheet, kita tukar kepada format export Excel
+                    else if (mime === "application/vnd.google-apps.spreadsheet") {
+                        pautan = "https://docs.google.com/spreadsheets/d/" + id + "/export?format=xlsx";
+                    }
+                    // Jika fail biasa (PDF, Word dimuat naik), guna pautan download terus
+                    else {
+                        pautan = "https://drive.google.com/uc?export=download&id=" + id;
+                    }
 
-      pautanData[file.getName()] = pautan;
-    }
+                    pautanData[file.getName()] = pautan;
+                }
 
-    return { "status": "BERJAYA", "data": pautanData };
-  } catch (e) {
-    return { "status": "GAGAL", "mesej": e.toString() };
-  }
-}
+                return { "status": "BERJAYA", "data": pautanData };
+            } catch (e) {
+                return { "status": "GAGAL", "mesej": e.toString() };
+            }
+        }
 
         // Fungsi Papar Notifikasi
         function paparUI(teks, warnaClass) {
@@ -402,7 +450,7 @@
             setTimeout(() => sm.classList.add('hidden'), 8000);
         }
 
-// Fungsi Buka / Tutup Modal
+        // Fungsi Buka / Tutup Modal
         function bukaModalBantuan() {
             document.getElementById('modalBantuanKod').classList.remove('hidden');
             
@@ -431,8 +479,8 @@
                 ruang.classList.add('hidden');
             }
         }
-		
-// ==========================================
+        
+        // ==========================================
         // FUNGSI BUKA TEMPLAT EDIT SECARA DINAMIK
         // ==========================================
         function bukaEditTemplate(e) {
