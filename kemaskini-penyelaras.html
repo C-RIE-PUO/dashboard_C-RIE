@@ -35,25 +35,70 @@
 <body class="bg-slate-100 p-4 md:p-6 font-sans text-gray-800 min-h-screen">
 
     <div class="max-w-7xl mx-auto">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-indigo-900 flex items-center gap-2">
-                    <span>👥</span> Pengurusan Pengguna Sistem
-                </h1>
-                <p class="text-sm text-gray-500 mt-1">Urus peranan, jabatan, dan akses pengguna</p>
-            </div>
-            <div class="flex gap-2 flex-wrap">
-                <button onclick="muatTurunCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition flex items-center gap-2">
-                    📥 Download CSV
-                </button>
-                <button onclick="bukaModalDaftar()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition flex items-center gap-2">
-                    ➕ Daftar Pengguna Baru
-                </button>
-                <a href="pengurusan-data.html" class="bg-slate-600 hover:bg-slate-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition">
-                    &larr; Kembali
-                </a>
-            </div>
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-indigo-900 flex items-center gap-2">
+            <span>👥</span> Pengurusan Pengguna Sistem
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">Urus peranan, jabatan, dan akses pengguna</p>
+    </div>
+
+    <div class="flex items-center gap-3 bg-gray-50 p-2.5 rounded-xl border border-gray-200 shadow-sm">
+        <div class="flex items-center gap-2">
+            <label for="inputSesi" class="text-sm font-bold text-gray-700">Sesi:</label>
+            <input type="text" id="inputSesi" class="w-20 px-2 py-1.5 text-sm font-semibold text-gray-800 text-center border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white" placeholder="...">
         </div>
+        <div class="flex items-center gap-2">
+            <label for="inputTahun" class="text-sm font-bold text-gray-700">Tahun:</label>
+            <input type="text" id="inputTahun" class="w-24 px-2 py-1.5 text-sm font-semibold text-gray-800 text-center border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white" placeholder="...">
+        </div>
+    </div>
+    <div class="flex gap-2 flex-wrap">
+        <button onclick="bukaModalSalin()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition flex items-center gap-2">
+            📋 Salin Rekod Sesi
+        </button>
+        <button onclick="muatTurunCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition flex items-center gap-2">
+            📥 Download CSV
+        </button>
+        <button onclick="bukaModalDaftar()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition flex items-center gap-2">
+            ➕ Daftar Pengguna Baru
+        </button>
+        <a href="pengurusan-data.html" class="bg-slate-600 hover:bg-slate-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition">
+            &larr; Kembali
+        </a>
+    </div>
+</div>
+
+<div id="modalSalinSesi" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 max-w-md w-full p-6">
+        <h3 class="text-lg font-bold text-indigo-900 mb-2 flex items-center gap-2">
+            📋 Salin Semua Rekod ke Sesi Baru
+        </h3>
+        <p class="text-xs text-gray-500 mb-4">
+            Sistem akan menyalin <strong>kesemua pengguna</strong> dari sesi dan tahun aktif semasa ke parameter sesi & tahun baru di bawah.
+        </p>
+        <form id="borangSalinSesi" onsubmit="prosesSalinRekod(event)">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Sesi Baru:</label>
+                    <input type="text" id="salin_sesi_baru" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold focus:ring-indigo-500 focus:border-indigo-500 bg-white" placeholder="Contoh: 2" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Tahun Baru:</label>
+                    <input type="text" id="salin_tahun_baru" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold focus:ring-indigo-500 focus:border-indigo-500 bg-white" placeholder="Contoh: 2026" required>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" onclick="tutupModal('modalSalinSesi')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold transition">
+                    Batal
+                </button>
+                <button type="submit" id="btnSubmitSalin" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition">
+                    Sahkan Salin
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 		
 		<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 items-end">
             <div class="w-full md:w-1/4">
@@ -546,58 +591,72 @@ function kemaskiniPagination(totalData) {
         }
 
         // FUNGSI 3: DAFTAR PENGGUNA BARU
-        function bukaModalDaftar() {
-            document.getElementById('borangDaftar').reset();
-            document.getElementById('modalDaftar').classList.remove('hidden');
-        }
-
-        document.getElementById('borangDaftar').addEventListener('submit', function(e) {
-            e.preventDefault();
-			
-			const perananDipilih = document.getElementById('daftar_peranan').value;
-			// 🌟 KAWALAN KESELAMATAN: Halang Pengurusan daftar rakan sejawatan atau Kuasa Tinggi
-			const perananPengurusan = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-			const senaraiKuasaTinggi = ["ADMIN", "KUPIK"];
+function bukaModalDaftar() {
+    // 1. Reset borang seperti biasa
+    document.getElementById('borangDaftar').reset();
     
-			const isPengurusanLogin = perananPengurusan.includes(userPeranan); // userPeranan ialah peranan login semasa
-			const isCubaDaftarPengurusanAtauTinggi = perananPengurusan.includes(perananDipilih) || senaraiKuasaTinggi.includes(perananDipilih);
+    // 2. Ambil Sesi dan Tahun dari localStorage dan masukkan ke dalam textbox borang daftar
+    const sesiSemasa = localStorage.getItem("sesiAktif") || "";
+    const tahunSemasa = localStorage.getItem("tahunAktif") || "";
+    
+    const inputDaftarSesi = document.getElementById('daftar_sesi');
+    const inputDaftarTahun = document.getElementById('daftar_tahun');
+    
+    // Jika elemen input tersebut wujud, masukkan nilainya
+    if(inputDaftarSesi) inputDaftarSesi.value = sesiSemasa;
+    if(inputDaftarTahun) inputDaftarTahun.value = tahunSemasa;
 
-			if (isPengurusanLogin && isCubaDaftarPengurusanAtauTinggi) {
-			alert(`❌ Ralat: Anda (sebagai ${userPeranan}) tiada kebenaran untuk mendaftar pengguna dengan peranan ${perananDipilih}.`);
-			return; // Hentikan proses pendaftaran serta-merta
-			}
-			
-			
-            const btn = document.getElementById('btnSubmitDaftar');
-            btn.disabled = true; btn.innerHTML = '⏳ Mendaftar...';
+    // 3. Buka modal
+    document.getElementById('modalDaftar').classList.remove('hidden');
+}
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ 
-                    action: "tambahPengguna", 
-                    NAMA: document.getElementById('daftar_nama').value,
-                    NO_IC: document.getElementById('daftar_ic').value,
-                    KATA_LALUAN: document.getElementById('daftar_pass').value,
-                    JABATAN: document.getElementById('daftar_jabatan').value, 
-                    PERANAN: document.getElementById('daftar_peranan').value,
-                    BAHAGIAN: document.getElementById('daftar_bahagian') ? document.getElementById('daftar_bahagian').value : "", // 🌟 TAMBAHAN
-                    SESI: document.getElementById('daftar_sesi').value, 
-                    TAHUN: document.getElementById('daftar_tahun').value, 
-                    STATUS: "AKTIF", 
-                    LOGIN_ROLE: userPeranan 
-                })
-            }).then(res => res.json()).then(data => {
-                btn.disabled = false; btn.innerHTML = 'Daftar Pengguna';
-                tutupModal('modalDaftar');
-                if(data.status === "BERJAYA") {
-                    paparStatusUI(`✅ ${data.mesej}`, 'bg-green-100 text-green-800 border-green-200');
-                    muatDataPengguna();
-                } else {
-                    paparStatusUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
-                }
-            });
-        });
+// KOD DI BAWAH DIKEKALKAN SEPENUHNYA
+document.getElementById('borangDaftar').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const perananDipilih = document.getElementById('daftar_peranan').value;
+    // 🌟 KAWALAN KESELAMATAN: Halang Pengurusan daftar rakan sejawatan atau Kuasa Tinggi
+    const perananPengurusan = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+    const senaraiKuasaTinggi = ["ADMIN", "KUPIK"];
+    
+    const isPengurusanLogin = perananPengurusan.includes(userPeranan); // userPeranan ialah peranan login semasa
+    const isCubaDaftarPengurusanAtauTinggi = perananPengurusan.includes(perananDipilih) || senaraiKuasaTinggi.includes(perananDipilih);
+
+    if (isPengurusanLogin && isCubaDaftarPengurusanAtauTinggi) {
+        alert(`❌ Ralat: Anda (sebagai ${userPeranan}) tiada kebenaran untuk mendaftar pengguna dengan peranan ${perananDipilih}.`);
+        return; // Hentikan proses pendaftaran serta-merta
+    }
+    
+    const btn = document.getElementById('btnSubmitDaftar');
+    btn.disabled = true; btn.innerHTML = '⏳ Mendaftar...';
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ 
+            action: "tambahPengguna", 
+            NAMA: document.getElementById('daftar_nama').value,
+            NO_IC: document.getElementById('daftar_ic').value,
+            KATA_LALUAN: document.getElementById('daftar_pass').value,
+            JABATAN: document.getElementById('daftar_jabatan').value, 
+            PERANAN: document.getElementById('daftar_peranan').value,
+            BAHAGIAN: document.getElementById('daftar_bahagian') ? document.getElementById('daftar_bahagian').value : "", // 🌟 TAMBAHAN
+            SESI: document.getElementById('daftar_sesi').value, 
+            TAHUN: document.getElementById('daftar_tahun').value, 
+            STATUS: "AKTIF", 
+            LOGIN_ROLE: userPeranan 
+        })
+    }).then(res => res.json()).then(data => {
+        btn.disabled = false; btn.innerHTML = 'Daftar Pengguna';
+        tutupModal('modalDaftar');
+        if(data.status === "BERJAYA") {
+            paparStatusUI(`✅ ${data.mesej}`, 'bg-green-100 text-green-800 border-green-200');
+            muatDataPengguna();
+        } else {
+            paparStatusUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
+        }
+    });
+});
 
         // FUNGSI 4: KEMASKINI PENGGUNA
         function bukaModalEdit(ic, nama, jabatan, peranan, status, bahagian, sesi, tahun) {
@@ -806,6 +865,214 @@ function setelahDataDiterimaDariServer(dataServer) {
     
     // 3. Papar jadual pertama kali dan tetapkan ke Muka Surat 1
     renderJadual(dataPenggunaGlobal, 1); 
+}
+
+// Panggil fungsi secara automatik apabila halaman selesai dimuatkan
+document.addEventListener("DOMContentLoaded", function() {
+    const inputSesi = document.getElementById('inputSesi');
+    const inputTahun = document.getElementById('inputTahun');
+
+    // 1. Ambil data terus dari localStorage untuk paparan serta-merta (sebaik sahaja lepas login)
+    const sAktif = localStorage.getItem("sesiAktif");
+    const tAktif = localStorage.getItem("tahunAktif");
+
+    if (sAktif) inputSesi.value = sAktif;
+    if (tAktif) inputTahun.value = tAktif;
+
+    // 2. (Pilihan) Panggil cloud fetch untuk memastikan data sentiasa selari/terkini
+    muatSesiDanTahun();
+});
+
+// Fungsi asal anda dikekalkan
+function muatSesiDanTahun() {
+    const inputSesi = document.getElementById('inputSesi');
+    const inputTahun = document.getElementById('inputTahun');
+
+    // Tunjukkan status sedang memuatkan jika input masih kosong
+    if (!inputSesi.value) inputSesi.value = "Memuatkan...";
+    if (!inputTahun.value) inputTahun.value = "Memuatkan...";
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: "ambilSesiGlobal" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "BERJAYA") {
+            inputSesi.value = data.sesi;
+            inputTahun.value = data.tahun;
+            
+            localStorage.setItem("sesiAktif", data.sesi);
+            localStorage.setItem("tahunAktif", data.tahun);
+            
+            if (typeof kemaskiniTajukTahun === "function") kemaskiniTajukTahun();
+        }
+    })
+    .catch(err => {
+        console.error("Gagal mengambil data sesi dari cloud:", err);
+        // Jika gagal, pastikan ia ambil semula dari backup localStorage
+        const sAktif = localStorage.getItem("sesiAktif");
+        const tAktif = localStorage.getItem("tahunAktif");
+        if (sAktif) inputSesi.value = sAktif;
+        if (tAktif) inputTahun.value = tAktif;
+    });
+}
+
+
+// ==========================================
+// FUNGSI TAMBAHAN: SALIN REKOD PENYELARAS
+// ==========================================
+
+function bukaModalSalin() {
+    document.getElementById('borangSalinSesi').reset();
+    document.getElementById('modalSalinSesi').classList.remove('hidden');
+}
+
+async function prosesSalinRekod(e) {
+    e.preventDefault();
+    
+    const sesiBaru = document.getElementById('salin_sesi_baru').value.trim();
+    const tahunBaru = document.getElementById('salin_tahun_baru').value.trim();
+    
+    const sesiSemasa = localStorage.getItem("sesiAktif");
+    const tahunSemasa = localStorage.getItem("tahunAktif");
+    
+    // Menggunakan terus pembolehubah data pengguna global anda
+    let semuaPengguna = dataPenggunaGlobal || [];
+    
+    // Validasi keselamatan sekiranya data masih kosong/belum dimuat turun
+    if (!semuaPengguna || semuaPengguna.length === 0) {
+        alert("❌ Ralat: Data rekod pengguna sistem gagal dikesan dalam memori halaman.\n\nSila pastikan senarai jadual pengguna telah terpapar sepenuhnya di skrin sebelum menekan butang salin.");
+        return;
+    }
+    
+    // 🌟 2. TAPIS DATA SEMUA PENGGUNA BERDASARKAN SESI & TAHUN SAHAJA
+    const senaraiSalinan = semuaPengguna.filter(u => {
+        if (!u) return false;
+        const sesi = String(u.sesi || u.SESI || "");
+        const tahun = String(u.tahun || u.TAHUN || "");
+        
+        // Hanya semak Sesi dan Tahun. Syarat peranan telah dibuang.
+        const adakahSesiPadang = sesi === String(sesiSemasa);
+        const adakahTahunPadang = tahun === String(tahunSemasa);
+        
+        return adakahSesiPadang && adakahTahunPadang;
+    });
+    
+    if (senaraiSalinan.length === 0) {
+        alert(`ℹ️ Makluman: Tiada rekod ditemui bagi Sesi: ${sesiSemasa}, Tahun: ${tahunSemasa} di dalam sistem.`);
+        return;
+    }
+    
+    if (!confirm(`Adakah anda pasti mahu menyalin kesemua ${senaraiSalinan.length} rekod dari Sesi ${sesiSemasa} (${tahunSemasa}) ke Sesi ${sesiBaru} (${tahunBaru})?`)) {
+        return;
+    }
+    
+    const btn = document.getElementById('btnSubmitSalin');
+    btn.disabled = true;
+    
+    let sukses = 0;
+    let gagal = 0;
+    
+    // 🌟 3. PROSES PENGHANTARAN DATA KE GOOGLE SHEET
+    for (let i = 0; i < senaraiSalinan.length; i++) {
+        const p = senaraiSalinan[i];
+        btn.innerHTML = `⏳ Menyalin (${i + 1}/${senaraiSalinan.length})...`;
+        
+        // Ekstrak data secara selamat
+        const nama = p.nama || p.NAMA || "";
+        const no_ic = p.ic || p.IC || p.NO_IC || p.no_ic || "";
+        const kata_laluan = p.kata_laluan || p.kataLaluan || p.password || p.PASSWORD || p.pass || p.PASS || "";
+        const jabatan = p.jabatan || p.JABATAN || "";
+        const peranan = p.peranan || p.PERANAN || "";
+        const bahagian = p.bahagian || p.BAHAGIAN || "";
+        
+        try {
+            const res = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ 
+                    action: "tambahPengguna", 
+                    NAMA: nama,
+                    NO_IC: no_ic,
+                    KATA_LALUAN: kata_laluan, 
+                    JABATAN: jabatan, 
+                    PERANAN: peranan,
+                    BAHAGIAN: bahagian, 
+                    SESI: sesiBaru, 
+                    TAHUN: tahunBaru, 
+                    STATUS: "AKTIF", 
+                    LOGIN_ROLE: typeof userPeranan !== 'undefined' ? userPeranan : ""
+                })
+            });
+            
+            const resData = await res.json();
+            if (resData.status === "BERJAYA") {
+                sukses++;
+            } else {
+                gagal++;
+            }
+        } catch (err) {
+            console.error("Gagal menyalin rekod bagi " + nama, err);
+            gagal++;
+        }
+    }
+    
+    // 🌟 4. KEMASKINI SESI GLOBAL (SISTEM) JIKA ADA REKOD BERJAYA DISALIN
+    if (sukses > 0) {
+        btn.innerHTML = `⏳ Mengemaskini Sesi Sistem...`;
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ 
+                    action: "simpanSesiGlobal", 
+                    SESI: sesiBaru, 
+                    TAHUN: tahunBaru,
+                    sesi: sesiBaru,
+                    tahun: tahunBaru,
+                    sesi_baru: sesiBaru,
+                    tahun_baru: tahunBaru
+                })
+            });
+            
+            // Simpan juga ke dalam memori peranti (pelayar) supaya sinkron
+            localStorage.setItem("sesiAktif", sesiBaru);
+            localStorage.setItem("tahunAktif", tahunBaru);
+
+            // 🌟 KEMASKINI PAPARAN INPUT UTAMA DI SKRIN SECARA LIVE
+            const inputSesiUtama = document.getElementById('inputSesi');
+            const inputTahunUtama = document.getElementById('inputTahun');
+            if (inputSesiUtama) inputSesiUtama.value = sesiBaru;
+            if (inputTahunUtama) inputTahunUtama.value = tahunBaru;
+
+        } catch (err) {
+            console.error("Gagal mengemaskini sesi global di tab SISTEM:", err);
+        }
+    }
+    
+    // Set semula rupa butang dan tutup modal
+    btn.disabled = false;
+    btn.innerHTML = 'Sahkan Salin';
+    if (typeof tutupModal === 'function') tutupModal('modalSalinSesi');
+    
+    // Papar notifikasi hasil salinan
+    if (gagal === 0) {
+        if (typeof paparStatusUI === 'function') {
+            paparStatusUI(`✅ Berjaya menyalin kesemua ${sukses} rekod ke Sesi ${sesiBaru} (${tahunBaru}) & Sistem telah dikemaskini!`, 'bg-green-100 text-green-800 border-green-200');
+        } else {
+            alert(`✅ Berjaya menyalin kesemua ${sukses} rekod ke Sesi ${sesiBaru} (${tahunBaru}) & Sistem telah dikemaskini!`);
+        }
+    } else {
+        if (typeof paparStatusUI === 'function') {
+            paparStatusUI(`⚠️ Selesai: ${sukses} disalin, ${gagal} gagal diproses.`, 'bg-yellow-100 text-yellow-800 border-yellow-200');
+        } else {
+            alert(`⚠️ Selesai: ${sukses} disalin, ${gagal} gagal diproses.`);
+        }
+    }
+    
+    // Kemaskini semula paparan jadual pengguna sedia ada
+    if (typeof muatDataPengguna === "function") muatDataPengguna();
 }
 		
     </script>
