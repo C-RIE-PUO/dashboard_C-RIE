@@ -22,17 +22,23 @@
 <body class="bg-gray-100 p-4 md:p-8 font-sans text-gray-800">
 
     <div class="max-w-5xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-200 gap-4">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">➕ Tambah KPI Penyelidikan</h1>
-                <p class="text-sm text-gray-500 mt-1">Isi borang secara manual atau muat naik fail CSV untuk pukal (bulk).</p>
-            </div>
-            <div>
-                <a href="dashboard-penyelidikan.html" class="bg-slate-600 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-2 text-sm">
-                    &larr; Kembali Dashboard
-                </a>
-            </div>
-        </div>
+<div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-200 gap-4">
+    <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">➕ Tambah KPI Penyelidikan</h1>
+        <p class="text-sm text-gray-500 mt-1">Isi borang secara manual atau muat naik fail CSV untuk pukal (bulk).</p>
+    </div>
+    <div class="flex flex-wrap gap-3 items-center w-full md:w-auto justify-center md:justify-end">
+        
+        <a href="Senarai Semak KPI-Penyelidikan.html" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center justify-center gap-2 text-sm">
+            📋 Senarai Semak
+        </a>
+
+        <a href="dashboard-penyelidikan.html" class="w-full sm:w-auto bg-slate-600 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center justify-center gap-2 text-sm">
+            &larr; Kembali Dashboard
+        </a>
+        
+    </div>
+</div>
 
         <div id="statusMesej" class="hidden mb-6 p-4 rounded-lg text-center text-sm font-semibold shadow-sm"></div>
 
@@ -420,11 +426,6 @@ document.getElementById("borangPenyelidikan").addEventListener("submit", functio
         return;
     }
 
-    const btnHantar = document.getElementById("btnHantar");
-    btnHantar.innerHTML = "⏳ Menghantar & Memuat Naik Fail...";
-    btnHantar.disabled = true;
-    paparMesej("Sistem sedang memproses maklumat dan memuat naik semua dokumen. Sila tunggu...", "INFO");
-
     // =========================================================================
     // PENAMBAHBAIKAN: Kumpul nama penulis secara dinamik (Maksimum 8 Orang)
     // =========================================================================
@@ -448,10 +449,10 @@ document.getElementById("borangPenyelidikan").addEventListener("submit", functio
     }
     // =========================================================================
 
-    const payload = {
-        action: "tambahKPIPenyelidikan",
+    // Sediakan struktur data daripada input pengguna
+    const dataForm = {
         tajuk: document.getElementById("tajuk").value.trim(),
-        penulis: namaPenulisGabung, // Diisi dengan hasil gabungan nama penulis dinamik
+        penulis: namaPenulisGabung,
         publisher: document.getElementById("publisher").value.trim(),
         volIssue: document.getElementById("volIssue").value.trim(),
         tarikhTerbit: document.getElementById("tarikhTerbit").value,
@@ -462,9 +463,40 @@ document.getElementById("borangPenyelidikan").addEventListener("submit", functio
         tahun: document.getElementById("tahun").value,
         bahasa: document.getElementById("bahasa").value,
         indexStatus: document.getElementById("indexStatus").value,
-        
-        // Menghantar tatasusunan (array) fail terus ke Apps Script
         senaraiFail: senaraiDokumenArr
+    };
+
+    // 1. 👇 PANGGIL PREVIEW/SEMAKAN TERLEBIH DAHULU (IN-PAGE MODAL LAYOUT)
+    paparModalPreviewKPI(dataForm, function() {
+        // Callback ini hanya dipanggil jika pengguna klik butang "Sahkan & Hantar"
+        jalankanProsesPenghantaran(dataForm);
+    });
+});
+
+// =========================================================================
+// FUNGSI IN-PAGE JALANKAN PENGHANTARAN (KOD ASAL YANG DIKEMAS KINI)
+// =========================================================================
+function jalankanProsesPenghantaran(dataForm) {
+    const btnHantar = document.getElementById("btnHantar");
+    btnHantar.innerHTML = "⏳ Menghantar & Memuat Naik Fail...";
+    btnHantar.disabled = true;
+    paparMesej("Sistem sedang memproses maklumat dan memuat naik semua dokumen. Sila tunggu...", "INFO");
+
+    const payload = {
+        action: "tambahKPIPenyelidikan",
+        tajuk: dataForm.tajuk,
+        penulis: dataForm.penulis,
+        publisher: dataForm.publisher,
+        volIssue: dataForm.volIssue,
+        tarikhTerbit: dataForm.tarikhTerbit,
+        doiUrl: dataForm.doiUrl,
+        jabatan: dataForm.jabatan,
+        tahapSebaran: dataForm.tahapSebaran,
+        laporanKpi: dataForm.laporanKpi,
+        tahun: dataForm.tahun,
+        bahasa: dataForm.bahasa,
+        indexStatus: dataForm.indexStatus,
+        senaraiFail: dataForm.senaraiFail
     };
 
     fetch(SCRIPT_URL, {
@@ -475,7 +507,12 @@ document.getElementById("borangPenyelidikan").addEventListener("submit", functio
         if (data.status === "BERJAYA") {
             paparMesej("✅ Rekod dan semua fail PDF berjaya dihantar! Menunggu pengesahan.", "BERJAYA");
             resetBorang();
-            setTimeout(() => window.location.href = "dashboard-penyelidikan.html", 2000);
+            
+            // 2. 👇 PAPARAN SOALAN IKUTAN PADA PAPARAN YANG SAMA (TIADA POP-UP WINDOWS)
+            setTimeout(() => {
+                paparSoalanIkutanInPage();
+            }, 600);
+            
         } else {
             paparMesej("❌ Gagal: " + data.mesej, "RALAT");
             aktifkanButang();
@@ -484,7 +521,130 @@ document.getElementById("borangPenyelidikan").addEventListener("submit", functio
         paparMesej("⚠️ Ralat rangkaian semasa memuat naik.", "RALAT");
         aktifkanButang();
     });
-});
+}
+
+// =========================================================================
+// PAPARAN ELEMEN KAD PREVIEW (IN-PAGE OVERLAY MODAL)
+// =========================================================================
+function paparModalPreviewKPI(data, onConfirm) {
+    const modalLama = document.getElementById("modalPreviewKPI");
+    if (modalLama) modalLama.remove();
+
+    const containerModal = document.createElement("div");
+    containerModal.id = "modalPreviewKPI";
+    containerModal.className = "fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 font-sans";
+    
+    // 👇 PERBAIKAN DI SINI: Deteksi otomatis nama properti objek file kustom Anda
+    let senaraiFailTeks = data.senaraiFail.map(f => {
+        const namaFail = f.name || f.fileName || f.namaFail || f.nama || "Dokumen Bukti";
+        const saizMentah = f.size || f.fileSize || f.saiz || 0;
+        const teksSaiz = (saizMentah > 0 && !isNaN(saizMentah)) ? `(${(saizMentah/1024/1024).toFixed(2)} MB)` : '';
+        
+        return `<li class="flex items-center gap-2">📄 <span class="truncate max-w-xs font-medium">${namaFail}</span> <span class="text-slate-400">${teksSaiz}</span></li>`;
+    }).join('');
+
+    containerModal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden border border-slate-100 animate-slide-up">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">🔍 Semakan (Preview) Maklumat KPI</h3>
+                <span class="text-xs font-semibold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full">Sila Sahkan</span>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-4 text-sm text-slate-700">
+                <p class="text-xs text-slate-500 bg-blue-50 p-3 rounded-xl border border-blue-100">Sila semak semula semua input anda di bawah. Klik 'Edit Semula' jika terdapat sebarang kesilapan.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3.5">
+                    <div class="md:col-span-2"><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Tajuk Penyelidikan / Artikel</strong> <span class="text-slate-900 font-medium text-base">${data.tajuk || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Penulis</strong> <span class="text-slate-900 font-medium">${data.penulis || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Jabatan</strong> <span class="text-slate-900 font-medium">${data.jabatan || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Penerbit (Publisher)</strong> <span class="text-slate-900 font-medium">${data.publisher || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Volume & Issue</strong> <span class="text-slate-900 font-medium">${data.volIssue || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Tarikh Terbit</strong> <span class="text-slate-900 font-medium">${data.tarikhTerbit || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Tahun KPI</strong> <span class="text-slate-900 font-medium">${data.tahun || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Bahasa</strong> <span class="text-slate-900 font-medium">${data.bahasa || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Status Indeks</strong> <span class="text-slate-900 font-medium">${data.indexStatus || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Tahap Sebaran</strong> <span class="text-slate-900 font-medium">${data.tahapSebaran || '-'}</span></div>
+                    <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Laporan KPI</strong> <span class="text-slate-900 font-medium">${data.laporanKpi || '-'}</span></div>
+                    <div class="md:col-span-2"><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">DOI / URL</strong> <span class="text-blue-600 font-medium break-all underline">${data.doiUrl || '-'}</span></div>
+                </div>
+                
+                <div class="border-t border-slate-100 pt-4 mt-2">
+                    <strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold mb-2">Dokumen Bukti Di-upload (${data.senaraiFail.length})</strong>
+                    <ul class="space-y-1.5 text-xs text-indigo-700 bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100 list-none">
+                        ${senaraiFailTeks}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row justify-end gap-3">
+                <button type="button" id="btnEditBorangSemula" class="px-5 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl transition-all shadow-xs flex items-center justify-center gap-2">
+                    ✏️ Edit Semula Borang
+                </button>
+                <button type="button" id="btnSahkanHantarFinal" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                    🚀 Sahkan & Hantar
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(containerModal);
+
+    document.getElementById("btnEditBorangSemula").addEventListener("click", function() {
+        containerModal.remove(); 
+    });
+
+    document.getElementById("btnSahkanHantarFinal").addEventListener("click", function() {
+        containerModal.remove(); 
+        onConfirm(); 
+    });
+}
+
+// =========================================================================
+// PAPARAN KAD SOALAN IKUTAN (IN-PAGE CARD DI ATAS PAPARAN SAMA)
+// =========================================================================
+function paparSoalanIkutanInPage() {
+    const dialogLama = document.getElementById("soalanIkutanKPI");
+    if (dialogLama) dialogLama.remove();
+
+    const containerDialog = document.createElement("div");
+    containerDialog.id = "soalanIkutanKPI";
+    containerDialog.className = "fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 font-sans animate-fade-in";
+    
+    containerDialog.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-md w-full text-center space-y-5 border border-slate-100 animate-scale-up">
+            <div class="w-14 h-14 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+                🎉
+            </div>
+            <div class="space-y-1.5">
+                <h4 class="text-xl font-bold text-slate-900">Rekod Sukses Dihantar!</h4>
+                <p class="text-sm text-slate-500 leading-relaxed">Penghantaran data telah selesai. Adakah anda ingin memasukkan lagi dokumen bukti KPI yang baharu?</p>
+            </div>
+            <div class="flex flex-col gap-2 pt-2">
+                <button type="button" id="btnTambahLagiInPage" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center justify-center gap-2">
+                    ➕ Ya, Tambah Dokumen Lagi
+                </button>
+                <button type="button" id="btnKeDashboardInPage" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
+                    📋 Tidak, Kembali ke Dashboard
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(containerDialog);
+
+    document.getElementById("btnTambahLagiInPage").addEventListener("click", function() {
+        containerDialog.remove();
+        if (typeof aktifkanButang === "function") {
+            aktifkanButang(); 
+        }
+        paparMesej("Sila isi maklumat untuk dokumen bukti KPI seterusnya.", "INFO");
+    });
+
+    document.getElementById("btnKeDashboardInPage").addEventListener("click", function() {
+        containerDialog.remove();
+        window.location.href = "dashboard-penyelidikan.html";
+    });
+}
 
         // --- FUNGSI CSV PUKAL (Dikekalkan) ---
         function downloadTemplateCSV() {
@@ -618,7 +778,69 @@ function kumpulNamaPenulis() {
     return senaraiNama.join(', ');
 }	
 		
-		
-    </script>
+</script>
+	
+
+
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+    // 1. Ambil data dari sessionStorage halaman sebelum ini
+    const simpanTajuk = sessionStorage.getItem("dataTajuk");
+    const simpanPenyelidik = sessionStorage.getItem("dataPenyelidik"); // Penyelidik Utama
+    const simpanAhli = sessionStorage.getItem("dataAhliKumpulan");   // Ahli Kumpulan (Nama dipisah dengan koma)
+
+    // 2. Auto-isi Tajuk Penyelidikan
+    if (simpanTajuk && document.getElementById("tajuk")) {
+        document.getElementById("tajuk").value = simpanTajuk;
+    }
+    
+    // 3. Auto-isi Nama Penyelidik Utama ke input Penulis 1
+    if (simpanPenyelidik && document.getElementById("penulis_1")) {
+        document.getElementById("penulis_1").value = simpanPenyelidik;
+    }
+    
+    // 4. Proses Auto-Isi untuk Ahli Kumpulan secara Dinamik
+    if (simpanAhli) {
+        // Pecahkan string nama berdasarkan tanda koma ',' dan buang ruang kosong (spaces) berlebihan
+        const senaraiAhli = simpanAhli.split(',')
+                                      .map(nama => nama.trim())
+                                      .filter(nama => nama !== "");
+
+        if (senaraiAhli.length > 0) {
+            // Jumlah Penulis = 1 (Penyelidik Utama) + bilangan ahli kumpulan
+            const jumlahPenulis = 1 + senaraiAhli.length;
+            const bilPenulisSelect = document.getElementById("bilPenulis");
+
+            if (bilPenulisSelect) {
+                // Setkan nilai dropdown bilPenulis (Maksimum 8 mengikut option HTML anda)
+                const nilaiDropdown = jumlahPenulis <= 8 ? jumlahPenulis : 8;
+                bilPenulisSelect.value = nilaiDropdown;
+
+                // PANGGIL fungsi asal anda untuk menjana elemen input penulis_2, penulis_3 dll. ke dalam DOM
+                if (typeof janakanInputPenulis === 'function') {
+                    janakanInputPenulis();
+                }
+
+                // Masukkan nama ahli kumpulan ke dalam kotak input yang baru dijana
+                senaraiAhli.forEach((nama, indeks) => {
+                    const nomborPenulis = indeks + 2; // Bermula dari Penulis 2
+                    if (nomborPenulis <= 8) {
+                        const inputAhli = document.getElementById(`penulis_${nomborPenulis}`);
+                        if (inputAhli) {
+                            inputAhli.value = nama;
+                        }
+                    }
+                });
+            }
+        }
+    }
+});
+</script>
+
+	
+	
+	
+	
 </body>
 </html>

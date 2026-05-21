@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senarai Semak KPI 18 - RDICE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        if (sessionStorage.getItem("userLulus") !== "YA") {
+            alert("Akses ditolak! Sila log masuk terlebih dahulu.");
+            window.location.href = "login.html"; 
+        }
+    </script>
+    <style>
+        /* Custom print styling supaya nampak kemas jika di-print */
+        @media print {
+            body { background-color: white; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            .shadow-xl { box-shadow: none; border: none; }
+            .print-border { border: 1px solid #000 !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-4 md:p-8 min-h-screen flex justify-center items-start">
+
+<div class="max-w-5xl w-full bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 print-border relative">
+    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 no-print flex flex-col md:flex-row justify-between items-center gap-4">
+        <a href="dashboard-penyelidikan.html" target="_parent" class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
+            &larr; Kembali ke Dashboard KPI
+        </a>
+
+        <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
+            <div id="paparanTahunSemasa" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-100 text-blue-800 border border-blue-300 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm">
+                📅 Tahun Semasa: <span id="teksTahun">...</span>
+            </div>
+
+            <a href="dokumen-inovasi.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-md border-2 border-teal-800 text-sm">
+                📁 Dokumen KPI
+            </a>
+
+            <div id="bahagianPukal" class="hidden w-full sm:w-auto">
+                <button type="button" onclick="bukaUploadPukal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-md border-2 border-indigo-800 text-sm">
+                    🚀 Muat Naik Data Pukal (CSV)
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="mesejUI" class="hidden p-4 text-center text-sm font-bold w-full relative z-10 no-print transition-all"></div>
+
+    <div class="text-center pt-8 pb-6 px-8 border-b-4 border-yellow-500 relative">
+        <div class="flex justify-center mb-4">
+            <img src="Logo/JPPKK-logo.png" alt="Logo JPPKK" class="h-20 md:h-28 w-auto object-contain">
+        </div>
+    </div>
+
+    <div class="bg-blue-50 py-6 px-8 text-center border-b border-gray-200">
+        <h3 class="text-xl font-bold text-blue-900 uppercase underline underline-offset-4 decoration-2">
+            Senarai Semak
+        </h3>
+        <p class="mt-3 font-semibold text-blue-800 max-w-3xl mx-auto leading-relaxed">
+            DOKUMEN BUKTI KPI 18: BILANGAN PROJEK RESEARCH, DEVELOPMENT, INNOVATION, COMMERCIALIZATION AND ECONOMY (RDICE) YANG DIAPLIKASIKAN KEPADA PEMEGANG TARUH
+        </p>
+    </div>
+
+    <form id="borangKPI18" class="p-6 md:p-8" onsubmit="hantarBorang(event)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 bg-gray-50 p-5 rounded-lg border border-gray-200">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Tajuk Projek/Tajuk penyelidikan</label>
+                <input type="text" id="tajukProjek" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase" placeholder="Masukkan tajuk projek">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Penyelidik Utama</label>
+                <input type="text" id="namaPenyelidik" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase" placeholder="NAMA PENYELIDIK UTAMA">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">
+                    Ahli Kumpulan <span class="text-xs font-normal text-gray-500">(Gunakan tanda koma ',' jika lebih dari 1 orang)</span>
+                </label>
+                <input type="text" id="ahliKumpulan" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase" placeholder="Contoh: AHMAD BIN ALI, SITI BINTI ABU">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Institusi / Politeknik</label>
+                <input type="text" id="institusi" value="POLITEKNIK UNGKU OMAR" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Jabatan</label>
+                <select id="jabatan" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium text-gray-700">
+                    <option value="">-- Sedang Memuat Senarai Jabatan... --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto mb-8">
+            <table class="w-full border-collapse border border-gray-300 text-sm md:text-base">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-800">
+                        <th class="border border-gray-300 p-3 w-16 text-center font-bold">Item</th>
+                        <th class="border border-gray-300 p-3 text-left font-bold">Perkara</th>
+                        <th class="border border-gray-300 p-3 w-32 text-center font-bold">Semak (✓ / ✗)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="bg-gray-50">
+                        <td class="border border-gray-300 p-3 text-center font-bold text-lg align-top">1</td>
+                        <td class="border border-gray-300 p-3 font-bold text-lg" colspan="2">Penerbitan kertas penyelidikan</td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center font-semibold align-top">a</td>
+                        <td class="border border-gray-300 p-3">Kertas penyelidikan penuh yang diterbitkan pada tahun semasa</td>
+                        <td class="border border-gray-300 p-2 text-center align-middle">
+                            <select id="semak1a" required class="w-full px-2 py-1.5 border border-gray-300 rounded outline-none font-bold text-center focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="ADA" class="text-green-600">✓ Ada</option>
+                                <option value="TIADA" class="text-red-600">✗ Tiada</option>
+                            </select>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center font-semibold align-top">b</td>
+                        <td class="border border-gray-300 p-3">Muka depan jurnal penyelidikan</td>
+                        <td class="border border-gray-300 p-2 text-center align-middle">
+                            <select id="semak1b" required class="w-full px-2 py-1.5 border border-gray-300 rounded outline-none font-bold text-center focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="ADA" class="text-green-600">✓ Ada</option>
+                                <option value="TIADA" class="text-red-600">✗ Tiada</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center font-semibold align-top">c</td>
+                        <td class="border border-gray-300 p-3 font-semibold bg-gray-50" colspan="2">Maklumat kertas penyelidikan:</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center align-top text-gray-500">i</td>
+                        <td class="border border-gray-300 p-3 pl-8">Isi kandungan tajuk penyelidikan</td>
+                        <td class="border border-gray-300 p-2 text-center align-middle">
+                            <select id="semak1ci" required class="w-full px-2 py-1.5 border border-gray-300 rounded outline-none font-bold text-center focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="ADA" class="text-green-600">✓ Ada</option>
+                                <option value="TIADA" class="text-red-600">✗ Tiada</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center align-top text-gray-500">ii</td>
+                        <td class="border border-gray-300 p-3 pl-8">No. DOI./No. ISBN/e-ISBN/ISSN</td>
+                        <td class="border border-gray-300 p-2 text-center align-middle">
+                            <select id="semak1cii" required class="w-full px-2 py-1.5 border border-gray-300 rounded outline-none font-bold text-center focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="ADA" class="text-green-600">✓ Ada</option>
+                                <option value="TIADA" class="text-red-600">✗ Tiada</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center align-top text-gray-500">iii</td>
+                        <td class="border border-gray-300 p-3 pl-8">Pautan URL jurnal</td>
+                        <td class="border border-gray-300 p-2 text-center align-middle">
+                            <select id="semak1ciii" required class="w-full px-2 py-1.5 border border-gray-300 rounded outline-none font-bold text-center focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="ADA" class="text-green-600">✓ Ada</option>
+                                <option value="TIADA" class="text-red-600">✗ Tiada</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr class="bg-gray-50 mt-4">
+                        <td class="border border-gray-300 p-3 text-center font-bold text-lg align-top">2</td>
+                        <td class="border border-gray-300 p-3 font-bold text-lg" colspan="2">Pemfailan harta intelek dan surat pengesahan daripada pemegang taruh</td>
+                    </tr>
+
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center font-semibold align-top">a</td>
+                        <td class="border border-gray-300 p-3 font-semibold bg-gray-50" colspan="2">Pendaftaran Harta Intelek pada tahun semasa:</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center align-top text-gray-500">i</td>
+                        <td class="border border-gray-300 p-3 pl-8 leading-relaxed">Notis pemberitahuan/Sijil Pendaftaran Harta Intelek/surat perlindungan harta intelek hak cipta/paten/pembaharuan utiliti/reka bentuk perindustrian/cap dagang/integrated circuit pada tahun semasa; <b>ATAU</b></td>
+                        <td class="border border-gray-300 p-2 text-center align-middle">
+                            <select id="semak2ai" required class="w-full px-2 py-1.5 border border-gray-300 rounded outline-none font-bold text-center focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="ADA" class="text-green-600">✓ Ada</option>
+                                <option value="TIADA" class="text-red-600">✗ Tiada</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center align-top text-gray-500">ii</td>
+                        <td class="border border-gray-300 p-3 pl-8">Borang Permohonan CR1 dan resit pembayaran beserta nombor pendaftaran.</td>
+                        <td class="border border-gray-300 p-2 text-center align-middle">
+                            <select id="semak2aii" required class="w-full px-2 py-1.5 border border-gray-300 rounded outline-none font-bold text-center focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="ADA" class="text-green-600">✓ Ada</option>
+                                <option value="TIADA" class="text-red-600">✗ Tiada</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="border border-gray-300 p-3 text-center font-semibold align-top">b</td>
+                        <td class="border border-gray-300 p-3">Bukti surat pengesahan dari pemegang taruh bagi produk/perkhidmatan diaplikasikan pada tahun semasa</td>
+                        <td class="border border-gray-300 p-2 text-center align-middle">
+                            <select id="semak2b" required class="w-full px-2 py-1.5 border border-gray-300 rounded outline-none font-bold text-center focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih --</option>
+                                <option value="ADA" class="text-green-600">✓ Ada</option>
+                                <option value="TIADA" class="text-red-600">✗ Tiada</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-8 rounded-r-lg">
+            <p class="text-sm text-yellow-800 font-semibold flex items-start gap-2">
+                <span class="text-xl">⚠️</span>
+                <span><strong>Nota Penting:</strong> Sila muat naik dokumen bukti secara pakej (1+2) mengikut item sasaran institusi, dan pastikan senarai semak yang telah disemak (✓ / ✗) turut dilampirkan bersama.</span>
+            </p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row justify-between gap-4 no-print border-t border-gray-200 pt-6 mt-6">
+            <div class="flex flex-wrap gap-2 justify-center lg:justify-start" id="ruangButangDokumen">
+                <button type="button" onclick="window.print()" title="Cetak atau Simpan sebagai PDF" class="px-4 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded shadow transition flex items-center gap-2 text-sm">
+                    🖨️ Cetak PDF
+                </button>
+                <button type="button" onclick="muatTurunSemakan()" title="Muat Tunun Data yang diisi ke MS Word" class="px-4 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded shadow transition flex items-center gap-2 text-sm">
+                    📥 Download Semakan
+                </button>
+            </div>
+            <div class="flex justify-center lg:justify-end w-full lg:w-auto">
+                <button type="submit" class="w-full lg:w-auto px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-md transition flex items-center justify-center gap-2 text-base border-2 border-blue-800">
+                    💾 Simpan & Teruskan
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
+let tahunSemasaSistem = "";
+
+window.addEventListener('DOMContentLoaded', function() {
+    
+    // --- AMBIL DATA DARI SESSION ---
+    const userNama = sessionStorage.getItem("namaPengguna") || "Pengguna";
+    const userPeranan = sessionStorage.getItem("peranan") || "STAF";
+    const userJabatan = sessionStorage.getItem("jabatan") || "";
+    const perananUpper = userPeranan.toUpperCase();
+    
+    const layakBulk = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "ADMIN", "KUPIK"];
+    const adakahLayak = layakBulk.some(p => perananUpper.includes(p));
+    
+    // Paparkan butang pukal jika layak
+    const bahagianPukalEl = document.getElementById('bahagianPukal');
+    if (adakahLayak && bahagianPukalEl) {
+        bahagianPukalEl.classList.remove('hidden');
+    }
+
+    // PENYELESAIAN RALAT (Kritikal): Gunakan '?.' (Optional Chaining) supaya skrip tidak mati (crash) 
+    // jika ID elemen ini tiada dalam fail HTML.
+    document.getElementById('namaPengguna')?.setAttribute("innerText", userNama);
+    document.getElementById('perananPengguna')?.setAttribute("innerText", userPeranan);
+    document.getElementById('jabatanPengguna')?.setAttribute("innerText", userJabatan);
+
+    // --- KOD ASAL ANDA (KEKAL) ---
+    if(typeof ambilTahunDanDokumen === 'function') {
+        ambilTahunDanDokumen();
+    }
+
+    // =========================================================================
+    // FUNGSI JABATAN DENGAN PELAN SANDARAN (FALLBACK)
+    // =========================================================================
+    function muatTurunSenaraiJabatan() {
+        const jabatanSelect = document.getElementById("jabatan");
+        if(!jabatanSelect) return;
+
+        // Ambil maklumat jabatan pengguna dari session
+        const sessionJabatan = (sessionStorage.getItem("jabatan") || "").toUpperCase().trim();
+        const urlPenuh = `${SCRIPT_URL}?action=ambilTetapanSenarai&_cb=${new Date().getTime()}`;
+
+        // Fungsi bantuan (Fallback) sekiranya fetch gagal atau data tiada
+        function gunakanJabatanSemasa(mesej) {
+            console.warn(mesej);
+            if (sessionJabatan) {
+                jabatanSelect.innerHTML = `<option value="${sessionJabatan}" selected>${sessionJabatan}</option>`;
+                if (!adakahLayak) {
+                    jabatanSelect.style.pointerEvents = "none";
+                    jabatanSelect.classList.add("bg-gray-100", "cursor-not-allowed");
+                }
+            } else {
+                jabatanSelect.innerHTML = '<option value="">-- Tiada Data Jabatan Ditemui --</option>';
+            }
+        }
+
+        fetch(urlPenuh)
+            .then(response => {
+                if (!response.ok) throw new Error('Respon rangkaian tidak OK');
+                return response.json();
+            })
+            .then(data => {
+                let senarai = null;
+                if (Array.isArray(data)) {
+                    senarai = data;
+                } else if (data) {
+                    senarai = data.jabatanList || data.senaraiJabatan || data.data || data.tetapan || null;
+                }
+
+                if (senarai && Array.isArray(senarai) && senarai.length > 0) {
+                    
+                    jabatanSelect.innerHTML = '<option value="">-- Sila Pilih Jabatan --</option>';
+                    let indeksPadanan = -1;
+
+                    senarai.forEach((jabatanInfo) => {
+                        if (!jabatanInfo) return;
+
+                        let nilaiJabatanText = typeof jabatanInfo === 'object' ? 
+                            (jabatanInfo.nama || jabatanInfo.jabatan || jabatanInfo.text || Object.values(jabatanInfo)[0]) : 
+                            jabatanInfo;
+
+                        const teksDipapar = String(nilaiJabatanText).toUpperCase().trim();
+                        if (!teksDipapar) return;
+
+                        const opt = document.createElement("option");
+                        opt.value = teksDipapar;
+                        opt.textContent = teksDipapar;
+                        jabatanSelect.appendChild(opt);
+
+                        const indeksSemasa = jabatanSelect.options.length - 1;
+
+                        if (sessionJabatan && (teksDipapar === sessionJabatan || teksDipapar.includes(sessionJabatan) || sessionJabatan.includes(teksDipapar))) {
+                            indeksPadanan = indeksSemasa;
+                        }
+                    });
+
+                    // Auto-Select jika padanan dijumpai, jika tidak set pertama
+                    if (indeksPadanan !== -1) {
+                        jabatanSelect.selectedIndex = indeksPadanan;
+                    } else if (sessionJabatan) {
+                        // Jika dalam senarai tiada jabatan pengguna, kita paksa tambah
+                        const opt = document.createElement("option");
+                        opt.value = sessionJabatan;
+                        opt.textContent = sessionJabatan;
+                        jabatanSelect.appendChild(opt);
+                        jabatanSelect.selectedIndex = jabatanSelect.options.length - 1;
+                    }
+
+                    // Kunci Dropdown untuk Staf Biasa
+                    if (!adakahLayak) {
+                        jabatanSelect.style.pointerEvents = "none";
+                        jabatanSelect.classList.add("bg-gray-100", "cursor-not-allowed");
+                    }
+
+                } else {
+                    gunakanJabatanSemasa("Format data Google Script tidak mengandungi senarai jabatan yang sah.");
+                }
+            })
+            .catch(error => {
+                gunakanJabatanSemasa("Ralat sambungan ketika muat turun jabatan: " + error.message);
+            });
+    }
+
+    muatTurunSenaraiJabatan();
+});
+
+
+        // 🌟 KEMASKINI BARU: Semak automatik jika pengguna kembali guna butang "Back" browser
+        window.addEventListener('pageshow', function(event) {
+            // event.persisted bermaksud halaman di-load dari memory cache (contoh: bila back dari halaman lain)
+            if (event.persisted) {
+                ambilTahunDanDokumen();
+            }
+        });
+
+        // 🌟 KEMASKINI BARU: Semak automatik bila pengguna tukar tab dan kembali semula ke tab ini
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                ambilTahunDanDokumen();
+            }
+        });
+
+        function paparNotis(teks, warna) {
+            const msgBox = document.getElementById('mesejUI');
+            const colorClass = (warna === 'hijau') ? 'bg-green-100 text-green-800 border-green-200' : 
+                               (warna === 'merah') ? 'bg-red-100 text-red-800 border-red-200' : 
+                               'bg-blue-100 text-blue-800 border-blue-200';
+            
+            msgBox.className = `mb-6 p-4 rounded-xl text-center text-sm font-bold shadow-sm border ${colorClass}`;
+            msgBox.innerHTML = teks;
+            msgBox.classList.remove('hidden');
+            
+            setTimeout(() => msgBox.classList.add('hidden'), 4000);
+        }
+
+        // 🌟 1. AMBIL TAHUN DARI SISTEM & SEMAK GOOGLE DRIVE
+        function ambilTahunDanDokumen() {
+            fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "BERJAYA" && data.TAHUN_SEMASA && data.TAHUN_SEMASA.length > 0) {
+                    tahunSemasaSistem = data.TAHUN_SEMASA[0];
+                    
+                    // Papar Tahun Pada Lencana (Badge)
+                    const lencana = document.getElementById("paparanTahunSemasa");
+                    if (lencana) {
+                        document.getElementById("teksTahun").innerText = tahunSemasaSistem;
+                        lencana.classList.remove("hidden");
+                    }
+                    
+                    // Teruskan semak fail Kamus KPI & Template di Drive
+                    semakStatusDariDrive();
+                }
+            })
+            .catch(err => console.log("Ralat mendapatkan tetapan tahun:", err));
+        }
+
+        // 🌟 2. SEMAK DRIVE (KAMUS KPI & TEMPLATE SENARAI SEMAK)
+        function semakStatusDariDrive() {
+            const payloadJSON = {
+                action: "semakDokumen",
+                folderIdDokumen: "1zYRQF7Ftd-9LYz_NWso93N0h66lXeZSA", // Folder Dokumen Biasa / Template
+                folderIdKamus: "1NYqDHUyaz1HTnbJh4_6kh1Axgu60WaoC" // Folder Kamus
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payloadJSON)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const failDariDrive = result.data; 
+                    let urlKamus = null;
+                    let urlTemplateSemak = null;
+
+                    // A) Cari Fail KAMUS KPI
+                    const namaKamus = Object.keys(failDariDrive).find(nama => nama.toUpperCase().includes("KAMUS KPI"));
+                    if (namaKamus) urlKamus = failDariDrive[namaKamus].url;
+
+                    // B) Cari Fail TEMPLATE SENARAI SEMAK
+                    const namaTemplate = Object.keys(failDariDrive).find(nama => 
+                        nama.toUpperCase().includes("TEMPLATE") && 
+                        nama.toUpperCase().includes("SENARAI SEMAK")
+                    );
+                    if (namaTemplate) urlTemplateSemak = failDariDrive[namaTemplate].url;
+
+                    // C) Jana Butang Jika Wujud
+                    renderButangDinamik(urlKamus, urlTemplateSemak);
+                }
+            })
+            .catch(error => {
+                console.log("Gagal menyemak status Drive untuk butang template.");
+            });
+        }
+
+        // 🌟 3. BINA BUTANG DINAMIK MUAT TURUN TERUS (DIRECT DOWNLOAD)
+        function renderButangDinamik(urlKamus, urlTemplateSemak) {
+            const bekasButang = document.getElementById("ruangButangDokumen");
+            
+            // Buang butang dinamik lama (jika ada) untuk elak duplicate masa refresh
+            const butangLama = document.querySelectorAll('.butang-dinamik-drive');
+            butangLama.forEach(btn => btn.remove());
+
+            let htmlButangBaru = "";
+
+            if (urlKamus) {
+                htmlButangBaru += `<button type="button" onclick="muatTurunDirectUrl('${urlKamus}')" class="butang-dinamik-drive px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded shadow transition flex items-center gap-2 text-sm">📘 Kamus KPI ${tahunSemasaSistem}</button>`;
+            }
+
+            if (urlTemplateSemak) {
+                htmlButangBaru += `<button type="button" onclick="muatTurunDirectUrl('${urlTemplateSemak}')" class="butang-dinamik-drive px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded shadow transition flex items-center gap-2 text-sm">📄 Template Senarai Semak</button>`;
+            }
+
+            // Masukkan butang baru di hadapan butang sedia ada
+            bekasButang.innerHTML = htmlButangBaru + bekasButang.innerHTML;
+        }
+
+        function muatTurunDirectUrl(url) {
+            const fileIdMatch = url.match(/[-\w]{25,}/);
+            if (fileIdMatch && fileIdMatch[0]) {
+                const directUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[0]}`;
+                const link = document.createElement("a");
+                link.href = directUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                window.open(url, '_blank'); // Fallback jika regex gagal
+            }
+        }
+
+        function bukaUploadPukal() {
+            sessionStorage.setItem("bukaModPukal", "YA");
+            window.location.href = "tambah-penyelidikan.html";
+        }
+
+function hantarBorang(e) {
+    e.preventDefault(); 
+    
+    // Ambil nilai dari input form
+    let tajukProjek = document.getElementById("tajukProjek").value;
+    let namaPenyelidik = document.getElementById("namaPenyelidik").value;
+    let ahliKumpulan = document.getElementById("ahliKumpulan").value; // <-- TAMBAHAN BARU
+    
+    // Simpan ke dalam Session Storage browser
+    sessionStorage.setItem("dataTajuk", tajukProjek);
+    sessionStorage.setItem("dataPenyelidik", namaPenyelidik);
+    sessionStorage.setItem("dataAhliKumpulan", ahliKumpulan); // <-- TAMBAHAN BARU
+    
+    alert("Borang senarai semak telah disahkan dan disimpan!");
+    window.location.href = "tambah-penyelidikan.html";
+}
+
+        function dapatkanIkon(nilai) {
+            if (nilai === 'ADA') return '<span style="color:green; font-weight:bold; font-size:12pt;">✓</span>';
+            if (nilai === 'TIADA') return '<span style="color:red; font-weight:bold; font-size:12pt;">✗</span>';
+            return ''; 
+        }
+
+        function muatTurunSemakan() {
+            const s1a = document.getElementById('semak1a').value;
+            const s1b = document.getElementById('semak1b').value;
+            const s1ci = document.getElementById('semak1ci').value;
+            const s1cii = document.getElementById('semak1cii').value;
+            const s1ciii = document.getElementById('semak1ciii').value;
+            const s2ai = document.getElementById('semak2ai').value;
+            const s2aii = document.getElementById('semak2aii').value;
+            const s2b = document.getElementById('semak2b').value;
+
+            let imgElement = document.querySelector("img[alt='Logo JPPKK']");
+            let imgDataURI = "";
+            let sasaranLebar = 180; 
+            let sasaranTinggi = 100; 
+
+            if (imgElement) {
+                try {
+                    let lebarAsal = imgElement.naturalWidth || imgElement.width;
+                    let tinggiAsal = imgElement.naturalHeight || imgElement.height;
+                    let nisbah = tinggiAsal / lebarAsal;
+                    sasaranTinggi = Math.round(sasaranLebar * nisbah);
+
+                    let canvas = document.createElement("canvas");
+                    canvas.width = lebarAsal;
+                    canvas.height = tinggiAsal;
+                    let ctx = canvas.getContext("2d");
+                    ctx.drawImage(imgElement, 0, 0, lebarAsal, tinggiAsal);
+                    imgDataURI = canvas.toDataURL("image/png");
+                } catch (e) {
+                    imgDataURI = imgElement.src; 
+                }
+            }
+
+            let htmlDoc = `
+                <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                <meta charset='utf-8'>
+                <title>Senarai Semak KPI 18</title>
+                <style>
+                    @page WordSection1 {
+                        size: 8.27in 11.69in;
+                        margin: 0.5in 0.5in 0.5in 0.5in; 
+                        mso-header-margin: 0.5in;
+                        mso-footer-margin: 0.5in;
+                        mso-paper-source: 0;
+                    }
+                    div.WordSection1 { page: WordSection1; }
+                    
+                    body { font-family: 'Arial', sans-serif; font-size: 10.5pt; color: black; }
+                    .center { text-align: center; }
+                    .bold { font-weight: bold; }
+                    .title { font-size: 14pt; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+                    .subtitle { font-size: 10.5pt; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; text-align: justify; text-align-last: center;}
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid black; padding: 4px 6px; vertical-align: top; }
+                    th { font-weight: bold; text-align: center; }
+                    .indent-1 { padding-left: 20px; }
+                    .nota { font-size: 9.5pt; font-style: italic; margin-top: 10px; }
+                </style>
+                </head>
+                <body>
+                    <div class="WordSection1">
+                        
+                        <div class="center">
+                            <img src="${imgDataURI}" width="${sasaranLebar}" height="${sasaranTinggi}" alt="Logo JPPKK">
+                        </div>
+                        <br>
+                        
+                        <div class="center title">SENARAI SEMAK</div>
+                        <div class="subtitle">
+                            DOKUMEN BUKTI KPI 18: BILANGAN PROJEK RESEARCH, DEVELOPMENT, INNOVATION, COMMERCIALIZATION AND ECONOMY (RDICE) YANG DIAPLIKASIKAN KEPADA PEMEGANG TARUH
+                        </div>
+                        
+                        <table>
+                            <tr>
+                                <th width="10%">Item</th>
+                                <th width="75%">Perkara</th>
+                                <th width="15%">Semak (✓ / ✗)</th>
+                            </tr>
+                            
+                            <tr>
+                                <td class="center bold">1</td>
+                                <td class="bold">Penerbitan kertas penyelidikan</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="center">a</td>
+                                <td>Kertas penyelidikan penuh yang diterbitkan pada tahun semasa</td>
+                                <td class="center">${dapatkanIkon(s1a)}</td>
+                            </tr>
+                            <tr>
+                                <td class="center">b</td>
+                                <td>Muka depan jurnal penyelidikan</td>
+                                <td class="center">${dapatkanIkon(s1b)}</td>
+                            </tr>
+                            <tr>
+                                <td class="center">c</td>
+                                <td class="bold">Maklumat kertas penyelidikan:</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="center">i</td>
+                                <td class="indent-1">Isi kandungan tajuk penyelidikan</td>
+                                <td class="center">${dapatkanIkon(s1ci)}</td>
+                            </tr>
+                            <tr>
+                                <td class="center">ii</td>
+                                <td class="indent-1">No. DOI./No. ISBN/e-ISBN/ISSN</td>
+                                <td class="center">${dapatkanIkon(s1cii)}</td>
+                            </tr>
+                            <tr>
+                                <td class="center">iii</td>
+                                <td class="indent-1">Pautan URL jurnal</td>
+                                <td class="center">${dapatkanIkon(s1ciii)}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="center bold">2</td>
+                                <td class="bold">Pemfailan harta intelek dan surat pengesahan daripada pemegang taruh</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="center">a</td>
+                                <td class="bold">Pendaftaran Harta Intelek pada tahun semasa:</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="center">i</td>
+                                <td class="indent-1">Notis pemberitahuan/Sijil Pendaftaran Harta Intelek/surat perlindungan harta intelek hak cipta/paten/pembaharuan utiliti/reka bentuk perindustrian/cap dagang/integrated circuit pada tahun semasa; <b>ATAU</b></td>
+                                <td class="center">${dapatkanIkon(s2ai)}</td>
+                            </tr>
+                            <tr>
+                                <td class="center">ii</td>
+                                <td class="indent-1">Borang Permohonan CR1 dan resit pembayaran beserta nombor pendaftaran.</td>
+                                <td class="center">${dapatkanIkon(s2aii)}</td>
+                            </tr>
+                            <tr>
+                                <td class="center">b</td>
+                                <td>Bukti surat pengesahan dari pemegang taruh bagi produk/perkhidmatan diaplikasikan pada tahun semasa</td>
+                                <td class="center">${dapatkanIkon(s2b)}</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="nota">
+                            Nota: Sila muat naik dokumen bukti secara pakej (1+2) mengikut item sasaran institusi, dan pastikan senarai semak yang telah disemak (✓ / ✗) turut dilampirkan bersama.
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const linkDownload = document.createElement('a');
+            linkDownload.href = url;
+            linkDownload.download = "Senarai-Semak-Disemak.doc";
+            
+            document.body.appendChild(linkDownload);
+            linkDownload.click();
+            
+            document.body.removeChild(linkDownload);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
