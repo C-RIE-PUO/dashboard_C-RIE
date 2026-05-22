@@ -482,15 +482,13 @@ function terapkanTapisan() {
         let checkJabatan = (valJab === "" || dbJabatan === valJab);
         if (!isApprover && userPeranan !== "PENYELARAS JABATAN") checkJabatan = (dbJabatan === userJabatan);
 
-        // 🌟 KEMASKINI: Semakan Tahun (Berdasarkan tarikh surat dikeluarkan)
-        // Nota: Pastikan ["tarikhSurat", "TARIKH_SURAT"] sepadan dengan nama kolum sebenar anda
+        // Semakan Tahun (Berdasarkan tarikh surat dikeluarkan)
         const tarikhSurat = dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT", "tarikhSuratDikeluarkan", "TARIKH"]);
         let checkTahun = true;
         
         if (valTahun !== "") {
             if (tarikhSurat) {
                 // Gunakan Regex /\d{4}/ untuk mencari sebarang 4 digit berturut-turut (Tahun)
-                // Ini membolehkan sistem mengekstrak "2026" daripada "13 Mei 2026" dengan tepat
                 const cariTahun = String(tarikhSurat).match(/\d{4}/);
                 
                 if (cariTahun && cariTahun[0]) {
@@ -517,14 +515,47 @@ function terapkanTapisan() {
         return checkJabatan && checkTahun && checkStatus;
     });
 
-    dataTapis.reverse(); // Susun jadual dari rekod terbaharu
+    // 🌟 KEMASKINI PENAMBAHBAIKAN: Logik Susunan Tersuai (Custom Sorting)
+    dataTapis.sort((a, b) => {
+        // Ekstrak No Rujukan & Tarikh Surat untuk Rekod A dan B
+        const noRujA = dapatkanData(a, ["noRujukan", "NO_RUJUKAN", "rujukan", "rujukanSurat"]);
+        const tSuratA = dapatkanData(a, ["tarikhSurat", "TARIKH_SURAT", "tarikhSuratDikeluarkan", "TARIKH"]);
+        
+        const noRujB = dapatkanData(b, ["noRujukan", "NO_RUJUKAN", "rujukan", "rujukanSurat"]);
+        const tSuratB = dapatkanData(b, ["tarikhSurat", "TARIKH_SURAT", "tarikhSuratDikeluarkan", "TARIKH"]);
+
+        // Tentukan jika rekod ini BELUM ADA No. Rujukan ATAU Tarikh Surat
+        const isBelumAdaA = !noRujA || String(noRujA).trim() === "" || !tSuratA || String(tSuratA).trim() === "";
+        const isBelumAdaB = !noRujB || String(noRujB).trim() === "" || !tSuratB || String(tSuratB).trim() === "";
+
+        // PERATURAN 1: Rekod yang tiada No. Rujukan / Tarikh Surat duduk di atas sekali
+        if (isBelumAdaA && !isBelumAdaB) return -1;
+        if (!isBelumAdaA && isBelumAdaB) return 1;
+
+        // PERATURAN 2: Jika status sama (sama-sama ada atau sama-sama tiada), susun ikut Tahun Tarikh Surat (Menurun)
+        const matchTahunA = String(tSuratA).match(/\d{4}/);
+        const matchTahunB = String(tSuratB).match(/\d{4}/);
+        
+        const yrA = (tSuratA && matchTahunA) ? parseInt(matchTahunA[0]) : 0;
+        const yrB = (tSuratB && matchTahunB) ? parseInt(matchTahunB[0]) : 0;
+
+        // Jika tahun berbeza, letakkan tahun yang lebih besar (contoh 2026) di atas
+        if (yrB !== yrA) {
+            return yrB - yrA;
+        }
+
+        // PERATURAN 3: Jika tahun juga sama, kekalkan susunan asal mengikut No. BIL (Menurun / Rekod Terbaharu di atas)
+        const bilA = parseInt(dapatkanData(a, ["bil", "BIL"])) || 0;
+        const bilB = parseInt(dapatkanData(b, ["bil", "BIL"])) || 0;
+        return bilB - bilA;
+    });
+
     halamanSemasa = 1;   // Reset kembali ke muka surat 1
     paparJadual();
     
     // Panggil fungsi statistik setiap kali filter berjalan!
     janaStatistik(dataTapis);
 }
-
 // ==========================================
         // FUNGSI TRANSLATE TARIKH KE FORMAT (Cth: 15 Oktober 2025)
         // ==========================================

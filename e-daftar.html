@@ -552,13 +552,42 @@ function terapkanTapisan() {
         return isSesuai;
     });
 
-            document.getElementById('statMenunggu').innerText = cMenunggu;
-            document.getElementById('statDisahkan').innerText = cDisahkan;
+    document.getElementById('statMenunggu').innerText = cMenunggu;
+    document.getElementById('statDisahkan').innerText = cDisahkan;
 
-            dataTapis.reverse(); 
-            halamanSemasa = 1;
-            paparJadual();
+    // 🌟 PENAMBAHBAIKAN: Logik Isihan (Sorting) Tersuai
+    dataTapis.sort((a, b) => {
+        const statusA = (dapatkanData(a, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN").toUpperCase();
+        const statusB = (dapatkanData(b, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN").toUpperCase();
+        
+        const isMenungguA = statusA !== "DISAHKAN";
+        const isMenungguB = statusB !== "DISAHKAN";
+
+        // Peraturan 1: Letakkan status "MENUNGGU PENGESAHAN" atau selain "DISAHKAN" di atas sekali
+        if (isMenungguA && !isMenungguB) return -1;
+        if (!isMenungguA && isMenungguB) return 1;
+
+        // Peraturan 2: Jika status sama, susun mengikut tahun pada tarikh surat secara menurun (Desc)
+        const tSuratA = dapatkanData(a, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
+        const tSuratB = dapatkanData(b, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
+        
+        const yrA = (tSuratA && !isNaN(new Date(tSuratA).getFullYear())) ? new Date(tSuratA).getFullYear() : 0;
+        const yrB = (tSuratB && !isNaN(new Date(tSuratB).getFullYear())) ? new Date(tSuratB).getFullYear() : 0;
+
+        // Jika tahun berbeza, susun tahun terbesar (terkini) di atas
+        if (yrB !== yrA) {
+            return yrB - yrA;
         }
+
+        // Jika tahun surat juga sama, kekalkan susunan asal mengikut ID/Bil baris secara menurun
+        const bilA = parseInt(dapatkanData(a, ["bil", "BIL"])) || 0;
+        const bilB = parseInt(dapatkanData(b, ["bil", "BIL"])) || 0;
+        return bilB - bilA;
+    });
+
+    halamanSemasa = 1;
+    paparJadual();
+}
 
 function paparJadual() {
             const tbody = document.getElementById('isiJadualStatus');
