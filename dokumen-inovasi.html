@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dokumen KPI Inovasi</title>
+    <title>Dokumen KPI Inovasi & Penyelidikan</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -12,9 +12,8 @@
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col relative">
-
     <header class="bg-indigo-800 text-white shadow-md">
-        <div class="max-w-5xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold tracking-wide flex items-center flex-wrap gap-3">
                     📂 Pengurusan Dokumen
@@ -22,35 +21,53 @@
                         ⏳ Memuatkan tahun...
                     </span>
                 </h1>
-                <p class="text-indigo-200 mt-1 text-sm">Muat Naik, Muat Turun & Kemaskini Dokumen KPI Inovasi</p>
+                <p class="text-indigo-200 mt-1 text-sm">Muat Naik, Muat Turun & Kemaskini Dokumen KPI Inovasi dan KPI Penyelidikan</p>
             </div>
             
             <div class="flex flex-wrap justify-center gap-3">
-                <a href="Senarai Semak KPI-Inovasi.html" class="bg-slate-600 text-white px-5 py-2 rounded-full font-bold shadow hover:bg-slate-700 transition flex items-center gap-2 text-sm border border-slate-500">
-                    ⬅️ Kembali
-                </a>
-                
                 <a href="utama.html" class="bg-white text-indigo-800 px-5 py-2 rounded-full font-bold shadow hover:bg-indigo-50 transition flex items-center gap-2 text-sm border border-indigo-200">
                     🏠 Utama
                 </a>
                 <a href="dashboard-kpi.html" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold shadow hover:bg-indigo-700 transition flex items-center gap-2 text-sm border border-indigo-400">
-                    📊 Dashboard KPI
+                    📊 Dashboard KPI Inovasi
+                </a>
+                <a href="dashboard-penyelidikan.html" class="bg-teal-600 text-white px-5 py-2 rounded-full font-bold shadow hover:bg-teal-700 transition flex items-center gap-2 text-sm border border-teal-400">
+                    📊 Dashboard KPI Penyelidikan
                 </a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full">
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
         
         <div id="mesejUI" class="hidden mb-6 p-4 rounded-xl text-center text-sm font-bold shadow-sm border"></div>
 
-        <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
-            <div class="bg-indigo-50 p-5 border-b border-gray-200 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📄 Senarai Dokumen Inovasi</h2>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start w-full">
             
-            <div class="p-6 space-y-6" id="senaraiDokumen">
+            <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                <div class="bg-indigo-50 p-5 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📄 Senarai Dokumen Inovasi</h2>
+                    <a href="Senarai Semak KPI-Inovasi.html" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-1.5 rounded-lg font-bold shadow transition text-xs flex items-center gap-1">
+                        ⬅️ Kembali
+                    </a>
                 </div>
+                
+                <div class="p-6 space-y-6" id="senaraiDokumen">
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                <div class="bg-teal-50 p-5 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-teal-800 flex items-center gap-2">🔬 Senarai Dokumen Penyelidikan</h2>
+                    <a href="Senarai Semak KPI-Penyelidikan.html" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-1.5 rounded-lg font-bold shadow transition text-xs flex items-center gap-1">
+                        ⬅️ Kembali
+                    </a>
+                </div>
+                
+                <div class="p-6 space-y-6" id="senaraiDokumenPenyelidikan">
+                </div>
+            </div>
+
         </div>
 
     </main>
@@ -89,7 +106,7 @@ const perananLayakUpload = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "AD
 const layakUpload = perananLayakUpload.some(p => userPeranan.toUpperCase().includes(p));
 
 // ==========================================
-// 2. SENARAI DOKUMEN (DINAMIK)
+// 2. SENARAI DOKUMEN INOVASI
 // ==========================================
 const senaraiDokumen = [
     { id: "doc1", tajuk: "GARIS PANDUAN PENYEDIAAN LAPORAN INOVASI PRODUK", failDitemui: [], hasTemplate: false },
@@ -101,8 +118,22 @@ const senaraiDokumen = [
     { id: "doc7", tajuk: "BORANG SEMAKAN KPI", failDitemui: [], hasTemplate: true, templateKunci: "SENARAI SEMAK KPI 18_ RDICE" }
 ];
 
-// 🌟 LOGIK KAWALAN: Hanya masukkan doc8 jika pengguna layak
+// ==========================================
+// 3. SENARAI DOKUMEN PENYELIDIKAN
+// ==========================================
+const senaraiDokumenPenyelidikan = [
+    { id: "pdoc1", tajuk: "TEMPLATE DOKUMEN BUKTI KPI18 Penerbitan", failDitemui: [], hasTemplate: false },
+    { id: "pdoc2", tajuk: "KAMUS KPI", failDitemui: [], hasTemplate: false },
+    { id: "pdoc3", tajuk: "BORANG SEMAKAN KPI", failDitemui: [], hasTemplate: false },
+    { id: "pdoc4", tajuk: "LAPORAN PENCAPAIAN KPI", failDitemui: [], hasTemplate: false },
+    { id: "pdoc5", tajuk: "CONTOH MUKA DEPAN JURNAL ATAU PROSIDING", failDitemui: [], hasTemplate: false },
+    { id: "pdoc6", tajuk: "CONTOH ARTIKEL PENUH", failDitemui: [], hasTemplate: false },
+    { id: "pdoc7", tajuk: "HALAMAN ARTIKEL MEMAPARKAN TAJUK DAN NAMA PENULIS", failDitemui: [], hasTemplate: false }
+];
+
+// 🌟 LOGIK KAWALAN: Hanya masukkan doc8 dan pdoc8 jika pengguna layak (Genapkan 8 Item)
 if (layakUpload) {
+    // 8. ITEM INOVASI
     senaraiDokumen.push({ 
         id: "doc8", 
         tajuk: "TEMPLATE SIJIL PENGHARGAAN KPI", 
@@ -110,14 +141,22 @@ if (layakUpload) {
         hasTemplate: false, 
         folderIdKhas: FOLDER_ID_SIJIL, 
         isSijil: true,
-        // 🌟 PENETAPAN NAMA KHAS: Backend (GAS) akan merujuk nama ini untuk penamaan fail
         namaSimpanan: "TEMPLATE SIJIL KPI",
-        convertToSlides: true // Memberitahu backend untuk menukar format ke Google Slides
+        convertToSlides: true 
+    });
+
+    // 8. ITEM PENYELIDIKAN
+    senaraiDokumenPenyelidikan.push({ 
+        id: "pdoc8", 
+        tajuk: "TEMPLATE SIJIL PENGHARGAAN KPI", 
+        failDitemui: [], 
+        hasTemplate: false, 
+        folderIdKhas: FOLDER_ID_SIJIL, 
+        isSijil: true,
+        namaSimpanan: "TEMPLATE SIJIL KPI PENYELIDIKAN",
+        convertToSlides: true 
     });
 }
-
-// Sekarang senaraiDokumen hanya akan mengandungi 8 item untuk Admin/Penyelaras, 
-// dan kekal 7 item untuk pengguna biasa.
 
         // 🌟 FUNGSI BARU: Ambil Tahun Semasa dari Tab SISTEM
         function ambilTahunSemasa() {
@@ -125,7 +164,7 @@ if (layakUpload) {
             .then(res => res.json())
             .then(data => {
                 if(data.status === "BERJAYA" && data.TAHUN_SEMASA && data.TAHUN_SEMASA.length > 0) {
-                    const tahunAktif = data.TAHUN_SEMASA[0]; // Ambil rekod pertama dalam senarai TAHUN SEMASA
+                    const tahunAktif = data.TAHUN_SEMASA[0]; 
                     const lencanaTahun = document.getElementById("paparanTahunSemasa");
                     if (lencanaTahun) {
                         lencanaTahun.innerText = "Tahun Semasa: " + tahunAktif;
@@ -136,12 +175,19 @@ if (layakUpload) {
             .catch(err => console.log("Ralat mendapatkan tetapan tahun:", err));
         }
 
-        // FUNGSI UI (REKA BENTUK 2 BAHAGIAN)
+        // FUNGSI UI (KEMASKINI: Diubahsuai untuk render kedua-dua belah kontena secara dinamik)
         function paparSenaraiDokumen() {
-            const container = document.getElementById("senaraiDokumen");
+            renderSatuBahagian(senaraiDokumen, "senaraiDokumen");
+            renderSatuBahagian(senaraiDokumenPenyelidikan, "senaraiDokumenPenyelidikan");
+        }
+
+        // Fungsi pembantu generik untuk mengelakkan pertindihan kod UI
+        function renderSatuBahagian(senarai, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
             container.innerHTML = "";
 
-            senaraiDokumen.forEach((doc, index) => {
+            senarai.forEach((doc, index) => {
                 const hasFile = doc.failDitemui && doc.failDitemui.length > 0;
                 const hasTemplateFile = doc.templatesDitemui && doc.templatesDitemui.length > 0;
 
@@ -270,6 +316,7 @@ if (layakUpload) {
             }
         }
 
+        // KEMASKINI: Membaca maklumat dari senaraiDokumen atau senaraiDokumenPenyelidikan
         function handlePilihFail(event, id, isTemplate) {
             const fail = event.target.files[0];
             if (!fail) return;
@@ -287,7 +334,8 @@ if (layakUpload) {
             reader.onload = function(e) {
                 const base64Data = e.target.result.split(',')[1]; 
                 
-                const docInfo = senaraiDokumen.find(d => d.id === id);
+                // Cari info daripada mana-mana senarai array yang sepadan
+                const docInfo = senaraiDokumen.find(d => d.id === id) || senaraiDokumenPenyelidikan.find(d => d.id === id);
                 const extension = fail.name.split('.').pop();
                 
                 let namaFailRasmi = "";
@@ -381,23 +429,20 @@ if (layakUpload) {
                     if(data.status === 'success' || data.status === 'BERJAYA') {
                         paparNotis(`✅ Berjaya! Fail untuk tahun ${tahun} selamat disimpan di Drive.`, "hijau");
                         
-                        // 🌟 PENYELESAIAN: Kemaskini UI Secara Optimistik
-                        // Kita masukkan terus maklumat fail ke dalam pembolehubah tanpa tunggu semakan dari Drive
                         const docIndex = senaraiDokumen.findIndex(d => d.id === "doc5");
                         if (docIndex !== -1) {
                             senaraiDokumen[docIndex].failDitemui = [{
                                 name: namaFailRasmi,
-                                url: data.url || data.fileUrl || "#" // Pakai URL dari GAS jika ada, atau '#' sementara
+                                url: data.url || data.fileUrl || "#" 
                             }];
                             senaraiDokumen[docIndex].tahun = tahun;
                         }
                         
-                        paparSenaraiDokumen(); // Paksa paparan web dikemaskini serta-merta!
+                        paparSenaraiDokumen(); 
 
                         failSementara = null;
                         idDokumenSementara = null;
                         
-                        // Berikan masa (delay 3 saat) sebelum buat semakan penuh untuk elak isu 'Drive belum index'
                         setTimeout(() => {
                             semakStatusDariDrive();
                         }, 3000);
@@ -414,6 +459,7 @@ if (layakUpload) {
             reader.readAsDataURL(failSementara);
         }
 
+        // KEMASKINI: Melakukan semakan data untuk kedua-dua senarai (Inovasi & Penyelidikan)
         function semakStatusDariDrive() {
             paparNotis("🔄 Menyemak rekod dokumen di Google Drive...", "biru");
 
@@ -433,8 +479,8 @@ if (layakUpload) {
                 if (result.status === 'success') {
                     const failDariDrive = result.data; 
 
+                    // 1. Semakan untuk Senarai Inovasi
                     senaraiDokumen.forEach(doc => {
-                        // 1. CARI FAIL RASMI UTAMA
                         const failDitemui = Object.keys(failDariDrive).filter(namaFail => 
                             namaFail.startsWith(doc.tajuk) && !namaFail.toUpperCase().includes("TEMPLATE")
                         );
@@ -450,13 +496,11 @@ if (layakUpload) {
                                 if (matchTahun) doc.tahun = matchTahun[0];
                             }
                         } else {
-                            doc.failDitemui = []; // Reset jika dipadam
+                            doc.failDitemui = []; 
                         }
 
-                        // 2. CARI FAIL TEMPLATE
                         if (doc.hasTemplate) {
                             const kataKunciCarian = doc.templateKunci ? doc.templateKunci.toUpperCase() : doc.tajuk.toUpperCase();
-                            
                             const templateJumpa = Object.keys(failDariDrive).filter(namaFail => 
                                 namaFail.toUpperCase().includes("TEMPLATE") && 
                                 namaFail.toUpperCase().includes(kataKunciCarian)
@@ -468,7 +512,40 @@ if (layakUpload) {
                                     url: failDariDrive[namaFail].url
                                 }));
                             } else {
-                                doc.templatesDitemui = []; // Reset jika dipadam
+                                doc.templatesDitemui = []; 
+                            }
+                        }
+                    });
+
+                    // 2. Semakan untuk Senarai Penyelidikan
+                    senaraiDokumenPenyelidikan.forEach(doc => {
+                        const failDitemui = Object.keys(failDariDrive).filter(namaFail => 
+                            namaFail.startsWith(doc.tajuk) && !namaFail.toUpperCase().includes("TEMPLATE")
+                        );
+                        
+                        if (failDitemui.length > 0) {
+                            doc.failDitemui = failDitemui.map(namaFail => ({
+                                name: namaFail,
+                                url: failDariDrive[namaFail].url
+                            }));
+                        } else {
+                            doc.failDitemui = []; 
+                        }
+
+                        if (doc.hasTemplate) {
+                            const kataKunciCarian = doc.templateKunci ? doc.templateKunci.toUpperCase() : doc.tajuk.toUpperCase();
+                            const templateJumpa = Object.keys(failDariDrive).filter(namaFail => 
+                                namaFail.toUpperCase().includes("TEMPLATE") && 
+                                namaFail.toUpperCase().includes(kataKunciCarian)
+                            );
+
+                            if (templateJumpa.length > 0) {
+                                doc.templatesDitemui = templateJumpa.map(namaFail => ({
+                                    name: namaFail,
+                                    url: failDariDrive[namaFail].url
+                                }));
+                            } else {
+                                doc.templatesDitemui = []; 
                             }
                         }
                     });
@@ -495,7 +572,6 @@ if (layakUpload) {
             setTimeout(() => msgBox.classList.add('hidden'), 4000);
         }
 
-        // 🌟 KEMASKINI: Panggil ambilTahunSemasa() semasa halaman dimuatkan
         window.onload = () => {
             ambilTahunSemasa(); 
             paparSenaraiDokumen(); 
