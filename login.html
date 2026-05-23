@@ -168,6 +168,22 @@
             }
         });
 
+        // ==========================================
+        // 🌟 FUNGSI BARU: AMBIL SINGKATAN JABATAN
+        // ==========================================
+        function dapatkanSingkatanJabatan(namaPenuh) {
+            if (!namaPenuh) return "";
+            
+            // Cari perkataan di dalam kurungan (cth: "JABATAN KEJURUTERAAN AWAM (JKA)")
+            const match = namaPenuh.match(/\(([^)]+)\)/);
+            if (match) {
+                return match[1].trim(); // Akan pulangkan "JKA"
+            }
+            
+            // Jika tiada kurungan dijumpai, ia akan papar nama asal yang dipendekkan
+            return namaPenuh.length > 15 ? namaPenuh.substring(0, 15) + "..." : namaPenuh; 
+        }
+
         // 🌟 MUAT TURUN TETAPAN SENARAI DAN SESI GLOBAL
         window.addEventListener('DOMContentLoaded', () => {
             // 1. Muat turun senarai dropdown menggunakan GET
@@ -180,8 +196,13 @@
                     document.getElementById('peranan').innerHTML = htmlPeranan;
                     document.getElementById('daftar_peranan').innerHTML = htmlPeranan;
 
+                    // 🌟 KEMASKINI: Gunakan fungsi dapatkanSingkatanJabatan() untuk paparan
                     let htmlJabatan = '<option value="">-- PILIH JABATAN --</option>';
-                    data.JABATAN.forEach(j => htmlJabatan += `<option value="${j}">${j}</option>`);
+                    data.JABATAN.forEach(j => {
+                        let singkatan = dapatkanSingkatanJabatan(j);
+                        // value="${j}" kekal penuh untuk dihantar ke Google Sheets
+                        htmlJabatan += `<option value="${j}">${singkatan}</option>`;
+                    });
                     document.getElementById('jabatan').innerHTML = htmlJabatan;
                     document.getElementById('daftar_jabatan').innerHTML = htmlJabatan;
 
@@ -273,7 +294,7 @@
                     sessionStorage.setItem("userLulus", "YA");
                     sessionStorage.setItem("namaPengguna", data.nama);
                     sessionStorage.setItem("peranan", data.peranan);
-                    sessionStorage.setItem("jabatan", data.jabatan);
+                    sessionStorage.setItem("jabatan", data.jabatan); // Akan terus simpan nama penuh JABATAN KEJURUTERAAN AWAM (JKA)
                     sessionStorage.setItem("bahagian", data.bahagian || "");
                     sessionStorage.setItem("no_ic", document.getElementById('no_ic').value);
                     sessionStorage.setItem("sesi_semasa", data.sesi || "");

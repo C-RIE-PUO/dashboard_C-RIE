@@ -18,11 +18,17 @@
 
     <div class="max-w-4xl mx-auto">
         
-        <div class="flex justify-between items-center mb-6">
+		<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <h1 class="text-2xl font-bold text-gray-800">➕ Tambah Rekod KPI</h1>
-            <a href="dashboard-kpi.html" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition shadow-sm">
-                &larr; Kembali ke Senarai KPI
-            </a>
+            <div class="flex flex-wrap gap-3">
+                <a href="Senarai Semak KPI-Inovasi.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition shadow-sm flex items-center gap-2">
+                    📋 Senarai Semak KPI Inovasi
+                </a>
+                
+                <a href="dashboard-kpi.html" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition shadow-sm flex items-center gap-2">
+                    &larr; Kembali ke Senarai KPI
+                </a>
+            </div>
         </div>
 
         <div id="statusMesej" class="hidden mb-4 p-4 rounded text-center text-sm font-semibold border"></div>
@@ -54,14 +60,34 @@
                     <input type="text" id="nama_produk" required placeholder="Contoh: Sistem e-Pelajar" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Ketua Projek <span class="text-red-500">*</span></label>
                         <input type="text" id="ketua" required placeholder="Nama Ketua Projek" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Ahli Kumpulan</label>
-                        <input type="text" id="ahli" placeholder="Nama ahli (pisahkan dengan koma)" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
+                    
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Bilangan Ahli Kumpulan (Tidak Termasuk Ketua)</label>
+                        <select id="bilangan_ahli" class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none mb-4" onchange="kemaskiniBorangAhli()">
+                            <option value="0">Tiada Ahli Tambahan</option>
+                            <option value="1">1 Ahli</option>
+                            <option value="2">2 Ahli</option>
+                            <option value="3">3 Ahli</option>
+                            <option value="4">4 Ahli</option>
+                            <option value="5">5 Ahli</option>
+                            <option value="6">6 Ahli</option>
+                            <option value="7">7 Ahli</option>
+                        </select>
+
+                        <div id="container_ahli" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                            <div id="wrapper_ahli_1" class="hidden"><label class="block text-xs font-bold text-gray-600 mb-1">Nama Ahli 1 <span class="text-red-500">*</span></label><input type="text" id="ahli_1" placeholder="Nama Ahli 1" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase text-sm"></div>
+                            <div id="wrapper_ahli_2" class="hidden"><label class="block text-xs font-bold text-gray-600 mb-1">Nama Ahli 2 <span class="text-red-500">*</span></label><input type="text" id="ahli_2" placeholder="Nama Ahli 2" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase text-sm"></div>
+                            <div id="wrapper_ahli_3" class="hidden"><label class="block text-xs font-bold text-gray-600 mb-1">Nama Ahli 3 <span class="text-red-500">*</span></label><input type="text" id="ahli_3" placeholder="Nama Ahli 3" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase text-sm"></div>
+                            <div id="wrapper_ahli_4" class="hidden"><label class="block text-xs font-bold text-gray-600 mb-1">Nama Ahli 4 <span class="text-red-500">*</span></label><input type="text" id="ahli_4" placeholder="Nama Ahli 4" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase text-sm"></div>
+                            <div id="wrapper_ahli_5" class="hidden"><label class="block text-xs font-bold text-gray-600 mb-1">Nama Ahli 5 <span class="text-red-500">*</span></label><input type="text" id="ahli_5" placeholder="Nama Ahli 5" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase text-sm"></div>
+                            <div id="wrapper_ahli_6" class="hidden"><label class="block text-xs font-bold text-gray-600 mb-1">Nama Ahli 6 <span class="text-red-500">*</span></label><input type="text" id="ahli_6" placeholder="Nama Ahli 6" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase text-sm"></div>
+                            <div id="wrapper_ahli_7" class="hidden"><label class="block text-xs font-bold text-gray-600 mb-1">Nama Ahli 7 <span class="text-red-500">*</span></label><input type="text" id="ahli_7" placeholder="Nama Ahli 7" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase text-sm"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -112,13 +138,38 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Muat Naik Bukti Dokumen (PDF Sahaja - Maks 5 fail / 10MB) <span class="text-red-500">*</span></label>
-                    <div class="relative border-2 border-dashed border-gray-300 rounded-xl p-6 bg-gray-50 hover:bg-gray-100 transition" id="dropzone">
-                        <input type="file" id="fail_bukti" multiple accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="kawalFail(this)" title="Klik untuk menambah fail">
-                        <div class="text-center">
-                            <p class="text-sm font-bold text-gray-600" id="status_fail">📥 Klik atau seret untuk tambah fail (Anda boleh pilih satu persatu)</p>
-                            <div id="senarai_nama_fail" class="mt-4 flex flex-wrap gap-2 justify-center relative z-10 pointer-events-none"></div>
+                <div class="mb-6 border-t pt-6">
+                    <label class="block text-base font-bold text-gray-800 mb-4">Muat Naik Dokumen Bukti (Wajib 3 Item - PDF Sahaja, Maks 10MB/Fail) <span class="text-red-500">*</span></label>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-50 border border-gray-300 rounded-lg hover:shadow-sm transition">
+                            <label class="block text-sm font-semibold text-blue-800 mb-2">1. Laporan Inovasi Produk (termasuk maklum balas) <span class="text-red-500">*</span></label>
+                            <input type="file" id="fail_1" required accept="application/pdf" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200" onchange="urusFailSpesifik(this, 1, 'Laporan_Inovasi_Produk')">
+                            
+                            <div id="div_nama_fail_1" class="hidden mt-3 bg-white p-3 rounded border border-gray-200 shadow-inner">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Nama Dokumen Dalam Sistem (Boleh Dipinda):</label>
+                                <input type="text" id="nama_fail_1" class="w-full px-3 py-1.5 border border-gray-300 rounded outline-none focus:ring-1 focus:ring-blue-500 text-sm font-medium text-blue-900 bg-blue-50">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 border border-gray-300 rounded-lg hover:shadow-sm transition">
+                            <label class="block text-sm font-semibold text-blue-800 mb-2">2. Bukti Surat Pengesahan (Industri/Agensi) <span class="text-red-500">*</span></label>
+                            <input type="file" id="fail_2" required accept="application/pdf" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200" onchange="urusFailSpesifik(this, 2, 'Surat_Pengesahan_Aplikasi')">
+                            
+                            <div id="div_nama_fail_2" class="hidden mt-3 bg-white p-3 rounded border border-gray-200 shadow-inner">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Nama Dokumen Dalam Sistem (Boleh Dipinda):</label>
+                                <input type="text" id="nama_fail_2" class="w-full px-3 py-1.5 border border-gray-300 rounded outline-none focus:ring-1 focus:ring-blue-500 text-sm font-medium text-blue-900 bg-blue-50">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 border border-gray-300 rounded-lg hover:shadow-sm transition">
+                            <label class="block text-sm font-semibold text-blue-800 mb-2">3. Pendaftaran Harta Intelek (CR1 & Resit) <span class="text-red-500">*</span></label>
+                            <input type="file" id="fail_3" required accept="application/pdf" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200" onchange="urusFailSpesifik(this, 3, 'Borang_CR1_Resit_Pendaftaran')">
+                            
+                            <div id="div_nama_fail_3" class="hidden mt-3 bg-white p-3 rounded border border-gray-200 shadow-inner">
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Nama Dokumen Dalam Sistem (Boleh Dipinda):</label>
+                                <input type="text" id="nama_fail_3" class="w-full px-3 py-1.5 border border-gray-300 rounded outline-none focus:ring-1 focus:ring-blue-500 text-sm font-medium text-blue-900 bg-blue-50">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,7 +183,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t mt-6">
-                    <button type="button" onclick="resetBorang()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2.5 px-6 rounded-lg transition duration-200 shadow-sm">Set Semula</button>
+                    <button type="button" onclick="resetBorangTersuai()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2.5 px-6 rounded-lg transition duration-200 shadow-sm">Set Semula</button>
                     <button type="button" onclick="pratonton()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition duration-200 shadow-md">Seterusnya &rarr;</button>
                 </div>
             </form>
@@ -145,7 +196,7 @@
                 <div><span class="font-bold text-gray-500">Nama Produk:</span> <p id="pre_produk" class="font-semibold text-lg uppercase text-blue-700"></p></div>
                 <div><span class="font-bold text-gray-500">Jabatan:</span> <p id="pre_jabatan" class="font-semibold text-gray-800"></p></div>
                 <div><span class="font-bold text-gray-500">Ketua Projek:</span> <p id="pre_ketua" class="font-semibold text-gray-800"></p></div>
-                <div><span class="font-bold text-gray-500">Ahli Kumpulan:</span> <p id="pre_ahli" class="text-gray-800"></p></div>
+                <div><span class="font-bold text-gray-500">Ahli Kumpulan:</span> <p id="pre_ahli" class="text-gray-800 italic"></p></div>
                 
                 <div><span class="font-bold text-gray-500">No Telefon:</span> <p id="pre_telefon" class="text-gray-800"></p></div>
                 <div><span class="font-bold text-gray-500">Emel:</span> <p id="pre_email" class="text-gray-800"></p></div>
@@ -155,7 +206,10 @@
                 <div><span class="font-bold text-gray-500">No Pendaftaran:</span> <p id="pre_pendaftaran" class="text-gray-800"></p></div>
                 <div><span class="font-bold text-gray-500">Tahun:</span> <p id="pre_tahun" class="font-semibold text-gray-800"></p></div>
                 
-                <div class="md:col-span-2"><span class="font-bold text-gray-500">Fail Dokumen Bukti:</span> <p id="pre_fail" class="text-blue-600 font-medium"></p></div>
+                <div class="md:col-span-2">
+                    <span class="font-bold text-gray-500">Fail Dokumen Bukti (Akan Dinamakan Sebagai):</span> 
+                    <div id="pre_fail" class="text-blue-600 font-medium mt-1 pl-4 border-l-2 border-blue-200 whitespace-pre-line"></div>
+                </div>
                 <div class="md:col-span-2 bg-amber-50 p-3 rounded border border-amber-200"><span class="font-bold text-gray-500">Sukuan:</span> <p id="pre_sukuan" class="font-bold text-amber-800 uppercase"></p></div>
             </div>
 
@@ -171,7 +225,10 @@
             <div class="text-6xl mb-4">🎉</div>
             <h2 class="text-2xl font-bold text-green-700 mb-2">Pendaftaran Berjaya!</h2>
             <p class="text-gray-600 mb-6" id="mesejKejayaan">Rekod KPI produk dan fail bukti anda telah dihantar dan sedang <span class="font-bold text-orange-600">MENUNGGU PENGESAHAN</span>.</p>
-            <a href="dashboard-kpi.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-md inline-block">Kembali ke Dashboard</a>
+            <div class="flex justify-center gap-4">
+                <a href="dashboard-kpi.html" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-md inline-block">Kembali ke Dashboard</a>
+                <button onclick="tambahLagiKPI()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition shadow-md inline-block">➕ Tambah Rekod Baru</button>
+            </div>
         </div>
 
     </div>
@@ -253,78 +310,94 @@
         const bahagianBerjaya = document.getElementById('bahagianBerjaya');
         const statusMesej = document.getElementById('statusMesej');
 
-        let failDipilih = [];
-
-        function kawalFail(input) {
-            const files = Array.from(input.files);
-            const pdfFiles = files.filter(f => f.type === "application/pdf");
-
-            let failSah = [];
-
-            for (let f of pdfFiles) {
-                if (f.size > 3 * 1024 * 1024) {
-                    alert(`⚠️ Fail '${f.name}' terlalu besar! (Maks 3MB setiap fail). Ia tidak akan ditambah.`);
-                    continue;
-                }
-                let sudahWujud = failDipilih.some(existing => existing.name === f.name && existing.size === f.size);
-                if (!sudahWujud) {
-                    failSah.push(f);
-                }
-            }
-
-            if (failDipilih.length + failSah.length > 5) {
-                alert("⚠️ Anda hanya boleh memuat naik maksimum 5 dokumen keseluruhan.");
-                let bakiKosong = 5 - failDipilih.length;
-                failSah = failSah.slice(0, bakiKosong); 
-            }
-
-            let arraySementara = [...failDipilih, ...failSah];
-            let totalSize = arraySementara.reduce((sum, f) => sum + f.size, 0);
+        // ==========================================
+        // 🌟 KOD BARU: PENGURUSAN AHLI KUMPULAN
+        // ==========================================
+        function kemaskiniBorangAhli() {
+            const bil = parseInt(document.getElementById('bilangan_ahli').value);
+            const container = document.getElementById('container_ahli');
             
-            if (totalSize > 10 * 1024 * 1024) {
-                alert("⚠️ Jumlah saiz keseluruhan semua dokumen melebihi 10MB. Fail terbaru ini dibatalkan.");
+            if (bil > 0) {
+                container.classList.remove('hidden');
             } else {
-                failDipilih = arraySementara; 
+                container.classList.add('hidden');
             }
 
-            input.value = "";
-            kemaskiniUIFail();
-        }
-
-        function padamFail(index) {
-            failDipilih.splice(index, 1);
-            kemaskiniUIFail();
-        }
-
-        function kemaskiniUIFail() {
-            const statusText = document.getElementById("status_fail");
-            const listDiv = document.getElementById("senarai_nama_fail");
-            
-            listDiv.innerHTML = "";
-            
-            if (failDipilih.length > 0) {
-                let totalSize = failDipilih.reduce((sum, f) => sum + f.size, 0);
-                let mbSize = (totalSize / (1024 * 1024)).toFixed(2);
-                statusText.innerText = `✅ ${failDipilih.length}/5 fail sedia untuk dihantar (${mbSize} MB / 10MB):`;
+            for(let i=1; i<=7; i++) {
+                const wrapper = document.getElementById('wrapper_ahli_'+i);
+                const input = document.getElementById('ahli_'+i);
                 
-                failDipilih.forEach((f, i) => {
-                    listDiv.innerHTML += `
-                        <div class="bg-indigo-100 text-indigo-800 px-3 py-2 rounded-lg text-sm font-bold border border-indigo-200 flex items-center gap-3 shadow-sm pointer-events-auto">
-                            📄 ${f.name}
-                            <button type="button" onclick="padamFail(${i})" class="bg-white hover:bg-red-500 hover:text-white text-red-500 border border-red-300 w-6 h-6 rounded-full flex items-center justify-center leading-none transition shadow-sm" title="Buang Fail">
-                                &times;
-                            </button>
-                        </div>`;
-                });
-            } else {
-                statusText.innerText = "📥 Klik atau seret untuk tambah fail (Anda boleh pilih satu persatu)";
+                if(i <= bil) {
+                    wrapper.classList.remove('hidden');
+                    input.required = true;
+                } else {
+                    wrapper.classList.add('hidden');
+                    input.required = false;
+                    input.value = ''; // Kosongkan input yang tidak digunakan
+                }
             }
         }
 
-        function resetBorang() {
+        function dapatkanNamaAhliGabungan() {
+            const bil = parseInt(document.getElementById('bilangan_ahli').value);
+            let senaraiAhli = [];
+            for(let i=1; i<=bil; i++) {
+                let nama = document.getElementById('ahli_'+i).value.trim();
+                if(nama) senaraiAhli.push(nama.toUpperCase());
+            }
+            return senaraiAhli.join(', '); // Pisahkan setiap nama ahli dengan koma
+        }
+
+        // ==========================================
+        // 🌟 KOD BARU: PENGURUSAN 3 FAIL BUKTI SPESIFIK
+        // ==========================================
+        let failSimpanan = { 1: null, 2: null, 3: null };
+
+        function urusFailSpesifik(input, index, namaCadanganAsal) {
+            const file = input.files[0];
+            const divNama = document.getElementById('div_nama_fail_' + index);
+            const inputNama = document.getElementById('nama_fail_' + index);
+
+            if (!file) {
+                failSimpanan[index] = null;
+                divNama.classList.add('hidden');
+                return;
+            }
+
+            if (file.type !== "application/pdf") {
+                alert("⚠️ Format tidak sah. Hanya dokumen PDF sahaja dibenarkan.");
+                input.value = "";
+                failSimpanan[index] = null;
+                divNama.classList.add('hidden');
+                return;
+            }
+
+            // 🌟 KEMASKINI: Tukar had saiz fail kepada 10 MB
+            if (file.size > 10 * 1024 * 1024) {
+                alert("⚠️ Fail terlalu besar! (Maksimum 10MB setiap fail). Sila kecilkan saiz PDF anda.");
+                input.value = "";
+                failSimpanan[index] = null;
+                divNama.classList.add('hidden');
+                return;
+            }
+
+            failSimpanan[index] = file;
+            divNama.classList.remove('hidden');
+            
+            // Cadangan nama automatik
+            inputNama.value = namaCadanganAsal + ".pdf";
+        }
+
+        function resetBorangTersuai() {
             document.getElementById('borangKPI').reset();
-            failDipilih = [];
-            kemaskiniUIFail();
+            kemaskiniBorangAhli(); // Reset paparan dropdown ahli
+            
+            // Reset fail dan kotak nama fail
+            failSimpanan = { 1: null, 2: null, 3: null };
+            for(let i=1; i<=3; i++) {
+                document.getElementById('fail_'+i).value = "";
+                document.getElementById('div_nama_fail_'+i).classList.add('hidden');
+            }
         }
 
         const toBase64 = file => new Promise((resolve, reject) => {
@@ -341,14 +414,16 @@
                 return;
             }
 
-            if (failDipilih.length === 0) {
-                alert("⚠️ Sila muat naik sekurang-kurangnya 1 dokumen bukti (Berformat PDF).");
+            // Semak jika semua 3 fail wajib telah di-upload
+            if (!failSimpanan[1] || !failSimpanan[2] || !failSimpanan[3]) {
+                alert("⚠️ Sila muat naik KETIGA-TIGA (3) item dokumen bukti PDF yang telah ditetapkan di ruangan muat naik.");
                 return;
             }
 
             document.getElementById('pre_produk').innerText = document.getElementById('nama_produk').value.toUpperCase();
             document.getElementById('pre_ketua').innerText = document.getElementById('ketua').value.toUpperCase();
-            document.getElementById('pre_ahli').innerText = document.getElementById('ahli').value.toUpperCase() || 'TIADA';
+            document.getElementById('pre_ahli').innerText = dapatkanNamaAhliGabungan() || 'TIADA AHLI TAMBAHAN';
+            
             document.getElementById('pre_telefon').innerText = document.getElementById('no_telefon').value;
             document.getElementById('pre_email').innerText = document.getElementById('email').value;
             document.getElementById('pre_jabatan').innerText = document.getElementById('jabatan').value;
@@ -358,8 +433,12 @@
             document.getElementById('pre_tahun').innerText = document.getElementById('tahun').value;
             document.getElementById('pre_sukuan').innerText = document.getElementById('sukuan').value;
             
-            let namaFailStr = failDipilih.map(f => f.name).join(", ");
-            document.getElementById('pre_fail').innerText = namaFailStr;
+            let susunanFailStr = [];
+            for (let i=1; i<=3; i++) {
+                let namaKastam = document.getElementById('nama_fail_'+i).value.trim() || failSimpanan[i].name;
+                susunanFailStr.push(`Item ${i}: ${namaKastam}`);
+            }
+            document.getElementById('pre_fail').innerText = susunanFailStr.join("\n");
 
             bahagianBorang.classList.add('hidden');
             bahagianPratonton.classList.remove('hidden');
@@ -379,38 +458,48 @@
 
             try {
                 let pautanFailArr = [];
-                
                 let tahunDipilih = document.getElementById('tahun').value || "TIADA_TAHUN";
                 let jabatanDipilih = document.getElementById('jabatan').value || "TIADA_JABATAN";
+                let sukuanDipilih = document.getElementById('sukuan').value || "TIADA_SUKUAN";
 
-                for (let i = 0; i < failDipilih.length; i++) {
-                    btn.innerHTML = `⏳ Memuat naik fail ${i + 1} dari ${failDipilih.length}...`;
-                    let file = failDipilih[i];
-                    let base64 = await toBase64(file);
-                    
-                    const payloadFile = {
-                        action: "uploadFailDrive",
-                        TAHUN: tahunDipilih,
-                        JABATAN: jabatanDipilih,
-                        FAIL: {
-                            nama: file.name,
-                            mimeType: file.type,
-                            data: base64.split(",")[1] 
+                // Loop 3 kali untuk muat naik 3 fail satu persatu ke Google Drive
+                for (let i = 1; i <= 3; i++) {
+                    let file = failSimpanan[i];
+                    if (file) {
+                        btn.innerHTML = `⏳ Memuat naik dokumen Item ${i}/3...`;
+                        let base64 = await toBase64(file);
+                        
+                        let namaKastam = document.getElementById('nama_fail_' + i).value.trim();
+                        if (!namaKastam) namaKastam = file.name; // Fallback jika pengguna padam nama
+                        
+                        // Menambah .pdf jika pengguna terpadam extension
+                        if(!namaKastam.toLowerCase().endsWith('.pdf')) namaKastam += ".pdf";
+
+                        const payloadFile = {
+                            action: "uploadFailDrive",
+                            TAHUN: tahunDipilih,
+                            SUKUAN: sukuanDipilih,
+                            JABATAN: jabatanDipilih,
+                            FAIL: {
+                                nama: namaKastam,
+                                mimeType: file.type,
+                                data: base64.split(",")[1] 
+                            }
+                        };
+
+                        const resUpload = await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify(payloadFile)
+                        });
+                        
+                        const dataUpload = await resUpload.json();
+
+                        if (dataUpload.status === 'BERJAYA') {
+                            pautanFailArr.push(dataUpload.url);
+                        } else {
+                            throw new Error(`Gagal muat naik fail '${namaKastam}': ${dataUpload.mesej}`);
                         }
-                    };
-
-                    const resUpload = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify(payloadFile)
-                    });
-                    
-                    const dataUpload = await resUpload.json();
-
-                    if (dataUpload.status === 'BERJAYA') {
-                        pautanFailArr.push(dataUpload.url);
-                    } else {
-                        throw new Error(`Gagal muat naik fail '${file.name}': ${dataUpload.mesej}`);
                     }
                 }
 
@@ -422,7 +511,7 @@
                     KETUA: document.getElementById('ketua').value.toUpperCase(),
                     NO_TELEFON: document.getElementById('no_telefon').value,
                     EMAIL: document.getElementById('email').value,
-                    AHLI: document.getElementById('ahli').value.toUpperCase(),
+                    AHLI: dapatkanNamaAhliGabungan(), // Menggunakan data ahli gabungan koma
                     JABATAN: document.getElementById('jabatan').value,
                     APLIKASI: document.getElementById('aplikasi').value,
                     JENIS: document.getElementById('jenis').value,
@@ -473,8 +562,26 @@
             window.scrollTo(0, 0);
         }
 
+        // 🌟 KEMASKINI: Fungsi Untuk Menambah Rekod KPI Seterusnya Tanpa Perlu Refresh
+        function tambahLagiKPI() {
+            // Sembunyikan mesej berjaya dan paparkan semula borang
+            bahagianBerjaya.classList.add('hidden');
+            bahagianBorang.classList.remove('hidden');
+            
+            // Kosongkan semula borang dan fail
+            resetBorangTersuai();
+
+            // Aktifkan dan tetapkan semula teks butang hantar
+            const btn = document.getElementById('btnHantar');
+            if(btn) {
+                btn.disabled = false;
+                btn.innerHTML = '✅ Hantar Pendaftaran';
+            }
+            window.scrollTo(0, 0);
+        }
+
         // ==========================================================
-        // 🌟 KOD BARU: MUAT NAIK CSV PUKAL YANG LEBIH TEGUH / BIJAK
+        // FUNGSI MUAT NAIK PUKAL (CSV) KEKAL SEPERTI ASAL
         // ==========================================================
         function muatTurunTemplateCSV() {
             const header = "NAMA PRODUK,KETUA,NO TELEFON,EMAIL,AHLI,JABATAN,APLIKASI,JENIS,NO PENDAFTARAN,TAHUN,URL,SUKUAN\n";
@@ -509,7 +616,6 @@
             reader.onload = function(e) {
                 const text = e.target.result;
                 
-                // Enjin Pembaca CSV yang lebih maju (Boleh baca baris baru dan koma di dalam pengikat kata)
                 const rows = [];
                 let currentRow = [];
                 let currentCell = "";
@@ -561,8 +667,6 @@
                         let urlSediaAda = "";
                         let sukuanSediaAda = "";
                         
-                        // Jika pengguna terlupa letak pengikat kata pada URL, 
-                        // CSV akan pecahkan ia menjadi lebih dari 12 lajur. Kita gabungkan ia semula:
                         if (arr.length > 12) {
                             sukuanSediaAda = arr[arr.length - 1]; 
                             urlSediaAda = arr.slice(10, arr.length - 1).join(", "); 
@@ -571,7 +675,6 @@
                             sukuanSediaAda = arr[11] || "";
                         }
                         
-                        // Pastikan URL yang diletak secara enter (Alt+Enter dalam Excel) turut ditukar kepada koma
                         let urlClean = urlSediaAda.replace(/\r?\n/g, ", ");
 
                         dataPukal.push({
@@ -629,7 +732,7 @@
     </script>
     
     <script>
-		window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', function() {
         let tajukDisalin = sessionStorage.getItem("dataTajuk");
         let penyelidikDisalin = sessionStorage.getItem("dataPenyelidik");
         
@@ -642,20 +745,14 @@
             if (kotakKetua) kotakKetua.value = penyelidikDisalin;
         }
 
-        // --- TAMBAHAN KAWALAN MOD PUKAL ---
         if (sessionStorage.getItem("bukaModPukal") === "YA") {
-            // Sembunyikan borang individu
             document.getElementById("bahagianBorang").classList.add("hidden");
-            // Highlight bahagian pukal (Pilihan animasi)
             let boxPukal = document.getElementById("bahagianBulkCSV");
             boxPukal.classList.add("ring-4", "ring-indigo-300");
-            // Skrol ke bahagian pukal
             boxPukal.scrollIntoView({ behavior: 'smooth' });
-            
-            // Padam semula penanda
             sessionStorage.removeItem("bukaModPukal");
         }
-		});
+        });
     </script>
 </body>
 </html>
