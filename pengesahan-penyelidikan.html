@@ -149,7 +149,7 @@
     </div>
 </body>
 
-    <div id="modalEdit" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
+<div id="modalEdit" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
         <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
             <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-slate-50 rounded-t-xl sticky top-0 z-10">
                 <h3 class="text-lg font-bold text-gray-800 flex items-center gap-1.5">📝 Kemaskini & Betulkan Rekod Penyelidikan</h3>
@@ -248,10 +248,31 @@
 
                 <div id="previewDokumenEdit" class="hidden mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200"></div>
 
-                <div class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <label class="block font-bold text-blue-900 mb-1 flex items-center gap-1">🔄 Tukar / Muat Naik Semula Fail Bukti (PDF sahaja):</label>
-                    <input type="file" id="editFileInput" multiple accept="application/pdf" class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer border border-slate-300 rounded p-1 bg-white focus:outline-none" />
-                    <div id="senaraiFailBaruPilihan" class="mt-2 hidden flex flex-col gap-1"></div>
+                <div class="col-span-1 md:col-span-2 mt-4 border-t border-gray-200 pt-5">
+                    <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">📂 Dokumen Bukti <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-semibold">(Maksimum 15MB/Fail)</span></h3>
+                    <p class="text-xs text-amber-600 font-semibold mb-4 bg-amber-50 p-2 rounded-lg border border-amber-100 inline-block">⚠️ Nota: Jika dokumen sedia ada salah, anda boleh muat naik fail PDF baharu untuk menggantikannya. Biarkan kosong jika tiada perubahan.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl hover:shadow-md hover:bg-blue-50 transition-all">
+                            <label class="block text-sm font-extrabold text-blue-900 mb-2">1. Kertas Penyelidikan Penuh</label>
+                            <div id="pautanLama1" class="text-xs mb-3 bg-white p-2 rounded border border-blue-100 min-h-[36px] flex items-center break-all text-blue-700 font-semibold"></div>
+                            <input type="hidden" id="urlLama1">
+                            <div class="flex flex-col gap-2">
+                                <input type="file" id="failEdit1" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm">
+                                <input type="text" id="namaFailEdit1" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full border border-gray-300 p-2 rounded-lg outline-none text-xs hidden focus:ring-2 focus:ring-blue-400" readonly>
+                            </div>
+                        </div>
+
+                        <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl hover:shadow-md hover:bg-blue-50 transition-all">
+                            <label class="block text-sm font-extrabold text-blue-900 mb-2">2. Muka Depan Jurnal</label>
+                            <div id="pautanLama2" class="text-xs mb-3 bg-white p-2 rounded border border-blue-100 min-h-[36px] flex items-center break-all text-blue-700 font-semibold"></div>
+                            <input type="hidden" id="urlLama2">
+                            <div class="flex flex-col gap-2">
+                                <input type="file" id="failEdit2" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm">
+                                <input type="text" id="namaFailEdit2" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full border border-gray-300 p-2 rounded-lg outline-none text-xs hidden focus:ring-2 focus:ring-blue-400" readonly>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-4 border-t border-gray-200 mt-4">
@@ -416,14 +437,14 @@ function renderJadual(senarai) {
         if (dokumenVal && dokumenVal.toString().trim() !== "" && dokumenVal !== "-") {
             const senaraiLink = dokumenVal.toString().split(/\r?\n|\s+/).filter(link => link.trim().startsWith("http"));
             if (senaraiLink.length > 0) {
-                htmlDokumen = `<div class="flex flex-col gap-1 items-center">`;
+                htmlDokumen = `<div class="flex flex-col gap-1 items-center w-full">`;
                 senaraiLink.forEach((link, idx) => {
-                    const labelFail = senaraiLink.length > 1 ? `Fail ${idx + 1}` : `Lihat Fail`;
+                    // 🌟 KEMASKINI: Dapatkan nama fail sebenar yang sudah dibersihkan
+                    const labelFail = dapatkanNamaFail(link, idx);
+                    
                     htmlDokumen += `
-                        <a href="${link.trim()}" target="_blank" class="w-full max-w-[110px] inline-flex items-center justify-center gap-1 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-slate-200 px-2 py-1 rounded-md text-[11px] font-medium transition shadow-2xs">
-                            <svg class="w-3 h-3 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                            </svg>${labelFail}
+                        <a href="${link.trim()}" target="_blank" title="${labelFail}" class="w-full inline-flex items-center justify-center gap-1 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-slate-200 px-2 py-1.5 rounded-md text-[11px] font-medium transition shadow-2xs">
+                            <span class="truncate max-w-[120px]">📄 ${labelFail}</span>
                         </a>`;
                 });
                 htmlDokumen += `</div>`;
@@ -501,6 +522,48 @@ function renderJadual(senarai) {
 
     kemaskiniStatusPaginasi(jumlahMukaSurat);
     applyColumnVisibility();
+}
+
+// =========================================================
+// 🌟 FUNGSI PEMBANTU: EKSTRAK & BERSIHKAN NAMA FAIL DARI URL
+// =========================================================
+function dapatkanNamaFail(url, index) {
+    if (!url) return `${index + 1}. Fail Bukti`;
+    try {
+        let decodedUrl = decodeURIComponent(url);
+        let namaFail = "";
+        
+        // Cuba ekstrak dari format URL parameter ?file=xxx atau #xxx
+        let matchParam = decodedUrl.match(/(?:file|name|title)=([^&]+)/i);
+        let matchHash = decodedUrl.match(/#([^&?]+)/);
+        
+        if (matchParam && matchParam[1]) {
+            namaFail = matchParam[1];
+        } else if (matchHash && matchHash[1]) {
+            namaFail = matchHash[1];
+        } else {
+            // Jika tiada parameter, ambil teks terakhir pada URL
+            namaFail = decodedUrl.split('/').pop().split('?')[0];
+        }
+        
+        // Fallback jika nama gagal dikesan dari format URL raw Drive
+        if (!namaFail || namaFail === "view" || namaFail === "edit" || namaFail === "open" || (namaFail.length > 30 && !namaFail.includes(".") && !namaFail.includes("_"))) {
+            const labelDokumen = ["Kertas_Penyelidikan_Penuh", "Muka_Depan_Jurnal"];
+            return `${index + 1}. ${labelDokumen[index] || 'Fail_Bukti'}`;
+        }
+        
+        // Buang extension .pdf / .docx
+        namaFail = namaFail.replace(/\.[^/.]+$/, "");
+        
+        // Buang prefix ID sistem seperti 46_2_ atau 46_1_
+        namaFail = namaFail.replace(/^\d+_\d+_/, ""); 
+        namaFail = namaFail.replace(/^\d+_+/, "");    
+        
+        return `${index + 1}. ${namaFail}`;
+    } catch (e) {
+        const labelDokumen = ["Kertas_Penyelidikan_Penuh", "Muka_Depan_Jurnal"];
+        return `${index + 1}. ${labelDokumen[index] || 'Fail_Bukti'}`;
+    }
 }
 
         function kemaskiniStatusPaginasi(jumlahMukaSurat) {
@@ -631,88 +694,77 @@ function renderJadual(senarai) {
             const previewContainer = document.getElementById('previewDokumenEdit');
             previewContainer.innerHTML = "";
             window.editSenaraiFail = [];
-            document.getElementById('editFileInput').value = "";
-            document.getElementById('senaraiFailBaruPilihan').innerHTML = "";
 
+            // 🌟 RESET INPUT FAIL 1 & 2
+            for(let i=1; i<=2; i++) {
+                const inputFail = document.getElementById('failEdit'+i);
+                const inputNamaFail = document.getElementById('namaFailEdit'+i);
+                const pautanLamaDiv = document.getElementById('pautanLama'+i);
+                const urlLamaInput = document.getElementById('urlLama'+i);
+
+                if(inputFail) inputFail.value = "";
+                if(inputNamaFail) {
+                    inputNamaFail.value = "";
+                    inputNamaFail.classList.add('hidden');
+                }
+                if(pautanLamaDiv) pautanLamaDiv.innerHTML = `<p class="text-gray-400 italic font-normal text-xs">❌ Tiada fail dimuat naik.</p>`;
+                if(urlLamaInput) urlLamaInput.value = "";
+
+                // Event listener untuk penamaan fizikal file di Google Drive
+                if (inputFail) {
+                    inputFail.onchange = function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            if (file.type !== "application/pdf") {
+                                alert(`⚠️ Item ${i}: Hanya format PDF sahaja yang dibenarkan!`);
+                                inputFail.value = "";
+                                return;
+                            }
+                            if (file.size > 15 * 1024 * 1024) {
+                                alert(`⚠️ Item ${i} Gagal: Saiz dokumen melebihi had maksimum 15 MB!`);
+                                inputFail.value = "";
+                                return;
+                            }
+
+                            const ext = file.name.includes('.') ? file.name.split('.').pop() : 'pdf';
+                            const formatNamaCadangan = (i === 1) ? "Kertas_Penyelidikan_Penuh" : "Muka_Depan_Jurnal";
+                            const namaFailBaruUnik = `${bil}_${i}_${formatNamaCadangan}.${ext}`;
+                            
+                            if (inputNamaFail) {
+                                inputNamaFail.value = namaFailBaruUnik;
+                                inputNamaFail.classList.remove('hidden');
+                            }
+                        } else {
+                            if (inputNamaFail) {
+                                inputNamaFail.value = "";
+                                inputNamaFail.classList.add('hidden');
+                            }
+                        }
+                    };
+                }
+            }
+
+            // Pautan Sedia Ada (Item 1 & 2)
             if (pautanAsal && pautanAsal.trim() !== "" && pautanAsal !== "-") {
                 const senaraiLink = pautanAsal.split(/\r?\n|\s+/).filter(link => link.trim().startsWith("http"));
                 
                 if (senaraiLink.length > 0) {
-                    let htmlList = `<p class="font-bold text-slate-800 mb-1.5">📁 Dokumen Bukti Sedia Ada:</p><div class="flex flex-col gap-1.5">`;
-                    
                     senaraiLink.forEach((link, idx) => {
-                        htmlList += `
-                            <div class="flex items-center justify-between bg-white p-2 rounded border border-slate-200 text-xs shadow-2xs">
-                                <span class="font-medium text-gray-600 truncate max-w-[220px]">📄 Fail Bukti ${idx + 1}.pdf</span>
-                                <a href="${link.trim()}" target="_blank" class="bg-blue-50 text-blue-700 px-2 py-1 rounded font-bold border border-blue-200 text-[10px] hover:bg-blue-100">Lihat Fail 🔗</a>
-                            </div>`;
+                        if (idx < 2) {
+                            const idxElement = idx + 1;
+                            const namaPaparan = typeof dapatkanNamaFail === 'function' ? dapatkanNamaFail(link, idx) : `Fail Bukti ${idxElement}.pdf`;
+                            
+                            const pautanLamaDiv = document.getElementById('pautanLama' + idxElement);
+                            const urlLamaInput = document.getElementById('urlLama' + idxElement);
+                            
+                            if (pautanLamaDiv && urlLamaInput) {
+                                urlLamaInput.value = link.trim();
+                                pautanLamaDiv.innerHTML = `✅ <a href="${link.trim()}" target="_blank" class="text-blue-600 hover:underline" title="${link.trim()}">${namaPaparan} (Klik Lihat)</a>`;
+                            }
+                        }
                     });
-                    
-                    htmlList += `</div>
-                        <p class="text-[10px] text-amber-600 font-semibold mt-2 bg-amber-50 p-1.5 rounded border border-amber-200 leading-tight">
-                            ⚠️ Nota: Jika anda memuat naik PDF baru di bawah, sistem akan memadam fail lama dari Drive secara automatik.
-                        </p>`;
-                    
-                    previewContainer.innerHTML = htmlList;
-                    previewContainer.classList.remove('hidden');
-                } else {
-                    previewContainer.innerHTML = `<p class="text-gray-400 italic text-xs">❌ Tiada fail fizikal sebelum ini.</p>`;
                 }
-            } else {
-                previewContainer.classList.add('hidden');
             }
-
-            document.getElementById('editFileInput').onchange = function(e) {
-                const files = e.target.files;
-                const divPilihan = document.getElementById('senaraiFailBaruPilihan');
-                divPilihan.innerHTML = "";
-                window.editSenaraiFail = [];
-
-                if(files.length > 0) {
-                    divPilihan.classList.remove('hidden');
-                    divPilihan.innerHTML = `<p class="font-bold text-emerald-800 mb-1">✨ Fail Terkini Dipilih (Akan Diupload):</p>`;
-
-                    for(let i=0; i<files.length; i++) {
-                        const file = files[i];
-                        const fileIndex = i;
-                        const failObj = { namaFail: file.name, failBase64: "" };
-                        window.editSenaraiFail.push(failObj);
-
-                        const item = document.createElement('div');
-                        item.className = "p-2 bg-emerald-50 border border-emerald-200 rounded text-emerald-900 font-medium flex items-center justify-between shadow-3xs";
-                        item.innerHTML = `
-                            <span class="truncate max-w-[70%]">📄 ${file.name}</span>
-                            <div class="flex items-center gap-2">
-                                <span id="status-fail-edit-${fileIndex}" class="text-amber-600 font-bold text-[10px]">Memproses... ⏳</span>
-                                <button type="button" class="text-red-500 hover:text-red-700 font-bold px-1 text-xs focus:outline-none" title="Batal Pilih Fail Ini">❌</button>
-                            </div>`;
-                        divPilihan.appendChild(item);
-
-                        item.querySelector('button').onclick = function() {
-                            window.editSenaraiFail = window.editSenaraiFail.filter(f => f !== failObj);
-                            item.remove();
-                            if(window.editSenaraiFail.length === 0) {
-                                divPilihan.classList.add('hidden');
-                                document.getElementById('editFileInput').value = "";
-                            }
-                        };
-
-                        const reader = new FileReader();
-                        reader.onload = function(evt) {
-                            failObj.failBase64 = evt.target.result.split(',')[1];
-                            failObj.isReady = true;
-                            const statusSpan = document.getElementById(`status-fail-edit-${fileIndex}`);
-                            if(statusSpan) {
-                                statusSpan.className = "text-emerald-600 font-bold text-[10px]";
-                                statusSpan.innerText = "Ready 🟢";
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                } else {
-                    divPilihan.classList.add('hidden');
-                }
-            };
 
             document.getElementById('modalEdit').classList.remove('hidden');
         }
@@ -721,17 +773,9 @@ function renderJadual(senarai) {
             document.getElementById('modalEdit').classList.add('hidden');
         }
 
-        function simpanKemaskini(e) {
+        async function simpanKemaskini(e) {
             e.preventDefault();
             
-            if (window.editSenaraiFail && window.editSenaraiFail.length > 0) {
-                const belumSiap = window.editSenaraiFail.some(f => f.failBase64 === "" || f.isReady === false);
-                if (belumSiap) {
-                    alert("Sila tunggu sebentar, fail PDF anda sedang diproses sistem (Tunggu status Ready 🟢).");
-                    return;
-                }
-            }
-
             const bil = document.getElementById('editID').value;
             const btn = document.getElementById('btnSimpanEdit');
             const statusMesej = document.getElementById("statusMesej");
@@ -742,6 +786,40 @@ function renderJadual(senarai) {
 
             statusMesej.className = "mb-6 p-4 rounded-lg text-center text-sm font-bold bg-blue-100 text-blue-800 border border-blue-200 block";
             statusMesej.innerText = `⏳ Menghantar pengemaskinian data rekod RND-${bil} ke pelayan...`;
+
+            // Fungsi Pembaca PDF ke Base64
+            const bacaFileKeBase64 = file => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+
+            let senaraiFailDihantar = [];
+
+            // Proses Fail 1 & Fail 2 untuk dihantar ke backend
+            for (let i = 1; i <= 2; i++) {
+                const failInput = document.getElementById('failEdit'+i);
+                if (failInput && failInput.files.length > 0) {
+                    const file = failInput.files[0];
+                    let namaDitetapkan = document.getElementById('namaFailEdit'+i) ? document.getElementById('namaFailEdit'+i).value.trim() : file.name;
+                    
+                    try {
+                        const base64Data = await bacaFileKeBase64(file);
+                        senaraiFailDihantar.push({
+                            namaFail: namaDitetapkan,
+                            mimeType: file.type,
+                            failBase64: base64Data,
+                            itemIndex: i
+                        });
+                    } catch (err) {
+                        alert(`❌ Ralat membaca fail Item ${i}`);
+                        btn.disabled = false;
+                        btn.innerText = "💾 Simpan Perubahan";
+                        return;
+                    }
+                }
+            }
 
             let namaPenulisGabungEdit = "";
             const editBilPenulisEl = document.getElementById('editBilPenulis');
@@ -776,7 +854,7 @@ function renderJadual(senarai) {
                 indexStatus: document.getElementById('editIndex').value,
                 urlBukti: document.getElementById('editDokumenSediaAda').value, 
                 urlDokumenBukti: document.getElementById('editDokumenSediaAda').value, 
-                senaraiFailBaru: window.editSenaraiFail
+                senaraiFailBaru: senaraiFailDihantar // Array baru dengan data fail
             };
 
             fetch(SCRIPT_URL, {
@@ -820,7 +898,6 @@ function renderJadual(senarai) {
                 statusMesej.innerText = "⚠️ Ralat rangkaian atau ralat konfigurasi server.";
             });
         }
-
         // =================================================================
         // KAWALAN TINDAKAN PENGESAH (SAHKAN / TOLAK / PADAM)
         // =================================================================
