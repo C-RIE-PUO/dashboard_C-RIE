@@ -17,192 +17,204 @@
         }
     </script>
 </head>
-<body class="bg-gray-100 p-4 md:p-6 font-sans relative">
-
-    <div class="max-w-[1400px] mx-auto">
+<body class="bg-gray-100 py-4 font-sans relative">
+    <div class="w-full px-3 sm:px-6 lg:px-8 mx-auto">
         
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-5 rounded-2xl shadow-sm border border-gray-200 gap-4 transition-all duration-300">
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">🔐 Pengesahan Rekod KPI</h1>
-                <p class="text-sm text-gray-500 mt-1">Sila semak maklumat dan klik pautan URL bukti sebelum membuat pengesahan.</p>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-800 tracking-tight">🔐 Pengesahan Rekod KPI</h1>
+                <p class="text-sm text-gray-500 mt-1 font-medium">Sila semak maklumat dan klik pautan URL bukti sebelum membuat pengesahan.</p>
             </div>
             <div>
-                <a href="dashboard-kpi.html" class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-2">
+                <a href="dashboard-kpi.html" class="bg-gray-600 hover:bg-gray-700 active:scale-95 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-sm flex items-center gap-2 duration-200">
                     &larr; Kembali Dashboard
                 </a>
             </div>
         </div>
 
-        <div id="statusMesej" class="hidden mb-4 p-4 rounded text-center text-sm font-semibold border shadow-sm"></div>
+        <div id="statusMesej" class="hidden mb-4 p-4 rounded-xl text-center text-sm font-semibold border shadow-sm transition-all"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div class="md:col-span-1 bg-white p-5 rounded-xl shadow-sm border border-green-200">
-                <h3 class="text-sm font-bold text-gray-600 uppercase mb-2">📊 Statistik Sah Mengikut Jabatan</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="md:col-span-1 bg-white p-5 rounded-2xl shadow-sm border border-green-200 hover:shadow-md transition-shadow duration-300">
+                <h3 class="text-sm font-bold text-gray-600 uppercase mb-2 flex items-center gap-2">📊 Statistik Sah Jabatan</h3>
                 <div id="statistikJabatan" class="text-xs text-gray-700 space-y-1.5 h-32 overflow-y-auto pr-2 custom-scrollbar">
                     <p class="text-gray-400 italic">Sedang mengira data...</p>
                 </div>
             </div>
 
-            <div class="md:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-blue-200 flex flex-col justify-center">
-                <h3 class="text-sm font-bold text-gray-600 uppercase mb-3">🔍 Tapis Senarai Jadual</h3>
+            <div class="md:col-span-3 bg-white p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-300 flex flex-col justify-center">
+                <h3 class="text-sm font-bold text-gray-600 uppercase mb-3 flex items-center gap-2">🔍 Tapis Senarai Jadual</h3>
                 <div class="flex flex-wrap gap-3">
-                    <div class="flex-1 min-w-[150px]">
-                        <label class="block text-xs font-semibold text-blue-800 mb-1">Jabatan</label>
-                        <select id="filterJabatan" onchange="tapisJadual()" class="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-xs font-bold text-blue-800 mb-1.5">Jabatan</label>
+                        <select id="filterJabatan" onchange="tapisJadual()" class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900 cursor-pointer transition-all">
                             <option value="Semua">-- Semua Jabatan --</option>
                         </select>
                     </div>
-                    <div class="w-32">
-                        <label class="block text-xs font-semibold text-blue-800 mb-1">Cari Tahun</label>
-                        <input type="text" id="filterTahun" oninput="tapisJadual()" placeholder="202X..." class="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900">
-                    </div>
                     <div class="w-36">
-                        <label class="block text-xs font-semibold text-blue-800 mb-1">Sukuan</label>
-                        <select id="filterSukuan" onchange="tapisJadual()" class="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900 uppercase">
+                        <label class="block text-xs font-bold text-blue-800 mb-1.5">Cari Tahun</label>
+                        <input type="text" id="filterTahun" oninput="tapisJadual()" placeholder="202X..." class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900 transition-all placeholder:text-blue-300">
+                    </div>
+                    <div class="w-40">
+                        <label class="block text-xs font-bold text-blue-800 mb-1.5">Sukuan</label>
+                        <select id="filterSukuan" onchange="tapisJadual()" class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900 uppercase cursor-pointer transition-all">
                             <option value="Semua">-- Semua --</option>
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button onclick="ambilDataPending()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold transition border border-gray-300">🔄 Reset</button>
+                        <button onclick="ambilDataPending()" class="bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-700 px-5 py-2 rounded-xl text-sm font-bold transition-all border border-gray-300 shadow-sm cursor-pointer flex items-center gap-1.5">
+                            🔄 Reset
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-            <div class="md:hidden text-xs text-purple-600 font-semibold p-2 bg-purple-50 flex items-center justify-center gap-1 animate-pulse border-b">
-                <span>👉</span> Geser jadual ke kiri/kanan untuk lihat penuh
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300">
+            <div class="xl:hidden text-xs text-purple-700 font-bold p-2.5 bg-purple-50 flex items-center justify-center gap-1.5 animate-pulse border-b border-purple-100">
+                <span>👉</span> Geser jadual ke kiri/kanan untuk lihat penuh pada skrin kecil
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[1400px]">
+            <div class="overflow-x-auto custom-scrollbar w-full">
+                <table class="w-full text-left border-collapse min-w-full table-auto">
                     <thead>
-                        <tr class="bg-purple-600 text-white text-xs uppercase">
-                            <th class="p-3 border-b">BIL</th>
-                            <th class="p-3 border-b w-48">PRODUK</th>
-                            <th class="p-3 border-b">KETUA & AHLI</th>
-                            <th class="p-3 border-b">HUBUNGI</th>
-                            <th class="p-3 border-b">JABATAN</th>
-                            <th class="p-3 border-b">APLIKASI</th>
-                            <th class="p-3 border-b">JENIS & DAFTAR</th>
-                            <th class="p-3 border-b text-center">TAHUN/SUKUAN</th>
-                            <th class="p-3 border-b text-center w-56">URL BUKTI</th>
-                            <th class="p-3 border-b text-center w-56">TINDAKAN</th>
+                        <tr class="bg-purple-600 text-white text-[11px] uppercase tracking-wider">
+                            <th class="p-3 border-b text-center w-[3%]">BIL</th>
+                            <th class="p-3 border-b w-[22%]">PRODUK</th>
+                            <th class="p-3 border-b w-[15%]">KETUA & AHLI</th>
+                            <th class="p-3 border-b w-[12%]">HUBUNGI</th>
+                            <th class="p-3 border-b w-[8%] text-center">JABATAN</th>
+                            <th class="p-3 border-b w-[8%] text-center">APLIKASI</th>
+                            <th class="p-3 border-b w-[10%]">JENIS & DAFTAR</th>
+                            <th class="p-3 border-b text-center w-[6%]">TAHUN / SUKUAN</th>
+                            <th class="p-3 border-b text-center w-[8%]">URL BUKTI</th>
+                            <th class="p-3 border-b text-center w-[8%]">TINDAKAN</th>
                         </tr>
                     </thead>
-                    <tbody id="isiJadual" class="text-gray-700 text-sm bg-white">
-                        <tr><td colspan="10" class="p-10 text-center font-semibold text-gray-500 animate-pulse">⏳ Memuatkan senarai...</td></tr>
+                    <tbody id="isiJadual" class="text-gray-700 text-xs bg-white divide-y divide-gray-100">
+                        <tr>
+                            <td colspan="10" class="p-16 text-center font-bold text-gray-400 select-none">
+                                <div class="flex items-center justify-center gap-2">
+                                    <span class="inline-block animate-spin text-lg text-purple-500">⏳</span> 
+                                    <span class="tracking-wide animate-pulse">Memuatkan senarai rekod KPI...</span>
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4 overflow-y-auto">
-        <div class="bg-white p-6 rounded-xl w-full max-w-4xl shadow-2xl relative my-8">
-            <button onclick="tutupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 font-bold text-2xl">&times;</button>
+    <div id="modalEdit" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-y-auto">
+        <div class="bg-white p-6 md:p-8 rounded-2xl w-full max-w-6xl shadow-2xl relative my-8 transition-all">
+            <button onclick="tutupModal()" class="absolute top-4 right-5 text-gray-400 hover:text-red-500 font-bold text-3xl transition-colors cursor-pointer">&times;</button>
             
-            <h2 class="text-xl font-bold mb-4 text-blue-700 border-b pb-2">✏️ Kemaskini / Betulkan Rekod & Dokumen</h2>
+            <h2 class="text-xl md:text-2xl font-extrabold mb-5 text-blue-700 border-b border-gray-100 pb-3 flex items-center gap-2">
+                <span>✏️</span> Kemaskini / Betulkan Rekod & Dokumen
+            </h2>
             <input type="hidden" id="editIdBil">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-4 bg-gray-50/50 p-5 rounded-xl border border-gray-200 shadow-sm">
+                <div class="md:col-span-2 lg:col-span-3">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nama Produk</label>
+                    <input type="text" id="editNama" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none uppercase transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Ketua Projek</label>
+                    <input type="text" id="editKetua" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none uppercase transition-all">
+                </div>
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-semibold text-gray-700">Nama Produk</label>
-                    <input type="text" id="editNama" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Ahli Kumpulan (Pisahkan dengan koma)</label>
+                    <input type="text" id="editAhli" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none uppercase transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">Ketua Projek</label>
-                    <input type="text" id="editKetua" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan</label>
+                    <input type="text" id="editJabatan" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none uppercase transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">Ahli Kumpulan (Pisahkan dengan koma)</label>
-                    <input type="text" id="editAhli" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Aplikasi Peringkat</label>
+                    <input type="text" id="editAplikasi" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none uppercase transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">Jabatan</label>
-                    <input type="text" id="editJabatan" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Jenis Harta Intelek</label>
+                    <input type="text" id="editJenis" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none uppercase transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">Aplikasi Peringkat</label>
-                    <input type="text" id="editAplikasi" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">No Telefon</label>
+                    <input type="text" id="editTelefon" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">No Telefon</label>
-                    <input type="text" id="editTelefon" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Email</label>
+                    <input type="email" id="editEmail" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">Email</label>
-                    <input type="email" id="editEmail" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran CR1</label>
+                    <input type="text" id="editPendaftaran" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none uppercase transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">Jenis Harta Intelek</label>
-                    <input type="text" id="editJenis" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Tahun</label>
+                    <input type="number" id="editTahun" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">No Pendaftaran CR1</label>
-                    <input type="text" id="editPendaftaran" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Tahun</label>
-                    <input type="number" id="editTahun" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Sukuan</label>
-                    <input type="text" id="editSukuan" placeholder="Contoh: S1" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Sukuan</label>
+                    <input type="text" id="editSukuan" placeholder="Contoh: S1" class="w-full border border-gray-300 p-2.5 rounded-xl mt-1 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none uppercase transition-all">
                 </div>
             </div>
 
-            <div class="mt-6 border-t pt-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-3">📂 Dokumen Bukti (Maksimum 10MB/Fail)</h3>
-                <p class="text-xs text-gray-500 mb-4">Jika dokumen sedia ada salah, anda boleh muat naik fail PDF baharu untuk menggantikannya. Biarkan kosong jika tiada perubahan.</p>
+            <div class="mt-8 border-t border-gray-200 pt-5">
+                <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">📂 Dokumen Bukti <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-semibold">(Maksimum 10MB/Fail)</span></h3>
+                <p class="text-xs text-amber-600 font-semibold mb-4 bg-amber-50 p-2 rounded-lg border border-amber-100 inline-block">⚠️ Nota: Jika dokumen sedia ada salah, anda boleh muat naik fail PDF baharu untuk menggantikannya. Biarkan kosong jika tiada perubahan.</p>
                 
-                <div class="space-y-4">
-                    <div class="p-4 border border-blue-200 bg-blue-50 rounded-lg">
-                        <label class="block text-sm font-bold text-blue-800 mb-1">1. Laporan Inovasi Produk</label>
-                        <div id="pautanLama1" class="text-xs mb-2"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl hover:shadow-md hover:bg-blue-50 transition-all">
+                        <label class="block text-sm font-extrabold text-blue-900 mb-2">1. Laporan Inovasi Produk</label>
+                        <div id="pautanLama1" class="text-xs mb-3 bg-white p-2 rounded border border-blue-100 min-h-[36px] flex items-center break-all"></div>
                         <input type="hidden" id="urlLama1">
-                        <div class="flex flex-col md:flex-row gap-2 items-center">
-                            <input type="file" id="failEdit1" accept="application/pdf" class="w-full md:w-1/2 text-sm text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700" onchange="urusFailEdit(this, 1, 'Laporan_Inovasi_Produk')">
-                            <input type="text" id="namaFailEdit1" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full md:w-1/2 border p-1.5 rounded outline-none text-sm hidden">
+                        <div class="flex flex-col gap-2">
+                            <input type="file" id="failEdit1" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm" onchange="urusFailEdit(this, 1, 'Laporan_Inovasi_Produk')">
+                            <input type="text" id="namaFailEdit1" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full border border-gray-300 p-2 rounded-lg outline-none text-xs hidden focus:ring-2 focus:ring-blue-400">
                         </div>
                     </div>
 
-                    <div class="p-4 border border-blue-200 bg-blue-50 rounded-lg">
-                        <label class="block text-sm font-bold text-blue-800 mb-1">2. Bukti Surat Pengesahan (Aplikasi)</label>
-                        <div id="pautanLama2" class="text-xs mb-2"></div>
+                    <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl hover:shadow-md hover:bg-blue-50 transition-all">
+                        <label class="block text-sm font-extrabold text-blue-900 mb-2">2. Bukti Surat (Aplikasi)</label>
+                        <div id="pautanLama2" class="text-xs mb-3 bg-white p-2 rounded border border-blue-100 min-h-[36px] flex items-center break-all"></div>
                         <input type="hidden" id="urlLama2">
-                        <div class="flex flex-col md:flex-row gap-2 items-center">
-                            <input type="file" id="failEdit2" accept="application/pdf" class="w-full md:w-1/2 text-sm text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700" onchange="urusFailEdit(this, 2, 'Surat_Pengesahan_Aplikasi')">
-                            <input type="text" id="namaFailEdit2" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full md:w-1/2 border p-1.5 rounded outline-none text-sm hidden">
+                        <div class="flex flex-col gap-2">
+                            <input type="file" id="failEdit2" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm" onchange="urusFailEdit(this, 2, 'Surat_Pengesahan_Aplikasi')">
+                            <input type="text" id="namaFailEdit2" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full border border-gray-300 p-2 rounded-lg outline-none text-xs hidden focus:ring-2 focus:ring-blue-400">
                         </div>
                     </div>
 
-                    <div class="p-4 border border-blue-200 bg-blue-50 rounded-lg">
-                        <label class="block text-sm font-bold text-blue-800 mb-1">3. Pendaftaran Harta Intelek (CR1 & Resit)</label>
-                        <div id="pautanLama3" class="text-xs mb-2"></div>
+                    <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl hover:shadow-md hover:bg-blue-50 transition-all">
+                        <label class="block text-sm font-extrabold text-blue-900 mb-2">3. Pendaftaran Harta Intelek</label>
+                        <div id="pautanLama3" class="text-xs mb-3 bg-white p-2 rounded border border-blue-100 min-h-[36px] flex items-center break-all"></div>
                         <input type="hidden" id="urlLama3">
-                        <div class="flex flex-col md:flex-row gap-2 items-center">
-                            <input type="file" id="failEdit3" accept="application/pdf" class="w-full md:w-1/2 text-sm text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700" onchange="urusFailEdit(this, 3, 'Borang_CR1_Resit_Pendaftaran')">
-                            <input type="text" id="namaFailEdit3" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full md:w-1/2 border p-1.5 rounded outline-none text-sm hidden">
+                        <div class="flex flex-col gap-2">
+                            <input type="file" id="failEdit3" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm" onchange="urusFailEdit(this, 3, 'Borang_CR1_Resit_Pendaftaran')">
+                            <input type="text" id="namaFailEdit3" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full border border-gray-300 p-2 rounded-lg outline-none text-xs hidden focus:ring-2 focus:ring-blue-400">
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="flex justify-end mt-6 gap-3 pt-4 border-t">
-                <button onclick="tutupModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-2 rounded-lg">Batal</button>
-                <button id="btnSimpanEdit" onclick="simpanKemaskini()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-lg shadow-md flex items-center gap-2">Simpan Perubahan & Dokumen</button>
+            <div class="flex justify-end mt-8 gap-3 pt-5 border-t border-gray-200">
+                <button onclick="tutupModal()" class="bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-700 font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer">Batal</button>
+                <button id="btnSimpanEdit" onclick="simpanKemaskini()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold px-6 py-2.5 rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer">
+                    💾 Simpan Perubahan & Dokumen
+                </button>
             </div>
         </div>
     </div>
 
     <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0;}
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
-
+    
     <script>
         // ⚠️ MASUKKAN URL WEB APP ANDA DI SINI
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
@@ -311,7 +323,7 @@
                 let matchThn = (pilTahun === "" || String(row.tahun).includes(pilTahun));
                 let matchSuk = (pilSukuan === "Semua" || String(row.sukuan).trim().toUpperCase() === pilSukuan.toUpperCase());
                 
-                // 🌟 KEMASKINI PENTING: Hanya papar rekod yang MENUNGGU PENGESAHAN di jadual ini!
+                // Hanya papar rekod yang MENUNGGU PENGESAHAN di jadual ini!
                 let matchStatus = (String(row.status).trim().toUpperCase() === "MENUNGGU PENGESAHAN");
 
                 return matchJab && matchThn && matchSuk && matchStatus;
@@ -352,7 +364,7 @@
                             let linkValid = link.startsWith("http") ? link : "https://" + link;
                             let namaButang = labelDokumen[index] ? labelDokumen[index] : `Fail ${index + 1}`;
                             
-                            pautanHtml += `<a href="${linkValid}" target="_blank" class="block mb-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-900 border border-blue-200 px-3 py-1.5 rounded font-semibold shadow-sm transition text-center text-[11px] truncate max-w-[180px] mx-auto" title="${linkValid}">📄 ${namaButang}</a>`;
+                            pautanHtml += `<a href="${linkValid}" target="_blank" class="block mb-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-900 border border-blue-200 px-3 py-1.5 rounded font-semibold shadow-sm transition text-center text-[11px] truncate w-full mx-auto" title="${linkValid}">📄 ${namaButang}</a>`;
                         });
                     }
                 }
@@ -360,33 +372,33 @@
                 let ahliKumpulan = row.ahli ? row.ahli : "<span class='text-gray-400 italic'>Tiada</span>";
 
                 tr.innerHTML = `
-                    <td class="p-3 font-mono font-bold text-gray-700">${row.bil}</td>
-                    <td class="p-3 font-bold text-gray-800 leading-tight">${row.namaProduk}</td>
+                    <td class="p-3 font-mono font-bold text-gray-700 text-center">${row.bil}</td>
+                    <td class="p-3 font-bold text-gray-800 leading-relaxed">${row.namaProduk}</td>
                     <td class="p-3 text-gray-700">
-                        <div class="font-bold text-blue-700 uppercase">👑 ${row.ketua}</div>
-                        <div class="text-[10px] text-gray-600 mt-1 uppercase leading-tight">👥 ${ahliKumpulan}</div>
+                        <div class="font-bold text-blue-700 uppercase leading-snug">👑 ${row.ketua}</div>
+                        <div class="text-[10px] text-gray-600 mt-1.5 uppercase leading-snug">👥 ${ahliKumpulan}</div>
                     </td>
-                    <td class="p-3 text-gray-700 whitespace-nowrap">
-                        <div class="text-blue-600">📞 ${row.telefon || '-'}</div>
-                        <div class="text-orange-600">✉️ ${row.email || '-'}</div>
+                    <td class="p-3 text-gray-700">
+                        <div class="text-blue-600 mb-1">📞 ${row.telefon || '-'}</div>
+                        <div class="text-orange-600 break-all">✉️ ${row.email || '-'}</div>
                     </td>
-                    <td class="p-3 font-bold text-purple-700 uppercase">${row.jabatan}</td>
-                    <td class="p-3 text-gray-600 uppercase">${row.aplikasi}</td>
+                    <td class="p-3 font-bold text-purple-700 uppercase text-center">${row.jabatan}</td>
+                    <td class="p-3 text-gray-600 uppercase text-center">${row.aplikasi}</td>
                     <td class="p-3">
-                        <div class="text-gray-800 font-semibold uppercase mb-1">${row.jenis}</div>
-                        <div class="font-mono text-[10px] bg-gray-100 p-1 rounded inline-block">Reg: ${row.pendaftaran || '-'}</div>
+                        <div class="text-gray-800 font-semibold uppercase mb-1.5 leading-snug">${row.jenis}</div>
+                        <div class="font-mono text-[10px] bg-gray-100 p-1.5 rounded inline-block">Reg: ${row.pendaftaran || '-'}</div>
                     </td>
                     <td class="p-3 text-center">
                         <div class="font-bold text-lg text-gray-800">${row.tahun || '-'}</div>
                         <div class="text-[11px] font-semibold text-gray-500 uppercase">${row.sukuan || '-'}</div>
                     </td>
                     <td class="p-3 text-center align-top pt-4">
-                        <div class="flex flex-col items-center justify-center">
+                        <div class="flex flex-col items-center justify-center w-full">
                             ${pautanHtml}
                         </div>
                     </td>
                     <td class="p-3 text-center align-top pt-4">
-                        <div class="flex flex-col gap-1.5">
+                        <div class="flex flex-col gap-1.5 w-full">
                             <button onclick="prosesPengesahan('${row.bil}', 'sahkanKPI')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg font-bold shadow-sm transition w-full">✔ Sahkan</button>
                             <button onclick="bukaModalEdit('${row.bil}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg font-bold shadow-sm transition w-full">✏ Kemaskini</button>
                             <button onclick="prosesPengesahan('${row.bil}', 'tolakKPI')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg font-bold shadow-sm transition w-full">✖ Tolak</button>
@@ -461,7 +473,6 @@
                 return;
             }
             
-            // 🌟 KEMASKINI SAIZ MAKSIMUM 10MB
             if (file.size > 10 * 1024 * 1024) {
                 alert("⚠️ Fail terlalu besar! (Maksimum 10MB). Sila kecilkan saiz PDF anda.");
                 input.value = "";

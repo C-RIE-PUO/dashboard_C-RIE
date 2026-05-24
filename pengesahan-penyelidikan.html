@@ -25,8 +25,7 @@
     </style>
 </head>
 <body class="bg-gray-50 p-4 md:p-8 font-sans text-gray-800">
-
-    <div class="max-w-[1400px] mx-auto">
+<div class="w-full px-3 sm:px-6 xl:px-12 mx-auto">
         
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-200 gap-4">
             <div>
@@ -46,7 +45,7 @@
 
         <div id="statusMesej" class="hidden mb-6 p-4 rounded-lg text-center text-sm font-semibold shadow-sm"></div>
    
-   <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6">
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">📊 Statistik Pengesahan Mengikut Jabatan</h2>
                 <button onclick="toggleStatistik()" class="text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg font-bold hover:bg-slate-200 transition shadow-3xs border border-slate-300">
@@ -60,8 +59,6 @@
                 </div>
             </div>
         </div>
-   
-   
    
         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 w-full lg:w-3/4 text-sm">
@@ -101,23 +98,22 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse whitespace-nowrap text-xs md:text-sm">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden w-full">
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse table-auto text-xs md:text-sm">
                     <thead>
                         <tr class="bg-slate-800 text-slate-100 border-b border-slate-900 uppercase tracking-wider text-[11px]">
-                            <th class="py-4 px-3 font-bold text-center w-[60px]">Bil</th>
-                            <th class="py-4 px-4 font-bold text-left min-w-[320px]">Maklumat Penyelidikan & Penerbitan</th>
-                            <th class="py-4 px-3 font-bold col-penulis text-left">Penulis</th>
-                            <th class="py-4 px-3 font-bold col-doi text-center">DOI/URL</th>
-                            <th class="py-4 px-3 font-bold col-jabatan text-center">Jabatan</th>
-                            <th class="py-4 px-3 font-bold col-tahap text-center">Tahap</th>
-                            <th class="py-4 px-3 font-bold col-kpi text-center">Sukuan</th>
-                            <th class="py-4 px-3 font-bold col-tahun text-center">Tahun</th>
-                            <th class="py-4 px-3 font-bold col-index text-center">Index</th>
-                            <th class="py-4 px-3 font-bold col-dokumen text-center">Fail Bukti</th>
-                            <th class="py-4 px-3 font-bold text-center">Status</th>
-                            <th class="py-4 px-3 font-bold text-center">Tindakan Pentadbir</th>
+                            <th class="py-4 px-3 font-bold text-center w-[3%]">Bil</th>
+                            <th class="py-4 px-4 font-bold text-left w-[25%]">Maklumat Penyelidikan & Penerbitan</th>
+                            <th class="py-4 px-3 font-bold col-penulis text-left w-[12%]">Penulis</th>
+                            <th class="py-4 px-3 font-bold col-doi text-center w-[8%]">DOI/URL</th>
+                            <th class="py-4 px-3 font-bold col-jabatan text-center w-[7%]">Jabatan</th>
+                            <th class="py-4 px-3 font-bold col-tahap text-center w-[7%]">Tahap</th>
+                            <th class="py-4 px-3 font-bold col-kpi text-center w-[7%]">Sukuan</th>
+                            <th class="py-4 px-3 font-bold col-tahun text-center w-[5%]">Tahun</th>
+                            <th class="py-4 px-3 font-bold col-index text-center w-[6%]">Index</th>
+                            <th class="py-4 px-3 font-bold col-dokumen text-center w-[10%]">Fail Bukti</th>
+                            <th class="py-4 px-3 font-bold text-center w-[10%]">Status / Tindakan</th>
                         </tr>
                     </thead>
                     <tbody id="senaraiMenunggu" class="divide-y divide-gray-100 text-gray-700">

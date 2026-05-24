@@ -536,7 +536,19 @@ function janaPilihanFilter(rawData) {
     
     // Hanya render pilihan untuk Jabatan sahaja
     fJabatan.innerHTML = '<option value="SEMUA">Semua Jabatan</option>';
-    Array.from(setJabatan).sort().forEach(j => fJabatan.innerHTML += `<option value="${j}">${j}</option>`);
+    
+    Array.from(setJabatan).sort().forEach(j => {
+        // 🌟 KEMASKINI: Ekstrak nama singkatan di dalam kurungan jika wujud
+        let namaSingkatan = j;
+        const match = j.match(/\(([^)]+)\)/); // Cari teks di dalam ()
+        if (match) {
+            namaSingkatan = match[1].trim(); // Ambil teks singkatan (cth: JKA)
+        }
+        
+        // Value kekal nama penuh (j) supaya fungsi filter asal tidak rosak
+        // Paparan teks menggunakan nama singkatan (namaSingkatan)
+        fJabatan.innerHTML += `<option value="${j}">${namaSingkatan}</option>`;
+    });
 }
 
 function laksanaFilter() {
@@ -599,6 +611,14 @@ function prosesDanRender(tab, data, page = 1) {
     const totalRekod = data.length;
     document.getElementById('chartSection').classList.remove('hidden');
 
+    // --- FUNGSI BANTUAN EKSTRAK SINGKATAN JABATAN ---
+    function formatSingkatanJabatan(namaJabatan) {
+        if (!namaJabatan) return '-';
+        let nama = String(namaJabatan).trim().toUpperCase();
+        let match = nama.match(/\(([^)]+)\)/);
+        return match ? match[1].trim() : nama; // Pulangkan JKA, JKE atau nama asal jika tiada kurungan
+    }
+
     if (tab === 'KPI_PENYELIDIKAN') {
         document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-microscope mr-2 text-blue-600"></i> Bilangan Kertas Penyelidikan Mengikut Jabatan`;
         document.getElementById('tajukCartaPie').innerText = `Status Indeks Penyelidikan`;
@@ -615,10 +635,13 @@ function prosesDanRender(tab, data, page = 1) {
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
         let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = r.bil || (indeksMula + index + 1);
+            let noBil = indeksMula + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
             let statusVal = String(r.statusPengesahan || 'MENUNGGU').toUpperCase();
             let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
             
+            // 🌟 KEMASKINI: Singkatan Jabatan
+            let jabSingkat = formatSingkatanJabatan(r.jabatan);
+
             return `<tr class="hover:bg-slate-50 transition-colors">
                 <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
                 <td class="p-4 border-b font-bold text-slate-700 uppercase text-xs">
@@ -626,7 +649,7 @@ function prosesDanRender(tab, data, page = 1) {
                     <div class="text-[9px] text-blue-500 mt-1 font-normal lowercase">${r.doiUrl || ''}</div>
                 </td>
                 <td class="p-4 border-b text-xs font-semibold uppercase">${r.penulis || '-'}</td>
-                <td class="p-4 border-b font-black text-blue-700 text-center text-[10px] uppercase">${r.jabatan || '-'}</td>
+                <td class="p-4 border-b font-black text-blue-700 text-center text-xs uppercase" title="${r.jabatan || ''}">${jabSingkat}</td>
                 <td class="p-4 border-b text-center font-bold text-xs">${r.tahun || '-'}</td>
                 <td class="p-4 border-b text-center"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[9px] font-bold uppercase">${r.indexStatus || '-'}</span></td>
                 <td class="p-4 border-b text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${statusClass}">${statusVal}</span></td>
@@ -654,14 +677,18 @@ function prosesDanRender(tab, data, page = 1) {
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
         let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = r.bil || (indeksMula + index + 1);
+            let noBil = indeksMula + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
             let statusVal = String(r.statusHI || '').toUpperCase();
             let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+            
+            // 🌟 KEMASKINI: Singkatan Jabatan
+            let jabSingkat = formatSingkatanJabatan(r.jabatan);
+
             return `<tr class="hover:bg-slate-50 transition-colors">
                 <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
                 <td class="p-4 border-b font-bold text-slate-700 uppercase text-xs">${r.tajuk || '-'}</td>
                 <td class="p-4 border-b text-xs font-semibold">${r.ketua || '-'}</td>
-                <td class="p-4 border-b font-black text-blue-700 text-center text-[10px] uppercase">${r.jabatan || '-'}</td>
+                <td class="p-4 border-b font-black text-blue-700 text-center text-xs uppercase" title="${r.jabatan || ''}">${jabSingkat}</td>
                 <td class="p-4 border-b text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-[9px] font-bold uppercase">${r.jenis || '-'}</span></td>
                 <td class="p-4 border-b text-xs font-mono text-blue-600 font-bold">${r.noDaftar || '-'}</td>
                 <td class="p-4 border-b text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${statusClass}">${r.statusHI || 'PROSES'}</span></td>
@@ -693,15 +720,19 @@ function prosesDanRender(tab, data, page = 1) {
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
         let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = r[0] || (indeksMula + index + 1);
+            let noBil = indeksMula + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
             let statusVal = String(r[13] || '').toUpperCase();
             let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+            
+            // 🌟 KEMASKINI: Singkatan Jabatan
+            let jabSingkat = formatSingkatanJabatan(r[6]);
+
             return `<tr class="hover:bg-slate-50 transition-colors">
                 <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
                 <td class="p-4 border-b font-bold text-slate-700 uppercase">${r[1] || '-'}</td>
                 <td class="p-4 border-b text-xs font-semibold">${r[2] || '-'}</td>
                 <td class="p-4 border-b text-[10px] text-slate-500">${r[5] || '-'}</td>
-                <td class="p-4 border-b font-black text-blue-700 text-center text-xs uppercase">${r[6] || '-'}</td>
+                <td class="p-4 border-b font-black text-blue-700 text-center text-xs uppercase" title="${r[6] || ''}">${jabSingkat}</td>
                 <td class="p-4 border-b text-[10px] uppercase italic">${r[7] || '-'}</td>
                 <td class="p-4 border-b text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-[9px] font-bold">${r[8] || '-'}</span></td>
                 <td class="p-4 border-b text-xs font-mono text-blue-600">${r[9] || '-'}</td>
@@ -711,11 +742,12 @@ function prosesDanRender(tab, data, page = 1) {
             </tr>`;
         }).join('');
         document.getElementById('bodyJadual').innerHTML = bodyHtml;
+        
         let statsKPI = kiraStatsKPI(data);
         renderChartsKPI(statsKPI);
         renderKadKPI(statsKPI);
 
-} else if (tab === 'GERAN') {
+    } else if (tab === 'GERAN') {
         document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-money-bill-trend-up mr-2 text-blue-600"></i> Nilai Geran Mengikut Jabatan (RM)`;
         document.getElementById('tajukCartaPie').innerText = `Pecahan Jenis Geran`;
 
@@ -731,11 +763,9 @@ function prosesDanRender(tab, data, page = 1) {
         </tr>`;
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
-        // 🌟 KEMASKINI C: Logik Pengumpulan pada KESELURUHAN DATA (Bukan dataTerhad)
         let semuaProjekKumpulan = [];
         let projekSemasa = null;
 
-        // ❗️ GUNA 'data' bukan 'dataTerhad' supaya ahli tidak terpotong awal
         data.forEach((r) => {
             let bilRaw = String(r[0] || '').trim(); 
             let ketuaRaw = String(r[1] || '').trim();
@@ -778,7 +808,6 @@ function prosesDanRender(tab, data, page = 1) {
             }
         });
 
-        // 🌟 KINI: Potong data untuk Pagination (Had 10 Projek)
         let startIdx = typeof indeksMula !== 'undefined' ? indeksMula : 0;
         let limitRecords = 10; 
         
@@ -790,17 +819,16 @@ function prosesDanRender(tab, data, page = 1) {
         
         let projekKumpulan = semuaProjekKumpulan.slice(startIdx, startIdx + limitRecords);
 
-        // 🌟 BINA JADUAL
         let bodyHtml = projekKumpulan.map((r, index) => {
             
-            let noBil = String(r[0] || '').trim() !== '' ? String(r[0]).trim() : '-';
+            let noBil = startIdx + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
             let ketuaRaw = String(r[1] || '-');        
-            let jabatanUtama = String(r[3] || '-').toUpperCase(); 
+            let jabatanUtama = formatSingkatanJabatan(r[3]); // 🌟 KEMASKINI: Singkatan Jabatan Geran
             let tajuk = String(r[6] || '-').toUpperCase(); 
             let jenisGeran = String(r[7] || '-').toUpperCase(); 
-            let noRuj = String(r[8] || '-');           
-            let tahunMula = String(r[9] || '-');       
-            let tahunTamat = String(r[10] || '-');     
+            let noRuj = String(r[8] || '-');            
+            let tahunMula = String(r[9] || '-');        
+            let tahunTamat = String(r[10] || '-');      
             let nilaiRaw = String(r[11] || '0').replace(/[^0-9.-]+/g, "");              
             let peratusRaw = String(r[12] || '0').trim(); 
             let status = String(r[13] || '-').toUpperCase(); 
@@ -817,12 +845,12 @@ function prosesDanRender(tab, data, page = 1) {
             if (r.senaraiAhliGabungan && r.senaraiAhliGabungan.length > 0) {
                 htmlAhli = r.senaraiAhliGabungan.slice(0, 5).map(a => {
                     let namaAhliBersih = a.nama.replace(/^\d+[\.\)\-\s]+/g, '').trim();
-                    let jabatanAhli = a.jabatan.toUpperCase();
+                    let jabatanAhli = formatSingkatanJabatan(a.jabatan); // 🌟 KEMASKINI: Singkatan Jabatan Ahli
                     return `
                     <div class="flex items-center mt-1.5">
                         <i class="fa-solid fa-user text-slate-300 text-[10px] mr-2"></i>
                         <span class="text-slate-500 text-[11px] font-semibold mr-2">${namaAhliBersih}</span>
-                        <span class="border border-slate-200 bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded text-[8px] font-bold">${jabatanAhli}</span>
+                        <span class="border border-slate-200 bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded text-[8px] font-bold" title="${a.jabatan}">${jabatanAhli}</span>
                     </div>`;
                 }).join('');
             }
@@ -837,7 +865,7 @@ function prosesDanRender(tab, data, page = 1) {
                             <span>${namaKetua}</span>
                         </div>
                         <div class="mt-1.5 ml-6">
-                            <span class="border border-blue-200 bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[9px] font-bold">${jabatanUtama}</span>
+                            <span class="border border-blue-200 bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[9px] font-bold" title="${r[3] || ''}">${jabatanUtama}</span>
                         </div>
                     </div>
                     <div class="ml-1 uppercase">
@@ -885,14 +913,14 @@ function prosesDanRender(tab, data, page = 1) {
             <th class="p-4 border-b sticky top-0 bg-blue-900">BIL</th>
             <th class="p-4 border-b sticky top-0 bg-blue-900">INNOVATOR / AHLI</th>
             <th class="p-4 border-b sticky top-0 bg-blue-900">PRODUK & PERTANDINGAN</th>
-            <th class="p-4 border-b sticky top-0 bg-blue-900">JABATAN</th>
+            <th class="p-4 border-b sticky top-0 bg-blue-900 text-center">JABATAN</th>
             <th class="p-4 border-b sticky top-0 bg-blue-900">PINGAT</th>
             <th class="p-4 border-b sticky top-0 bg-blue-900">STATUS</th>
         </tr>`;
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
         let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = r[0] || (indeksMula + index + 1);
+            let noBil = indeksMula + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
             let badgePingat = "";
             let p = String(r[7]).toUpperCase();
             if(p.includes('EMAS')) badgePingat = "bg-yellow-500 text-white";
@@ -901,8 +929,11 @@ function prosesDanRender(tab, data, page = 1) {
             else badgePingat = "bg-slate-100 text-slate-600";
             let statusClass = r[9].includes('DISAHKAN') ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50';
 
+            // 🌟 KEMASKINI: Singkatan Jabatan (Inovasi Tab)
+            let jabSingkat = formatSingkatanJabatan(r[3]);
+
             return `<tr class="hover:bg-blue-50/30 transition-colors">
-                <td class="p-4 border-b font-bold text-slate-400">${noBil}</td>
+                <td class="p-4 border-b font-bold text-slate-400 text-center">${noBil}</td>
                 <td class="p-4 border-b">
                     <div class="font-bold text-blue-900">${r[1]}</div>
                     <div class="text-[10px] text-slate-500 italic uppercase">${r[2]}</div>
@@ -911,7 +942,7 @@ function prosesDanRender(tab, data, page = 1) {
                     <div class="font-bold uppercase text-slate-700">${r[4]}</div>
                     <div class="text-[10px] text-blue-600">${r[5]} (${r[8]})</div>
                 </td>
-                <td class="p-4 border-b font-bold text-xs">${r[3]}</td>
+                <td class="p-4 border-b font-bold text-xs text-blue-700 text-center" title="${r[3] || ''}">${jabSingkat}</td>
                 <td class="p-4 border-b"><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${badgePingat}">${r[7]}</span></td>
                 <td class="p-4 border-b"><span class="px-2 py-1 rounded text-[9px] font-bold ${statusClass}">${r[9]}</span></td>
             </tr>`;
@@ -1606,7 +1637,7 @@ function renderChartsGeran(stats) {
 	
 	
 	<script>
-    window.onload = () => {
+window.onload = () => {
         // 1. Logik asal untuk pengesahan sesi/login
         const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
         const perananPengguna = (sessionStorage.getItem("peranan") || "").trim().toUpperCase();
@@ -1630,7 +1661,20 @@ function renderChartsGeran(stats) {
             
             if (pNama) pNama.innerText = sessionStorage.getItem("namaPengguna") || "Pengguna";
             if (pPeranan) pPeranan.innerText = perananPengguna;
-            if (pJabatan) pJabatan.innerText = sessionStorage.getItem("jabatan") || "TIADA";
+            
+            // 🌟 KEMASKINI: Ekstrak singkatan untuk paparan Jabatan
+            if (pJabatan) {
+                let jabatanAsal = sessionStorage.getItem("jabatan") || "TIADA";
+                let paparanJabatan = jabatanAsal;
+                
+                // Cari teks di dalam kurungan (contoh: JKA, JKE)
+                const matchJabatan = jabatanAsal.match(/\(([^)]+)\)/);
+                if (matchJabatan) {
+                    paparanJabatan = matchJabatan[1].trim(); // Ambil singkatan sahaja
+                }
+                
+                pJabatan.innerText = paparanJabatan;
+            }
 
             const btnLogKeluar = document.getElementById('btnLogKeluar');
             if (btnLogKeluar) {
