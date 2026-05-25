@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
 	<script src="https://cdn.tailwindcss.com"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script>
         if (sessionStorage.getItem("userLulus") !== "YA") {
             alert("Akses ditolak! Sila log masuk terlebih dahulu.");
@@ -70,46 +72,51 @@
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200/70 overflow-hidden transition-all duration-300">
             
-            <div class="p-5 border-b border-slate-100 flex flex-col xl:flex-row justify-between items-start xl:items-center bg-slate-50/70 gap-4">
+           <div class="p-5 border-b border-slate-100 flex flex-col xl:flex-row justify-between items-start xl:items-center bg-slate-50/70 gap-4">
                 <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2 flex-shrink-0">
                     📋 Senarai Penerbitan <span id="tajukJadual" class="text-blue-600 font-extrabold bg-blue-50 px-2.5 py-0.5 rounded-lg text-sm"></span>
                 </h2>
                 
-                <div class="flex flex-wrap gap-2 items-center w-full xl:w-auto grid-cols-2 md:grid-cols-none">
-                    <div class="relative flex-grow md:flex-grow-0 w-full md:w-44">
-                        <input type="text" id="filterTahun" oninput="applyFilters()" placeholder="Cari Tahun (Cth: 2024)" class="w-full border border-slate-300 hover:border-slate-400 bg-white px-3 py-2 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all duration-200 placeholder:text-slate-400 shadow-3xs">
+                <div class="flex flex-wrap lg:flex-nowrap gap-2 items-center w-full xl:w-auto">
+                    
+                    <div class="relative flex-grow md:flex-grow-0 w-full lg:w-32 xl:w-40 shrink-0">
+                        <input type="text" id="filterTahun" oninput="applyFilters()" placeholder="Tahun (Cth: 2024)" class="w-full border border-slate-300 hover:border-slate-400 bg-white px-3 py-2 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all duration-200 placeholder:text-slate-400 shadow-3xs">
                     </div>
 
-                    <select id="filterSukuan" onchange="applyFilters()" class="border border-slate-300 hover:border-slate-400 bg-white px-3 py-2 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all duration-200 flex-grow md:flex-grow-0 cursor-pointer shadow-3xs">
+                    <select id="filterSukuan" onchange="applyFilters()" class="border border-slate-300 hover:border-slate-400 bg-white px-3 py-2 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all duration-200 flex-grow md:flex-grow-0 cursor-pointer shadow-3xs shrink-0">
                         <option value="">⏳ Semua Sukuan</option>
                     </select>
 
-                    <select id="filterJabatan" onchange="applyFilters()" class="border border-slate-300 hover:border-slate-400 bg-white px-3 py-2 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all duration-200 flex-grow md:flex-grow-0 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 cursor-pointer shadow-3xs">
+                    <select id="filterJabatan" onchange="applyFilters()" class="border border-slate-300 hover:border-slate-400 bg-white px-3 py-2 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all duration-200 flex-grow md:flex-grow-0 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 cursor-pointer shadow-3xs shrink-0 max-w-[180px]">
                         <option value="">🏢 Semua Jabatan</option>
                     </select>
 
-                    <select id="filterStatus" onchange="applyFilters()" class="border border-slate-300 hover:border-slate-400 bg-white px-3 py-2 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all duration-200 flex-grow md:flex-grow-0 cursor-pointer shadow-3xs">
+                    <select id="filterStatus" onchange="applyFilters()" class="border border-slate-300 hover:border-slate-400 bg-white px-3 py-2 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-all duration-200 flex-grow md:flex-grow-0 cursor-pointer shadow-3xs shrink-0">
                         <option value="">🔔 Semua Status</option>
                         <option value="MENUNGGU">🟡 Menunggu</option>
                         <option value="DISAHKAN">🟢 Disahkan</option>
                         <option value="DITOLAK">🔴 Ditolak</option>
                     </select>
 
-                    <button onclick="ambilDataPenyelidikan()" class="bg-blue-50 text-blue-700 hover:bg-blue-100 active:scale-95 px-3.5 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-3xs cursor-pointer">
-                        🔄 Refresh
+                    <button onclick="ambilDataPenyelidikan()" class="bg-blue-50 text-blue-700 hover:bg-blue-100 active:scale-95 px-3 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-3xs cursor-pointer shrink-0" title="Refresh">
+                        🔄
                     </button>
                     
-                    <button onclick="downloadCSV()" class="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 px-3.5 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm cursor-pointer">
-                        📊 Eksport CSV
+                    <button onclick="downloadCSV()" class="bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95 px-3 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm cursor-pointer shrink-0">
+                        📊 CSV
+                    </button>
+                    
+                    <button onclick="muatTurunPDFLaporan()" class="bg-red-600 text-white hover:bg-red-700 active:scale-95 px-3 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-sm cursor-pointer shrink-0" title="Muat Turun Laporan PDF">
+                        📄 Laporan
                     </button>
 
-                    <button id="btnDownloadZIP" onclick="muatTurunZipKPI()" class="hidden bg-purple-600 text-white hover:bg-purple-700 active:scale-95 px-3.5 py-2 rounded-xl text-sm font-bold items-center justify-center gap-1.5 transition-all duration-200 shadow-sm cursor-pointer" title="Muat turun fail dokumen KPI yang dipilih dalam format ZIP">
-                        📦 Download KPI (ZIP)
+                    <button id="btnDownloadZIP" onclick="muatTurunZipKPI()" class="hidden bg-purple-600 text-white hover:bg-purple-700 active:scale-95 px-3 py-2 rounded-xl text-sm font-bold items-center justify-center gap-1.5 transition-all duration-200 shadow-sm cursor-pointer shrink-0" title="Muat turun fail dokumen KPI yang dipilih dalam format ZIP">
+                        📦 ZIP
                     </button>
                     
-                    <div class="relative inline-block text-left flex-grow md:flex-grow-0 w-full md:w-auto">
-                        <button id="btnPilihanLajur" onclick="togglePilihanLajur()" class="w-full bg-white text-slate-700 hover:bg-slate-50 active:scale-95 px-3.5 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-3xs border border-slate-300 cursor-pointer">
-                            ⚙️ Papar Lajur
+                    <div class="relative inline-block text-left flex-grow md:flex-grow-0 w-full md:w-auto shrink-0">
+                        <button id="btnPilihanLajur" onclick="togglePilihanLajur()" class="w-full bg-white text-slate-700 hover:bg-slate-50 active:scale-95 px-3 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-3xs border border-slate-300 cursor-pointer">
+                            ⚙️ Lajur
                         </button>
                         
                         <div id="menuPilihanLajur" class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-md shadow-xl z-50 p-3 flex flex-col gap-2 max-h-64 overflow-y-auto">
@@ -190,6 +197,11 @@
                 <div class="col-span-1 md:col-span-2">
                     <label class="block text-sm font-bold text-gray-700">Tajuk Penyelidikan</label>
                     <input type="text" id="editTajuk" class="w-full border px-3 py-2 rounded-lg focus:ring focus:ring-blue-300 uppercase" required>
+                </div>
+                
+                <div class="col-span-1 md:col-span-2">
+                    <label class="block text-sm font-bold text-gray-700">Nama Jurnal / Prosiding</label>
+                    <input type="text" id="editNamaJurnal" class="w-full border px-3 py-2 rounded-lg focus:ring focus:ring-blue-300 uppercase" placeholder="Contoh: JURNAL TEKNOLOGI / PROCEEDING IEEE">
                 </div>
 
                 <div>
@@ -533,7 +545,7 @@ function paparkanJadualPenyelidikan(senarai) {
             if (senaraiLink.length > 0) {
                 htmlDokumen = `<div class="flex flex-col gap-1.5 items-center w-full">`;
                 senaraiLink.forEach((link, i) => {
-                    // 🌟 KEMASKINI: Dapatkan nama fail sebenar yang sudah dibersihkan
+                    // Dapatkan nama fail sebenar yang sudah dibersihkan
                     let teksPautan = dapatkanNamaFail(link, i);
                     htmlDokumen += `
                         <a href="${link.trim()}" target="_blank" title="${teksPautan}" class="w-full inline-flex items-center justify-center gap-1 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-slate-200 px-2 py-1.5 rounded-md font-medium transition shadow-3xs">
@@ -555,7 +567,14 @@ function paparkanJadualPenyelidikan(senarai) {
                     <div class="font-bold text-gray-900 text-sm leading-snug tracking-tight">
                         ${formatDataKosong(row.tajuk || row.TAJUK)}
                     </div>
-                    <div class="flex flex-wrap items-center gap-x-2 gap-y-2 text-[11px]">
+                    
+                    ${(row.namaJurnal || row.NAMA_JURNAL) ? `
+                    <div class="text-[11px] font-medium text-purple-700 flex items-center gap-1.5 mt-0.5">
+                        📚 <span class="italic bg-purple-50 px-2 py-0.5 rounded border border-purple-100 shadow-3xs uppercase">${row.namaJurnal || row.NAMA_JURNAL}</span>
+                    </div>
+                    ` : ''}
+
+                    <div class="flex flex-wrap items-center gap-x-2 gap-y-2 text-[11px] mt-1">
                         <span class="col-publisher inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-medium shadow-3xs" title="Penerbit / Jurnal">
                             🏢 <span class="font-semibold text-slate-900">Penerbit:</span> ${formatDataKosong(row.publisher || row.PUBLISHER)}
                         </span>
@@ -632,7 +651,9 @@ function downloadCSV() {
         return;
     }
 
-    let csvContent = "Bil,Tajuk,Penulis,Publisher,Vol/Issue,Tarikh Terbit,DOI/URL,Jabatan,Tahap Sebaran,Laporan KPI,Tahun,Bahasa,Index Status,URL Dokumen,Status Pengesahan\n";
+    // 🌟 KEMASKINI: Menambahkan BOM (\uFEFF) di awal agar aksen/karakter terbaca rapi di Excel 
+    // serta menambah kolom "Nama Jurnal/Prosiding" di akhir baris sesuai dengan struktur Lajur P
+    let csvContent = "\uFEFFBil,Tajuk,Penulis,Publisher,Vol/Issue,Tarikh Terbit,DOI/URL,Jabatan,Tahap Sebaran,Laporan KPI,Tahun,Bahasa,Index Status,URL Dokumen,Status Pengesahan,Nama Jurnal/Prosiding\n";
 
     rekodDitapis.forEach((row, index) => {
         let rowData = [
@@ -650,7 +671,8 @@ function downloadCSV() {
             `"${row.bahasa || ''}"`,
             `"${row.indexStatus || row.index_status || ''}"`,
             `"${row.urlDokumenBukti || row.url_dokumen_bukti || row.urlBukti || ''}"`,
-            `"${row.statusPengesahan || 'MENUNGGU'}"`
+            `"${row.statusPengesahan || 'MENUNGGU'}"`,
+            `"${(row.namaJurnal || row.NAMA_JURNAL || '').replace(/"/g, '""')}"` // 🌟 TAMBAHAN BARU: Memasukkan nilai Nama Jurnal / Prosiding
         ];
         csvContent += rowData.join(",") + "\n";
     });
@@ -837,6 +859,12 @@ function editRekod(idRekod) {
 
     document.getElementById('editID').value = idRekod;
     document.getElementById('editTajuk').value = String(rekod.tajuk || rekod.TAJUK || '').toUpperCase();
+    
+    // 🌟 TAMBAHAN BARU: Masukkan data nama jurnal ke dalam modal edit
+    const elEditNamaJurnal = document.getElementById('editNamaJurnal');
+    if (elEditNamaJurnal) {
+        elEditNamaJurnal.value = String(rekod.namaJurnal || rekod.NAMA_JURNAL || '').toUpperCase();
+    }
     
     const elEditJabatan = document.getElementById('editJabatan');
     if (elEditJabatan) {
@@ -1051,7 +1079,7 @@ function tutupModal() {
     document.getElementById('modalEdit').classList.add('hidden');
 }
 
-// --- FUNGSI SIMPAN KEMASKINI (VERSI DISINKRONI PENUH) ---
+// --- FUNGSI SIMPAN KEMASKINI (VERSI DISINKRONI PENUH & TERBARU) ---
 async function simpanKemaskini(event) {
     event.preventDefault(); 
     
@@ -1080,7 +1108,7 @@ async function simpanKemaskini(event) {
         if (file1.type !== "application/pdf") {
             alert("⚠️ Item 1: Hanya format PDF sahaja yang dibenarkan!");
             btnSimpan.disabled = false;
-            btnSimpan.innerText = "💾 Simpan Perubahan";
+            btnSimpan.innerText = "💾 Simpan Perubahan & Dokumen";
             return;
         }
         
@@ -1088,7 +1116,7 @@ async function simpanKemaskini(event) {
         if (file1.size > 15 * 1024 * 1024) {
             alert("⚠️ Item 1 Gagal: Saiz dokumen melebihi had maksimum 15 MB!");
             btnSimpan.disabled = false;
-            btnSimpan.innerText = "💾 Simpan Perubahan";
+            btnSimpan.innerText = "💾 Simpan Perubahan & Dokumen";
             return;
         }
         
@@ -1108,7 +1136,7 @@ async function simpanKemaskini(event) {
         } catch (e) {
             alert("❌ Ralat ketika memproses fail Item 1.");
             btnSimpan.disabled = false;
-            btnSimpan.innerText = "💾 Simpan Perubahan";
+            btnSimpan.innerText = "💾 Simpan Perubahan & Dokumen";
             return;
         }
     }
@@ -1121,7 +1149,7 @@ async function simpanKemaskini(event) {
         if (file2.type !== "application/pdf") {
             alert("⚠️ Item 2: Hanya format PDF sahaja yang dibenarkan!");
             btnSimpan.disabled = false;
-            btnSimpan.innerText = "💾 Simpan Perubahan";
+            btnSimpan.innerText = "💾 Simpan Perubahan & Dokumen";
             return;
         }
         
@@ -1129,7 +1157,7 @@ async function simpanKemaskini(event) {
         if (file2.size > 15 * 1024 * 1024) {
             alert("⚠️ Item 2 Gagal: Saiz dokumen melebihi had maksimum 15 MB!");
             btnSimpan.disabled = false;
-            btnSimpan.innerText = "💾 Simpan Perubahan";
+            btnSimpan.innerText = "💾 Simpan Perubahan & Dokumen";
             return;
         }
         
@@ -1149,7 +1177,7 @@ async function simpanKemaskini(event) {
         } catch (e) {
             alert("❌ Ralat ketika memproses fail Item 2.");
             btnSimpan.disabled = false;
-            btnSimpan.innerText = "💾 Simpan Perubahan";
+            btnSimpan.innerText = "💾 Simpan Perubahan & Dokumen";
             return;
         }
     }
@@ -1178,10 +1206,11 @@ async function simpanKemaskini(event) {
         action: "kemaskiniMaklumatPenyelidikan",
         id: idRekod,
         jabatan: document.getElementById('editJabatan').value, 
-        tajuk: document.getElementById('editTajuk').value,
+        tajuk: document.getElementById('editTajuk').value.toUpperCase(), // Ubah kepada huruf besar untuk keseragaman
+        namaJurnal: document.getElementById('editNamaJurnal') ? document.getElementById('editNamaJurnal').value.toUpperCase() : "", // 🌟 TAMBAHAN BARU
         penulis: namaPenulisGabungEdit, 
-        publisher: document.getElementById('editPublisher').value,
-        volumeIssue: document.getElementById('editVol').value,
+        publisher: document.getElementById('editPublisher').value.toUpperCase(),
+        volumeIssue: document.getElementById('editVol').value.toUpperCase(),
         tarikhPenerbitan: document.getElementById('editTarikh').value,
         doiUrl: document.getElementById('editDoi').value,
         tahapSebaran: document.getElementById('editTahap').value,
@@ -1216,6 +1245,7 @@ async function simpanKemaskini(event) {
                     // Update semua data maklumat teks sedia ada
                     rekodPenuh[indexLokal].jabatan = dataHantar.jabatan;
                     rekodPenuh[indexLokal].tajuk = dataHantar.tajuk;
+                    rekodPenuh[indexLokal].namaJurnal = dataHantar.namaJurnal; // 🌟 TAMBAHAN BARU
                     rekodPenuh[indexLokal].penulis = dataHantar.penulis;
                     rekodPenuh[indexLokal].publisher = dataHantar.publisher;
                     rekodPenuh[indexLokal].volumeIssue = dataHantar.volumeIssue;
@@ -1270,7 +1300,7 @@ async function simpanKemaskini(event) {
     .finally(() => {
         // Aktifkan semula butang simpan dan kembalikan teks asalnya
         btnSimpan.disabled = false;
-        btnSimpan.innerText = "💾 Simpan Perubahan";
+        btnSimpan.innerText = "💾 Simpan Perubahan & Dokumen";
     });
 }
 function tukarBilanganPenulisEdit() {
@@ -1514,6 +1544,172 @@ function padamRekod(idRekod) {
             
             // Buka tetingkap baru (Trigger download dari backend Apps Script)
             window.open(SCRIPT_URL + queryParams, "_blank");
+        }
+		
+// =================================================================
+        // 🌟 FUNGSI BARU: MUAT TURUN LAPORAN PDF (STATISTIK & JADUAL TERKINI)
+        // =================================================================
+        function muatTurunPDFLaporan() {
+            let dataUntukEksport = typeof rekodDitapis !== 'undefined' ? rekodDitapis : [];
+            
+            // Fallback (Jika tapisan belum dibuat, guna rekod penuh sedia ada)
+            if (dataUntukEksport.length === 0) {
+                if (typeof rekodPenuh !== 'undefined' && rekodPenuh.length > 0) {
+                    dataUntukEksport = rekodPenuh;
+                } else {
+                    alert("Tiada data penyelidikan yang dijumpai untuk dieksport.");
+                    return;
+                }
+            }
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("Sistem sedang memuatkan pustaka enjin PDF. Sila cuba tekan sekali lagi.");
+                return;
+            }
+
+            // 🌟 1. Prompt untuk Input Khas KPI Pengguna
+            let inputKpi = prompt(
+                "Sila masukkan teks deskripsi KPI yang ingin dipaparkan (Boleh tinggalkan kosong):", 
+                "Paparan KPI 18: Bilangan Projek Research, Development, Innovation, Commercialization & Economy (RDICE) yang Diaplikasikan kepada Pemegang Taruh"
+            );
+
+            // Jika pengguna klik "Cancel", hentikan eksport
+            if (inputKpi === null) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape'); 
+
+            // 2. Ambil nilai Tapisan (Filter) Semasa 
+            let elTahun = document.getElementById('filterTahun');
+            let fTahun = (elTahun && elTahun.value.trim() !== "") ? elTahun.value.trim() : "Semua Tahun";
+            
+            let selSukuan = document.getElementById('filterSukuan');
+            let fSukuan = (selSukuan && selSukuan.selectedIndex > -1 && selSukuan.value !== "") 
+                            ? selSukuan.options[selSukuan.selectedIndex].text.replace(/⏳ |-- /g, '').replace(' --', '') 
+                            : "Semua Sukuan";
+            
+            let selJabatan = document.getElementById('filterJabatan');
+            // Dapatkan nama JABATAN dengan tepat, buang ikon
+            let fJabatan = (selJabatan && selJabatan.selectedIndex > -1 && selJabatan.value !== "") 
+                            ? selJabatan.options[selJabatan.selectedIndex].text.replace(/🏢 |-- /g, '').replace(' --', '') 
+                            : "SEMUA JABATAN";
+
+            // Pastikan Jabatan adalah huruf besar untuk paparan header PDF
+            fJabatan = fJabatan.toUpperCase();
+
+            // 3. Masukkan Header Imej / Logo
+            try {
+                if (typeof logoJPPKKBase64 !== 'undefined' && logoJPPKKBase64.length > 100) {
+                    doc.addImage(logoJPPKKBase64, 'PNG', 14, 15, 30, 15);
+                }
+                if (typeof logoPUOBase64 !== 'undefined' && logoPUOBase64.length > 100) {
+                    doc.addImage(logoPUOBase64, 'PNG', 245, 12, 35, 20); 
+                }
+            } catch (e) {
+                console.warn("Ralat memasukkan imej logo ke PDF:", e);
+            }
+
+            // 4. Teks Header Laporan Dinamik 
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(30, 41, 59); // Slate 800
+            
+            // Pastikan tajuk sentiasa berada di tengah (Center Align)
+            const pageWidth = doc.internal.pageSize.width;
+            doc.text("RUMUSAN KERTAS PENYELIDIKAN YANG DITERBITKAN", pageWidth / 2, 20, { align: "center" });
+            doc.text(fJabatan, pageWidth / 2, 27, { align: "center" }); // Jabatan Dinamik
+            doc.text("POLITEKNIK UNGKU OMAR", pageWidth / 2, 34, { align: "center" });
+
+            // 5. Teks Input KPI Tersuai & Maklumat Filter
+            let splitKpiText = doc.splitTextToSize(inputKpi, 250); // Bungkus (wrap) teks jika terlalu panjang
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(71, 85, 105); // Slate 600
+            
+            let yPosAfterKpi = 45; // Kedudukan permulaan teks KPI
+            if(inputKpi.trim() !== "") {
+                doc.text(splitKpiText, 14, yPosAfterKpi);
+                yPosAfterKpi += (splitKpiText.length * 5) + 3; // Tolak Y ke bawah berdasarkan panjang teks
+            }
+
+            doc.setFont("helvetica", "italic");
+            doc.text(`Tahun: ${fTahun}   |   Sukuan: ${fSukuan}`, 14, yPosAfterKpi);
+            yPosAfterKpi += 5; // Jarak sebelum kotak statistik
+
+            // 🌟 6. Kira & Lukis Kotak Rumusan Statistik
+            const total = dataUntukEksport.length;
+            const disahkan = dataUntukEksport.filter(r => (r.statusPengesahan || r.STATUSPENGESAHAN || r.status || "").toUpperCase() === "DISAHKAN").length;
+            const ditolak = dataUntukEksport.filter(r => (r.statusPengesahan || r.STATUSPENGESAHAN || r.status || "").toUpperCase() === "DITOLAK").length;
+            const menunggu = total - disahkan - ditolak;
+
+            doc.setDrawColor(226, 232, 240);
+            doc.setFillColor(248, 250, 252);
+            doc.rect(14, yPosAfterKpi, 269, 14, 'FD'); // Lukis kotak latar belakang
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(15, 23, 42);
+            doc.text("Rumusan Statistik:", 18, yPosAfterKpi + 6);
+            
+            doc.setFont("helvetica", "normal");
+            doc.text(`Jumlah Rekod: ${total}   |   Disahkan: ${disahkan}   |   Menunggu: ${menunggu}   |   Ditolak: ${ditolak}`, 18, yPosAfterKpi + 11);
+
+            yPosAfterKpi += 18; // Anjak Y ke bawah supaya jadual tidak bertindih dengan kotak statistik
+
+            // 7. Sediakan Data untuk Jadual PDF
+            const tableColumn = ["Bil", "Maklumat Penyelidikan & Penerbitan", "Penulis", "Jabatan", "Laporan KPI", "Tahun", "Status"];
+            const tableRows = [];
+
+            dataUntukEksport.forEach((row, index) => {
+                let maklumat = `${(row.tajuk || row.TAJUK || '-').toUpperCase()}\n`;
+                if (row.namaJurnal || row.NAMA_JURNAL) maklumat += `\nJurnal: ${row.namaJurnal || row.NAMA_JURNAL}`;
+                maklumat += `\nPenerbit: ${row.publisher || row.PUBLISHER || '-'}`;
+                maklumat += `\nVol/Issue: ${row.volIssue || row.volumeIssue || row.volume_issue || row.VOLUME || '-'}`;
+                maklumat += `\nTarikh: ${row.tarikhTerbit || row.tarikhPenerbitan || row.tarikh_penerbitan || row.TARIKH || '-'}`;
+
+                const rowData = [
+                    index + 1,
+                    maklumat,
+                    (row.penulis || row.PENULIS || '-'),
+                    (row.jabatan || row.JABATAN || '-'),
+                    (row.laporanKpi || row.laporan_kpi || row.SUKUAN || '-'),
+                    (row.tahun || row.TAHUN || '-'),
+                    (row.statusPengesahan || row.STATUSPENGESAHAN || row.status || "MENUNGGU").toUpperCase()
+                ];
+                tableRows.push(rowData);
+            });
+
+            // 8. Jana Jadual Menggunakan AutoTable
+            doc.autoTable({
+                startY: yPosAfterKpi,
+                head: [tableColumn],
+                body: tableRows,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 3, font: 'helvetica' },
+                headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold' },
+                columnStyles: {
+                    0: { cellWidth: 10, halign: 'center' },      
+                    1: { cellWidth: 100 },                       
+                    2: { cellWidth: 50 },                        
+                    3: { cellWidth: 25, halign: 'center' },      
+                    4: { cellWidth: 25, halign: 'center' },      
+                    5: { cellWidth: 15, halign: 'center' },      
+                    6: { cellWidth: 25, halign: 'center' }       
+                },
+                didDrawPage: function (data) {
+                    let str = 'Muka Surat ' + doc.internal.getNumberOfPages();
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+                }
+            });
+
+            // 9. Simpan Fail PDF
+            let namaJabatanFail = fJabatan.replace(/ /g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+            let fTahunDinamik = fTahun === "Semua Tahun" ? "SemuaTahun" : fTahun;
+            let fileName = `Laporan_KPI_Penyelidikan_${namaJabatanFail}_${fTahunDinamik}.pdf`;
+            
+            doc.save(fileName);
         }
     </script>
 </body>

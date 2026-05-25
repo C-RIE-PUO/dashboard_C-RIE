@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script>
         if (sessionStorage.getItem("userLulus") !== "YA") {
             alert("Akses ditolak! Sila log masuk terlebih dahulu.");
@@ -893,190 +895,192 @@ function drawTable() {
             document.body.removeChild(link);
         }
 		
+// =================================================================
+        // 🌟 FUNGSI BARU: MUAT TURUN LAPORAN PDF (PRODUK INOVASI)
+        // =================================================================
         function muatTurunPDF() {
-            const tajukDefault = "LAPORAN KPI 18: BILANGAN PROJEK RESEARCH, DEVELOPMENT, INNOVATION, COMMERCIALIZATION AND ECONOMY (RDICE) YANG DIAPLIKASIKAN KEPADA PEMEGANG TARUH";
-            let tajukCustom = prompt("Sila semak dan kemaskini tajuk laporan jika perlu:", tajukDefault);
-            if (tajukCustom === null) return; 
-
-            while (tajukCustom.trim() === '') {
-                alert("⚠️ Ralat: Tajuk laporan tidak boleh dibiarkan kosong.");
-                tajukCustom = prompt("Sila masukkan tajuk laporan:", tajukDefault);
-                if (tajukCustom === null) return; 
-            }
-
-            let disediakanOleh = prompt("Sila masukkan nama untuk ruangan 'Disediakan oleh':\n(Biar kosong untuk garisan sahaja)", "");
-            if (disediakanOleh === null) return;
-
-            let disemakOleh = prompt("Sila masukkan nama untuk ruangan 'Disemak oleh':\n(Biar kosong untuk garisan sahaja)", "");
-            if (disemakOleh === null) return;
-
-            const element = document.getElementById('kawasan-cetakan');
-            if (!element) return alert("Ralat: Kawasan cetakan tidak dijumpai.");
-
-            document.getElementById('isiJadual').innerHTML = `<tr><td colspan="${totalLajur}" class="p-10 text-center font-bold text-red-500 animate-pulse">⏳ Sedang menjana PDF. Sila tunggu sebentar...</td></tr>`;
-
-            const thTindakan = document.getElementById('thTindakan');
-            if(thTindakan) thTindakan.style.display = 'none';
-
-            window.scrollTo(0, 0);
-            const tableContainer = document.querySelector('.overflow-x-auto');
-            const kotakJadual = tableContainer ? tableContainer.parentElement : null;
-
-            if (tableContainer) {
-                tableContainer.scrollLeft = 0; 
-                tableContainer.classList.remove('overflow-x-auto');
-            }
-
-            const jadual = document.querySelector('table');
-            if (jadual) {
-                jadual.classList.remove('min-w-[1500px]');
-                jadual.style.width = '100%'; 
-            }
-
-            const lebarAsal = element.style.width;
-            element.style.width = '1122px'; 
-
-            paparSemuaUntukCetak = true;
-            drawTable(); 
+            // Pengesanan pintar: Guna filteredData (jika ada), atau kpiData (data asal)
+            let dataUntukEksport = [];
             
-            const semuaSelTindakan = document.querySelectorAll('.sel-tindakan');
-            semuaSelTindakan.forEach(sel => sel.style.display = 'none');
-
-            const tajukCarta = document.querySelector('#bahagianCarta h2');
-            const tajukAsal = tajukCarta ? tajukCarta.innerText : '';
-            if (tajukCarta) tajukCarta.innerText = 'Laporan KPI mengikut jabatan'; 
-
-            const bahagianCartaObj = document.getElementById('bahagianCarta');
-            const isCartaVisible = bahagianCartaObj && !bahagianCartaObj.classList.contains('hidden');
-
-            const logoDiv = document.createElement('div');
-            logoDiv.id = 'logoCetakPDF';
-            logoDiv.className = 'w-full pt-4 pb-2 text-center';
-            if (typeof logoPoliBase64 !== 'undefined' && logoPoliBase64 !== '') {
-                logoDiv.innerHTML = `<img src="${logoPoliBase64}" class="mx-auto h-24 object-contain" />`;
+            if (typeof currentFilteredData !== 'undefined' && currentFilteredData.length > 0) {
+                dataUntukEksport = currentFilteredData;
+            } else if (typeof semuaData !== 'undefined' && semuaData.length > 0) {
+                dataUntukEksport = semuaData;
+            } else if (typeof window.filteredData !== 'undefined' && window.filteredData.length > 0) {
+                dataUntukEksport = window.filteredData;
+            } else if (typeof window.kpiData !== 'undefined' && window.kpiData.length > 0) {
+                dataUntukEksport = window.kpiData;
+            }
+            
+            if (dataUntukEksport.length === 0) {
+                alert("Tiada data produk inovasi yang dijumpai untuk dieksport berdasarkan tapisan ini.");
+                return;
             }
 
-            if (isCartaVisible) {
-                const headerCarta = document.createElement('div');
-                headerCarta.id = 'headerCartaPDF';
-                headerCarta.className = 'w-full pt-4 pb-6 text-center';
-                headerCarta.innerHTML = logoDiv.innerHTML; 
-                if (tajukCustom.trim() !== '') {
-                    headerCarta.innerHTML += `<h3 class="font-bold text-lg px-4 mt-4">${tajukCustom.trim()}</h3>`;
-                }
-                element.insertBefore(headerCarta, element.firstChild);
-
-                if (kotakJadual && jadual) {
-                    kotakJadual.style.pageBreakBefore = 'always';
-                    kotakJadual.classList.add('html2pdf__page-break');
-                    jadual.parentNode.insertBefore(logoDiv, jadual);
-                }
-            } else {
-                if (jadual) {
-                    jadual.parentNode.insertBefore(logoDiv, jadual);
-                }
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("Sistem sedang memuatkan pustaka enjin PDF. Sila pastikan skrip jsPDF diletakkan di bahagian <head>.");
+                return;
             }
 
-            if (jadual) {
-                let thead = jadual.querySelector('thead');
-                if (!thead) {
-                    thead = document.createElement('thead');
-                    jadual.insertBefore(thead, jadual.firstChild);
-                }
-                thead.style.display = 'table-header-group'; 
+            // 1. Prompt untuk Input Khas KPI Pengguna
+            let inputKpi = prompt(
+                "Sila semak dan kemaskini teks deskripsi KPI yang ingin dipaparkan:", 
+                "Paparan KPI 18: Bilangan Projek Research, Development, Innovation, Commercialization & Economy (RDICE) yang Diaplikasikan kepada Pemegang Taruh"
+            );
 
-                const trTajuk = document.createElement('tr');
-                trTajuk.id = 'trTajukPDF';
-                trTajuk.style.backgroundColor = 'white'; 
+            // Jika pengguna klik "Cancel", hentikan proses eksport
+            if (inputKpi === null) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape'); 
+
+            // 2. Ambil nilai Tapisan (Filter) Semasa untuk Header
+            let elTahun = document.getElementById('filterTahun');
+            let fTahun = (elTahun && elTahun.value.trim() !== "") ? elTahun.value.trim() : "Semua Tahun";
+            
+            let selSukuan = document.getElementById('filterSukuan');
+            let fSukuan = (selSukuan && selSukuan.selectedIndex > 0 && selSukuan.value !== "Semua") 
+                            ? selSukuan.options[selSukuan.selectedIndex].text.replace(/⏳ |-- /g, '').replace(' --', '') 
+                            : "Semua Sukuan";
+            
+            let selJabatan = document.getElementById('filterJabatan');
+            let fJabatan = (selJabatan && selJabatan.selectedIndex > 0 && selJabatan.value !== "Semua") 
+                            ? selJabatan.options[selJabatan.selectedIndex].text.replace(/🏢 |-- /g, '').replace(' --', '') 
+                            : "SEMUA JABATAN";
+
+            // Pastikan Jabatan adalah huruf besar untuk paparan header PDF yang seragam
+            fJabatan = fJabatan.toUpperCase();
+
+            // 3. Masukkan Header Imej / Logo
+            try {
+                if (typeof logoJPPKKBase64 !== 'undefined' && logoJPPKKBase64.length > 100) {
+                    doc.addImage(logoJPPKKBase64, 'PNG', 14, 15, 30, 15);
+                }
+                if (typeof logoPUOBase64 !== 'undefined' && logoPUOBase64.length > 100) {
+                    // Letak logo Politeknik di belah kanan atas
+                    doc.addImage(logoPUOBase64, 'PNG', 245, 12, 35, 20); 
+                }
+            } catch (e) {
+                console.warn("Ralat memasukkan imej logo ke PDF:", e);
+            }
+
+            // 4. Teks Header Laporan Dinamik 
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(30, 41, 59); 
+            
+            const pageWidth = doc.internal.pageSize.width;
+            doc.text("RUMUSAN PRODUK INOVASI YANG DIHASILKAN", pageWidth / 2, 20, { align: "center" });
+            doc.text(fJabatan, pageWidth / 2, 27, { align: "center" }); // Nama Jabatan Dinamik
+            doc.text("POLITEKNIK UNGKU OMAR", pageWidth / 2, 34, { align: "center" });
+
+            // 5. Teks Input KPI Tersuai & Maklumat Filter
+            let splitKpiText = doc.splitTextToSize(inputKpi, 250); 
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(71, 85, 105); 
+            
+            let yPosAfterKpi = 45; 
+            if(inputKpi.trim() !== "") {
+                doc.text(splitKpiText, 14, yPosAfterKpi);
+                yPosAfterKpi += (splitKpiText.length * 5) + 3; 
+            }
+
+            doc.setFont("helvetica", "italic");
+            doc.text(`Tahun: ${fTahun}   |   Sukuan: ${fSukuan}`, 14, yPosAfterKpi);
+            yPosAfterKpi += 5;
+
+            // PEMBAIKAN: Baca status mengikut indeks Array (13) atau Objek
+            const total = dataUntukEksport.length;
+            const disahkan = dataUntukEksport.filter(r => {
+                let stat = Array.isArray(r) ? r[13] : (r.statusPengesahan || r.STATUSPENGESAHAN || r.status);
+                return String(stat || "").trim().toUpperCase() === "DISAHKAN";
+            }).length;
+            const ditolak = dataUntukEksport.filter(r => {
+                let stat = Array.isArray(r) ? r[13] : (r.statusPengesahan || r.STATUSPENGESAHAN || r.status);
+                return String(stat || "").trim().toUpperCase() === "DITOLAK";
+            }).length;
+            const menunggu = total - disahkan - ditolak;
+
+            // 6. Kira & Lukis Kotak Rumusan Statistik
+            doc.setDrawColor(226, 232, 240);
+            doc.setFillColor(248, 250, 252);
+            doc.rect(14, yPosAfterKpi, 269, 14, 'FD'); 
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(15, 23, 42);
+            doc.text("Rumusan Statistik:", 18, yPosAfterKpi + 6);
+            
+            doc.setFont("helvetica", "normal");
+            doc.text(`Jumlah Rekod: ${total}   |   Disahkan: ${disahkan}   |   Menunggu: ${menunggu}   |   Ditolak: ${ditolak}`, 18, yPosAfterKpi + 11);
+
+            yPosAfterKpi += 18; 
+
+            // 7. Sediakan Data untuk Jadual PDF Mengikut Kehendak (Produk Inovasi)
+            const tableColumn = ["Bil", "Nama Produk", "Ketua Projek", "Ahli Kumpulan", "Jenis", "No Daftar", "Tahun", "Sukuan", "Status"];
+            const tableRows = [];
+
+            dataUntukEksport.forEach((row, index) => {
+                // 🌟 PEMBAIKAN STRUKTUR INDEKS: Menyelaraskan indeks mengikut fungsi editRekod
+                let isArr = Array.isArray(row);
                 
-                const thTajuk = document.createElement('th');
-                thTajuk.colSpan = 100; 
-                thTajuk.style.border = 'none'; 
-                thTajuk.style.padding = '10px 0 20px 0'; 
-                thTajuk.style.backgroundColor = 'white';
+                let namaProduk = isArr ? row[1] : (row.namaProduk || row.NAMA_PRODUK || '-');
+                let ketua      = isArr ? row[2] : (row.ketuaProjek || row.KETUA_PROJEK || '-');
+                let ahli       = isArr ? row[5] : (row.ahliKumpulan || row.AHLI_KUMPULAN || '-'); // Dibaiki ke indeks 5
+                let jenis      = isArr ? row[8] : (row.jenisInovasi || row.JENIS_INOVASI || '-');  // Dibaiki ke indeks 8
+                let noDaftar   = isArr ? row[9] : (row.noPendaftaran || row.NO_PENDAFTARAN || '-'); // Dibaiki ke indeks 9
+                let tahun      = isArr ? row[10] : (row.tahun || row.TAHUN || '-');
+                let sukuan     = isArr ? row[12] : (row.sukuan || row.SUKUAN || '-');
+                let status     = isArr ? row[13] : (row.statusPengesahan || row.STATUSPENGESAHAN || row.status || "MENUNGGU");
 
-                if (tajukCustom.trim() !== '') {
-                    thTajuk.innerHTML = `<h3 class="text-center font-bold text-lg px-4">${tajukCustom.trim()}</h3>`;
+                const rowData = [
+                    index + 1,
+                    String(namaProduk || '-').toUpperCase(),
+                    String(ketua || '-'),
+                    String(ahli || '-'),
+                    String(jenis || '-'),
+                    String(noDaftar || '-'),
+                    String(tahun || '-'),
+                    String(sukuan || '-'),
+                    String(status || 'MENUNGGU').toUpperCase()
+                ];
+                tableRows.push(rowData);
+            });
+
+            // 8. Jana Jadual Menggunakan AutoTable
+            doc.autoTable({
+                startY: yPosAfterKpi,
+                head: [tableColumn],
+                body: tableRows,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 3, font: 'helvetica' },
+                headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold' },
+                columnStyles: {
+                    0: { cellWidth: 10, halign: 'center' },      // Bil
+                    1: { cellWidth: 60 },                        // Nama Produk
+                    2: { cellWidth: 40 },                        // Ketua Projek
+                    3: { cellWidth: 50 },                        // Ahli Kumpulan
+                    4: { cellWidth: 25, halign: 'center' },      // Jenis Inovasi
+                    5: { cellWidth: 25, halign: 'center' },      // No Pendaftaran
+                    6: { cellWidth: 15, halign: 'center' },      // Tahun
+                    7: { cellWidth: 20, halign: 'center' },      // Sukuan
+                    8: { cellWidth: 22, halign: 'center' }       // Status
+                },
+                didDrawPage: function (data) {
+                    let str = 'Muka Surat ' + doc.internal.getNumberOfPages();
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
                 }
+            });
 
-                trTajuk.appendChild(thTajuk);
-                thead.insertBefore(trTajuk, thead.firstChild);
-
-                const divSign = document.createElement('div');
-                divSign.id = 'ruanganTandatanganPDF';
-                divSign.className = 'flex justify-between mt-12 px-16 w-full';
-                divSign.style.pageBreakInside = 'avoid'; 
-
-                divSign.innerHTML = `
-                    <div class="text-center">
-                        <p class="mb-16 text-sm font-normal">Disediakan oleh,</p>
-                        <p class="font-bold border-t border-black inline-block pt-2 min-w-[250px]">${disediakanOleh}</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="mb-16 text-sm font-normal">Disemak oleh,</p>
-                        <p class="font-bold border-t border-black inline-block pt-2 min-w-[250px]">${disemakOleh}</p>
-                    </div>
-                `;
-                element.appendChild(divSign);
-            }
-
-            setTimeout(() => { teruskanJanaPDF(); }, 600);
-
-            function teruskanJanaPDF() {
-                const filterTahun = document.getElementById('filterTahun') ? document.getElementById('filterTahun').value : "Semasa";
-                const namaFail = `Laporan_Statistik_KPI_${filterTahun}.pdf`;
-
-                const opt = {
-                    margin:       0.05, 
-                    filename:     namaFail,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { 
-                        scale: 2, 
-                        useCORS: true,
-                        scrollX: 0, 
-                        scrollY: 0  
-                    }, 
-                    pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '#ruanganTandatanganPDF'] }, 
-                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-                };
-
-                html2pdf().set(opt).from(element).save().then(() => {
-                    kembalikanKeadaanAsal();
-                }).catch(err => {
-                    console.error("Ralat PDF: ", err);
-                    alert("Gagal menjana PDF. Sila cuba lagi.");
-                    kembalikanKeadaanAsal();
-                });
-            }
-
-            function kembalikanKeadaanAsal() {
-                if(thTindakan) thTindakan.style.display = '';
-                if (tableContainer) tableContainer.classList.add('overflow-x-auto');
-                if (jadual) jadual.classList.add('min-w-[1500px]');
-                element.style.width = lebarAsal; 
-
-                if (tajukCarta) tajukCarta.innerText = tajukAsal;
-                
-                const logoCetak = document.getElementById('logoCetakPDF');
-                if (logoCetak) logoCetak.remove();
-
-                const headerCarta = document.getElementById('headerCartaPDF');
-                if (headerCarta) headerCarta.remove();
-                
-                const trTajuk = document.getElementById('trTajukPDF');
-                if (trTajuk) trTajuk.remove();
-
-                const divSign = document.getElementById('ruanganTandatanganPDF');
-                if (divSign) divSign.remove();
-
-                if (kotakJadual) {
-                    kotakJadual.style.pageBreakBefore = '';
-                    kotakJadual.classList.remove('html2pdf__page-break');
-                }
-
-                paparSemuaUntukCetak = false;
-                drawTable(); 
-            }
+            // 9. Simpan Fail PDF
+            let namaJabatanFail = fJabatan.replace(/ /g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+            let fTahunDinamik = fTahun === "Semua Tahun" ? "SemuaTahun" : fTahun;
+            let fileName = `Laporan_Statistik_Produk_${namaJabatanFail}_${fTahunDinamik}.pdf`;
+            
+            doc.save(fileName);
         }
         function logKeluar() { sessionStorage.clear(); window.location.href = "login.html"; }
 

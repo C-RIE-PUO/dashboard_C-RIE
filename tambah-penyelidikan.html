@@ -45,13 +45,20 @@
                         <div class="border-b pb-4">
                             <h2 class="text-lg font-bold text-gray-800 mb-4">A. Maklumat Utama Penerbitan</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Tajuk Penyelidikan <span class="text-red-500">*</span></label>
-                                    <input type="text" id="tajuk" required class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                                </div>
+
+								
+								<div>
+									<label class="block font-bold text-gray-700 mb-1">Tajuk Penyelidikan / Artikel:</label>
+									<textarea id="tajuk" required rows="2" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none font-medium"></textarea>
+								</div>
+
+								<div>
+									<label class="block font-bold text-gray-700 mb-1">Nama Jurnal / Prosiding:</label>
+									<input type="text" id="namaJurnal" required class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none font-medium" placeholder="Contoh: Jurnal Teknologi / IEEE International Conference Proceedings">
+								</div>
                                 
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Bilangan Penulis <span class="text-red-500">*</span></label>
+                                <div class="bg-purple-50 p-3 rounded-lg border border-purple-100">
+									<label class="block font-bold text-purple-800 mb-1">Bilangan Penulis:</label>
                                     <select id="bilPenulis" onchange="janakanInputPenulis()" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
                                         <option value="1">1 Orang</option>
                                         <option value="2">2 Orang</option>
@@ -282,7 +289,7 @@
         }
 
         // ==========================================
-        // 🌟 FUNGSI PENGURUSAN MUAT NAIK 2 ITEM (BARU)
+        // 🌟 FUNGSI PENGURUSAN MUAT NAIK 2 ITEM (DITAMBAH BAIK)
         // ==========================================
         function urusFailSpesifik(input, index, namaCadanganAsal) {
             const file = input.files[0];
@@ -291,7 +298,7 @@
 
             if (!file) {
                 failSimpanan[index] = null;
-                divNama.classList.add('hidden');
+                if (divNama) divNama.classList.add('hidden');
                 return;
             }
 
@@ -299,7 +306,7 @@
                 alert(`❌ Ralat: Fail "${file.name}" bukan dalam format PDF.`);
                 input.value = "";
                 failSimpanan[index] = null;
-                divNama.classList.add('hidden');
+                if (divNama) divNama.classList.add('hidden');
                 return;
             }
 
@@ -308,12 +315,13 @@
                 alert(`❌ Ralat: Saiz fail "${file.name}" terlalu besar! (Maksimum 15MB). Sila kecilkan saiz PDF anda.`);
                 input.value = "";
                 failSimpanan[index] = null;
-                divNama.classList.add('hidden');
+                if (divNama) divNama.classList.add('hidden');
                 return;
             }
 
             // Membaca fail ke Base64 (untuk dihantar ke Apps Script nanti)
             const reader = new FileReader();
+            
             reader.onload = function(e) {
                 const base64Data = e.target.result.split(',')[1];
                 failSimpanan[index] = {
@@ -321,21 +329,29 @@
                     base64: base64Data
                 };
                 
-                divNama.classList.remove('hidden');
-                inputNama.value = namaCadanganAsal + ".pdf";
+                if (divNama) divNama.classList.remove('hidden');
+                if (inputNama) inputNama.value = namaCadanganAsal + ".pdf";
             };
+            
+            // Tambahan: Tangkap ralat jika fail gagal dibaca oleh browser
+            reader.onerror = function() {
+                alert("❌ Ralat: Gagal membaca fail. Sila cuba lagi.");
+                input.value = "";
+            };
+            
             reader.readAsDataURL(file);
         }
 
         function resetBorang() {
-            document.getElementById("borangPenyelidikan").reset();
+            const borang = document.getElementById("borangPenyelidikan");
+            if (borang) borang.reset();
             
             // Reset fail memori dan sembunyikan kotak nama fail
             failSimpanan = { 1: null, 2: null };
-            for(let i=1; i<=2; i++) {
-                let elFail = document.getElementById('fail_'+i);
-                let divNama = document.getElementById('div_nama_fail_'+i);
-                let inputNama = document.getElementById('nama_fail_'+i);
+            for(let i = 1; i <= 2; i++) {
+                let elFail = document.getElementById('fail_' + i);
+                let divNama = document.getElementById('div_nama_fail_' + i);
+                let inputNama = document.getElementById('nama_fail_' + i);
                 
                 if(elFail) elFail.value = "";
                 if(inputNama) inputNama.value = "";
@@ -344,7 +360,7 @@
         }
 
         // --- FUNGSI HANTAR MANUAL ---
-        document.getElementById("borangPenyelidikan").addEventListener("submit", function(e) {
+        document.getElementById("borangPenyelidikan")?.addEventListener("submit", function(e) {
             e.preventDefault(); 
             
             // Periksa jika kedua-dua fail wajib telah dimuat naik
@@ -358,7 +374,7 @@
             const bilPenulisEl = document.getElementById('bilPenulis');
 
             if (bilPenulisEl) {
-                const bil = parseInt(bilPenulisEl.value);
+                const bil = parseInt(bilPenulisEl.value) || 0;
                 let senaraiNama = [];
                 for (let i = 1; i <= bil; i++) {
                     const el = document.getElementById(`penulis_${i}`);
@@ -376,7 +392,9 @@
             let senaraiDokumenArr = [];
             for (let i = 1; i <= 2; i++) {
                 if (failSimpanan[i]) {
-                    let customName = document.getElementById('nama_fail_' + i).value.trim();
+                    let customNameElement = document.getElementById('nama_fail_' + i);
+                    let customName = customNameElement ? customNameElement.value.trim() : "";
+                    
                     if (!customName) customName = failSimpanan[i].file.name;
                     if (!customName.toLowerCase().endsWith('.pdf')) customName += '.pdf';
 
@@ -389,19 +407,21 @@
                 }
             }
 
+            // Tambahan: Menggunakan Optional Chaining (?.) untuk mengelakkan ralat jika elemen tiada
             const dataForm = {
-                tajuk: document.getElementById("tajuk").value.trim(),
+                tajuk: document.getElementById("tajuk")?.value.trim() || "",
+                namaJurnal: document.getElementById("namaJurnal")?.value.trim() || "",
                 penulis: namaPenulisGabung,
-                publisher: document.getElementById("publisher").value.trim(),
-                volIssue: document.getElementById("volIssue").value.trim(),
-                tarikhTerbit: document.getElementById("tarikhTerbit").value,
-                doiUrl: document.getElementById("doiUrl").value.trim(),
-                jabatan: document.getElementById("jabatan").value,
-                tahapSebaran: document.getElementById("tahapSebaran").value,
-                laporanKpi: document.getElementById("laporanKpi").value,
-                tahun: document.getElementById("tahun").value,
-                bahasa: document.getElementById("bahasa").value,
-                indexStatus: document.getElementById("indexStatus").value,
+                publisher: document.getElementById("publisher")?.value.trim() || "",
+                volIssue: document.getElementById("volIssue")?.value.trim() || "",
+                tarikhTerbit: document.getElementById("tarikhTerbit")?.value || "",
+                doiUrl: document.getElementById("doiUrl")?.value.trim() || "",
+                jabatan: document.getElementById("jabatan")?.value || "",
+                tahapSebaran: document.getElementById("tahapSebaran")?.value || "",
+                laporanKpi: document.getElementById("laporanKpi")?.value || "",
+                tahun: document.getElementById("tahun")?.value || "",
+                bahasa: document.getElementById("bahasa")?.value || "",
+                indexStatus: document.getElementById("indexStatus")?.value || "",
                 senaraiFail: senaraiDokumenArr
             };
 
@@ -415,32 +435,25 @@
         // =========================================================================
         function jalankanProsesPenghantaran(dataForm) {
             const btnHantar = document.getElementById("btnHantar");
-            btnHantar.innerHTML = "⏳ Menghantar & Memuat Naik Fail...";
-            btnHantar.disabled = true;
+            if (btnHantar) {
+                btnHantar.innerHTML = "⏳ Menghantar & Memuat Naik Fail...";
+                btnHantar.disabled = true;
+            }
+            
             paparMesej("Sistem sedang memproses maklumat dan memuat naik semua dokumen. Sila tunggu...", "INFO");
 
             const payload = {
                 action: "tambahKPIPenyelidikan",
-                tajuk: dataForm.tajuk,
-                penulis: dataForm.penulis,
-                publisher: dataForm.publisher,
-                volIssue: dataForm.volIssue,
-                tarikhTerbit: dataForm.tarikhTerbit,
-                doiUrl: dataForm.doiUrl,
-                jabatan: dataForm.jabatan,
-                tahapSebaran: dataForm.tahapSebaran,
-                laporanKpi: dataForm.laporanKpi,
-                tahun: dataForm.tahun,
-                bahasa: dataForm.bahasa,
-                indexStatus: dataForm.indexStatus,
-                senaraiFail: dataForm.senaraiFail
+                ...dataForm // Spread operator untuk memasukkan semua data dengan lebih kemas
             };
 
             fetch(SCRIPT_URL, {
                 method: "POST",
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
-            }).then(res => res.json()).then(data => {
+            })
+            .then(res => res.json())
+            .then(data => {
                 if (data.status === "BERJAYA") {
                     paparMesej("✅ Rekod dan semua fail PDF berjaya dihantar! Menunggu pengesahan.", "BERJAYA");
                     resetBorang();
@@ -450,12 +463,14 @@
                     }, 600);
                     
                 } else {
-                    paparMesej("❌ Gagal: " + data.mesej, "RALAT");
-                    aktifkanButang();
+                    paparMesej("❌ Gagal: " + (data.mesej || "Sebab tidak diketahui"), "RALAT");
+                    if (typeof aktifkanButang === "function") aktifkanButang();
                 }
-            }).catch(() => {
-                paparMesej("⚠️ Ralat rangkaian semasa memuat naik.", "RALAT");
-                aktifkanButang();
+            })
+            .catch((err) => {
+                console.error("Ralat Fetch:", err);
+                paparMesej("⚠️ Ralat rangkaian semasa memuat naik. Sila semak sambungan internet anda.", "RALAT");
+                if (typeof aktifkanButang === "function") aktifkanButang();
             });
         }
 
@@ -490,6 +505,7 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3.5">
                             <div class="md:col-span-2"><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Tajuk Penyelidikan / Artikel</strong> <span class="text-slate-900 font-medium text-base">${data.tajuk || '-'}</span></div>
+                            <div class="md:col-span-2"><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Nama Jurnal / Prosiding</strong> <span class="text-purple-700 font-semibold italic bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100 block mt-0.5">${data.namaJurnal || '-'}</span></div>
                             <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Penulis</strong> <span class="text-slate-900 font-medium">${data.penulis || '-'}</span></div>
                             <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Jabatan</strong> <span class="text-slate-900 font-medium">${data.jabatan || '-'}</span></div>
                             <div><strong class="text-slate-400 block text-xs uppercase tracking-wider font-semibold">Penerbit (Publisher)</strong> <span class="text-slate-900 font-medium">${data.publisher || '-'}</span></div>
@@ -577,16 +593,25 @@
                 window.location.href = "dashboard-penyelidikan.html";
             });
         }
-
-        // --- FUNGSI CSV PUKAL ---
+// --- // --- FUNGSI CSV PUKAL (DITAMBAH BAIK) ---
         function downloadTemplateCSV() {
-            const header = "Tajuk,Penulis,Publisher,VolIssue,TarikhTerbit,DoiUrl,Jabatan,TahapSebaran,Sukuan,Tahun,Bahasa,IndexStatus,UrlBukti\n";
-            const contoh = `"Kajian AI","Ali Bin Abu","Jurnal IT","Vol 1","2024-05-12","https://doi...","JTMK","Antarabangsa","S1","2024","Bahasa Inggeris","SCOPUS","https://drive..."`;
+            // 🌟 KEMASKINI: Ditambah lajur NamaJurnal dan BOM (\uFEFF) untuk keserasian Microsoft Excel
+            const header = "\uFEFFTajuk,NamaJurnal,Penulis,Publisher,VolIssue,TarikhTerbit,DoiUrl,Jabatan,TahapSebaran,Sukuan,Tahun,Bahasa,IndexStatus,UrlBukti\n";
+            const contoh = `"Kajian AI Integrasi","Jurnal Teknologi Maklumat","Ali Bin Abu","Penerbit UTM","Vol 1 Issue 2","2024-05-12","https://doi.org/10...","JTMK","Antarabangsa","S1","2024","Bahasa Melayu","SCOPUS","https://drive.google.com/..."`;
+            
             const blob = new Blob([header + contoh], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "Template_Upload_KPI.csv";
-            link.click();
+            
+            // Pengendalian muat turun yang menyokong pelbagai pelayar web
+            if (navigator.msSaveBlob) { 
+                navigator.msSaveBlob(blob, "Template_Upload_KPI.csv");
+            } else {
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute("download", "Template_Upload_KPI.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
 
         function prosesFailCSV() {
@@ -598,44 +623,112 @@
 
             Papa.parse(failInput, {
                 header: true,
-                skipEmptyLines: true,
+                skipEmptyLines: 'greedy', // 🌟 KEMASKINI: 'greedy' buang baris kosong yang mengandungi whitespace sahaja
+                transformHeader: header => header.trim(), // Pastikan tiada ralat spasi pada nama lajur (header)
                 complete: function(results) {
-                    if(results.errors.length > 0 && results.data.length === 0) {
-                        alert("Gagal membaca CSV. Pastikan format betul.");
+                    if (results.errors.length > 0 && results.data.length === 0) {
+                        alert("Gagal membaca CSV. Pastikan format dan lajur (headers) adalah betul mengikut templat.");
+                        console.error(results.errors);
                         return;
                     }
+                    
+                    // =====================================================================
+                    // 🌟 TAMBAHAN BARU: LOGIK PEMETAAN SINGKATAN JABATAN KE NAMA PENUH
+                    // =====================================================================
+                    // Dapatkan senarai jabatan penuh dari dropdown (yang asalnya dari tab SISTEM)
+                    let senaraiJabatanSistem = [];
+                    const dropdownJabatan = document.getElementById('filterJabatan') || document.getElementById('editJabatan');
+                    if (dropdownJabatan) {
+                        Array.from(dropdownJabatan.options).forEach(opt => {
+                            if(opt.value && opt.value !== "") senaraiJabatanSistem.push(opt.value);
+                        });
+                    }
+                    
+                    // Fallback jika dropdown masih belum dimuatkan sepenuhnya
+                    if (senaraiJabatanSistem.length === 0) {
+                        senaraiJabatanSistem = [
+                            "JABATAN TEKNOLOGI MAKLUMAT & KOMUNIKASI (JTMK)",
+                            "JABATAN KEJURUTERAAN ELEKTRIK (JKE)",
+                            "JABATAN KEJURUTERAAN AWAM (JKA)",
+                            "JABATAN KEJURUTERAAN MEKANIKAL (JKM)",
+                            "JABATAN PERDAGANGAN (JP)",
+                            "JABATAN PENGAJIAN AM (JPA)",
+                            "JABATAN MATEMATIK, SAINS & KOMPUTER (JMSK)"
+                        ];
+                    }
+
+                    // Padankan singkatan CSV dengan nama penuh dari senarai sistem
+                    results.data.forEach(row => {
+                        if (row.Jabatan) {
+                            let inputJab = row.Jabatan.trim().toUpperCase();
+                            // Cari jabatan yang mengandungi singkatan tersebut dalam kurungan (cth: "(JTMK)")
+                            let padanan = senaraiJabatanSistem.find(jab => 
+                                jab.toUpperCase() === inputJab || 
+                                jab.toUpperCase().includes(`(${inputJab})`)
+                            );
+                            if (padanan) {
+                                row.Jabatan = padanan; // Gantikan singkatan dengan nama penuh
+                            } else {
+                                row.Jabatan = inputJab; // Kekalkan jika tiada padanan
+                            }
+                        }
+                    });
+                    // =====================================================================
+
                     dataCSVSedia = results.data;
                     paparPreviewCSV(dataCSVSedia);
+                },
+                error: function(error) {
+                    alert("Ralat memproses fail: " + error.message);
                 }
             });
         }
 
         function paparPreviewCSV(data) {
             const tbody = document.getElementById("isiPreviewCSV");
+            if (!tbody) return;
+            
             tbody.innerHTML = "";
-            document.getElementById("jumlahRekodCSV").innerText = data.length;
+            const lblJumlah = document.getElementById("jumlahRekodCSV");
+            if (lblJumlah) lblJumlah.innerText = data.length;
 
             data.forEach((row, index) => {
                 const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50 transition-colors";
+                
+                // 🌟 KEMASKINI: Memasukkan NamaJurnal secara kemas di bawah Tajuk (jika ada)
+                let paparanTajuk = `<div class="font-bold text-gray-800">${row.Tajuk || '-'}</div>`;
+                if (row.NamaJurnal && row.NamaJurnal.trim() !== "") {
+                    paparanTajuk += `<div class="text-[10px] text-purple-600 mt-0.5 font-medium">📚 ${row.NamaJurnal}</div>`;
+                }
+
                 tr.innerHTML = `
-                    <td class="p-2 border truncate max-w-[200px]" title="${row.Tajuk || ''}">${row.Tajuk || '-'}</td>
-                    <td class="p-2 border truncate max-w-[150px]">${row.Penulis || '-'}</td>
-                    <td class="p-2 border">${row.Jabatan || '-'}</td>
-                    <td class="p-2 border text-center">${row.Tahun || '-'}</td>
-                    <td class="p-2 border text-blue-600 truncate max-w-[100px]">${row.UrlBukti ? '🔗 Ada' : '❌ Tiada'}</td>
+                    <td class="p-2.5 border truncate max-w-[200px]" title="${row.Tajuk || ''}">
+                        ${paparanTajuk}
+                    </td>
+                    <td class="p-2.5 border truncate max-w-[150px] font-medium text-gray-700">${row.Penulis || '-'}</td>
+                    <td class="p-2.5 border text-center font-semibold text-gray-600" title="${row.Jabatan || ''}">${row.Jabatan || '-'}</td>
+                    <td class="p-2.5 border text-center font-bold text-blue-700">${row.Tahun || '-'}</td>
+                    <td class="p-2.5 border text-center text-sm truncate max-w-[100px]">
+                        ${(row.UrlBukti && row.UrlBukti.trim() !== "") ? '<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold shadow-3xs">🔗 Ada</span>' : '<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold shadow-3xs">❌ Tiada</span>'}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            document.getElementById("ruangPreview").classList.remove("hidden");
+            const ruangPreview = document.getElementById("ruangPreview");
+            if (ruangPreview) ruangPreview.classList.remove("hidden");
         }
 
         function hantarDataCSV() {
-            if (dataCSVSedia.length === 0) return;
+            if (!dataCSVSedia || dataCSVSedia.length === 0) return;
 
             const btn = document.getElementById("btnHantarCSV");
-            btn.innerHTML = "⏳ Sedang Menghantar...";
-            btn.disabled = true;
+            if (btn) {
+                btn.innerHTML = "⏳ Sedang Menghantar...";
+                btn.disabled = true;
+            }
+            
             paparMesej(`Sedang memproses ${dataCSVSedia.length} rekod. Jangan tutup tetingkap ini...`, "INFO");
 
             const payload = {
@@ -647,26 +740,41 @@
                 method: "POST",
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
-            }).then(res => res.json()).then(data => {
+            })
+            .then(res => res.json())
+            .then(data => {
                 if (data.status === "BERJAYA") {
-                    paparMesej(`✅ ${data.jumlah} Rekod berjaya dimasukkan secara pukal!`, "BERJAYA");
-                    setTimeout(() => window.location.href = "dashboard-penyelidikan.html", 2500);
+                    paparMesej(`✅ ${data.jumlah} Rekod berjaya dimasukkan secara pukal! Memuat semula halaman...`, "BERJAYA");
+                    setTimeout(() => {
+                        window.location.href = "dashboard-penyelidikan.html";
+                    }, 2500);
                 } else {
-                    paparMesej("❌ Gagal: " + data.mesej, "RALAT");
+                    paparMesej("❌ Gagal: " + (data.mesej || "Ralat tidak diketahui"), "RALAT");
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = "🚀 Sah & Hantar Semua Rekod";
+                    }
+                }
+            })
+            .catch((err) => {
+                console.error("Ralat bulk CSV:", err);
+                paparMesej("⚠️ Ralat rangkaian semasa hantar pukal. Sila semak sambungan internet.", "RALAT");
+                if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = "🚀 Sah & Hantar Semua Rekod";
                 }
-            }).catch(() => {
-                paparMesej("⚠️ Ralat rangkaian semasa hantar pukal.", "RALAT");
-                btn.disabled = false;
-                btn.innerHTML = "🚀 Sah & Hantar Semua Rekod";
             });
         }
         
         function janakanInputPenulis() {
-            const bil = parseInt(document.getElementById('bilPenulis').value);
+            const bilEl = document.getElementById('bilPenulis');
             const kontainer = document.getElementById('kontainerPenulis');
             
+            if (!bilEl || !kontainer) return;
+            
+            const bil = parseInt(bilEl.value) || 1;
+            
+            // Simpan nilai sedia ada sebelum di-render semula
             const nilaiSediaAda = [];
             for (let i = 1; i <= 8; i++) {
                 const el = document.getElementById(`penulis_${i}`);
@@ -677,12 +785,16 @@
 
             for (let i = 1; i <= bil; i++) {
                 const div = document.createElement('div');
-                div.className = bil === 1 ? "md:col-span-2" : "col-span-1";
+                div.className = (bil === 1) ? "md:col-span-2" : "col-span-1";
                 const nilaiLama = nilaiSediaAda[i - 1] || "";
+                
+                // 🌟 KEMASKINI: Ditambah class 'uppercase' supaya tulisan pengguna seragam 
+                // dan placeholder untuk UX yang lebih interaktif
+                const placeholderTeks = (i === 1) ? "Contoh: Ali Bin Abu (Penulis Utama)" : `Nama Penulis ${i}`;
                 
                 div.innerHTML = `
                     <label class="block text-sm font-bold text-gray-700 mb-1">Nama Penulis ${i} <span class="text-red-500">*</span></label>
-                    <input type="text" id="penulis_${i}" value="${nilaiLama}" required class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    <input type="text" id="penulis_${i}" value="${nilaiLama}" placeholder="${placeholderTeks}" required class="w-full border border-gray-300 px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none uppercase shadow-sm transition-all">
                 `;
                 kontainer.appendChild(div);
             }
