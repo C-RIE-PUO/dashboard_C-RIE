@@ -6,6 +6,10 @@
     <title>Dashboard Inovasi (Akses Berpusat)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <script>
         // HALANG AKSES JIKA BELUM LOGIN
@@ -19,46 +23,25 @@
 
     <div class="w-[98%] max-w-[1800px] mx-auto">
         
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
+		<div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800">📊 Dashboard Data Inovasi</h1>
+                <h1 class="text-3xl font-bold text-gray-800">📊 Dashboard Data Pencapaian Inovasi</h1>
                 <p class="text-sm text-gray-500 mt-1">Selamat datang, <span id="namaPengguna" class="font-bold text-blue-600">...</span> 
                 (<span id="perananPengguna" class="uppercase"></span> - <span id="jabatanPengguna" class="uppercase font-bold"></span>)</p>
             </div>
             <div class="flex flex-wrap gap-2 items-center">
-                
-                <div id="divFilterJabatan" class="hidden items-center bg-gray-50 border rounded-lg px-3">
-                    <label class="text-xs font-bold text-gray-500 mr-2 uppercase">Jabatan:</label>
-                    <select id="filterJabatan" onchange="tapisData()" class="bg-transparent py-2 focus:outline-none font-semibold text-blue-700">
-                        <option value="Semua">Semua</option>
-                    </select>
-                </div>
-
-                <div class="flex items-center bg-gray-50 border rounded-lg px-3">
-                    <label class="text-xs font-bold text-gray-500 mr-2 uppercase">Tahun:</label>
-                    <input type="text" id="filterTahun" onkeyup="tapisData()" placeholder="Cari Tahun..." class="bg-transparent py-2 focus:outline-none font-semibold text-blue-700 w-28" autocomplete="off">
-                </div>
-                
                 <a href="utama.html" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-1">
                     🏠 Utama
                 </a>
-
                 <a href="pengesahan-inovasi.html" id="btnPengesahan" class="hidden bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md items-center gap-1">
                     🔐 Pengesahan inovasi
                 </a>
-
                 <a href="dashboard-kpi.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-1">
                     📈 KPI
                 </a>
-
-                <button onclick="eksportCSV()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-1">
-                    📥 CSV
-                </button>
-
                  <a href="sijil-inovasi.html" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-1">
-            🏅 Sijil
-        </a>
-
+                    🏅 Sijil
+                </a>
                 <a href="tambah-inovasi.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md">➕ Tambah</a>
                 <button onclick="logKeluar()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg font-semibold transition shadow-md">Log Keluar</button>
             </div>
@@ -96,10 +79,37 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b flex justify-between items-center bg-gray-50">
-                <h2 class="text-2xl font-bold text-gray-800">📋 Senarai Rekod Inovasi <span id="tajukJadual" class="text-blue-600"></span></h2>
-                <button onclick="ambilData()" class="text-blue-600 hover:underline text-sm font-semibold">🔄 Refresh Data</button>
+		<div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden mt-8">
+            <div class="p-4 md:p-6 border-b flex flex-col xl:flex-row justify-between items-start xl:items-center bg-gray-50 gap-4">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2 shrink-0">
+                    📋 Senarai Rekod Inovasi <span id="tajukJadual" class="text-blue-600 text-lg md:text-xl"></span>
+                </h2>
+                
+                <div class="flex flex-wrap lg:flex-nowrap gap-2 items-center w-full xl:w-auto">
+                    <div id="divFilterJabatan" class="hidden items-center bg-white border border-gray-300 rounded-lg px-3 py-1.5 shadow-sm shrink-0 max-w-[200px]">
+                        <span class="text-xs font-bold text-gray-500 mr-2 uppercase">Jabatan:</span>
+                        <select id="filterJabatan" onchange="tapisData()" class="bg-transparent focus:outline-none font-semibold text-blue-700 text-sm w-full truncate cursor-pointer">
+                            <option value="Semua">Semua</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-1.5 shadow-sm shrink-0 w-full sm:w-32">
+                        <span class="text-xs font-bold text-gray-500 mr-2 uppercase">Tahun:</span>
+                        <input type="text" id="filterTahun" onkeyup="tapisData()" placeholder="Cth: 2024" class="bg-transparent focus:outline-none font-semibold text-blue-700 text-sm w-full" autocomplete="off">
+                    </div>
+
+                    <button onclick="ambilData()" class="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-3.5 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-1 shrink-0">
+                        🔄 Refresh
+                    </button>
+
+                    <button onclick="eksportCSV()" class="bg-teal-600 hover:bg-teal-700 text-white px-3.5 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-1 shrink-0">
+                        📥 CSV
+                    </button>
+
+                    <button onclick="muatTurunPDFLaporan()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-1 shrink-0" title="Muat Turun Laporan PDF">
+                        📄 Laporan PDF
+                    </button>
+                </div>
             </div>
             
             <div class="overflow-x-auto">
@@ -177,7 +187,21 @@
             document.getElementById('divFilterJabatan').classList.add('flex');
         }
 
-        async function ambilData() {
+       // 🌟 KEMASKINI 1: Fungsi untuk mendapatkan nama singkatan dari teks jabatan yang panjang
+        function dapatkanSingkatanJabatan(teksJabatan) {
+            if (!teksJabatan || teksJabatan === "-") return "-";
+            
+            // Cari string di dalam kurungan cth: (JKA)
+            const padananKurungan = teksJabatan.match(/\(([^)]+)\)/);
+            if (padananKurungan && padananKurungan[1]) {
+                return padananKurungan[1].trim().toUpperCase(); // Kembalikan 'JKA'
+            }
+            
+            // Jika tiada kurungan, kekalkan teks asal
+            return teksJabatan.trim().toUpperCase();
+        }
+
+async function ambilData() {
             const tbody = document.getElementById('isiJadual');
             const paginationControls = document.getElementById('paginationControls');
             
@@ -222,6 +246,23 @@
                     return;
                 }
 
+                // 🌟 KEMASKINI BARU: Tukar semua teks paparan rekod kepada Huruf Besar (Kecuali URL/Pautan)
+                if (dataDariSheet.length > 0) {
+                    dataDariSheet = dataDariSheet.map(row => 
+                        row.map(cell => {
+                            if (typeof cell === 'string') {
+                                let trimmed = cell.trim();
+                                // Kekalkan format asal jika cell merupakan pautan/URL supaya tidak rosak
+                                if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+                                    return cell;
+                                }
+                                return cell.toUpperCase();
+                            }
+                            return cell; // Kekalkan jika data berbentuk angka/nombor (cth: BIL atau TAHUN)
+                        })
+                    );
+                }
+
                 if (dataDariSheet.length > 0) {
                     if (userPeranan.toUpperCase() === "STAF" && userJabatan !== "") {
                         dataDariSheet = dataDariSheet.filter(row => {
@@ -258,20 +299,27 @@
             tapisData();
         }
 
+        // 🌟 KEMASKINI 2: Membina Dropdown Jabatan Berdasarkan Singkatan
         function binaFilter(data) {
-            // KEMASKINI: Logik filter tahun diubah suai kerana text input tidak perlukan dropdown data
             if (userPeranan.toUpperCase() !== "STAF") {
                 const dropJabatan = document.getElementById('filterJabatan');
-                const jabatanUnik = [...new Set(data.map(r => String(r[3]).trim()).filter(j => j !== "" && j !== "-"))].sort();
+                
+                // Kumpulkan nama penuh unik dari data sheet
+                const jabatanPenuhUnik = [...new Set(data.map(r => String(r[3]).trim()).filter(j => j !== "" && j !== "-"))].sort();
+                
                 const pilJabatanAsal = dropJabatan.value;
                 dropJabatan.innerHTML = '<option value="Semua">Semua</option>';
-                jabatanUnik.forEach(jab => { dropJabatan.innerHTML += `<option value="${jab}">${jab}</option>`; });
-                if (jabatanUnik.includes(pilJabatanAsal) || pilJabatanAsal === "Semua") dropJabatan.value = pilJabatanAsal;
+                
+                // Masukkan nama penuh sebagai `value`, tetapi paparkan SINGKATAN sahaja kepada pengguna
+                jabatanPenuhUnik.forEach(jab => { 
+                    dropJabatan.innerHTML += `<option value="${jab}">${dapatkanSingkatanJabatan(jab)}</option>`; 
+                });
+                
+                if (jabatanPenuhUnik.includes(pilJabatanAsal) || pilJabatanAsal === "Semua") dropJabatan.value = pilJabatanAsal;
             }
         }
 
         function tapisData() {
-            // KEMASKINI: Ambil input dari textbox dan guna .includes() untuk carian fleksibel
             const tahunDipilih = document.getElementById('filterTahun').value.trim();
             const jabatanDipilih = document.getElementById('filterJabatan') ? document.getElementById('filterJabatan').value : "Semua";
             
@@ -281,13 +329,15 @@
                 dataDitapis = dataDitapis.filter(r => String(r[8]).includes(tahunDipilih));
             }
 
+            // 🌟 KEMASKINI 3: Logik Filter akan mengambil `value` asal (Nama Penuh) untuk dipadankan 
+            // dengan data Google Sheet. Ini mengekalkan data sheet tidak terusik.
             if (jabatanDipilih !== "Semua" && userPeranan.toUpperCase() !== "STAF") {
                 dataDitapis = dataDitapis.filter(r => String(r[3]).trim().toUpperCase() === jabatanDipilih.toUpperCase());
             }
             
             // Susun rekod mengikut tahun terkini secara menurun (Descending)
             dataDitapis.sort((a, b) => {
-                let tahunA = parseInt(a[8]) || 0; // Index 8 ialah TAHUN
+                let tahunA = parseInt(a[8]) || 0; 
                 let tahunB = parseInt(b[8]) || 0;
                 return tahunB - tahunA;
             });
@@ -316,10 +366,7 @@
             const dataPaginasi = data.slice(startIndex, endIndex);
 
             dataPaginasi.forEach((row, index) => {
-                // 🌟 KEMASKINI: Paparan Bil. akan menggunakan indeks senarai jadual, bukan ID dari Sheet
                 const displayBil = startIndex + index + 1; 
-                
-                // 🌟 KEMASKINI: ID Sebenar dari Google Sheet akan digunakan khas untuk fungsi Edit/Padam
                 const recordID = row[0]; 
                 
                 let tindakanHTML = "";
@@ -336,13 +383,16 @@
                     </td>`;
                 }
 
+                // 🌟 KEMASKINI 4: Tukarkan paparan teks lajur Jabatan kepada SINGKATAN pada skrin jadual
+                const singkatanJabatanPapar = dapatkanSingkatanJabatan(row[3]);
+
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-blue-50 transition text-sm";
                 tr.innerHTML = `
                     <td class="p-4 font-bold text-gray-600">${displayBil}</td>
                     <td class="p-4 font-semibold text-gray-800">${row[1] || '-'}</td>
                     <td class="p-4 text-gray-600">${row[2] || '-'}</td>
-                    <td class="p-4 font-bold text-blue-700">${row[3] || '-'}</td>
+                    <td class="p-4 font-bold text-blue-700" title="${row[3]}">${singkatanJabatanPapar}</td>
                     <td class="p-4 font-semibold">${row[4] || '-'}</td>
                     <td class="p-4 text-gray-700">${row[5] || '-'}</td>
                     <td class="p-4 text-xs text-gray-600">${row[6] || '-'}</td>
@@ -541,7 +591,172 @@
             link.click();
             document.body.removeChild(link);
         }
+		
+		
+// =================================================================
+        // 🌟 FUNGSI BARU: MUAT TURUN LAPORAN PDF INOVASI (STATISTIK & JADUAL)
+        // =================================================================
+        function muatTurunPDFLaporan() {
+            let dataUntukEksport = dataSemasa && dataSemasa.length > 0 ? dataSemasa : semuaData;
 
+            if (!dataUntukEksport || dataUntukEksport.length === 0) {
+                alert("Tiada data pencapaian inovasi yang dijumpai untuk dieksport.");
+                return;
+            }
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("Sistem sedang memuatkan pustaka enjin PDF. Sila cuba tekan sekali lagi.");
+                return;
+            }
+
+            // 1. Prompt untuk Input Khas KPI/Pencapaian
+            let inputKpi = prompt(
+                "Sila semak dan kemaskini teks pencapaian/KPI yang ingin dipaparkan:", 
+                "Paparan Pencapaian Inovasi"
+            );
+
+            if (inputKpi === null) return; // Batal jika pengguna tekan Cancel
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape'); 
+
+            // 2. Ambil nilai Tapisan Semasa 
+            let fTahun = document.getElementById('filterTahun').value.trim() || "Semua Tahun";
+            
+            let selJabatan = document.getElementById('filterJabatan');
+            
+            // 🌟 KEMASKINI: Logik Tajuk Jabatan Dinamik mengikut tapisan (Filter)
+            let fJabatan = "";
+            let nilaiFilterJabatan = selJabatan ? selJabatan.value : "Semua";
+            
+            if (nilaiFilterJabatan === "Semua") {
+                // Jika "Semua" dipilih, tukar paparan tajuk kepada SEMUA JABATAN
+                fJabatan = "SEMUA JABATAN";
+            } else {
+                // Jika jabatan tertentu dipilih, gunakan nama jabatan tersebut
+                fJabatan = nilaiFilterJabatan;
+            }
+            fJabatan = fJabatan.toUpperCase();
+
+            // 3. Masukkan Header Imej / Logo
+            try {
+                if (typeof logoJPPKKBase64 !== 'undefined' && logoJPPKKBase64.length > 100) {
+                    doc.addImage(logoJPPKKBase64, 'PNG', 14, 15, 30, 15);
+                }
+                if (typeof logoPUOBase64 !== 'undefined' && logoPUOBase64.length > 100) {
+                    doc.addImage(logoPUOBase64, 'PNG', 245, 12, 35, 20); 
+                }
+            } catch (e) {
+                console.warn("Ralat memasukkan imej logo ke PDF:", e);
+            }
+
+            // 4. Teks Header Laporan Dinamik 
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(30, 41, 59); // Slate 800
+            
+            const pageWidth = doc.internal.pageSize.width;
+            doc.text("RUMUSAN PENCAPAIAN PRODUK INOVASI", pageWidth / 2, 20, { align: "center" });
+            
+            // Memaparkan nama jabatan secara dinamik (SEMUA JABATAN atau Nama Jabatan yang dipilih)
+            doc.text(fJabatan, pageWidth / 2, 27, { align: "center" }); 
+            doc.text("POLITEKNIK UNGKU OMAR", pageWidth / 2, 34, { align: "center" });
+
+            // 5. Teks Input Khas 
+            let splitKpiText = doc.splitTextToSize(inputKpi, 250); 
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(71, 85, 105); // Slate 600
+            
+            let yPos = 45; 
+            if(inputKpi.trim() !== "") {
+                doc.text(splitKpiText, 14, yPos);
+                yPos += (splitKpiText.length * 5) + 3; 
+            }
+
+            doc.setFont("helvetica", "italic");
+            doc.text(`Tahun Tapisan: ${fTahun}`, 14, yPos);
+            yPos += 5;
+
+            // 6. Kira & Lukis Kotak Rumusan Statistik Pingat
+            const total = dataUntukEksport.length;
+            const emas = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("EMAS")).length;
+            const perak = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("PERAK")).length;
+            const gangsa = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("GANGSA")).length;
+
+            doc.setDrawColor(226, 232, 240);
+            doc.setFillColor(248, 250, 252);
+            doc.rect(14, yPos, 269, 14, 'FD'); 
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(15, 23, 42);
+            doc.text("Rumusan Pingat Keseluruhan:", 18, yPos + 6);
+            
+            doc.setFont("helvetica", "normal");
+            doc.text(`Jumlah Projek: ${total}   |   Emas: ${emas}   |   Perak: ${perak}   |   Gangsa: ${gangsa}`, 18, yPos + 11);
+
+            yPos += 18; 
+
+            // 7. Sediakan Data untuk Jadual PDF
+            const tableColumn = ["Bil", "Innovator", "Ahli Kumpulan", "Jabatan", "Produk Inovasi", "Pertandingan", "Tarikh & Tempat", "Pingat", "Tahun", "Status"];
+            const tableRows = [];
+
+            dataUntukEksport.forEach((row, index) => {
+                // Gunakan fungsi singkatan untuk lajur Jabatan di dalam jadual PDF
+                let namaJabatanAsal = String(row[3] || '-');
+                let jabatanSingkatan = typeof dapatkanSingkatanJabatan === 'function' ? dapatkanSingkatanJabatan(namaJabatanAsal) : namaJabatanAsal;
+
+                const rowData = [
+                    index + 1,
+                    String(row[1] || '-'),
+                    String(row[2] || '-'),
+                    jabatanSingkatan, // Kekal menunjukkan singkatan (cth: JKA, JKM) dalam sel jadual
+                    String(row[4] || '-').toUpperCase(),
+                    String(row[5] || '-'),
+                    String(row[6] || '-'),
+                    String(row[7] || '-').toUpperCase(),
+                    String(row[8] || '-'),
+                    String(row[9] || 'MENUNGGU').toUpperCase()
+                ];
+                tableRows.push(rowData);
+            });
+
+            // 8. Jana Jadual Menggunakan AutoTable
+            doc.autoTable({
+                startY: yPos,
+                head: [tableColumn],
+                body: tableRows,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 3, font: 'helvetica' },
+                headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' }, 
+                columnStyles: {
+                    0: { cellWidth: 10, halign: 'center' },      // Bil
+                    1: { cellWidth: 30 },                        // Innovator
+                    2: { cellWidth: 35 },                        // Ahli
+                    3: { cellWidth: 20, halign: 'center' },      // Jabatan
+                    4: { cellWidth: 40 },                        // Produk
+                    5: { cellWidth: 40 },                        // Pertandingan
+                    6: { cellWidth: 30 },                        // Tarikh & Tempat
+                    7: { cellWidth: 20, halign: 'center' },      // Pingat
+                    8: { cellWidth: 15, halign: 'center' },      // Tahun
+                    9: { cellWidth: 25, halign: 'center' }       // Status
+                },
+                didDrawPage: function (data) {
+                    let str = 'Muka Surat ' + doc.internal.getNumberOfPages();
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+                }
+            });
+
+            // 9. Simpan Fail PDF
+            let namaJabatanFail = fJabatan.replace(/ /g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+            let fTahunDinamik = fTahun === "Semua Tahun" ? "SemuaTahun" : fTahun;
+            let fileName = `Laporan_Inovasi_${namaJabatanFail}_${fTahunDinamik}.pdf`;
+            
+            doc.save(fileName);
+        }
         function logKeluar() {
             sessionStorage.clear();
             window.location.href = "login.html";
