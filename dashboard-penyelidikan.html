@@ -284,21 +284,21 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl hover:shadow-md hover:bg-blue-50 transition-all">
-                            <label class="block text-sm font-extrabold text-blue-900 mb-2">1. Kertas Penyelidikan Penuh</label>
+                            <label class="block text-sm font-extrabold text-blue-900 mb-2">1. Muka Depan Jurnal</label>
                             <div id="pautanLama1" class="text-xs mb-3 bg-white p-2 rounded border border-blue-100 min-h-[36px] flex items-center break-all text-blue-700 font-semibold"></div>
                             <input type="hidden" id="urlLama1">
                             <div class="flex flex-col gap-2">
-                                <input type="file" id="failEdit1" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm" onchange="urusFailEdit(this, 1, 'Kertas_Penyelidikan_Penuh')">
+                                <input type="file" id="failEdit1" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm" onchange="urusFailEdit(this, 1, 'Muka_Depan_Jurnal')">
                                 <input type="text" id="namaFailEdit1" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full border border-gray-300 p-2 rounded-lg outline-none text-xs hidden focus:ring-2 focus:ring-blue-400">
                             </div>
                         </div>
 
                         <div class="p-4 border border-blue-200 bg-blue-50/50 rounded-xl hover:shadow-md hover:bg-blue-50 transition-all">
-                            <label class="block text-sm font-extrabold text-blue-900 mb-2">2. Muka Depan Jurnal</label>
+                            <label class="block text-sm font-extrabold text-blue-900 mb-2">2. Kertas Penyelidikan Penuh</label>
                             <div id="pautanLama2" class="text-xs mb-3 bg-white p-2 rounded border border-blue-100 min-h-[36px] flex items-center break-all text-blue-700 font-semibold"></div>
                             <input type="hidden" id="urlLama2">
                             <div class="flex flex-col gap-2">
-                                <input type="file" id="failEdit2" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm" onchange="urusFailEdit(this, 2, 'Muka_Depan_Jurnal')">
+                                <input type="file" id="failEdit2" accept="application/pdf" class="w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:font-bold file:cursor-pointer cursor-pointer border border-white bg-white rounded-lg p-1 shadow-sm" onchange="urusFailEdit(this, 2, 'Kertas_Penyelidikan_Penuh')">
                                 <input type="text" id="namaFailEdit2" placeholder="Nama Dokumen (Boleh dipinda)" class="w-full border border-gray-300 p-2 rounded-lg outline-none text-xs hidden focus:ring-2 focus:ring-blue-400">
                             </div>
                         </div>
@@ -459,7 +459,7 @@ function dapatkanNamaFail(url, index) {
         
         // Fallback jika nama gagal dikesan dari format URL raw Drive
         if (!namaFail || namaFail === "view" || namaFail === "edit" || namaFail === "open" || (namaFail.length > 30 && !namaFail.includes(".") && !namaFail.includes("_"))) {
-            const labelDokumen = ["Kertas_Penyelidikan_Penuh", "Muka_Depan_Jurnal"];
+            const labelDokumen = ["Muka_Depan_Jurnal", "Kertas_Penyelidikan_Penuh"];
             return `${index + 1}. ${labelDokumen[index] || 'Fail_Bukti'}`;
         }
         
@@ -472,7 +472,7 @@ function dapatkanNamaFail(url, index) {
         
         return `${index + 1}. ${namaFail}`;
     } catch (e) {
-        const labelDokumen = ["Kertas_Penyelidikan_Penuh", "Muka_Depan_Jurnal"];
+        const labelDokumen = ["Muka_Depan_Jurnal", "Kertas_Penyelidikan_Penuh"];
         return `${index + 1}. ${labelDokumen[index] || 'Fail_Bukti'}`;
     }
 }
