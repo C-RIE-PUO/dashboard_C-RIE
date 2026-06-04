@@ -1526,12 +1526,19 @@ function padamRekod(idRekod) {
             }
         }
         
-        function muatTurunZipKPI() {
+       function muatTurunZipKPI() {
             // Ambil nilai tapisan sedia ada dari input pengguna
-            let fTahun = document.getElementById('filterTahun').value.trim();
-            let fSukuan = document.getElementById('filterSukuan').value;
-            let fJabatan = document.getElementById('filterJabatan').value;
-            let fStatus = document.getElementById('filterStatus').value;
+            let fTahun = document.getElementById('filterTahun') ? document.getElementById('filterTahun').value.trim() : '';
+            let fSukuan = document.getElementById('filterSukuan') ? document.getElementById('filterSukuan').value : '';
+            let fJabatan = document.getElementById('filterJabatan') ? document.getElementById('filterJabatan').value : '';
+            let fStatus = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : '';
+            
+            // Berikan notis kepada pengguna supaya mereka tidak menekan berkali-kali
+            if (typeof paparNotis === "function") {
+                paparNotis("⏳ Tetingkap baharu akan dibuka. Sila tunggu sistem menjana fail ZIP...", "biru");
+            } else {
+                alert("⏳ Sila tunggu sebentar. Sistem sedang menjana fail ZIP pada tetingkap baharu.");
+            }
             
             // Susun URL untuk dihantar ke backend script
             // Folder ID diletakkan statik mengikut permintaan
