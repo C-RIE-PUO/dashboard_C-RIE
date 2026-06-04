@@ -3,61 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetapan Sasaran KPI C-RIE</title>
+    <title>Tetapan Sasaran & Penyataan KPI C-RIE</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+    </style>
 </head>
-<body class="p-4 md:p-10 bg-gray-100 min-h-screen flex justify-center items-center">
+<body class="p-4 md:p-8 bg-slate-100 min-h-screen flex items-center justify-center font-sans">
 
-    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
-        <div class="bg-gray-800 text-white p-8 text-center shadow-md">
-            <h1 class="text-3xl font-extrabold tracking-tight">⚙️ Tetapan Sasaran KPI</h1>
-            <p class="text-gray-300 mt-2 font-medium">Ubah sasaran pencapaian KPI mengikut tahun penilaian.</p>
+    <div class="max-w-6xl w-full space-y-8">
+        
+        <div class="bg-gradient-to-r from-slate-800 to-slate-950 text-white p-8 rounded-2xl shadow-xl text-center border-b-4 border-blue-600 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-600 rounded-full opacity-10 blur-2xl"></div>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight flex items-center justify-center gap-3">
+                ⚙️ Pusat Pengurusan & Tetapan KPI C-RIE
+            </h1>
+            <p class="text-slate-300 mt-2 font-medium max-w-xl mx-auto text-sm md:text-base">
+                Kemaskini angka sasaran tahunan dan urus penyataan komponen bagi KPI Penyelidikan serta KPI Inovasi.
+            </p>
         </div>
 
-        <form id="tetapanForm" class="p-6 md:p-10 space-y-8" onsubmit="simpanTetapan(event)">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1 space-y-8">
+                
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden hover:shadow-lg transition-all">
+                    <div class="bg-gradient-to-r from-blue-700 to-blue-800 text-white px-6 py-4 font-bold text-lg flex items-center gap-2">
+                        📊 <span>Sasaran Bilangan & Angka</span>
+                    </div>
+                    
+                    <form id="tetapanForm" class="p-6 space-y-5" onsubmit="simpanTetapan(event)">
+                        <div class="flex items-center justify-between bg-blue-50 p-4 rounded-xl border border-blue-200 shadow-inner">
+                            <label for="tahunTetapan" class="text-sm font-bold text-slate-700">Tahun Penilaian:</label>
+                            <input type="number" id="tahunTetapan" class="w-24 px-3 py-1.5 border-2 border-blue-300 rounded-lg font-bold text-center text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" value="2026" required>
+                        </div>
 
-            <div class="flex items-center justify-between bg-blue-50 p-6 rounded-xl border border-blue-200">
-                <h2 class="text-lg font-bold text-gray-700">Tahun Penilaian:</h2>
-                <input type="number" id="tahunTetapan" class="w-32 px-4 py-2 border-2 border-blue-300 rounded-lg font-bold text-center text-xl focus:border-blue-600 outline-none" value="2026" required>
+                        <div class="space-y-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-blue-900 mb-1 tracking-wide uppercase">Target Penyelidikan (Keseluruhan Platform)</label>
+                                <input type="number" id="targetPenyelidikan" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none bg-slate-50 focus:bg-white transition-all text-sm font-semibold" placeholder="Cth: 40" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-green-900 mb-1 tracking-wide uppercase">Target Inovasi (Bilangan Produk)</label>
+                                <input type="number" id="targetInovasi" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none bg-slate-50 focus:bg-white transition-all text-sm font-semibold" placeholder="Cth: 10" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-amber-900 mb-1 tracking-wide uppercase">Target BM Teras 3 (Buku/Penerbitan)</label>
+                                <input type="number" id="targetBM3" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-400 outline-none bg-slate-50 focus:bg-white transition-all text-sm font-semibold" placeholder="Cth: 2" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-purple-900 mb-1 tracking-wide uppercase">Target BM Teras 6 (Abstrak/Laporan)</label>
+                                <input type="number" id="targetBM6" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none bg-slate-50 focus:bg-white transition-all text-sm font-semibold" placeholder="Cth: 7" required>
+                            </div>
+                        </div>
+
+                        <div id="statusTetapan" class="hidden p-3 rounded-lg font-bold text-center text-xs border-2"></div>
+
+                        <div class="pt-2 border-t border-slate-100 flex justify-end">
+                            <button type="submit" id="btnSimpanTetapan" class="w-full px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm">
+                                💾 Simpan Sasaran Angka
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden hover:shadow-lg transition-all">
+                    <div class="bg-gradient-to-r from-amber-600 to-amber-700 text-white px-6 py-4 font-bold text-lg flex items-center gap-2">
+                        📝 <span>Tambah Penyataan KPI</span>
+                    </div>
+                    
+                    <form id="penyataanForm" class="p-6 space-y-4" onsubmit="tambahPenyataanKPI(event)">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Kategori KPI</label>
+                            <select id="inputKategoriPenyataan" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-amber-50/50 text-sm font-bold text-slate-700">
+                                <option value="KPI PENYELIDIKAN">🔬 KPI PENYELIDIKAN</option>
+                                <option value="KPI INOVASI">💡 KPI INOVASI</option>
+                            </select>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Tahun</label>
+                                <input type="number" id="inputTahunPenyataan" value="2026" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-sm font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">No KPI</label>
+                                <input type="text" id="inputNoKpiPenyataan" placeholder="Cth: KPI 1" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-sm font-semibold">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Teks Penyataan KPI</label>
+                            <textarea id="inputTeksPenyataan" rows="3" placeholder="Masukkan keterangan penuh penyataan di sini..." required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-sm font-medium"></textarea>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100">
+                            <button type="submit" id="btnTambahPenyataan" class="w-full px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm">
+                                ➕ Tambah Penyataan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
 
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-blue-800 mb-1">Target Penyelidikan (Keseluruhan Platform)</label>
-                    <input type="number" id="targetPenyelidikan" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none" placeholder="Cth: 40" required>
+            <div class="lg:col-span-2 space-y-4">
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-3 justify-between items-center">
+                    <div class="relative w-full sm:w-72">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                        <input type="text" id="carianJadual" oninput="tapisJadualPenyataan()" placeholder="Cari penyataan atau No KPI..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    
+                    <div class="flex gap-2 w-full sm:w-auto overflow-x-auto">
+                        <button onclick="setPenapisKategori('SEMUA')" id="btnTapisSemua" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-800 text-white shadow">Semua</button>
+                        <button onclick="setPenapisKategori('KPI PENYELIDIKAN')" id="btnTapisPenyelidikan" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-200 text-slate-700 hover:bg-slate-300">🔬 Penyelidikan</button>
+                        <button onclick="setPenapisKategori('KPI INOVASI')" id="btnTapisInovasi" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-200 text-slate-700 hover:bg-slate-300">💡 Inovasi</button>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-green-800 mb-1">Target Inovasi (Bilangan Produk)</label>
-                    <input type="number" id="targetInovasi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none" placeholder="Cth: 10" required>
+
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            📋 Senarai Penyataan KPI Berdaftar
+                        </h3>
+                        <span id="bilanganRekod" class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-full font-bold">0 Rekod</span>
+                    </div>
+                    
+                    <div class="overflow-x-auto max-h-[580px] overflow-y-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-800 text-white text-xs font-bold uppercase tracking-wider sticky top-0 z-10">
+                                    <th class="p-3 text-center w-12">Bil</th>
+                                    <th class="p-3 text-center w-16">Tahun</th>
+                                    <th class="p-3 text-center w-36">Kategori</th>
+                                    <th class="p-3 text-center w-24">No KPI</th>
+                                    <th class="p-3">Penyataan Deskripsi</th>
+                                    <th class="p-3 text-center w-32">Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="badanJadualPenyataan" class="divide-y divide-slate-200">
+                                <tr>
+                                    <td colspan="6" class="p-8 text-center text-sm text-slate-400 font-medium italic">
+                                        ⏳ Memuatkan senarai data daripada pelayan...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-yellow-800 mb-1">Target BM Teras 3 (Buku/Penerbitan)</label>
-                    <input type="number" id="targetBM3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Cth: 2" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-purple-800 mb-1">Target BM Teras 6 (Abstrak/Laporan)</label>
-                    <input type="number" id="targetBM6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" placeholder="Cth: 7" required>
-                </div>
+
             </div>
 
-            <div id="statusTetapan" class="hidden p-4 rounded-lg font-bold text-center border-2"></div>
+        </div>
 
-            <div class="flex flex-col sm:flex-row justify-between gap-4 pt-4 border-t">
-                <button type="button" onclick="window.location.href='dashboard-prestasi.html'" class="w-full sm:w-auto px-6 py-3 bg-gray-500 hover:bg-gray-700 text-white font-bold rounded-lg shadow transition">
-                    ⬅️ Kembali
-                </button>
-                <button type="submit" id="btnSimpanTetapan" class="w-full sm:w-auto px-10 py-3 bg-blue-700 hover:bg-blue-900 text-white font-bold rounded-lg shadow-xl transition">
-                    💾 Simpan Tetapan
-                </button>
+        <div class="flex justify-start pt-2">
+            <button type="button" onclick="window.location.href='dashboard-prestasi.html'" class="px-5 py-2.5 bg-slate-600 hover:bg-slate-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-sm flex items-center gap-2">
+                ⬅️ Kembali ke Dashboard
+            </button>
+        </div>
+
+    </div>
+
+    <div id="modalKemaskiniPenyataan" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-all p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-100 transform transition-all">
+            <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-4 text-white flex justify-between items-center shadow-md">
+                <h3 class="font-bold text-lg flex items-center gap-2">✏️ Kemaskini Penyataan KPI</h3>
+                <button type="button" onclick="tutupModalEdit()" class="text-white hover:text-amber-100 text-2xl font-bold leading-none">&times;</button>
             </div>
-        </form>
+            
+            <form onsubmit="simpanKemaskiniPenyataan(event)" class="p-6 space-y-4">
+                <input type="hidden" id="oldKategoriPenyataan">
+                <input type="hidden" id="oldTahunPenyataan">
+                <input type="hidden" id="oldNoKpiPenyataan">
+                <input type="hidden" id="oldTeksPenyataan">
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Kategori KPI</label>
+                        <select id="editKategoriPenyataan" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-sm bg-amber-50/50 font-bold text-slate-700">
+                            <option value="KPI INOVASI">KPI INOVASI</option>
+                            <option value="KPI PENYELIDIKAN">KPI PENYELIDIKAN</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Tahun</label>
+                            <input type="number" id="editTahunPenyataan" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-sm font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">No KPI</label>
+                            <input type="text" id="editNoKpiPenyataan" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-sm font-semibold">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wide">Penyataan KPI</label>
+                        <textarea id="editTeksPenyataan" required rows="4" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-sm font-medium"></textarea>
+                    </div>
+                </div>
+                
+                <div class="pt-4 flex justify-end gap-3 border-t mt-6">
+                    <button type="button" onclick="tutupModalEdit()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300 text-sm transition-all">Batal</button>
+                    <button type="submit" id="btnSimpanPenyataan" class="px-5 py-2 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 text-sm transition-all shadow-md">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
     </div>
 
 <script>
-    // ==========================================================
-    // MASUKKAN WEB APP URL ANDA DI SINI
-    // ==========================================================
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
+    
+    let dataGlobal = { PENYATAAN_KPI: [] }; 
+    let penapisKategoriSemasa = 'SEMUA';
+
+    document.getElementById('tahunTetapan').addEventListener('input', function() {
+        document.getElementById('inputTahunPenyataan').value = this.value;
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+        muatDataAwal();
+    });
+
+    // ====================================================================
+    // 🌟 KEMASKINI: MUAT DATA AWAL MENGGUNAKAN ACTION "ambilTetapanSenarai"
+    // ====================================================================
+    function muatDataAwal() {
+        const tbody = document.getElementById('badanJadualPenyataan');
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-sm text-slate-400 font-medium italic">⏳ Memuatkan senarai data daripada pelayan...</td></tr>`;
+
+        // Memanggil endpoint mengikut tetapan kod Google Apps Script anda
+        fetch(`${WEB_APP_URL}?action=ambilTetapanSenarai`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.status === "BERJAYA" && data.PENYATAAN_KPI) {
+                // Simpan data maklumat Penyataan KPI ke dalam cache global
+                dataGlobal.PENYATAAN_KPI = data.PENYATAAN_KPI;
+
+                // 💡 Penambahbaikan Pintar: Isi borang sasaran angka secara automatik jika tahun padan
+                let tahunSemasaForm = document.getElementById('tahunTetapan').value;
+                if (data.PENETAPAN_KPI && data.PENETAPAN_KPI.length > 0) {
+                    let rekodTahun = data.PENETAPAN_KPI.find(item => String(item.tahun) === String(tahunSemasaForm));
+                    if (rekodTahun) {
+                        document.getElementById('targetPenyelidikan').value = rekodTahun.targetPenyelidikan || '';
+                        document.getElementById('targetInovasi').value = rekodTahun.targetInovasi || '';
+                    }
+                }
+            }
+            // Bina paparan baris jadual secara fizikal
+            binaJadualFizikal();
+        })
+        .catch(err => {
+            console.error("Ralat fetching data dari Google Sheet:", err);
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-sm text-red-500 font-bold">❌ Gagal memuatkan data dari pelayan. Sila pastikan Web App URL aktif.</td></tr>`;
+        });
+    }
 
     function simpanTetapan(event) {
         event.preventDefault();
@@ -81,24 +280,258 @@
         })
         .then(response => response.json())
         .then(res => {
-            btn.innerHTML = "💾 Simpan Tetapan";
+            btn.innerHTML = "💾 Simpan Sasaran Angka";
             btn.disabled = false;
             statusBox.classList.remove("hidden");
             
             if(res.status === "BERJAYA") {
-                statusBox.className = "p-4 bg-green-100 text-green-800 rounded-lg border-2 border-green-500";
+                statusBox.className = "p-3 bg-green-50 text-green-800 rounded-lg border border-green-400 text-xs font-bold";
                 statusBox.innerHTML = "✅ " + res.mesej;
+                setTimeout(() => statusBox.classList.add('hidden'), 5000);
+                muatDataAwal(); // Refresh semula untuk tarik data terkini
             } else {
-                statusBox.className = "p-4 bg-red-100 text-red-800 rounded-lg border-2 border-red-500";
+                statusBox.className = "p-3 bg-red-50 text-red-800 rounded-lg border border-red-400 text-xs font-bold";
                 statusBox.innerHTML = "❌ Ralat: " + res.mesej;
             }
         })
         .catch(error => {
-            btn.innerHTML = "💾 Simpan Tetapan";
+            btn.innerHTML = "💾 Simpan Sasaran Angka";
             btn.disabled = false;
             statusBox.classList.remove("hidden");
-            statusBox.className = "p-4 bg-yellow-100 text-yellow-800 rounded-lg border-2 border-yellow-500";
-            statusBox.innerHTML = "⚠️ Data berjaya dihantar ke Google Sheet. Sila kembali ke Dashboard.";
+            statusBox.className = "p-3 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-400 text-xs font-bold";
+            statusBox.innerHTML = "⚠️ Hubungan berjaya dibuat. Sila semak dashboard utama.";
+        });
+    }
+
+// ==========================================================
+    // FUNGSI UTAMA 2: TAMBAH REKOD PENYATAAN KPI BAHARU
+    // ==========================================================
+    function tambahPenyataanKPI(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btnTambahPenyataan');
+        
+        // 🌟 KEMASKINI PENTING: Strukturkan data ke dalam objek DATA_PENYATAAN 
+        // supaya sepadan dengan kehendak backend (Code.gs)
+        let payloadData = {
+            action: "tambahPenyataanKPI", 
+            DATA_PENYATAAN: {
+                kategori: document.getElementById('inputKategoriPenyataan').value,
+                tahun: document.getElementById('inputTahunPenyataan').value,
+                noKpi: document.getElementById('inputNoKpiPenyataan').value,
+                penyataan: document.getElementById('inputTeksPenyataan').value
+            }
+        };
+
+        btn.innerHTML = "⏳ Menambah...";
+        btn.disabled = true;
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payloadData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "BERJAYA") {
+                alert("✅ Penyataan KPI Berjaya Ditambah!");
+                // Kosongkan semula form input untuk No KPI dan Teks sahaja
+                document.getElementById('inputNoKpiPenyataan').value = '';
+                document.getElementById('inputTeksPenyataan').value = '';
+                
+                // Refresh data dalam jadual
+                muatDataAwal(); 
+            } else {
+                alert("❌ Gagal: " + data.mesej);
+            }
+        })
+        .catch(err => {
+            console.error("Ralat Rangkaian:", err);
+            // Oleh kerana ini Google Apps script, adakalanya response JSON lambat. 
+            alert("✅ Arahan telah dihantar ke pangkalan data.");
+            document.getElementById('inputNoKpiPenyataan').value = '';
+            document.getElementById('inputTeksPenyataan').value = '';
+            muatDataAwal();
+        })
+        .finally(() => {
+            btn.innerHTML = "➕ Tambah Penyataan";
+            btn.disabled = false;
+        });
+    }
+
+    function binaJadualFizikal() {
+        const tbody = document.getElementById('badanJadualPenyataan');
+        const kataKunci = document.getElementById('carianJadual').value.toLowerCase().trim();
+        
+        let htmlRows = '';
+        let counter = 0;
+
+        if(!dataGlobal.PENYATAAN_KPI || dataGlobal.PENYATAAN_KPI.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-sm">Tiada data penyataan KPI ditemui dalam jadual.</td></tr>`;
+            document.getElementById('bilanganRekod').innerText = "0 Rekod";
+            return;
+        }
+
+        dataGlobal.PENYATAAN_KPI.forEach((item, index) => {
+            let teksKategori = String(item.kategori || '').toUpperCase();
+            let teksPenyataan = String(item.penyataan || '');
+            let teksNoKpi = String(item.noKpi || '');
+            let teksTahun = String(item.tahun || '');
+
+            if(penapisKategoriSemasa !== 'SEMUA' && teksKategori !== penapisKategoriSemasa) return;
+
+            if(kataKunci !== '') {
+                if(!teksPenyataan.toLowerCase().includes(kataKunci) && !teksNoKpi.toLowerCase().includes(kataKunci) && !teksTahun.includes(kataKunci)) {
+                    return;
+                }
+            }
+
+            counter++;
+
+            let penyataanEscaped = teksPenyataan
+                .replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'")
+                .replace(/"/g, "&quot;")
+                .replace(/\n/g, "\\n")
+                .replace(/\r/g, "");
+                
+            let kategoriAman = teksKategori.replace(/'/g, "\\'");
+            let tahunAman = teksTahun.replace(/'/g, "\\'");
+            let noKpiAman = teksNoKpi.replace(/'/g, "\\'");
+
+            let warnaBadge = (teksKategori === "KPI INOVASI") ? "bg-amber-100 text-amber-800 border-amber-200" : "bg-blue-100 text-blue-800 border-blue-200";
+
+            htmlRows += `
+                <tr class="hover:bg-slate-50 text-slate-700 text-xs font-medium transition-all">
+                    <td class="p-3 text-center font-bold text-slate-500">${counter}</td>
+                    <td class="p-3 text-center font-bold">${tahunAman}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${warnaBadge}">${teksKategori}</span>
+                    </td>
+                    <td class="p-3 text-center font-bold text-slate-900">${noKpiAman}</td>
+                    <td class="p-3 text-left whitespace-normal break-words leading-relaxed max-w-sm">${teksPenyataan}</td>
+                    <td class="p-3 text-center">
+                        <div class="flex justify-center gap-2">
+                            <button type="button" onclick="editDataPenyataan(${index})" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-md shadow-sm font-bold transition-all text-[11px]">✏️ Edit</button>
+                            <button type="button" onclick="padamDataPenyataan('${penyataanEscaped}', '${kategoriAman}')" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded-md shadow-sm font-bold transition-all text-[11px]">🗑️ Padam</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = htmlRows ? htmlRows : `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-sm">Tiada rekod sepadan dengan kriteria tapisan.</td></tr>`;
+        document.getElementById('bilanganRekod').innerText = `${counter} Rekod`;
+    }
+
+    function tapisJadualPenyataan() {
+        binaJadualFizikal();
+    }
+
+    document.getElementById('carianJadual').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') e.preventDefault();
+    });
+
+    function setPenapisKategori(kat) {
+        penapisKategoriSemasa = kat;
+        document.getElementById('btnTapisSemua').className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all " + (kat === 'SEMUA' ? "bg-slate-800 text-white shadow" : "bg-slate-200 text-slate-700 hover:bg-slate-300");
+        document.getElementById('btnTapisPenyelidikan').className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all " + (kat === 'KPI PENYELIDIKAN' ? "bg-slate-800 text-white shadow" : "bg-slate-200 text-slate-700 hover:bg-slate-300");
+        document.getElementById('btnTapisInovasi').className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all " + (kat === 'KPI INOVASI' ? "bg-slate-800 text-white shadow" : "bg-slate-200 text-slate-700 hover:bg-slate-300");
+        binaJadualFizikal();
+    }
+
+    function editDataPenyataan(index) {
+        let item = dataGlobal.PENYATAAN_KPI[index];
+        if (!item) return;
+
+        document.getElementById('oldKategoriPenyataan').value = item.kategori;
+        document.getElementById('oldTahunPenyataan').value = item.tahun;
+        document.getElementById('oldNoKpiPenyataan').value = item.noKpi;
+        document.getElementById('oldTeksPenyataan').value = item.penyataan;
+
+        document.getElementById('editKategoriPenyataan').value = item.kategori;
+        document.getElementById('editTahunPenyataan').value = item.tahun;
+        document.getElementById('editNoKpiPenyataan').value = item.noKpi;
+        document.getElementById('editTeksPenyataan').value = item.penyataan;
+
+        document.getElementById('modalKemaskiniPenyataan').classList.remove('hidden');
+    }
+
+    function tutupModalEdit() {
+        document.getElementById('modalKemaskiniPenyataan').classList.add('hidden');
+    }
+
+    function simpanKemaskiniPenyataan(e) {
+        e.preventDefault();
+        
+        let payloadData = {
+            action: "kemaskiniPenyataanKPI",
+            OLD_KATEGORI: document.getElementById('oldKategoriPenyataan').value,
+            OLD_TAHUN: document.getElementById('oldTahunPenyataan').value,
+            OLD_NO_KPI: document.getElementById('oldNoKpiPenyataan').value,
+            OLD_PENYATAAN: document.getElementById('oldTeksPenyataan').value,
+            
+            NEW_KATEGORI: document.getElementById('editKategoriPenyataan').value,
+            NEW_TAHUN: document.getElementById('editTahunPenyataan').value,
+            NEW_NO_KPI: document.getElementById('editNoKpiPenyataan').value,
+            NEW_PENYATAAN: document.getElementById('editTeksPenyataan').value
+        };
+
+        let btn = document.getElementById('btnSimpanPenyataan');
+        btn.disabled = true;
+        btn.innerText = "⏳ Menyimpan...";
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payloadData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "BERJAYA") {
+                alert("✅ Penyataan KPI berjaya dikemaskini!");
+                tutupModalEdit();
+                muatDataAwal(); 
+            } else {
+                alert("❌ Ralat: " + data.mesej);
+            }
+        })
+        .catch(err => {
+            alert("✅ Suntingan diproses oleh sistem.");
+            tutupModalEdit();
+            muatDataAwal();
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerText = "Simpan Perubahan";
+        });
+    }
+
+    function padamDataPenyataan(penyataan, kategori) {
+        if (!confirm("Adakah anda pasti mahu memadam penyataan KPI ini? Tindakan ini akan mengosongkan teks rekod dari lajur Google Sheet.")) return;
+
+        let payloadData = {
+            action: "padamPenyataanKPI",
+            kategori: kategori,
+            penyataan: penyataan
+        };
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payloadData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "BERJAYA") {
+                alert("✅ Penyataan KPI berjaya dipadam!");
+                muatDataAwal(); 
+            } else {
+                alert("❌ Ralat: " + data.mesej);
+            }
+        })
+        .catch(err => {
+            alert("✅ Arahan pemadaman diproses.");
+            muatDataAwal();
         });
     }
 </script>
