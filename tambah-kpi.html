@@ -276,6 +276,9 @@
         }
 
         window.onload = () => {
+            // ==============================================================
+            // 🌟 LOGIK BARU: AMBIL TETAPAN SUKUAN DAN AUTO SELECT BERDASARKAN TARIKH
+            // ==============================================================
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -283,13 +286,57 @@
             })
             .then(res => res.json())
             .then(data => {
-                if(data.status === "BERJAYA" && data.data && data.data.length > 0) {
-                    elSukuan.innerHTML = '<option value="">-- Pilih Sukuan --</option>';
-                    data.data.forEach(s => { elSukuan.innerHTML += `<option value="${s}">${s}</option>`; });
-                } else elSukuan.innerHTML = '<option value="">Tiada Data Sukuan</option>';
-            })
-            .catch(err => { elSukuan.innerHTML = '<option value="">Ralat Memuat Turun</option>'; });
+                // Periksa sama ada properti SENARAI_SUKUAN wujud (dari kemaskini Code.gs terbaru)
+                // Jika tiada, fallback kepada 'data' lama
+                const sumberDataSukuan = data.SENARAI_SUKUAN || data.data;
 
+                if (data.status === "BERJAYA" && sumberDataSukuan && sumberDataSukuan.length > 0) {
+                    elSukuan.innerHTML = '<option value="">-- Pilih Sukuan --</option>';
+                    
+                    const tarikhKomputer = new Date();
+                    let sukuanTelahDipilih = false;
+
+                    sumberDataSukuan.forEach(s => {
+                        let option = document.createElement("option");
+                        
+                        // Periksa format data: jika objek (ada tarikh tutup) atau string biasa
+                        if (typeof s === 'object' && s !== null) {
+                            option.value = s.sukuan;
+                            option.text = s.sukuan;
+
+                            let tarikhSistemTutup = new Date(s.tarikhTutup);
+                            tarikhSistemTutup.setHours(23, 59, 59, 999);
+
+                            if (!sukuanTelahDipilih && tarikhKomputer <= tarikhSistemTutup) {
+                                option.selected = true;
+                                sukuanTelahDipilih = true;
+                            }
+                        } else {
+                            // Format lama (array string)
+                            option.value = s;
+                            option.text = s;
+                        }
+                        
+                        elSukuan.appendChild(option);
+                    });
+
+                    // Fail-safe: Jika menggunakan objek tarikh tetapi semua tarikh telah luput
+                    if (typeof sumberDataSukuan[0] === 'object' && !sukuanTelahDipilih && elSukuan.options.length > 1) {
+                        elSukuan.options[elSukuan.options.length - 1].selected = true;
+                    }
+                    
+                } else {
+                    elSukuan.innerHTML = '<option value="">Tiada Data Sukuan</option>';
+                }
+            })
+            .catch(err => { 
+                console.error(err);
+                elSukuan.innerHTML = '<option value="">Ralat Memuat Turun</option>'; 
+            });
+
+            // ==============================================================
+            // AMBIL JENIS HARTA INTELEK
+            // ==============================================================
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },

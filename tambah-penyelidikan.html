@@ -216,7 +216,7 @@
     </div>
 
     <script>
-        // ⚠️ MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+       // ⚠️ MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
 
         let dataCSVSedia = []; 
@@ -224,23 +224,86 @@
         // Objek untuk menyimpan 2 fail PDF wajib
         let failSimpanan = { 1: null, 2: null }; 
 
+        // Fungsi sokongan untuk dropdown biasa
+        function isiDropdown(idElemen, dataList, teksDefault) {
+            const el = document.getElementById(idElemen);
+            if(!el) return;
+            el.innerHTML = `<option value="">${teksDefault}</option>`;
+            dataList.forEach(item => {
+                if(item.trim() !== "") {
+                    el.innerHTML += `<option value="${item}">${item}</option>`;
+                }
+            });
+        }
+
         window.onload = function() {
             fetch(SCRIPT_URL + "?action=ambilPilihan")
             .then(res => res.json())
             .then(data => {
                 if(data.status === "BERJAYA") {
+                    
                     isiDropdown("jabatan", data.jabatan, "-- Pilih Jabatan --");
                     isiDropdown("tahapSebaran", data.tahapSebaran, "-- Pilih Tahap --");
                     isiDropdown("bahasa", data.bahasa, "-- Pilih Bahasa --");
-                    isiDropdown("laporanKpi", data.laporanKpi, "-- Pilih Sukuan --");
+                    
+                    // ==============================================================
+                    // 🌟 LOGIK KHUSUS: DROPDOWN LAPORAN KPI (SUKUAN) AUTOMATIK
+                    // ==============================================================
+                    const elSukuan = document.getElementById("laporanKpi");
+                    // Gunakan data dari SENARAI_SUKUAN (yang ada format tarikh) atau fallback ke format lama laporanKpi
+                    const dataSukuanDinamik = data.SENARAI_SUKUAN || data.laporanKpi;
+                    
+                    if (elSukuan && dataSukuanDinamik && dataSukuanDinamik.length > 0) {
+                        elSukuan.innerHTML = '<option value="">-- Pilih Sukuan --</option>';
+                        
+                        const tarikhKomputer = new Date(); // Dapatkan waktu sistem sekarang
+                        let sukuanTelahDipilih = false;
+
+                        dataSukuanDinamik.forEach(s => {
+                            let option = document.createElement("option");
+                            
+                            // Jika data adalah format objek berserta tarikh tutup
+                            if (typeof s === 'object' && s !== null) {
+                                option.value = s.sukuan;
+                                option.text = s.sukuan;
+
+                                let tarikhSistemTutup = new Date(s.tarikhTutup);
+                                tarikhSistemTutup.setHours(23, 59, 59, 999); // Set hujung hari
+
+                                // Pilih automatik jika tarikh komputer sebelum/sama dengan tarikh tutup
+                                if (!sukuanTelahDipilih && tarikhKomputer <= tarikhSistemTutup) {
+                                    option.selected = true;
+                                    sukuanTelahDipilih = true;
+                                }
+                            } else {
+                                // Fallback jika data masih array string lama ["1", "2"]
+                                option.value = s;
+                                option.text = s;
+                            }
+                            
+                            elSukuan.appendChild(option);
+                        });
+
+                        // Fallback selamat: Jika semua tarikh tutup telah lepas (cth: hujung tahun)
+                        if (typeof dataSukuanDinamik[0] === 'object' && !sukuanTelahDipilih && elSukuan.options.length > 1) {
+                            elSukuan.options[elSukuan.options.length - 1].selected = true;
+                        }
+                    } else if (elSukuan) {
+                        elSukuan.innerHTML = '<option value="">Tiada Data Sukuan</option>';
+                    }
+                    // ==============================================================
                     
                     const userJabatan = sessionStorage.getItem("jabatan");
                     if (userJabatan) document.getElementById("jabatan").value = userJabatan;
+                    
+                    // Set Tahun semasa automatik
                     document.getElementById("tahun").value = new Date().getFullYear();
 
-                    aktifkanButang();
+                    if(typeof aktifkanButang === 'function') {
+                        aktifkanButang();
+                    }
                 }
-            }).catch(err => console.error(err));
+            }).catch(err => console.error("Ralat memuat data pilihan:", err));
         };
 
         function aktifkanButang() {

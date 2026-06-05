@@ -30,8 +30,16 @@
         </a>
 
         <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
+            
+            <div id="paparanSukuan" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-purple-100 text-purple-800 border border-purple-300 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm">
+                📊 Sukuan: 
+                <select id="pilihanSukuan" class="bg-white border border-purple-400 text-purple-900 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-purple-500 font-bold cursor-pointer">
+                    <option value="">Memuatkan...</option>
+                </select>
+            </div>
+
             <div id="paparanTahunSemasa" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-100 text-blue-800 border border-blue-300 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm">
-                📅 Tahun Semasa: <span id="teksTahun">...</span>
+                📅 Tahun Penilaian: <span id="teksTahun">...</span>
             </div>
 
             <a href="dokumen-inovasi.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-md border-2 border-teal-800 text-sm">
@@ -689,6 +697,77 @@ function hantarBorang(e) {
             document.body.removeChild(linkDownload);
             URL.revokeObjectURL(url);
         }
+		
+	// Panggil fungsi ini sebaik sahaja halaman selesai dimuatkan
+document.addEventListener("DOMContentLoaded", function() {
+    tetapkanTahunDanSukuan();
+});
+
+function tetapkanTahunDanSukuan() {
+    // 1. Dapatkan Tarikh & Tahun dari Jam Komputer Pengguna
+    const tarikhKomputer = new Date();
+    const tahunKomputer = tarikhKomputer.getFullYear(); // Contoh: 2026
+    
+    // Paparkan Tahun pada lencana biru
+    const lencanaTahun = document.getElementById("paparanTahunSemasa");
+    const teksTahun = document.getElementById("teksTahun");
+    if (lencanaTahun && teksTahun) {
+        teksTahun.innerText = tahunKomputer;
+        lencanaTahun.classList.remove("hidden");
+    }
+
+    // 2. Hubungi Google Apps Script untuk dapatkan data "Sistem Tutup"
+    // Nota: Pastikan variabel SCRIPT_URL telah didefinisikan dengan betul di kod asal anda.
+    fetch(`${SCRIPT_URL}?action=ambilTetapanSukuan`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "BERJAYA" && data.SENARAI_SUKUAN) {
+                const dropdownSukuan = document.getElementById("pilihanSukuan");
+                dropdownSukuan.innerHTML = ""; // Kosongkan teks "Memuatkan..."
+                
+                let sukuanTelahDipilih = false;
+
+                // Loop melalui data (Sukuan 1, 2, 3, 4)
+                data.SENARAI_SUKUAN.forEach(item => {
+                    let option = document.createElement("option");
+                    option.value = item.sukuan;
+                    option.text = item.sukuan;
+
+                    // Tukar tarikh dari sheet "2026-06-21" kepada objek Masa
+                    let tarikhSistemTutup = new Date(item.tarikhTutup);
+                    // Tetapkan waktu jam 11:59:59 PM untuk hari penutup tersebut
+                    tarikhSistemTutup.setHours(23, 59, 59, 999);
+
+                    // Logik: Jika tarikh komputer SEBELUM atau SAMA DENGAN tarikh tutup sheet
+                    // Dan jika sukuan belum ditanda (hanya tanda yang pertama kali terjumpa)
+                    if (!sukuanTelahDipilih && tarikhKomputer <= tarikhSistemTutup) {
+                        option.selected = true;
+                        sukuanTelahDipilih = true;
+                    }
+
+                    dropdownSukuan.appendChild(option);
+                });
+
+                // Fail-safe: Jika semua tarikh tutup telah luput (contoh komputer berada pada tahun 2027),
+                // secara lalai ia akan auto-pilih sukuan yang terakhir dalam senarai (Sukuan 4).
+                if (!sukuanTelahDipilih && dropdownSukuan.options.length > 0) {
+                    dropdownSukuan.options[dropdownSukuan.options.length - 1].selected = true;
+                }
+            } else {
+                document.getElementById("pilihanSukuan").innerHTML = "<option>Ralat Data</option>";
+            }
+        })
+        .catch(err => {
+            console.error("Ralat memuat turun data sukuan:", err);
+            document.getElementById("pilihanSukuan").innerHTML = "<option>Gagal Dimuat</option>";
+        });
+}	
+		
+		
+		
+		
+		
+		
     </script>
 </body>
 </html>

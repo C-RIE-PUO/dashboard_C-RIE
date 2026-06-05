@@ -579,7 +579,7 @@
             }).catch(err => paparNotis("⚠️ Ralat pelayan. Pastikan Google Apps Script anda sedia.", "merah"));
         }
 
-        function binaDropdownSukuan() {
+function binaDropdownSukuan() {
             const selectSukuan = document.getElementById('kpiSukuan');
             selectSukuan.innerHTML = '<option value="">⏳ Memuatkan...</option>';
             
@@ -587,12 +587,25 @@
             .then(res => res.json())
             .then(result => {
                 selectSukuan.innerHTML = '<option value="">Pilih Suku...</option>';
+                
                 if (result.status === "BERJAYA" && result.data) {
-                    result.data.forEach(namaSukuan => {
-                        if (namaSukuan !== "") {
+                    result.data.forEach(item => {
+                        let nilaiSukuan = "";
+
+                        // 💡 TAMBAH BAIK: Semak sama ada data yang diterima adalah Objek atau Teks biasa
+                        if (typeof item === 'object' && item !== null) {
+                            // Ambil nilai dari key 'sukuan' jika ia wujud
+                            nilaiSukuan = item.sukuan || ""; 
+                        } else {
+                            // Jika data sudah memang teks/nombor biasa
+                            nilaiSukuan = String(item).trim();
+                        }
+
+                        // Hanya paparkan jika nilai tidak kosong
+                        if (nilaiSukuan !== "") {
                             let opt1 = document.createElement('option');
-                            opt1.value = namaSukuan;
-                            opt1.textContent = namaSukuan;
+                            opt1.value = nilaiSukuan;
+                            opt1.textContent = nilaiSukuan;
                             selectSukuan.appendChild(opt1);
                         }
                     });

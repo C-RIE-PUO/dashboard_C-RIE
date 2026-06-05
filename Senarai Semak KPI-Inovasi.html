@@ -18,27 +18,35 @@
 <body class="bg-gray-100 text-gray-800 font-sans p-4 md:p-8 min-h-screen flex justify-center items-start">
 <div class="max-w-5xl w-full bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 print-border relative">
 
-        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 no-print flex flex-col md:flex-row justify-between items-center gap-4">
-            <a href="dashboard-kpi.html" target="_parent" class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
-                &larr; Kembali ke Dashboard KPI
-            </a>
+<div class="bg-gray-50 px-6 py-4 border-b border-gray-200 no-print flex flex-col md:flex-row justify-between items-center gap-4">
+    <a href="dashboard-kpi.html" target="_parent" class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
+        &larr; Kembali ke Dashboard KPI
+    </a>
 
-            <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
-                <div id="paparanTahunSemasa" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-100 text-blue-800 border border-blue-300 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm">
-                    📅 Tahun Semasa: <span id="teksTahun">...</span>
-                </div>
-
-                <a href="dokumen-inovasi.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-md border-2 border-teal-800 text-sm">
-                    📁 Dokumen KPI
-                </a>
-
-                <div id="bahagianPukal" class="hidden w-full sm:w-auto">
-                    <button type="button" onclick="bukaUploadPukal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-md border-2 border-indigo-800 text-sm">
-                        🚀 Muat Naik Data Pukal (CSV)
-                    </button>
-                </div>
-            </div>
+    <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
+        
+        <div id="paparanSukuan" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-purple-100 text-purple-800 border border-purple-300 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm">
+            📊 Sukuan: 
+            <select id="pilihanSukuan" class="bg-white border border-purple-400 text-purple-900 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-purple-500 font-bold cursor-pointer">
+                <option value="">Memuatkan...</option>
+            </select>
         </div>
+
+        <div id="paparanTahunSemasa" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-100 text-blue-800 border border-blue-300 px-4 py-2.5 rounded-lg font-bold text-sm shadow-sm">
+            📅 Tahun Penilaian: <span id="teksTahun">...</span>
+        </div>
+
+        <a href="dokumen-inovasi.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-md border-2 border-teal-800 text-sm">
+            📁 Dokumen KPI
+        </a>
+
+        <div id="bahagianPukal" class="hidden w-full sm:w-auto">
+            <button type="button" onclick="bukaUploadPukal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-md border-2 border-indigo-800 text-sm">
+                🚀 Muat Naik Data Pukal (CSV)
+            </button>
+        </div>
+    </div>
+</div>
         
         <div id="mesejUI" class="hidden p-4 text-center text-sm font-bold w-full relative z-10 no-print transition-all"></div>
 
@@ -560,6 +568,92 @@
             document.body.removeChild(linkDownload);
             URL.revokeObjectURL(url);
         }
+		
+		
+	
+		
+// Panggil fungsi ini sebaik sahaja halaman selesai dimuatkan
+document.addEventListener("DOMContentLoaded", function() {
+    tetapkanTahunDanSukuan();
+});
+
+function tetapkanTahunDanSukuan() {
+    // 1. Dapatkan Tarikh & Tahun dari Jam Komputer Pengguna
+    const tarikhKomputer = new Date();
+    const tahunKomputer = tarikhKomputer.getFullYear(); 
+    
+    // Paparkan Tahun pada lencana biru
+    const lencanaTahun = document.getElementById("paparanTahunSemasa");
+    const teksTahun = document.getElementById("teksTahun");
+    if (lencanaTahun && teksTahun) {
+        teksTahun.innerText = tahunKomputer;
+        lencanaTahun.classList.remove("hidden");
+    }
+
+    // 2. Hubungi Google Apps Script untuk dapatkan data "Sistem Tutup"
+    fetch(`${SCRIPT_URL}?action=ambilTetapanSukuan`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "BERJAYA" && data.SENARAI_SUKUAN) {
+                const dropdownSukuan = document.getElementById("pilihanSukuan");
+                if(!dropdownSukuan) return; // Hentikan fungsi jika ID tiada
+
+                dropdownSukuan.innerHTML = '<option value="">-- Pilih Sukuan --</option>'; 
+                
+                let sukuanTelahDipilih = false;
+
+                // Loop melalui data (Sukuan 1, 2, 3, 4)
+                data.SENARAI_SUKUAN.forEach(item => {
+                    let option = document.createElement("option");
+                    
+                    // Ekstrak nombor sukuan yang betul
+                    let nilaiSukuan = typeof item === 'object' ? item.sukuan : item;
+                    option.value = String(nilaiSukuan).trim();
+                    option.text = String(nilaiSukuan).trim();
+
+                    // 🌟 LOGIK PERBANDINGAN TARIKH YANG DITAMBAH BAIK
+                    if (typeof item === 'object' && item.tarikhTutup) {
+                        // Pecahkan format "YYYY-MM-DD" kepada ["2026", "06", "21"]
+                        let tParts = item.tarikhTutup.split('-'); 
+                        
+                        if (tParts.length === 3) {
+                            // Bina tarikh berdasarkan zon masa tempatan komputer (Bulan bermula dari 0 dalam JS)
+                            // new Date(Tahun, Bulan-1, Hari, Jam, Minit, Saat)
+                            let tarikhSistemTutup = new Date(tParts[0], tParts[1] - 1, tParts[2], 23, 59, 59, 999);
+
+                            // Logik: Jika tarikh komputer SEBELUM atau SAMA DENGAN tarikh tutup sheet
+                            // Dan sukuan belum ditanda (hanya tanda yang terawal mematuhi syarat)
+                            if (!sukuanTelahDipilih && tarikhKomputer <= tarikhSistemTutup) {
+                                option.selected = true;
+                                sukuanTelahDipilih = true;
+                            }
+                        }
+                    }
+
+                    if(option.value !== "") {
+                        dropdownSukuan.appendChild(option);
+                    }
+                });
+
+                // Fail-safe: Jika semua tarikh tutup telah luput (contoh komputer berada pada 2027),
+                // secara lalai ia akan auto-pilih sukuan yang terakhir dalam senarai (Sukuan 4).
+                if (!sukuanTelahDipilih && dropdownSukuan.options.length > 1) {
+                    dropdownSukuan.options[dropdownSukuan.options.length - 1].selected = true;
+                }
+            } else {
+                document.getElementById("pilihanSukuan").innerHTML = "<option>Ralat Data</option>";
+            }
+        })
+        .catch(err => {
+            console.error("Ralat memuat turun data sukuan:", err);
+            const dropdownSukuan = document.getElementById("pilihanSukuan");
+            if (dropdownSukuan) dropdownSukuan.innerHTML = "<option>Gagal Dimuat</option>";
+        });
+}
+
+		
+		
+		
     </script>
 </body>
 </html>
