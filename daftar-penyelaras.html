@@ -27,7 +27,7 @@
         <div class="lg:col-span-1">
             <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden sticky top-8">
                 <div class="bg-indigo-50 p-5 border-b border-gray-200">
-                    <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📝 Daftar Pengguna</h2>
+                    <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📝 Daftar Penyelaras</h2>
                 </div>
                 <div class="p-6">
                     <div id="mesejBorang" class="hidden mb-4 p-3 rounded-xl text-center text-sm font-bold border"></div>
@@ -244,15 +244,25 @@
                     document.getElementById('bahagian').innerHTML = htmlBahagian;
                     document.getElementById('editBahagian').innerHTML = htmlBahagian;
 
-                    // --- SETUP PERANAN ---
+					// --- SETUP PERANAN ---
                     let htmlPeranan = '<option value="">-- Pilih Peranan --</option>';
-                    data.PERANAN.forEach(p => htmlPeranan += `<option value="${p}">${p}</option>`);
+                    data.PERANAN.forEach(p => {
+                        // Semak dan abaikan jika peranan adalah STAF
+                        if (p.toString().trim().toUpperCase() !== "STAF") {
+                            htmlPeranan += `<option value="${p}">${p}</option>`;
+                        }
+                    });
                     document.getElementById('peranan').innerHTML = htmlPeranan; // Untuk Daftar
                     document.getElementById('editPeranan').innerHTML = htmlPeranan; // Untuk Edit
 
                     // ⬇️ TAMBAH KOD INI UNTUK FILTER PERANAN ⬇️
                     let htmlFilterPeranan = '<option value="">Semua Peranan</option>';
-                    data.PERANAN.forEach(p => htmlFilterPeranan += `<option value="${p}">${p}</option>`);
+                    data.PERANAN.forEach(p => {
+                        // Semak dan abaikan jika peranan adalah STAF
+                        if (p.toString().trim().toUpperCase() !== "STAF") {
+                            htmlFilterPeranan += `<option value="${p}">${p}</option>`;
+                        }
+                    });
                     document.getElementById('filterPeranan').innerHTML = htmlFilterPeranan;
                     // ⬆️ TAMAT KOD FILTER PERANAN ⬆️
                 }

@@ -184,17 +184,32 @@
             return namaPenuh.length > 15 ? namaPenuh.substring(0, 15) + "..." : namaPenuh; 
         }
 
-        // 🌟 MUAT TURUN TETAPAN SENARAI DAN SESI GLOBAL
+		// 🌟 MUAT TURUN TETAPAN SENARAI DAN SESI GLOBAL
         window.addEventListener('DOMContentLoaded', () => {
             // 1. Muat turun senarai dropdown menggunakan GET
             fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'BERJAYA') {
-                    let htmlPeranan = '<option value="">-- PILIH PERANAN --</option>';
-                    data.PERANAN.forEach(p => htmlPeranan += `<option value="${p}">${p}</option>`);
-                    document.getElementById('peranan').innerHTML = htmlPeranan;
-                    document.getElementById('daftar_peranan').innerHTML = htmlPeranan;
+                    
+                    // --- SETUP PERANAN ---
+                    // 💡 KEMASKINI: Buat dua pembolehubah berbeza
+                    let htmlPerananPenuh = '<option value="">-- PILIH PERANAN --</option>';
+                    let htmlPerananTanpaStaf = '<option value="">-- PILIH PERANAN --</option>';
+
+                    data.PERANAN.forEach(p => {
+                        // 1. Masukkan SEMUA peranan ke dalam dropdown 'peranan'
+                        htmlPerananPenuh += `<option value="${p}">${p}</option>`;
+
+                        // 2. Abaikan (skip) STAF untuk dropdown 'daftar_peranan' sahaja
+                        if (p.toString().trim().toUpperCase() !== "STAF") {
+                            htmlPerananTanpaStaf += `<option value="${p}">${p}</option>`;
+                        }
+                    });
+
+                    // Masukkan data ke dalam elemen HTML masing-masing
+                    document.getElementById('peranan').innerHTML = htmlPerananPenuh;
+                    document.getElementById('daftar_peranan').innerHTML = htmlPerananTanpaStaf;
 
                     // 🌟 KEMASKINI: Gunakan fungsi dapatkanSingkatanJabatan() untuk paparan
                     let htmlJabatan = '<option value="">-- PILIH JABATAN --</option>';
@@ -206,6 +221,7 @@
                     document.getElementById('jabatan').innerHTML = htmlJabatan;
                     document.getElementById('daftar_jabatan').innerHTML = htmlJabatan;
 
+                    // --- SETUP BAHAGIAN ---
                     let htmlBahagian = '<option value="">-- TIADA BAHAGIAN --</option>';
                     data.BAHAGIAN.forEach(b => htmlBahagian += `<option value="${b}">${b}</option>`);
                     document.getElementById('daftar_bahagian').innerHTML = htmlBahagian;
