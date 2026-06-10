@@ -16,17 +16,18 @@
     <style>
         /* Gaya khas untuk sijil supaya nampak formal */
         .sijil-container {
-            background-image: url('https://www.transparenttextures.com/patterns/white-diamond.png'); /* Corak latar belakang halus */
+            background-image: url('https://www.transparenttextures.com/patterns/white-diamond.png'); 
         }
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-8 font-sans text-gray-800">
 
-    <div class="max-w-5xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-200 gap-4">
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-gray-200 gap-4">
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">🎓 Muat Turun Sijil Penyelidikan</h1>
-                <p class="text-sm text-gray-500 mt-1">Hanya penyelidikan bersatus <span class="text-green-600 font-bold">DISAHKAN</span> akan dipaparkan.</p>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">🎓 Pengurusan & Muat Turun Sijil Penyelidikan</h1>
+                <p class="text-sm text-gray-500 mt-1">Hanya penyelidikan berstatus <span class="text-green-600 font-bold">DISAHKAN</span> akan dipaparkan di dalam jadual dan sistem.</p>
             </div>
             <div>
                 <a href="dashboard-penyelidikan.html" class="bg-slate-600 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg font-semibold transition shadow-md flex items-center gap-2 text-sm">
@@ -35,50 +36,71 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6 h-fit">
-                <h2 class="text-lg font-bold text-amber-600 mb-4 border-b pb-2">1. Pilih Penyelidikan</h2>
-                
+        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4 mb-4">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    📋 Senarai 10 Rekod Terkini
+                </h2>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label class="font-bold text-sm text-gray-600">Tapisan Jabatan:</label>
+                    <select id="filterJabatanPenyelidikan" onchange="tapisJadualSijil()" class="border border-gray-300 px-3 py-1.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm w-full md:w-64">
+                        <option value="">Semua Jabatan</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-800 text-white font-semibold uppercase tracking-wider">
+                            <th class="p-3 text-center w-12">Bil</th>
+                            <th class="p-3 min-w-[250px]">Tajuk Penyelidikan</th>
+                            <th class="p-3">Penulis</th>
+                            <th class="p-3 text-center">Jabatan</th>
+                            <th class="p-3 text-center">Tahun</th>
+                            <th class="p-3 text-center min-w-[220px]">Pengurusan Sijil</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiJadualDisahkan" class="divide-y divide-gray-200 bg-white">
+                        <tr>
+                            <td colspan="6" class="p-6 text-center text-gray-500 font-medium">⏳ Sedang memuatkan senarai rekod yang disahkan...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="skrolPilihan" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div id="blokBorangPenjana" class="bg-white rounded-xl shadow-md border border-gray-100 p-6 h-fit hidden">
+                <h2 class="text-lg font-bold text-amber-600 mb-4 border-b pb-2">1. Penjana Sijil Automatik</h2>
                 <div class="mb-4">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Pilih Tajuk Penyelidikan:</label>
                     <select id="pilihanKPI" onchange="kemaskiniSijil()" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm">
                         <option value="">⏳ Sedang memuatkan data...</option>
                     </select>
                 </div>
-
                 <div class="mb-6">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Nama Penerima Sijil:</label>
                     <input type="text" id="namaPenerima" onkeyup="kemaskiniSijil()" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm uppercase" placeholder="Masukkan nama anda">
-                    <p class="text-xs text-gray-500 mt-1">Anda boleh menyunting nama di atas jika anda adalah salah seorang penulis bersama (co-author).</p>
+                    <p class="text-[10px] text-gray-500 mt-1">Sunting nama jika anda adalah penulis bersama (co-author).</p>
                 </div>
-
                 <button onclick="muatTurunPDF()" id="btnDownload" disabled class="w-full bg-amber-500 hover:bg-amber-600 text-white px-4 py-3 rounded-lg font-bold transition shadow-md flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
-                    📥 Muat Turun Sijil (PDF)
+                    📥 Muat Turun Sijil Semasa (PDF)
                 </button>
             </div>
 
-            <div class="lg:col-span-2 flex justify-center bg-gray-200 rounded-xl p-4 overflow-x-auto border border-gray-300 shadow-inner">
-                
+            <div id="blokPaparanSijil" class="lg:col-span-3 flex justify-center bg-gray-200 rounded-xl p-4 overflow-x-auto border border-gray-300 shadow-inner">
                 <div id="templatSijil" class="sijil-container bg-white w-[800px] h-[565px] p-10 relative shadow-lg border-[12px] border-double border-amber-600 flex flex-col justify-center items-center text-center hidden">
-                    
-                    <div class="absolute top-8 left-1/2 transform -translate-x-1/2 flex items-center gap-4">
-                        <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500 border border-gray-300 font-bold">LOGO 1</div>
-                        <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500 border border-gray-300 font-bold">LOGO 2</div>
-                    </div>
-
                     <div class="mt-16">
                         <h1 class="text-4xl font-serif font-bold text-amber-700 uppercase tracking-widest mb-2">Sijil Penghargaan</h1>
                         <h2 class="text-xl font-serif text-slate-700 tracking-wider">Pencapaian Penyelidikan & Inovasi</h2>
                     </div>
-
                     <div class="mt-10 w-full px-12">
                         <p class="text-gray-600 font-medium mb-3">Dengan ini disahkan bahawa</p>
                         <p id="sijilNama" class="text-3xl font-bold text-gray-900 border-b-2 border-gray-300 pb-2 mb-4 uppercase inline-block min-w-[300px]"></p>
-                        
                         <p class="text-gray-600 font-medium mb-2">telah berjaya menerbitkan penyelidikan bertajuk:</p>
                         <p id="sijilTajuk" class="text-xl font-bold text-blue-800 italic leading-snug px-8 mb-4"></p>
                     </div>
-
                     <div class="mt-4 grid grid-cols-2 gap-4 w-full px-16 text-sm">
                         <div class="text-left bg-gray-50 p-3 rounded border border-gray-200">
                             <p><span class="font-bold text-gray-700">Penerbit:</span> <span id="sijilPenerbit" class="text-gray-800"></span></p>
@@ -89,27 +111,22 @@
                             <p><span class="font-bold text-gray-700">Tarikh Terbit:</span> <span id="sijilTarikh" class="text-gray-800"></span></p>
                         </div>
                     </div>
-
                     <div class="absolute bottom-10 right-16 text-center">
                         <div class="border-b border-gray-800 w-48 mb-1 h-12 flex items-end justify-center">
                             <span class="text-gray-300 text-xs italic">Tandatangan Digital</span>
                         </div>
                         <p class="font-bold text-sm text-gray-800">Pengarah</p>
-                        <p class="text-xs text-gray-600">Institusi Anda</p>
                     </div>
-
                     <div class="absolute bottom-10 left-16 text-left">
                         <p class="text-xs text-gray-500 font-bold">Kod ID: <span id="sijilBil" class="font-mono"></span></p>
                         <p class="text-xs text-gray-500">Jabatan: <span id="sijilJabatan" class="font-bold"></span></p>
                     </div>
-
                 </div>
                 
                 <div id="placeholderSijil" class="flex flex-col items-center justify-center text-gray-400 h-[500px]">
                     <span class="text-6xl mb-4">📜</span>
-                    <p class="font-semibold">Sila pilih tajuk penyelidikan untuk papar sijil.</p>
+                    <p id="teksPlaceholder" class="font-semibold">Sila pilih atau klik 'Auto Generate' pada jadual.</p>
                 </div>
-
             </div>
         </div>
     </div>
@@ -121,57 +138,248 @@
         const userNama = sessionStorage.getItem("namaPengguna") || "";
         const userPeranan = sessionStorage.getItem("peranan") || "STAF";
         const userJabatan = sessionStorage.getItem("jabatan") || "";
+        const perananUpper = userPeranan.toUpperCase();
 
-        let senaraiSah = []; // Simpan data yang telah disahkan
+        let senaraiSahPenuh = []; // Simpan data penuh yang disahkan
 
-        // Set nama default ke input
+        // Tentukan kelayakan pengguna
+        const isAuthorized = perananUpper.includes("INOVASI") || perananUpper === "KUPIK" || perananUpper === "ADMIN" || perananUpper.includes("PENYELIDIKAN");
+
         document.getElementById("namaPenerima").value = userNama;
 
         window.onload = function() {
+            // Sembunyi/Tunjuk panel Auto Generate bergantung pada peranan
+            if (isAuthorized) {
+                document.getElementById('blokBorangPenjana').classList.remove('hidden');
+                document.getElementById('blokPaparanSijil').classList.replace('lg:col-span-3', 'lg:col-span-2');
+            } else {
+                document.getElementById('teksPlaceholder').innerText = "Cari pautan sijil pada jadual dan klik 'Lihat' untuk memaparkan sijil.";
+            }
+
             ambilDataDisahkan();
         };
 
         function ambilDataDisahkan() {
-            const dropdown = document.getElementById("pilihanKPI");
-            
-            // Bina URL fetch
             const fetchUrl = SCRIPT_URL.includes('?') ? `${SCRIPT_URL}&action=ambilKPIPenyelidikan` : `${SCRIPT_URL}?action=ambilKPIPenyelidikan`;
 
             fetch(fetchUrl)
                 .then(res => res.json())
                 .then(data => {
                     if(data.status === "BERJAYA") {
-                        // Tapis data: Hanya yang DISAHKAN
-                        let dataDisahkan = data.data.filter(item => item.statusPengesahan.toUpperCase() === "DISAHKAN");
+                        let dataDisahkan = data.data.filter(item => {
+                            let st = (item.statusPengesahan || item.STATUSPENGESAHAN || "").toUpperCase();
+                            return st === "DISAHKAN";
+                        });
                         
-                        // Jika Staf biasa, hanya tunjuk jabatan dia sahaja
-                        if (userPeranan.toUpperCase() === "STAF" && userJabatan) {
+                        // Peranan Staf hanya nampak jabatan dia
+                        if (!isAuthorized && userJabatan) {
                             dataDisahkan = dataDisahkan.filter(item => item.jabatan === userJabatan);
                         }
 
-                        senaraiSah = dataDisahkan; // Simpan ke pembolehubah global
+                        senaraiSahPenuh = dataDisahkan; 
 
-                        dropdown.innerHTML = `<option value="">-- Sila Pilih Tajuk Penyelidikan --</option>`;
-                        
-                        if (senaraiSah.length === 0) {
-                            dropdown.innerHTML = `<option value="">Tiada penyelidikan yang telah disahkan.</option>`;
-                            return;
-                        }
-
-                        senaraiSah.forEach((item, index) => {
-                            let option = document.createElement("option");
-                            option.value = index; // Gunakan index array sebagai value
-                            option.text = item.tajuk;
-                            dropdown.appendChild(option);
+                        // Extract senarai jabatan unik untuk dropdown filter
+                        let jabatanUnik = [...new Set(dataDisahkan.map(item => item.jabatan))].filter(Boolean);
+                        let filterSelect = document.getElementById("filterJabatanPenyelidikan");
+                        filterSelect.innerHTML = `<option value="">Semua Jabatan</option>`;
+                        jabatanUnik.forEach(jab => {
+                            filterSelect.innerHTML += `<option value="${jab}">${jab}</option>`;
                         });
 
+                        // Populate dropdown "Auto Generate"
+                        const dropdownKPI = document.getElementById("pilihanKPI");
+                        dropdownKPI.innerHTML = `<option value="">-- Sila Pilih Tajuk Penyelidikan --</option>`;
+                        senaraiSahPenuh.forEach((item, index) => {
+                            let option = document.createElement("option");
+                            option.value = index; 
+                            option.text = item.tajuk;
+                            dropdownKPI.appendChild(option);
+                        });
+
+                        tapisJadualSijil(); // Panggil fungsi render jadual
+
                     } else {
-                        dropdown.innerHTML = `<option value="">Ralat memuatkan data.</option>`;
+                        document.getElementById("isiJadualDisahkan").innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500 font-bold">Ralat memuatkan data: ${data.mesej}</td></tr>`;
                     }
                 })
                 .catch(err => {
-                    dropdown.innerHTML = `<option value="">Gagal menghubungi pangkalan data.</option>`;
+                    document.getElementById("isiJadualDisahkan").innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500 font-bold">Gagal menghubungi pangkalan data.</td></tr>`;
                 });
+        }
+
+        function tapisJadualSijil() {
+            let filterNilai = document.getElementById("filterJabatanPenyelidikan").value;
+            let senaraiDitapis = senaraiSahPenuh;
+
+            if (filterNilai !== "") {
+                senaraiDitapis = senaraiSahPenuh.filter(item => item.jabatan === filterNilai);
+            }
+
+            // Hadkan kepada 10 rekod pertama sahaja
+            let senarai10Terawal = senaraiDitapis.slice(0, 10);
+            binaJadualDisahkan(senarai10Terawal);
+        }
+
+        function binaJadualDisahkan(senarai) {
+            const tbody = document.getElementById("isiJadualDisahkan");
+            tbody.innerHTML = "";
+
+            if (senarai.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500 italic">✨ Tiada rekod disahkan untuk kriteria ini.</td></tr>`;
+                return;
+            }
+
+            senarai.forEach((item, index) => {
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50 transition border-b border-gray-100";
+
+                let linkSijil = String(item.linkSijil || item.link_sijil || item["LINK SIJIL"] || "").trim();
+                if (linkSijil === "-" || linkSijil.toLowerCase() === "null" || linkSijil.toLowerCase() === "undefined") {
+                    linkSijil = "";
+                }
+
+                let kodBil = item.bil || (index + 1);
+                let tahunRec = item.tahun || "TIADA";
+                let jabatanRec = item.jabatan || "TIADA";
+                
+                let originalIndex = senaraiSahPenuh.findIndex(x => x.bil === item.bil);
+
+                // 🌟 LOGIK KAWALAN AKSES BUTANG SIJIL
+                let htmlAksiSijil = "";
+                
+                if (linkSijil === "") {
+                    // JIKA TIADA SIJIL: Hanya pentadbir boleh Upload/Generate. Staf biasa lihat teks 'Belum Dijana'.
+                    if (isAuthorized) {
+                        htmlAksiSijil = `
+                            <div class="flex flex-col gap-1.5 py-1">
+                                <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1.5 rounded transition shadow-xs text-center text-[11px] w-full">
+                                    <input type="file" accept="application/pdf" class="hidden" onchange="uploadSijilManual(this, '${kodBil}', '${tahunRec}', '${jabatanRec}')">
+                                    📁 Upload Sijil
+                                </label>
+                                <button onclick="pilihDanJanaSijil(${originalIndex})" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2 py-1.5 rounded transition shadow-xs text-[11px] w-full">
+                                    ✨ Auto Generate
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        htmlAksiSijil = `<span class="block text-center text-gray-400 italic text-[11px]">⏳ Sijil Belum Dijana</span>`;
+                    }
+                } else {
+                    // JIKA SUDAH ADA SIJIL
+                    let butangTukarHTML = "";
+                    if (isAuthorized) {
+                        butangTukarHTML = `
+                            <label class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1.5 rounded transition shadow-xs text-center text-[11px] col-span-2">
+                                <input type="file" accept="application/pdf" class="hidden" onchange="uploadSijilManual(this, '${kodBil}', '${tahunRec}', '${jabatanRec}')">
+                                🔄 Tukar Sijil
+                            </label>
+                        `;
+                    }
+
+                    // Staf biasa & Pentadbir boleh Lihat & Download
+                    htmlAksiSijil = `
+                        <div class="grid grid-cols-2 gap-1.5 py-1">
+                            <a href="${linkSijil}" target="_blank" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-2 py-1.5 rounded transition shadow-xs text-center text-[11px] flex items-center justify-center">
+                                👁️ Lihat
+                            </a>
+                            <a href="${linkSijil}" target="_blank" download class="bg-slate-600 hover:bg-slate-700 text-white font-bold px-2 py-1.5 rounded transition shadow-xs text-center text-[11px] flex items-center justify-center">
+                                📥 Download
+                            </a>
+                            ${butangTukarHTML}
+                        </div>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-3 text-center font-bold text-gray-500 bg-slate-50/50">${index + 1}</td>
+                    <td class="p-3 font-semibold text-gray-900 whitespace-normal max-w-[350px]">${item.tajuk}</td>
+                    <td class="p-3 text-gray-600">${item.penulis || "-"}</td>
+                    <td class="p-3 text-center font-bold text-slate-700 uppercase">${item.jabatan || "-"}</td>
+                    <td class="p-3 text-center font-bold text-purple-800">${item.tahun || "-"}</td>
+                    <td class="p-3 text-center align-middle w-40">${htmlAksiSijil}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function pilihDanJanaSijil(index) {
+            if (!isAuthorized) return; // Tambahan sekuriti
+            const dropdown = document.getElementById("pilihanKPI");
+            dropdown.value = index;
+            kemaskiniSijil();
+            document.getElementById("skrolPilihan").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 🌟 FUNGSI: MUAT NAIK SIJIL & RENAME FORMAT
+        function uploadSijilManual(input, bilID, tahun, jabatan) {
+            if (!isAuthorized) {
+                alert("Anda tidak mempunyai kebenaran untuk memuat naik sijil.");
+                return;
+            }
+
+            const fail = input.files[0];
+            if (!fail) return;
+
+            if (fail.size > 2 * 1024 * 1024) {
+                alert("Ralat: Saiz fail PDF melebihi sekatan maksimum 2MB!");
+                input.value = "";
+                return;
+            }
+
+            if(confirm(`Adakah anda pasti ingin memuat naik fail "${fail.name}" untuk rujukan RND-${bilID}?`)) {
+                const pembaca = new FileReader();
+                pembaca.onload = function(e) {
+                    const base64Data = e.target.result.split(',')[1];
+                    
+                    // 🌟 Penjanaan nama fail yang lebih selamat dan unik
+                    // Buang simbol/jarak yang bermasalah dan gabungkan dengan ID & Tahun
+                    const namaFailBersih = fail.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+                    const tahunLabel = (tahun && tahun !== "TIADA") ? tahun : "TIADA_TAHUN";
+                    const namaFailUnik = `SIJIL_ID${bilID}_${tahunLabel}_${namaFailBersih}`;
+                    
+                    // Struktur payload sejajar dengan failSijil di Google Apps Script
+                    const payload = {
+                        action: "kemaskiniSijilPenyelidikan", 
+                        bil: bilID,
+                        tahun: tahun,
+                        jabatan: jabatan,
+                        failSijil: {
+                            failBase64: base64Data,
+                            mimeType: fail.type,
+                            namaFail: namaFailUnik
+                        }
+                    };
+
+                    const labelButang = input.parentElement;
+                    const teksAsal = labelButang.innerHTML;
+                    labelButang.style.opacity = "0.5";
+                    labelButang.innerText = "⏳ Uploading...";
+
+                    fetch(SCRIPT_URL, {
+                        method: "POST",
+                        body: JSON.stringify(payload)
+                    })
+                    .then(res => res.json())
+                    .then(hasil => {
+                        if (hasil.status === "BERJAYA") {
+                            alert("Sijil berjaya disimpan!");
+                            ambilDataDisahkan(); // Segar semula data
+                        } else {
+                            alert("Gagal: " + (hasil.mesej || "Ralat tidak diketahui"));
+                            labelButang.innerHTML = teksAsal;
+                            labelButang.style.opacity = "1";
+                        }
+                    })
+                    .catch(err => {
+                        alert("Ralat sambungan rangkaian.");
+                        labelButang.innerHTML = teksAsal;
+                        labelButang.style.opacity = "1";
+                    });
+                };
+                pembaca.readAsDataURL(fail);
+            } else {
+                input.value = "";
+            }
         }
 
         function kemaskiniSijil() {
@@ -183,7 +391,6 @@
             const placeholder = document.getElementById("placeholderSijil");
 
             if (indexPilihan === "" || !namaPenerima) {
-                // Sembunyikan sijil, disable butang
                 btnDownload.disabled = true;
                 btnDownload.classList.add("opacity-50", "cursor-not-allowed");
                 templatSijil.classList.add("hidden");
@@ -191,19 +398,17 @@
                 return;
             }
 
-            const dataPilihan = senaraiSah[indexPilihan];
+            const dataPilihan = senaraiSahPenuh[indexPilihan];
 
-            // Masukkan data ke dalam template HTML
             document.getElementById("sijilNama").innerText = namaPenerima;
             document.getElementById("sijilTajuk").innerText = dataPilihan.tajuk;
-            document.getElementById("sijilPenerbit").innerText = dataPilihan.publisher;
+            document.getElementById("sijilPenerbit").innerText = dataPilihan.publisher || dataPilihan.namaJurnal || "-";
             document.getElementById("sijilTahap").innerText = dataPilihan.tahapSebaran;
             document.getElementById("sijilIndeks").innerText = dataPilihan.indexStatus;
             document.getElementById("sijilTarikh").innerText = dataPilihan.tarikhTerbit;
             document.getElementById("sijilBil").innerText = `RND-${dataPilihan.bil}`;
             document.getElementById("sijilJabatan").innerText = dataPilihan.jabatan;
 
-            // Paparkan sijil, aktifkan butang
             placeholder.classList.add("hidden");
             templatSijil.classList.remove("hidden");
             
@@ -216,16 +421,14 @@
             const namaPenerima = document.getElementById("namaPenerima").value.trim().replace(/ /g, "_");
             const namaFail = `Sijil_Penyelidikan_${namaPenerima}.pdf`;
 
-            // Konfigurasi html2pdf
             const opt = {
                 margin:       0,
                 filename:     namaFail,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 }, // Kualiti tinggi
+                html2canvas:  { scale: 2 }, 
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
             };
 
-            // Mula muat turun
             html2pdf().set(opt).from(elemenSijil).save();
         }
     </script>

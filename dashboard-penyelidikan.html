@@ -18,7 +18,7 @@
 </head>
 <body class="bg-slate-50 p-4 md:p-8 font-sans text-slate-800 antialiased selection:bg-blue-500 selection:text-white">
 
-<div class="w-[98%] max-w-[1800px] mx-auto space-y-6">
+    <div class="w-[98%] max-w-[1800px] mx-auto space-y-6">
         
         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 gap-6 transition-all duration-300">
             <div class="space-y-1">
@@ -323,48 +323,52 @@
     </div>
     <script>
 // ⚠️ MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
 
-        const userNama = sessionStorage.getItem("namaPengguna") || "Pengguna";
-        const userPeranan = sessionStorage.getItem("peranan") || "STAF";
-        const userJabatan = sessionStorage.getItem("jabatan") || "";
-        const perananUpper = userPeranan.toUpperCase();
-        
-        let rekodPenuh = []; 
-        let rekodDitapis = []; 
-        let mukaSuratSemasa = 1;
-        const saizMukaSurat = 10;
+const userNama = sessionStorage.getItem("namaPengguna") || "Pengguna";
+const userPeranan = sessionStorage.getItem("peranan") || "STAF";
+const userJabatan = sessionStorage.getItem("jabatan") || "";
+const perananUpper = userPeranan.toUpperCase();
 
-        document.getElementById('namaPengguna').innerText = userNama;
-        document.getElementById('perananPengguna').innerText = userPeranan;
-        document.getElementById('jabatanPengguna').innerText = userJabatan;
+let rekodPenuh = []; 
+let rekodDitapis = []; 
+let mukaSuratSemasa = 1;
+const saizMukaSurat = 10;
 
-        const isAuthorized = perananUpper.includes("INOVASI") || perananUpper === "KUPIK" || perananUpper === "ADMIN" || perananUpper.includes("PENYELIDIKAN");
-        
-        if (isAuthorized) {
-            const btnSahkan = document.getElementById('btnPengesahanKPI');
-            if (btnSahkan) {
-                btnSahkan.classList.remove('hidden');
-                btnSahkan.classList.add('flex');
-            }
-        } else {
-            const thTindakan = document.getElementById('headerTindakan');
-            if(thTindakan) thTindakan.remove();
-        }
+// Set paparan maklumat profil pengguna
+document.getElementById('namaPengguna').innerText = userNama;
+document.getElementById('perananPengguna').innerText = userPeranan;
+document.getElementById('jabatanPengguna').innerText = userJabatan;
 
-        if(perananUpper === "STAF" && userJabatan) {
-            document.getElementById('tajukJadual').innerText = `(${userJabatan})`;
-        } else {
-            document.getElementById('tajukJadual').innerText = `(Semua Jabatan)`;
-        }
+// Semakan akses authorization
+const isAuthorized = perananUpper.includes("INOVASI") || perananUpper === "KUPIK" || perananUpper === "ADMIN" || perananUpper.includes("PENYELIDIKAN");
 
-        document.addEventListener('click', function(event) {
-            const menu = document.getElementById('menuPilihanLajur');
-            const button = document.getElementById('btnPilihanLajur');
-            if (menu && !menu.contains(event.target) && !button.contains(event.target)) {
-                menu.classList.add('hidden');
-            }
-        });
+if (isAuthorized) {
+    const btnSahkan = document.getElementById('btnPengesahanKPI');
+    if (btnSahkan) {
+        btnSahkan.classList.remove('hidden');
+        btnSahkan.classList.add('flex');
+    }
+} else {
+    // 💡 NOTA: Arahan 'thTindakan.remove()' telah dibuang di sini 
+    // supaya lajur TINDAKAN tidak dipadamkan apabila STAF log masuk.
+}
+
+// Set tajuk mengikut jabatan pengguna
+if (perananUpper === "STAF" && userJabatan) {
+    document.getElementById('tajukJadual').innerText = `(${userJabatan})`;
+} else {
+    document.getElementById('tajukJadual').innerText = `(Semua Jabatan)`;
+}
+
+// Event listener untuk menutup menu pilihan lajur apabila klik di luar kawasan menu
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('menuPilihanLajur');
+    const button = document.getElementById('btnPilihanLajur');
+    if (menu && !menu.contains(event.target) && !button.contains(event.target)) {
+        menu.classList.add('hidden');
+    }
+});
 
 window.onload = function() {
     fetch(SCRIPT_URL + "?action=ambilPilihan")
@@ -510,72 +514,74 @@ function paparkanJadualPenyelidikan(senarai) {
         let rekodID = row.bil || row.BIL || row.id || (indeksMula + index + 1);
         let noBilPaparan = indeksMula + index + 1; 
 
-        let butangTindakan = "";
-        if (typeof isAuthorized !== 'undefined' && isAuthorized) {
-            
-            // 🌟 LOGIK BUTANG SIJIL YANG DIKEMASKINI DENGAN TRACKING DINAMIK:
-            // 1. Semakan awal menggunakan kunci statik yang biasa (termasuk huruf kecil berjarak)
-            let linkSijil = String(row.linkSijil || row.link_sijil || row["LINK SIJIL"] || row["link sijil"] || row.linksijil || row.sijil || row.LINK_SIJIL || "").trim();
-            
-            // Periksa jika nilainya hanyalah pemegang tempat kosong (placeholder)
-            if (linkSijil === "-" || linkSijil.toLowerCase() === "null" || linkSijil.toLowerCase() === "undefined") {
-                linkSijil = ""; 
-            }
+        // 🌟 LOGIK BUTANG SIJIL YANG DIKEMASKINI DENGAN TRACKING DINAMIK:
+        // 1. Semakan awal menggunakan kunci statik yang biasa
+        let linkSijil = String(row.linkSijil || row.link_sijil || row["LINK SIJIL"] || row["link sijil"] || row.linksijil || row.sijil || row.LINK_SIJIL || "").trim();
+        
+        // Periksa jika nilainya hanyalah pemegang tempat kosong (placeholder)
+        if (linkSijil === "-" || linkSijil.toLowerCase() === "null" || linkSijil.toLowerCase() === "undefined") {
+            linkSijil = ""; 
+        }
 
-            // 2. PENAMBAHBAIKAN AUTOMATIK: Jika pautan masih kosong, selongkar objek row secara dinamik untuk kesan kunci alternatif yang mengandungi teks 'sijil'
-            if (linkSijil === "") {
-                for (let key in row) {
-                    if (key.toLowerCase().includes("sijil")) {
-                        let nilaiKunci = String(row[key] || "").trim();
-                        if (nilaiKunci && nilaiKunci !== "-" && nilaiKunci.toLowerCase() !== "null" && nilaiKunci.toLowerCase() !== "undefined") {
-                            linkSijil = nilaiKunci;
-                            break; // Hentikan gelung sebaik sahaja pautan ditemui
-                        }
+        // 2. PENAMBAHBAIKAN AUTOMATIK: Jika pautan masih kosong, selongkar objek row secara dinamik
+        if (linkSijil === "") {
+            for (let key in row) {
+                if (key.toLowerCase().includes("sijil")) {
+                    let nilaiKunci = String(row[key] || "").trim();
+                    if (nilaiKunci && nilaiKunci !== "-" && nilaiKunci.toLowerCase() !== "null" && nilaiKunci.toLowerCase() !== "undefined") {
+                        linkSijil = nilaiKunci;
+                        break; 
                     }
                 }
             }
+        }
 
-            let tahunRec = row.tahun || row.TAHUN || "TIADA";
-            let jabatanRec = row.jabatan || row.JABATAN || "TIADA";
-            let htmlSijil = "";
+        let tahunRec = row.tahun || row.TAHUN || "TIADA";
+        let jabatanRec = row.jabatan || row.JABATAN || "TIADA";
+        let htmlSijil = "";
 
-            // 🌟 PENAMBAHBAIKAN BARU: Sekatan Berdasarkan Status Pengesahan (Lajur O)
-            if (statusSemasa === "DISAHKAN") {
-                // Jika status telah DISAHKAN, benarkan fungsi Upload / Tukar Sijil sepenuhnya
-                if (linkSijil === "") {
-                    htmlSijil = `
-                    <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white px-2 py-1.5 rounded-md font-bold transition shadow-sm flex items-center justify-center gap-1 mt-1 text-[11px] w-full" title="Upload Sijil Peringkat Sistem">
+        // =========================================================================
+        // 🌟 PENAMBAHBAIKAN: KAWALAN AKSES UNTUK STAF, PENYELARAS JABATAN & ADMIN
+        // =========================================================================
+        if (linkSijil !== "") {
+            // JIKA SIJIL WUJUD: Semua pengguna (termasuk Staf) boleh Lihat & Download
+            let butangLihatDownload = `
+                <div class="flex gap-1 mt-1 w-full">
+                    <a href="${linkSijil}" target="_blank" class="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1.5 rounded-md font-bold transition flex-1 text-center text-[10px] items-center justify-center flex" title="Lihat Sijil">👁️ Lihat</a>
+                    <a href="${linkSijil}" target="_blank" download class="bg-slate-600 hover:bg-slate-700 text-white px-2 py-1.5 rounded-md font-bold transition flex-1 text-center text-[10px] items-center justify-center flex" title="Muat Turun Sijil">📥 Download</a>
+                </div>`;
+            
+            // Hanya Admin/Penyelaras Utama dibenarkan untuk Tukar Sijil (jika status disahkan)
+            if (typeof isAuthorized !== 'undefined' && isAuthorized && statusSemasa === "DISAHKAN") {
+                htmlSijil = `
+                    ${butangLihatDownload}
+                    <label class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1.5 rounded-md font-bold transition flex-1 text-center text-[10px] items-center justify-center flex mt-1 w-full" title="Tukar Sijil PDF">
                         <input type="file" accept="application/pdf" class="hidden" onchange="uploadSijilTerus(this, '${rekodID}', '${tahunRec}', '${jabatanRec}')">
-                        📄 Upload Sijil
-                    </label>`;
-                } else {
-                    htmlSijil = `
-                    <div class="flex gap-1 mt-1 w-full">
-                        <a href="${linkSijil}" target="_blank" class="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1.5 rounded-md font-bold transition flex-1 text-center text-[10px] items-center justify-center flex" title="Lihat Sijil">👁️ Lihat</a>
-                        <label class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1.5 rounded-md font-bold transition flex-1 text-center text-[10px] items-center justify-center flex" title="Tukar Sijil PDF">
-                            <input type="file" accept="application/pdf" class="hidden" onchange="uploadSijilTerus(this, '${rekodID}', '${tahunRec}', '${jabatanRec}')">
-                            🔄 Tukar
-                        </label>
-                    </div>`;
-                }
+                        🔄 Tukar Sijil
+                    </label>
+                `;
             } else {
-                // Jika status adalah MENUNGGU atau DITOLAK, sekat operasi muat naik
-                if (linkSijil !== "") {
-                    // Jika data sijil entah bagaimana wujud, hanya benarkan lihat tanpa butang tukar
-                    htmlSijil = `
-                    <div class="flex gap-1 mt-1 w-full">
-                        <a href="${linkSijil}" target="_blank" class="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1.5 rounded-md font-bold transition flex-1 text-center text-[10px] items-center justify-center flex" title="Lihat Sijil">👁️ Lihat</a>
-                    </div>`;
-                } else {
-                    // Kosongkan paparan tindakan sijil jika belum disahkan & tiada pautan sijil
-                    htmlSijil = ""; 
-                }
+                htmlSijil = butangLihatDownload;
             }
+        } else {
+            // JIKA SIJIL TIADA: Staf biasa hanya nampak teks "Belum Dijana"
+            if (typeof isAuthorized !== 'undefined' && isAuthorized && statusSemasa === "DISAHKAN") {
+                htmlSijil = `
+                <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white px-2 py-1.5 rounded-md font-bold transition shadow-sm flex items-center justify-center gap-1 mt-1 text-[11px] w-full" title="Upload Sijil Peringkat Sistem">
+                    <input type="file" accept="application/pdf" class="hidden" onchange="uploadSijilTerus(this, '${rekodID}', '${tahunRec}', '${jabatanRec}')">
+                    📄 Upload Sijil
+                </label>`;
+            } else {
+                htmlSijil = `<span class="block text-center text-gray-400 italic text-[10px] mt-1 p-1 bg-slate-100 rounded">Sijil Belum Dijana</span>`;
+            }
+        }
 
-            // GABUNG SEMUA BUTANG TINDAKAN
+        // BINA BLOK TINDAKAN KESELURUHAN (Bergantung kepada hak akses)
+        let butangTindakan = "";
+        if (typeof isAuthorized !== 'undefined' && isAuthorized) {
             butangTindakan = `
             <td class="col-tindakan p-3 text-center align-top">
-                <div class="flex flex-col gap-1 w-[95px] mx-auto">
+                <div class="flex flex-col gap-1 w-[120px] mx-auto">
                     <div class="flex gap-1 w-full">
                         <button onclick="editRekod('${rekodID}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-1 py-1.5 rounded-md font-bold transition shadow-sm text-[10px]">📝 Edit</button>
                         <button onclick="padamRekod('${rekodID}')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white px-1 py-1.5 rounded-md font-bold transition shadow-sm text-[10px]">🗑️ Padam</button>
@@ -585,8 +591,15 @@ function paparkanJadualPenyelidikan(senarai) {
             </td>
             `;
         } else {
-            butangTindakan = `<td class="col-tindakan p-4 text-center text-gray-300 italic">-</td>`;
+            butangTindakan = `
+            <td class="col-tindakan p-3 text-center align-top">
+                <div class="flex flex-col gap-1 w-[120px] mx-auto">
+                    ${htmlSijil}
+                </div>
+            </td>
+            `;
         }
+
 
         let doiUrlVal = row.doiUrl || row.doi_url || row.DOI || "";
         let htmlDoi = doiUrlVal 
@@ -686,7 +699,6 @@ function paparkanJadualPenyelidikan(senarai) {
     if (typeof kemaskiniPagination === "function") kemaskiniPagination(jumlahMukaSurat);
     if(typeof applyColumnVisibility === "function") applyColumnVisibility();
 }
-
 function kemaskiniPagination(jumlahMukaSurat) {
     document.getElementById('currentMukaSurat').innerText = mukaSuratSemasa || 1;
     document.getElementById('totalMukaSurat').innerText = jumlahMukaSurat || 1;
@@ -1410,9 +1422,13 @@ function tukarBilanganPenulisEdit() {
     }
 }
 
+// 🌟 FUNGSI: PADAM REKOD DAN FAIL FIZIKAL
 function padamRekod(idRekod) {
-    if (confirm("Adakah anda pasti mahu memadam rekod ini? Tindakan ini akan memadam rekod dalam Google Sheet dan fail fizikal dalam Drive secara kekal.")) {
+    if (confirm("Adakah anda pasti mahu memadam rekod ini?\nTindakan ini akan memadam rekod jadual serta SEMUA fail fizikal (Dokumen & Sijil) dalam Drive secara kekal.")) {
         
+        // Boleh tambah feedback visual di sini (jika ada loader)
+        console.log(`Menghantar arahan padam untuk rekod ID: ${idRekod}`);
+
         fetch(SCRIPT_URL, {
             method: 'POST',
             headers: {
@@ -1426,9 +1442,13 @@ function padamRekod(idRekod) {
         .then(res => res.json())
         .then(data => {
             if(data.status === "BERJAYA") {
-                alert("✅ Rekod dan fail dalam Drive telah berjaya dipadam sepenuhnya.");
+                alert("✅ Rekod dan fail sijil dalam Drive telah berjaya dipadam sepenuhnya.");
+                
+                // Segar semula senarai paparan
                 if (typeof ambilDataPenyelidikan === "function") {
                     ambilDataPenyelidikan(); 
+                } else if (typeof ambilDataDisahkan === "function") {
+                    ambilDataDisahkan(); // Jika fungsi ini yang digunakan pada Sijil.html
                 }
             } else {
                 alert("❌ Ralat memadam rekod: " + (data.mesej || "Sila cuba lagi."));

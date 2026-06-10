@@ -104,17 +104,18 @@
                     <thead>
                         <tr class="bg-slate-800 text-slate-100 border-b border-slate-900 uppercase tracking-wider text-[11px]">
                             <th class="py-4 px-3 font-bold text-center w-[3%]">Bil</th>
-                            <th class="py-4 px-4 font-bold text-left w-[25%]">Maklumat Penyelidikan & Penerbitan</th>
-                            <th class="py-4 px-3 font-bold col-penulis text-left w-[12%]">Penulis</th>
-                            <th class="py-4 px-3 font-bold col-doi text-center w-[8%]">DOI/URL</th>
-                            <th class="py-4 px-3 font-bold col-jabatan text-center w-[7%]">Jabatan</th>
-                            <th class="py-4 px-3 font-bold col-tahap text-center w-[7%]">Tahap</th>
-                            <th class="py-4 px-3 font-bold col-kpi text-center w-[7%]">Sukuan</th>
+                            <th class="py-4 px-4 font-bold text-left min-w-[200px] w-[18%]">Maklumat Penyelidikan & Penerbitan</th>
+                            <th class="py-4 px-3 font-bold col-penulis text-left w-[10%]">Penulis</th>
+                            <th class="py-4 px-3 font-bold col-doi text-center w-[7%]">DOI/URL</th>
+                            <th class="py-4 px-3 font-bold col-jabatan text-center w-[6%]">Jabatan</th>
+                            <th class="py-4 px-3 font-bold col-tahap text-center w-[6%]">Tahap</th>
+                            <th class="py-4 px-3 font-bold col-kpi text-center w-[6%]">Sukuan</th>
                             <th class="py-4 px-3 font-bold col-tahun text-center w-[5%]">Tahun</th>
-                            <th class="py-4 px-3 font-bold col-index text-center w-[6%]">Index</th>
-                            <th class="py-4 px-3 font-bold col-dokumen text-center w-[10%]">Fail Bukti</th>
+                            <th class="py-4 px-3 font-bold col-index text-center w-[5%]">Index</th>
+                            <th class="py-4 px-3 font-bold col-dokumen text-center w-[8%]">Fail Bukti</th>
                             <th class="py-4 px-3 font-bold col-status text-center w-[8%]">Status</th>
-                            <th class="py-4 px-3 font-bold col-tindakan text-center w-[10%]">Tindakan</th>
+                            <th class="py-4 px-3 font-bold col-ulasan text-left min-w-[120px] w-[10%]">Ulasan Ditolak</th>
+                            <th class="py-4 px-3 font-bold col-tindakan text-center w-[8%]">Tindakan</th>
                         </tr>
                     </thead>
                     <tbody id="senaraiMenunggu" class="divide-y divide-gray-100 text-gray-700">
@@ -280,6 +281,24 @@
                     </div>
                 </div>
             </div>
+			
+            <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 mb-4 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Status Pengesahan (Lajur O):</label>
+                        <select id="editStatusPengesahan" onchange="semakStatusUlasan()" class="w-full p-2.5 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold uppercase shadow-sm bg-white text-gray-800">
+                            <option value="MENUNGGU PENGESAHAN">🟡 MENUNGGU PENGESAHAN</option>
+                            <option value="DISAHKAN">✅ DISAHKAN</option>
+                            <option value="DITOLAK">❌ DITOLAK</option>
+                        </select>
+                    </div>
+                    
+                    <div id="ruangUlasanTolak" class="hidden transition-all duration-300">
+                        <label class="block font-bold text-rose-800 mb-1">Ulasan Ditolak (Lajur R): <span class="text-rose-500">*</span></label>
+                        <textarea id="editUlasanDitolak" rows="2" class="w-full p-2.5 border border-rose-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none font-medium shadow-sm bg-rose-50/50" placeholder="Nyatakan sebab rekod ini ditolak..."></textarea>
+                    </div>
+                </div>
+            </div>
 
             <div class="flex justify-end gap-3 pt-5 border-t border-gray-200 mt-6">
                 <button type="button" onclick="tutupModalEdit()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-bold transition-colors border border-gray-300 shadow-sm">Batal</button>
@@ -395,7 +414,7 @@ function renderJadual(senarai) {
 
     if (senarai.length === 0) {
         tbody.innerHTML = `<tr><td colspan="100%" class="py-10 text-center text-gray-500 font-medium">✨ Tiada rekod dijumpai berdasarkan tapisan anda.</td></tr>`;
-        kemaskiniStatusPaginasi(0);
+        if (typeof kemaskiniStatusPaginasi === 'function') kemaskiniStatusPaginasi(0);
         return;
     }
 
@@ -457,6 +476,16 @@ function renderJadual(senarai) {
             }
         }
 
+        // 🌟 KEMASKINI BARU: Ulasan Ditolak (Lajur R)
+        let ulasanTeks = row.ulasanDitolak || row.ulasan_ditolak || row.ulasan || "";
+        let htmlUlasan = "";
+        
+        if (statusSemasa === "DITOLAK" && ulasanTeks !== "") {
+            htmlUlasan = `<span class="inline-block bg-rose-50 text-rose-700 font-medium p-1.5 rounded text-[11px] line-clamp-3 leading-snug w-full" title="${ulasanTeks}">${ulasanTeks}</span>`;
+        } else {
+            htmlUlasan = `<span class="text-gray-300 italic text-[11px]">-</span>`;
+        }
+
         // Butang Tindakan yang lebih moden dan ada animasi hover mikro
         let butangTindakan = `
             <div class="flex items-center justify-center gap-1.5 flex-wrap min-w-[180px]">
@@ -471,7 +500,7 @@ function renderJadual(senarai) {
         tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100";
         tr.id = `baris-${rekodID}`;
         
-        // 🌟 KEMASKINI: Lajur Status dan Tindakan dipaparkan pada dua <td> berasingan berserta kelas identifier
+        // 🌟 KEMASKINI: Ditambah `<td class="py-4 px-3 col-ulasan">` sebelum `<td ... col-tindakan>`
         tr.innerHTML = `
             <td class="py-4 px-3 font-bold text-gray-500 text-center select-none bg-slate-50/50">${noPaparanBermula}</td>
             
@@ -531,6 +560,7 @@ function renderJadual(senarai) {
             <td class="py-4 px-3 col-dokumen text-center">${htmlDokumen}</td>
             
             <td class="py-4 px-3 text-center col-status">${statusBadge}</td>
+            <td class="py-4 px-3 text-left col-ulasan">${htmlUlasan}</td>
             <td class="py-4 px-3 text-center bg-slate-50/30 col-tindakan">${butangTindakan}</td>
         `;
         tbody.appendChild(tr);
@@ -659,6 +689,33 @@ function dapatkanNamaFail(url, index) {
             if (elEditNamaJurnal) {
                 elEditNamaJurnal.value = rekod.namaJurnal || rekod.NAMA_JURNAL || '';
             }
+            
+            // =======================================================================
+            // 🌟 TAMBAHAN BARU: SETUP DATA STATUS PENGESAHAN & ULASAN KETIKA MODAL DIBUKA
+            // =======================================================================
+            const elStatusPengesahan = document.getElementById('editStatusPengesahan');
+            const elUlasanDitolak = document.getElementById('editUlasanDitolak');
+            const ruangUlasanTolak = document.getElementById('ruangUlasanTolak');
+            
+            if (elStatusPengesahan) {
+                let statusSemasa = (rekod.statusPengesahan || rekod.STATUSPENGESAHAN || rekod.status || "MENUNGGU").toUpperCase();
+                elStatusPengesahan.value = statusSemasa;
+                
+                if (elUlasanDitolak && ruangUlasanTolak) {
+                    let ulasanSemasa = rekod.ulasanDitolak || rekod.ulasan_ditolak || rekod.ulasan || "";
+                    elUlasanDitolak.value = ulasanSemasa;
+                    
+                    // Automatik buka ruangan ulasan jika status semasa memang DITOLAK
+                    if (statusSemasa === "DITOLAK") {
+                        ruangUlasanTolak.classList.remove("hidden");
+                        elUlasanDitolak.setAttribute("required", "true");
+                    } else {
+                        ruangUlasanTolak.classList.add("hidden");
+                        elUlasanDitolak.removeAttribute("required");
+                    }
+                }
+            }
+            // =======================================================================
             
             // Pengawalan Bilangan Penulis
             const namaPenulisAsal = rekod.penulis || rekod.PENULIS || '';
@@ -789,7 +846,6 @@ function dapatkanNamaFail(url, index) {
 
             document.getElementById('modalEdit').classList.remove('hidden');
         }
-
         function tutupModalEdit() {
             document.getElementById('modalEdit').classList.add('hidden');
         }
@@ -857,12 +913,16 @@ function dapatkanNamaFail(url, index) {
                 namaPenulisGabungEdit = senaraiNama.join(', '); 
             }
 
+            // Dapatkan nilai tambahan dari UI (Lajur O & R)
+            const statusPengesahanVal = document.getElementById('editStatusPengesahan') ? document.getElementById('editStatusPengesahan').value : "";
+            const ulasanDitolakVal = document.getElementById('editUlasanDitolak') ? document.getElementById('editUlasanDitolak').value : "";
+
             const payload = {
                 action: "kemaskiniMaklumatPenyelidikan",
                 id: bil,
                 bil: bil,
                 tajuk: document.getElementById('editTajuk').value,
-                namaJurnal: document.getElementById('editNamaJurnal') ? document.getElementById('editNamaJurnal').value : "", // 🌟 TAMBAHAN: Hantar data jurnal
+                namaJurnal: document.getElementById('editNamaJurnal') ? document.getElementById('editNamaJurnal').value : "", 
                 penulis: namaPenulisGabungEdit,
                 publisher: document.getElementById('editPublisher').value,
                 volumeIssue: document.getElementById('editVol').value,
@@ -876,7 +936,11 @@ function dapatkanNamaFail(url, index) {
                 indexStatus: document.getElementById('editIndex').value,
                 urlBukti: document.getElementById('editDokumenSediaAda').value, 
                 urlDokumenBukti: document.getElementById('editDokumenSediaAda').value, 
-                senaraiFailBaru: senaraiFailDihantar
+                senaraiFailBaru: senaraiFailDihantar,
+                
+                // 🌟 TAMBAHAN BARU: Sertakan data status & ulasan ke dalam payload hantaran
+                statusPengesahan: statusPengesahanVal,
+                ulasanDitolak: (statusPengesahanVal === "DITOLAK") ? ulasanDitolakVal : "" 
             };
 
             fetch(SCRIPT_URL, {
@@ -899,7 +963,21 @@ function dapatkanNamaFail(url, index) {
                         window.rekodPenuh[indexLokal].volIssue = payload.volumeIssue;
                         window.rekodPenuh[indexLokal].jabatan = payload.jabatan;
                         window.rekodPenuh[indexLokal].tajuk = payload.tajuk;
-                        window.rekodPenuh[indexLokal].namaJurnal = payload.namaJurnal; // 🌟 TAMBAHAN: Kemaskini ke memori paparan
+                        window.rekodPenuh[indexLokal].namaJurnal = payload.namaJurnal;
+                        
+                        // 🌟 TAMBAHAN BARU: Kemaskini rekod status & ulasan pada memori paparan HTML
+                        if (payload.statusPengesahan) {
+                            window.rekodPenuh[indexLokal].statusPengesahan = payload.statusPengesahan;
+                            window.rekodPenuh[indexLokal].STATUSPENGESAHAN = payload.statusPengesahan;
+                            window.rekodPenuh[indexLokal].status = payload.statusPengesahan;
+                        }
+                        if (payload.statusPengesahan === "DITOLAK") {
+                            window.rekodPenuh[indexLokal].ulasanDitolak = payload.ulasanDitolak;
+                            window.rekodPenuh[indexLokal].ulasan = payload.ulasanDitolak;
+                        } else {
+                            window.rekodPenuh[indexLokal].ulasanDitolak = "";
+                            window.rekodPenuh[indexLokal].ulasan = "";
+                        }
                     }
 
                     statusMesej.className = "mb-6 p-4 rounded-lg text-center text-sm font-bold bg-green-100 text-green-800 border border-green-200 block";
@@ -923,27 +1001,39 @@ function dapatkanNamaFail(url, index) {
                 statusMesej.innerText = "⚠️ Ralat rangkaian atau ralat konfigurasi server.";
             });
         }
-
         // =================================================================
         // KAWALAN TINDAKAN PENGESAH (SAHKAN / TOLAK / PADAM)
         // =================================================================
         function kemaskiniStatus(bil, statusBaru) {
-            const mesejPengesahan = statusBaru === "DISAHKAN" 
-                ? "Adakah anda pasti untuk SAHKAN rekod penyelidikan ini?" 
-                : "Adakah anda pasti mahu TOLAK rekod ini? Data tidak akan dipaparkan di laporan akhir.";
+            let ulasanMesej = "";
+
+            // Jika status DITOLAK, wajibkan pengguna memasukkan ulasan
+            if (statusBaru === "DITOLAK") {
+                ulasanMesej = prompt("Sila nyatakan ulasan / sebab rekod ini DITOLAK (Lajur R):", "");
+                
+                if (ulasanMesej === null) return; // Pengguna klik Batal (Cancel)
+                if (ulasanMesej.trim() === "") {
+                    alert("⚠️ Ulasan / sebab WAJIB diisi sekiranya anda menolak permohonan ini.");
+                    return;
+                }
+            } else {
+                const mesejPengesahan = "Adakah anda pasti untuk SAHKAN rekod penyelidikan ini?";
+                if (!confirm(mesejPengesahan)) return;
+            }
             
-            if (!confirm(mesejPengesahan)) return;
-            laksanakanArahanAPI("kemaskiniStatusPenyelidikan", bil, statusBaru);
+            // Hantar tindakan bersama ulasanMesej
+            laksanakanArahanAPI("kemaskiniStatusPenyelidikan", bil, statusBaru, ulasanMesej.trim());
         }
 
         function padamRekod(bil) {
             const mesejPengesahan = "⚠️ AMARAN: Adakah anda pasti mahu MEMADAM rekod ini sepenuhnya dari pangkalan data? Tindakan ini memadam fail Drive juga dan tidak boleh dipulihkan.";
             
             if (!confirm(mesejPengesahan)) return;
-            laksanakanArahanAPI("padamKPIPenyelidikan", bil, null);
+            laksanakanArahanAPI("padamKPIPenyelidikan", bil, null, "");
         }
 
-        function laksanakanArahanAPI(actionType, bil, statusBaru) {
+        // Ditambah parameter ulasanDitolak
+        function laksanakanArahanAPI(actionType, bil, statusBaru, ulasanDitolak = "") {
             const statusMesej = document.getElementById("statusMesej");
             const barisElement = document.getElementById(`baris-${bil}`);
             
@@ -955,10 +1045,13 @@ function dapatkanNamaFail(url, index) {
                 ? `⏳ Sedang memadam rekod RND-${bil}...` 
                 : `⏳ Sedang mengemaskini status rekod RND-${bil}...`;
 
+            // Payload dihantar ke Google Apps Script
             const payload = {
                 action: actionType,
                 bil: bil,
-                statusBaru: statusBaru
+                statusBaru: statusBaru,
+                statusPengesahan: statusBaru, // Disertakan untuk keserasian skrip pelayan
+                ulasanDitolak: ulasanDitolak  // 🌟 TAMBAHAN: Data ulasan ditolak (Lajur R)
             };
 
             fetch(SCRIPT_URL, {
@@ -974,7 +1067,7 @@ function dapatkanNamaFail(url, index) {
                         ? `✅ Rekod RND-${bil} berjaya dipadam sepenuhnya.`
                         : `✅ Rekod RND-${bil} berjaya dikemaskini sebagai ${statusBaru}.`;
                     
-                    // 🌟 PEMBAIKAN BUG: Jika padam, buang terus. Jika kemaskini, ubah rekod status di lokal sahaja
+                    // 🌟 PEMBAIKAN BUG: Jika padam, buang terus. Jika kemaskini, ubah rekod status & ulasan di lokal sahaja
                     if (actionType === "padamKPIPenyelidikan") {
                         window.rekodPenuh = window.rekodPenuh.filter(r => r.bil != bil);
                     } else {
@@ -982,6 +1075,15 @@ function dapatkanNamaFail(url, index) {
                         if (idxLokal > -1) {
                             window.rekodPenuh[idxLokal].statusPengesahan = statusBaru;
                             window.rekodPenuh[idxLokal].status = statusBaru;
+                            
+                            // Kemaskini rekod ulasan ke memori paparan secara langsung
+                            if (statusBaru === "DITOLAK") {
+                                window.rekodPenuh[idxLokal].ulasanDitolak = ulasanDitolak;
+                                window.rekodPenuh[idxLokal].ulasan = ulasanDitolak;
+                            } else {
+                                window.rekodPenuh[idxLokal].ulasanDitolak = "";
+                                window.rekodPenuh[idxLokal].ulasan = "";
+                            }
                         }
                     }
                     
@@ -1003,7 +1105,6 @@ function dapatkanNamaFail(url, index) {
                 statusMesej.classList.add("hidden");
             }, 3000);
         }
-		
 		
 		// =================================================================
         // STATISTIK PENGESAHAN MENGIKUT JABATAN
@@ -1081,6 +1182,23 @@ function dapatkanNamaFail(url, index) {
                 bekas.classList.toggle('hidden');
             }
         }
+		
+		
+		// Fungsi ini dipanggil apabila pengguna menukar dropdown Status
+    function semakStatusUlasan() {
+        const ddlStatus = document.getElementById("editStatusPengesahan");
+        const ruangUlasan = document.getElementById("ruangUlasanTolak");
+        const ulasanTeks = document.getElementById("editUlasanDitolak");
+        
+        if (ddlStatus.value === "DITOLAK") {
+            ruangUlasan.classList.remove("hidden");
+            ulasanTeks.setAttribute("required", "true"); // Wajib diisi
+        } else {
+            ruangUlasan.classList.add("hidden");
+            ulasanTeks.removeAttribute("required"); // Tidak wajib
+        }
+    }
+		
     </script>
 </body>
 </html>
