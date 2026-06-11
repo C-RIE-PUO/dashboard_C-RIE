@@ -139,7 +139,7 @@
                     <thead>
                         <tr class="bg-teal-600 text-white uppercase tracking-wide text-xs">
                             <th class="p-4 border-b text-center w-12 font-semibold">BIL</th>
-                            <th class="p-4 border-b min-w-[300px] font-semibold">MAKLUMAT PROJEK & TEMPOH</th>
+                            <th class="p-4 border-b min-w-[300px] font-semibold">MAKLUMAT PROJEK, ID & TEMPOH</th>
                             <th class="p-4 border-b min-w-[250px] font-semibold">SENARAI PENYELIDIK</th>
                             <th class="p-4 border-b text-center font-semibold">JABATAN</th>
                             <th class="p-4 border-b text-center border-l border-teal-500 font-semibold">DOKUMEN</th>
@@ -163,7 +163,7 @@
         </div>
     </main>
 
-    <div id="modalKemaskini" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
+<div id="modalKemaskini" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-blue-700 p-4 text-white flex justify-between items-center">
                 <h3 class="font-bold text-lg">✏️ Kemaskini Pendaftaran Projek</h3>
@@ -204,6 +204,18 @@
                                     <input type="date" id="edit_tarikh_surat" class="w-full px-3 py-2 border border-gray-300 rounded outline-none text-sm font-semibold text-gray-600">
                                 </div>
                             </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Projek ID</label>
+                                    <input type="text" id="edit_projek_id" class="w-full px-3 py-2 border border-gray-300 rounded outline-none text-sm font-semibold text-gray-600" placeholder="-">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Tahun Daftar</label>
+                                    <input type="text" id="edit_tahun_daftar" class="w-full px-3 py-2 border border-gray-300 rounded outline-none text-sm font-semibold text-gray-600" placeholder="-">
+                                </div>
+                            </div>
+
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 mb-1">Tarikh Mula Projek</label>
@@ -259,33 +271,33 @@
                         </div>
                     </div>
 
-<div class="p-3 bg-gray-50 rounded-lg border">
-    <h4 class="font-bold text-blue-800 text-sm mb-3 border-b pb-1">Pautan Dokumen Pendaftaran</h4>
-    <div class="space-y-4">
-        <input type="hidden" id="edit_url_maklumat">
-        <input type="hidden" id="edit_url_proposal">
+                    <div class="p-3 bg-gray-50 rounded-lg border">
+                        <h4 class="font-bold text-blue-800 text-sm mb-3 border-b pb-1">Pautan Dokumen Pendaftaran</h4>
+                        <div class="space-y-4">
+                            <input type="hidden" id="edit_url_maklumat">
+                            <input type="hidden" id="edit_url_proposal">
 
-        <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Muat Naik Borang Maklumat Penyelidikan (PDF Sahaja)</label>
-            <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                <input type="file" id="edit_file_maklumat" accept="application/pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                <a id="btn_view_maklumat" href="#" target="_blank" class="hidden shrink-0 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow">
-                    👁️ View Dokumen
-                </a>
-            </div>
-        </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Muat Naik Borang Maklumat Penyelidikan (PDF Sahaja)</label>
+                                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                                    <input type="file" id="edit_file_maklumat" accept="application/pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                    <a id="btn_view_maklumat" href="#" target="_blank" class="hidden shrink-0 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow">
+                                        👁️ View Dokumen
+                                    </a>
+                                </div>
+                            </div>
 
-        <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">Muat Naik Borang Proposal (PDF Sahaja)</label>
-            <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                <input type="file" id="edit_file_proposal" accept="application/pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
-                <a id="btn_view_proposal" href="#" target="_blank" class="hidden shrink-0 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow">
-                    👁️ View Dokumen
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Muat Naik Borang Proposal (PDF Sahaja)</label>
+                                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                                    <input type="file" id="edit_file_proposal" accept="application/pdf" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                                    <a id="btn_view_proposal" href="#" target="_blank" class="hidden shrink-0 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow">
+                                        👁️ View Dokumen
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -509,9 +521,12 @@ function terapkanTapisan() {
 
     dataTapis = dataAsal.filter(row => {
         // 1. Semakan Tahun 
-        // 🌟 DIKEMASKINI: Tukar `===` kepada `.includes()` supaya boleh cari tahun secara separa (partial match)
+        // 🌟 DIKEMASKINI: Carian tahun kini merangkumi tahun dari Tarikh Mula ATAU Tahun Daftar
         const checkTarikhMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
-        let checkTahun = (valTahun === "" || (checkTarikhMula && new Date(checkTarikhMula).getFullYear().toString().includes(valTahun)));
+        const tahunMulaStr = (checkTarikhMula && !isNaN(new Date(checkTarikhMula).getFullYear())) ? new Date(checkTarikhMula).getFullYear().toString() : "";
+        const tahunDaftarStr = String(dapatkanData(row, ["tahunDaftar", "TAHUN_DAFTAR"]) || "");
+
+        let checkTahun = (valTahun === "" || tahunMulaStr.includes(valTahun) || tahunDaftarStr.includes(valTahun));
         
         // 2. Semakan Jabatan
         const dbJabatan = dapatkanData(row, ["jabatan", "JABATAN"]);
@@ -591,7 +606,6 @@ function terapkanTapisan() {
     halamanSemasa = 1;
     paparJadual();
 }
-
 function paparJadual() {
     const tbody = document.getElementById('isiJadualStatus');
     tbody.innerHTML = "";
@@ -618,6 +632,9 @@ function paparJadual() {
         const dbMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
         const dbAkhir = dapatkanData(row, ["tarikhAkhir", "TARIKH_AKHIR", "tarikhAkhirProjek", "tarikhTamat"]);
         const sStatus = dbStatus.toUpperCase();
+
+        const dbProjekId = dapatkanData(row, ["projekId", "PROJEK_ID"]) || "-";
+        const dbTahunDaftar = dapatkanData(row, ["tahunDaftar", "TAHUN_DAFTAR"]) || "-";
         
         const a1 = dapatkanData(row, ["ahli1", "AHLI_1", "namaAhli1"]);
         const a2 = dapatkanData(row, ["ahli2", "AHLI_2", "namaAhli2"]);
@@ -626,13 +643,11 @@ function paparJadual() {
         const a5 = dapatkanData(row, ["ahli5", "AHLI_5", "namaAhli5"]);
         let senaraiAhli = [a1, a2, a3, a4, a5].filter(a => a && String(a).trim() !== "");
 
-        // 🌟 PENAMBAHBAIKAN PAPARAN STATUS, NO RUJUKAN & TARIKH SURAT
         let paparanStatus = sStatus === 'DISAHKAN' 
             ? `<span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">✅ DISAHKAN</span>` 
             : `<span class="bg-orange-100 text-orange-800 border border-orange-300 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">⏳ MENUNGGU</span>`;
 
         if (sStatus === 'DISAHKAN') {
-            // Ekstrak No Rujukan & Tarikh Surat
             const noRujukan = dapatkanData(row, ["noRujukan", "NO_RUJUKAN", "rujukan", "rujukanSurat"]);
             const tarikhSuratRaw = dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
             
@@ -672,35 +687,37 @@ function paparJadual() {
         const dbBil = dapatkanData(row, ["bil", "BIL"]);
         let actionBtn = `<span class="text-gray-300">-</span>`;
         
-// 🛠️ KEMASKINI LOGIK BUTANG TINDAKAN
-if (isApprover) {
-    let btnSahkan = '';
-    if (sStatus !== 'DISAHKAN') {
-        btnSahkan = `<button onclick="sahkanTindakan('${dbBil}', '${dbTajuk.replace(/'/g, "\\'")}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1.5 rounded font-bold shadow-sm transition text-[10px] w-full mb-1">✅ Sahkan</button>`;
-    }
-    actionBtn = `
-        <div class="flex flex-col gap-1 w-full min-w-[80px]">
-            ${btnSahkan}
-            <button onclick="bukaModalKemaskini('${dbBil}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">✏️ Edit</button>
-            <button onclick="padamRekod('${dbBil}', '${dbTajuk.replace(/'/g, "\\'")}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">🗑️ Padam</button>
-        </div>
-    `;
-} else if (userPeranan === "STAF") {
-    // 💡 KEMASKINI: Ditukar kepada 'semakKataLuanDanEdit' untuk lapisan keselamatan STAF
-    actionBtn = `
-        <div class="flex flex-col gap-1 w-full min-w-[80px]">
-            <button onclick="semakKataLuanDanEdit('${dbBil}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">✏️ Edit</button>
-        </div>
-    `;
-}
+        if (isApprover) {
+            let btnSahkan = '';
+            if (sStatus !== 'DISAHKAN') {
+                btnSahkan = `<button onclick="sahkanTindakan('${dbBil}', '${dbTajuk.replace(/'/g, "\\'")}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1.5 rounded font-bold shadow-sm transition text-[10px] w-full mb-1">✅ Sahkan</button>`;
+            }
+            actionBtn = `
+                <div class="flex flex-col gap-1 w-full min-w-[80px]">
+                    ${btnSahkan}
+                    <button onclick="bukaModalKemaskini('${dbBil}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">✏️ Edit</button>
+                    <button onclick="padamRekod('${dbBil}', '${dbTajuk.replace(/'/g, "\\'")}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">🗑️ Padam</button>
+                </div>
+            `;
+        } else if (userPeranan === "STAF") {
+            actionBtn = `
+                <div class="flex flex-col gap-1 w-full min-w-[80px]">
+                    <button onclick="semakKataLuanDanEdit('${dbBil}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">✏️ Edit</button>
+                </div>
+            `;
+        }
 
         const tr = document.createElement('tr');
         tr.className = "border-b hover:bg-teal-50 transition";
         
+        // --- PERUBAHAN UTAMA DI SINI ---
         let tdContent = `
             <td class="p-3 text-center font-bold text-gray-600 align-top">${Mula + index + 1}</td>
-            
-            <td class="p-3 whitespace-normal align-top min-w-[200px]">
+            <td class="p-3 whitespace-normal align-top min-w-[300px]">
+                <div class="flex items-center gap-2 mb-2 flex-wrap">
+                    <span class="bg-teal-100 text-teal-800 px-2 py-0.5 rounded text-[10px] font-bold border border-teal-200">ID: ${dbProjekId}</span>
+                    <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px] font-bold border border-blue-200">TAHUN DAFTAR: ${dbTahunDaftar}</span>
+                </div>
                 <div class="font-bold text-teal-800 text-xs uppercase leading-tight mb-2">${dbTajuk}</div>
                 <div class="text-[10px] text-gray-600 font-semibold mt-1 flex gap-2 items-center flex-wrap">
                     <span class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">Mula: ${tMula}</span> 
@@ -722,7 +739,6 @@ if (isApprover) {
             <td class="p-3 text-center border-l border-teal-50 align-top">${paparanStatus}</td>
         `;
 
-        // 🛠️ KEMASKINI: Lajur dipaparkan sekiranya user ialah Approver ATAU STAF
         if (isApprover || userPeranan === "STAF") {
             tdContent += `<td class="p-3 text-center border-l border-teal-50 align-top">${actionBtn}</td>`;
         }
@@ -735,7 +751,6 @@ if (isApprover) {
     document.getElementById('btnPrev').disabled = halamanSemasa === 1;
     document.getElementById('btnNext').disabled = Akhir >= dataTapis.length;
 }
-
         function ubahHalaman(arah) { halamanSemasa += arah; paparJadual(); }
 
         function sahkanTindakan(bil, tajuk) {
@@ -758,16 +773,15 @@ if (isApprover) {
     document.getElementById('edit_tajuk').value = dapatkanData(row, ["tajuk", "TAJUK", "tajukProjek"]);
     document.getElementById('edit_jabatan').value = dapatkanData(row, ["jabatan", "JABATAN"]);
     
-    // 🌟 KEMASKINI LOGIK LOCK STATUS PROJEK UNTUK STAF
     const inputStatus = document.getElementById('edit_status');
     let statusEdit = dapatkanData(row, ["status", "STATUS", "statusProjek"]);
     inputStatus.value = statusEdit ? statusEdit.toUpperCase() : 'MENUNGGU PENGESAHAN';
     
     if (userPeranan === "STAF") {
-        inputStatus.disabled = true; // Mengunci pilihan status (sesuai untuk tag <select> atau <input>)
+        inputStatus.disabled = true; 
         inputStatus.classList.add("bg-gray-100", "cursor-not-allowed");
     } else {
-        inputStatus.disabled = false; // Buka kunci semula jika admin/approver yang masuk
+        inputStatus.disabled = false; 
         inputStatus.classList.remove("bg-gray-100", "cursor-not-allowed");
     }
     
@@ -784,17 +798,14 @@ if (isApprover) {
     document.getElementById('edit_ahli_4').value = dapatkanData(row, ["ahli4", "AHLI_4", "ahli_4", "namaAhli4"]);
     document.getElementById('edit_ahli_5').value = dapatkanData(row, ["ahli5", "AHLI_5", "ahli_5", "namaAhli5"]);
     
-    // Simpan pautan asal ke input tersembunyi
     const urlMaklumat = dapatkanData(row, ["urlMaklumat", "URL_MAKLUMAT"]) || "";
     const urlProposal = dapatkanData(row, ["urlProposal", "URL_PROPOSAL"]) || "";
     document.getElementById('edit_url_maklumat').value = urlMaklumat;
     document.getElementById('edit_url_proposal').value = urlProposal;
 
-    // Kosongkan pilihan file sedia ada (reset input file apabila buka rekod lain)
     document.getElementById('edit_file_maklumat').value = "";
     document.getElementById('edit_file_proposal').value = "";
 
-    // 🌟 KEMAS KINI: Semak dan paparkan butang VIEW dokumen jika link wujud
     const btnViewMaklumat = document.getElementById('btn_view_maklumat');
     if (urlMaklumat && urlMaklumat.trim() !== "") {
         btnViewMaklumat.href = urlMaklumat;
@@ -811,7 +822,6 @@ if (isApprover) {
         btnViewProposal.classList.add('hidden');
     }
 
-    // Tarik data No. Rujukan & Tarikh Surat dan jadikannya Read-Only
     const inputNoRujukan = document.getElementById('edit_no_rujukan');
     const inputTarikhSurat = document.getElementById('edit_tarikh_surat');
     
@@ -829,8 +839,37 @@ if (isApprover) {
         inputTarikhSurat.classList.add("bg-gray-100", "cursor-not-allowed");
     }
 
+    // =======================================================
+    // KAWALAN MEDAN EDIT BAGI PROJEK ID & TAHUN DAFTAR
+    // =======================================================
+    const inputProjekId = document.getElementById('edit_projek_id');
+    const inputTahunDaftar = document.getElementById('edit_tahun_daftar');
+
+    if (inputProjekId) {
+        inputProjekId.value = dapatkanData(row, ["projekId", "PROJEK_ID"]) || "";
+        if (isApprover) {
+            inputProjekId.readOnly = false;
+            inputProjekId.classList.remove("bg-gray-100", "cursor-not-allowed");
+        } else {
+            inputProjekId.readOnly = true;
+            inputProjekId.classList.add("bg-gray-100", "cursor-not-allowed");
+        }
+    }
+
+    if (inputTahunDaftar) {
+        inputTahunDaftar.value = dapatkanData(row, ["tahunDaftar", "TAHUN_DAFTAR"]) || "";
+        if (isApprover) {
+            inputTahunDaftar.readOnly = false;
+            inputTahunDaftar.classList.remove("bg-gray-100", "cursor-not-allowed");
+        } else {
+            inputTahunDaftar.readOnly = true;
+            inputTahunDaftar.classList.add("bg-gray-100", "cursor-not-allowed");
+        }
+    }
+
     document.getElementById('modalKemaskini').classList.remove('hidden');
 }
+
 function tutupModalKemaskini() {
     document.getElementById('modalKemaskini').classList.add('hidden');
 }
@@ -906,6 +945,13 @@ async function hantarKemaskini(e) {
         URL_PROPOSAL: document.getElementById('edit_url_proposal').value,
         NO_RUJUKAN: document.getElementById('edit_no_rujukan') ? document.getElementById('edit_no_rujukan').value : "",
         TARIKH_SURAT: tarikhSuratEdit,
+        
+        // =========================================================================
+        // TAMBAHAN: Ambil nilai PROJEK_ID & TAHUN_DAFTAR untuk dihantar ke server
+        // =========================================================================
+        PROJEK_ID: document.getElementById('edit_projek_id') ? document.getElementById('edit_projek_id').value : "",
+        TAHUN_DAFTAR: document.getElementById('edit_tahun_daftar') ? document.getElementById('edit_tahun_daftar').value : "",
+        
         // Tambahan data fail base64
         FILE_MAKLUMAT: fileMaklumatData,
         FILE_PROPOSAL: fileProposalData
@@ -935,7 +981,6 @@ async function hantarKemaskini(e) {
         btn.innerText = "💾 Simpan Perubahan"; 
     });
 }
-
         function padamRekod(bil, tajuk) {
             if(!confirm(`AMARAN: Anda pasti mahu memadam rekod ini secara kekal?\n\nTajuk: ${tajuk}\n\nNota: Segala fail (PDF/Maklumat/Proposal) yang diupload ke dalam Google Drive juga akan dibuang secara automatik.`)) return;
             

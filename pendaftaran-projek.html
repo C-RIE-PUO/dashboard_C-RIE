@@ -14,10 +14,22 @@
 </head>
 <body class="bg-slate-50 text-gray-800 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-teal-700 text-white shadow-md">
+<header class="bg-teal-700 text-white shadow-md">
         <div class="max-w-5xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center">
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold tracking-wide">📋 Pendaftaran Projek</h1>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-wide">📋 Pendaftaran Projek</h1>
+                    
+                    <span class="bg-teal-800/80 text-teal-100 text-xs md:text-sm font-bold px-3 py-1.5 rounded-lg border border-teal-500/40 shadow-sm tracking-wider select-none flex items-center gap-2.5 transition-all duration-300 hover:bg-teal-800">
+                        
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                        </span>
+                        
+                        <span>TAHUN DAFTAR: <span id="tahunDaftarSistem" class="text-white font-extrabold">----</span></span>
+                    </span>
+                </div>
                 <p class="text-teal-200 mt-1 text-sm">Borang Pendaftaran Maklumat Projek Penyelidikan & Inovasi</p>
             </div>
             <div class="mt-4 md:mt-0">
@@ -27,6 +39,16 @@
             </div>
         </div>
     </header>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const tahunSemasa = new Date().getFullYear();
+            const paparanTahun = document.getElementById('tahunDaftarSistem');
+            if (paparanTahun) {
+                paparanTahun.textContent = tahunSemasa;
+            }
+        });
+    </script>
 
     <main class="max-w-5xl mx-auto px-4 py-8 w-full flex-grow">
         
@@ -38,7 +60,11 @@
                 <h2 class="text-xl font-bold text-teal-800">Maklumat Projek</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">PROJEK ID</label>
+                    <input type="text" id="projek_id" readonly placeholder="Menjana ID..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-200 text-gray-600 font-bold font-mono outline-none cursor-not-allowed select-none">
+                </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Tajuk Projek <span class="text-red-500">*</span></label>
                     <input type="text" id="tajuk" required placeholder="Sila masukkan tajuk projek" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none uppercase transition bg-gray-50">
@@ -121,9 +147,15 @@
             </div>
             
             <div class="p-6 overflow-y-auto space-y-4 text-sm text-gray-800 flex-grow bg-slate-50">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <p class="text-xs text-gray-400 font-bold uppercase mb-1">Tajuk Projek</p>
-                    <p id="prev_tajuk" class="font-bold text-teal-800 text-base uppercase leading-tight"></p>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex justify-between items-start gap-4">
+                    <div class="w-2/3">
+                        <p class="text-xs text-gray-400 font-bold uppercase mb-1">Tajuk Projek</p>
+                        <p id="prev_tajuk" class="font-bold text-teal-800 text-base uppercase leading-tight"></p>
+                    </div>
+                    <div class="w-1/3 text-right">
+                        <p class="text-xs text-gray-400 font-bold uppercase mb-1">PROJEK ID</p>
+                        <p id="prev_projek_id" class="font-mono font-bold text-teal-700 text-sm"></p>
+                    </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,7 +202,6 @@
     </footer>
 
     <script>
-        // ⚠️ MASUKKAN URL APP SCRIPT ANDA DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
         
         const perananSesi = (sessionStorage.getItem("peranan") || "").toUpperCase();
@@ -178,9 +209,24 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             muatDropdownJabatan();
+            muatProjekIdTerbaru(); // PENDAFTARAN: Memuat Projek ID saat halaman diakses
         });
 
-        // FUNGSI BARU UNTUK FORMAT TARIKH (Tukar YYYY-MM-DD -> DD-MMM-YYYY)
+        // PENAMBAHBAIKAN: Fungsi mengambil Projek ID terbaru secara real-time dari Sheet
+        function muatProjekIdTerbaru() {
+            fetch(`${SCRIPT_URL}?action=ambilProjekIdTerbaru`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "BERJAYA") {
+                    document.getElementById("projek_id").value = data.projekId;
+                }
+            })
+            .catch(err => {
+                console.error("Ralat memuatkan Projek ID terbaru:", err);
+                document.getElementById("projek_id").value = "PROJEK ID-178"; // Fallback awal
+            });
+        }
+
         function formatTarikh(tarikhString) {
             if (!tarikhString) return "";
             const bulanArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -216,7 +262,6 @@
             });
         }
 
-        // --- FUNGSI UNTUK BACA FAIL SEBAGAI BASE64 ---
         function bacaFail(file) {
             return new Promise((resolve, reject) => {
                 if (!file) {
@@ -228,7 +273,6 @@
                     resolve({
                         namaFail: file.name,
                         mimeType: file.type,
-                        // Buang header "data:application/pdf;base64,"
                         dataBase64: reader.result.split(',')[1] 
                     });
                 };
@@ -237,7 +281,6 @@
             });
         }
 
-        // 2. TANGKAP SUBMIT BORANG & PAPAR PREVIEW
         document.getElementById('borangProjek').addEventListener('submit', async function(e) {
             e.preventDefault(); 
 
@@ -250,15 +293,12 @@
                 const statusDihantar = (perananSesi === "PENYELARAS INOVASI" || perananSesi === "PENYELARAS PENYELIDIKAN" || perananSesi === "ADMIN") 
                                         ? "DISAHKAN" : "MENUNGGU PENGESAHAN";
 
-                // Dapatkan elemen fail
                 const failMaklumat = document.getElementById('fail_maklumat').files[0];
                 const failProposal = document.getElementById('fail_proposal').files[0];
 
-                // Tukar fail ke Base64 (Tunggu sehingga selesai)
                 const dataFailMaklumat = await bacaFail(failMaklumat);
                 const dataFailProposal = await bacaFail(failProposal);
 
-                // Dapatkan dan format tarikh
                 const tarikhMulaBerformat = formatTarikh(document.getElementById('tarikh_mula').value);
                 const tarikhAkhirBerformat = formatTarikh(document.getElementById('tarikh_akhir').value);
 
@@ -270,21 +310,19 @@
                     TARIKH_AKHIR: tarikhAkhirBerformat,
                     KETUA: document.getElementById('ketua_projek').value.trim().toUpperCase(),
                     IC_KETUA: document.getElementById('ic_ketua').value.trim(), 
-                    EMAIL_KETUA: document.getElementById('email_ketua').value.trim(), // Data E-mel
+                    EMAIL_KETUA: document.getElementById('email_ketua').value.trim(), 
                     AHLI_1: document.getElementById('ahli_1').value.trim().toUpperCase(),
                     AHLI_2: document.getElementById('ahli_2').value.trim().toUpperCase(),
                     AHLI_3: document.getElementById('ahli_3').value.trim().toUpperCase(),
                     AHLI_4: document.getElementById('ahli_4').value.trim().toUpperCase(),
                     AHLI_5: document.getElementById('ahli_5').value.trim().toUpperCase(),
-                    
-                    // Masukkan data fail ke dalam payload
                     FAIL_MAKLUMAT: dataFailMaklumat,
                     FAIL_PROPOSAL: dataFailProposal,
                     STATUS: statusDihantar 
                 };
 
-                // Susun maklumat ke dalam Modal
                 document.getElementById('prev_tajuk').innerText = payloadDataSemasa.TAJUK;
+                document.getElementById('prev_projek_id').innerText = document.getElementById('projek_id').value; // Set pada Preview
                 document.getElementById('prev_ketua').innerText = payloadDataSemasa.KETUA;
                 document.getElementById('prev_ic').innerText = payloadDataSemasa.IC_KETUA;
                 document.getElementById('prev_email').innerText = payloadDataSemasa.EMAIL_KETUA;
@@ -294,7 +332,6 @@
                 document.getElementById('prev_fail_maklumat').innerText = dataFailMaklumat ? dataFailMaklumat.namaFail : "Tiada fail dimuat naik";
                 document.getElementById('prev_fail_proposal').innerText = dataFailProposal ? dataFailProposal.namaFail : "Tiada fail dimuat naik";
 
-                // Buka Modal
                 document.getElementById('modalPreview').classList.remove('hidden');
 
             } catch (error) {
@@ -310,13 +347,11 @@
             document.getElementById('modalPreview').classList.add('hidden');
         }
 
-        // 3. PENGHANTARAN SEBENAR KE SERVER
         function sahkanHantar() {
             const btnSahkan = document.getElementById('btnSahkan');
             btnSahkan.disabled = true;
             btnSahkan.innerHTML = '⏳ Sedang Memuat Naik & Menyimpan...';
 
-            // Kerana payload sekarang ada Base64 fail (saiz besar), pastikan fetch berjalan dengan baik
             fetch(SCRIPT_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -326,8 +361,9 @@
             .then(data => {
                 tutupPreview();
                 if (data.status === 'BERJAYA') {
-                    paparMesejUtama(`✅ Berjaya! Maklumat projek dan fail telah dihantar. Status pendaftaran: ${payloadDataSemasa.STATUS}`, "bg-green-100 text-green-800 border-green-200");
+                    paparMesejUtama(`✅ Berjaya! Maklumat projek dan fail telah dihantar dengan ID: ${data.projekId}. Status pendaftaran: ${payloadDataSemasa.STATUS}`, "bg-green-100 text-green-800 border-green-200");
                     document.getElementById('borangProjek').reset();
+                    muatProjekIdTerbaru(); // Memperbarui nomor ID untuk entri berikutnya secara otomatis
                     if(perananSesi === "STAF" || perananSesi === "PENYELARAS JABATAN"){
                          document.getElementById('jabatan').value = sessionStorage.getItem("jabatan");
                     }
