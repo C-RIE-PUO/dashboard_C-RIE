@@ -1500,7 +1500,12 @@ function padamRekod(idRekod) {
             // Kira jumlah mengikut jabatan
             const statJabatan = {};
             senaraiSah.forEach(row => {
-                let jab = row.jabatan || row.JABATAN || "TIADA MAKLUMAT JABATAN";
+                let jabPenuh = row.jabatan || row.JABATAN || "TIADA MAKLUMAT JABATAN";
+                
+                // 🌟 DIKEMASKINI: Ekstrak singkatan di dalam kurungan (cth: "JABATAN KEJURUTERAAN AWAM (JKA)" -> "JKA")
+                let matchSingkatan = jabPenuh.match(/\(([^)]+)\)/);
+                let jab = matchSingkatan ? matchSingkatan[1].trim() : jabPenuh; 
+
                 statJabatan[jab] = (statJabatan[jab] || 0) + 1;
             });
 
