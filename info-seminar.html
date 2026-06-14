@@ -30,13 +30,17 @@
             </div>
             
             <div class="flex gap-2 flex-wrap justify-end">
-                <button onclick="bukaModalCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md transition flex items-center gap-2 text-sm">
+                <a href="paparan.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md transition flex items-center gap-2 text-sm">
+                    🏠 Menu Utama
+                </a>
+
+                <button id="btnAksesUpload" onclick="bukaModalCSV()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md transition flex items-center gap-2 text-sm">
                     📁 Upload CSV
                 </button>
-                <button onclick="bukaModalManual()" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md transition flex items-center gap-2 text-sm">
+                <button id="btnAksesManual" onclick="bukaModalManual()" class="hidden bg-pink-600 hover:bg-pink-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md transition flex items-center gap-2 text-sm">
                     ➕ Tambah Manual
                 </button>
-                <a href="pengurusan-data.html" class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md transition flex items-center gap-2 text-sm">
+                <a href="pengurusan-data.html" id="btnAksesKembali" class="hidden bg-slate-600 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md transition flex items-center gap-2 text-sm">
                     &larr; Kembali
                 </a>
             </div>
@@ -162,7 +166,27 @@
         // ⚠️ MASUKKAN URL APP SCRIPT ANDA DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
-        window.onload = muatData;
+        window.onload = () => {
+            semakAksesButang();
+            muatData();
+        };
+
+        // --- KAWALAN AKSES BUTANG BERDASARKAN PERANAN PENGGUNA ---
+        function semakAksesButang() {
+            const perananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+            const perananSemasa = userPeranan.trim().toUpperCase();
+
+            // Jika peranan ada dalam senarai dibenarkan, buang kelas 'hidden'
+            if (perananDibenarkan.includes(perananSemasa)) {
+                const btnUpload = document.getElementById('btnAksesUpload');
+                const btnManual = document.getElementById('btnAksesManual');
+                const btnKembali = document.getElementById('btnAksesKembali');
+
+                if (btnUpload) btnUpload.classList.remove('hidden');
+                if (btnManual) btnManual.classList.remove('hidden');
+                if (btnKembali) btnKembali.classList.remove('hidden');
+            }
+        }
 
         // --- BACA DATA DARI SERVER ---
         function muatData() {
