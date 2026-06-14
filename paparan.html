@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>C-RIE | Politeknik Ungku Omar</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Animasi Latar Belakang Hero */
+        .bg-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 flex flex-col min-h-screen">
+
+<nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b-4 border-yellow-400">
+        <div class="flex justify-between h-20 items-center">
+            
+            <div class="flex-shrink-0 flex items-center gap-3">
+                <div class="bg-blue-900 text-white w-12 h-12 flex items-center justify-center rounded-xl font-black text-xl shadow-inner">
+                    <i class="fa-solid fa-atom"></i>
+                </div>
+                <span class="font-black text-2xl tracking-widest text-blue-950 uppercase">C-RIE</span>
+            </div>
+            
+            <div class="flex items-center space-x-3 md:space-x-6"> 
+                
+                <a href="tentang-crie.html" class="text-blue-700 hover:text-blue-900 font-bold px-2 py-2 rounded-md text-sm md:text-base transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info"></i> <span class="hidden sm:inline">TENTANG C-RIE</span>
+                </a>
+                
+                <div id="infoPengguna" class="hidden flex items-center gap-3 text-right border-l-2 border-gray-200 pl-4">
+                    <div class="hidden sm:block">
+                        <p id="paparNama" class="text-sm font-bold text-gray-800 uppercase">NAMA PENGGUNA</p>
+                        <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider">
+                            <span id="paparPeranan">PERANAN</span> • <span id="paparJabatan">JABATAN</span>
+                        </p>
+                    </div>
+                    <div class="bg-blue-100 text-blue-700 w-10 h-10 rounded-full flex items-center justify-center font-bold border border-blue-200">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+                
+                <button id="btnLogKeluar" onclick="logKeluar()" class="hidden bg-red-100 text-red-700 hover:bg-red-600 hover:text-white font-bold px-4 py-2 md:px-4 md:py-2 rounded-xl text-sm md:text-base transition-all duration-300 flex items-center gap-2 border border-red-200 hover:border-transparent">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">LOG KELUAR</span>
+                </button>
+
+                <a href="daftar-penyelaras.html" id="btnDaftarPenyelaras" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 md:px-5 md:py-2.5 rounded-xl text-sm md:text-base transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-user-plus"></i> <span class="hidden md:inline">DAFTAR PENYELARAS</span>
+                </a>
+
+                <a href="paparan.html" id="btnLogMasuk" class="login-required bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 md:px-5 md:py-2.5 rounded-xl text-sm md:text-base transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-right-to-bracket"></i> LOG IN
+                </a>
+                
+                <div class="relative">
+                    <button id="btnTetapanSesi" onclick="bukaTetapanSesi()" style="display: none;" class="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 text-white text-xs md:text-sm font-semibold py-2 px-3 rounded-lg border border-blue-600 shadow-md transition-all focus:outline-none">
+                        <i class="fa-solid fa-calendar-days text-sm"></i>
+                        <span class="hidden md:inline">Sesi Semasa</span>
+                    </button>
+                    
+                    <div id="modalSesi" style="display: none;" class="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4 !ml-0 backdrop-blur-sm">
+                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all relative z-[10000]">
+                            <div class="bg-blue-950 p-4 text-white flex justify-between items-center relative z-20">
+                                <h3 class="font-bold flex items-center gap-2">
+                                    <i class="fa-solid fa-gears"></i> Konfigurasi Sesi & Tahun
+                                </h3>
+                                <button onclick="tutupModalSesi()" class="hover:text-red-400 transition focus:outline-none">
+                                    <i class="fa-solid fa-xmark text-xl"></i>
+                                </button>
+                            </div>
+
+                            <div class="p-6 space-y-4 relative z-20">
+                                <p class="text-xs text-gray-500 italic">* Tetapan ini akan menentukan sesi aktif bagi sistem log masuk dan pelaporan.</p>
+                                
+                                <div>
+                                    <label for="inputSesi" class="block text-sm font-bold text-gray-700 mb-1">Sesi Semasa</label>
+                                    <select id="inputSesi" class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition cursor-pointer relative z-30" required>
+                                        <option value="" disabled selected>-- Pilih Sesi --</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="inputTahun" class="block text-sm font-bold text-gray-700 mb-1">Tahun Semasa</label>
+                                    <input type="number" id="inputTahun" 
+                                           class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition relative z-30" 
+                                           placeholder="Contoh: 2024" 
+                                           min="2000" max="2100"
+                                           autocomplete="off" required>
+                                </div>
+
+                                <div id="pesananSesi" class="hidden text-center p-2 rounded text-xs font-bold"></div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 flex justify-end gap-2 relative z-20">
+                                <button onclick="tutupModalSesi()" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-lg transition focus:outline-none">
+                                    Batal
+                                </button>
+                                <button id="btnSimpanSesi" onclick="simpanSesiAktif()" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition focus:outline-none">
+                                    Simpan Tetapan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+        </div>
+    </div>
+</nav>
+
+<header class="bg-hero text-white py-10 md:py-10 px-4 text-center shadow-lg relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 bg-blue-900">
+        <div class="absolute top-5 left-5 text-7xl md:text-8xl"><i class="fa-solid fa-microscope"></i></div>
+        <div class="absolute bottom-5 right-5 text-7xl md:text-8xl"><i class="fa-solid fa-lightbulb"></i></div>
+    </div>
+
+    <div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center justify-center">
+        <p class="text-yellow-400 font-bold tracking-[0.2em] text-xs md:text-sm mb-3">POLITEKNIK UNGKU OMAR</p>
+        
+        <h1 class="text-3xl md:text-5xl lg:text-5xl font-black uppercase tracking-tight leading-tight mb-4 text-white drop-shadow-md">
+            Centre of Research <br> <span class="text-blue-300">& Innovation Excellence</span>
+        </h1>
+        
+        <p class="text-blue-100 text-sm md:text-base max-w-2xl mx-auto opacity-90 leading-relaxed font-light">
+            Pusat rujukan utama bagi pengurusan, pemantauan, dan pemerkasaan aktiviti penyelidikan serta inovasi warga politeknik.
+        </p>
+    </div>
+	
+
+	
+</header>
+
+<main class="flex-1 max-w-7xl mx-auto w-full px-4 py-12 md:py-16 relative -mt-8 md:-mt-12 z-20">
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <a href="utama.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-blue-600 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-chart-line text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-blue-700">DASHBOARD C-RIE</h3>
+            <p class="text-xs text-gray-500 mt-2">Papar analisis dan statistik KPI penyelidikan & inovasi, Harta Intelek, Geran, Komersialan</p>
+        </a>
+        
+        <a href="e-daftar.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-teal-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-file-signature text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-teal-700">E-DAFTAR PENYELIDIKAN/INOVASI</h3>
+            <p class="text-xs text-gray-500 mt-2">Sistem pendaftaran projek penyelidikan dan inovasi secara atas talian.</p>
+        </a>
+        
+        <a href="dashboard-kpi.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-orange-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-lightbulb text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-orange-700">KPI INOVASI</h3>
+            <p class="text-xs text-gray-500 mt-2">Pantau pencapaian dan indikator prestasi utama bagi aktiviti inovasi.</p>
+        </a>
+
+        <a href="dashboard-penyelidikan.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-violet-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-violet-50 text-violet-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-violet-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-chart-column text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-violet-700">KPI PENYELIDIKAN</h3>
+            <p class="text-xs text-gray-500 mt-2">Semak statistik dan pencapaian sasaran penyelidikan semasa.</p>
+        </a>
+
+        <a href="dashboard.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-pink-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-pink-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-award text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-pink-700">PENCAPAIAN INOVASI</h3>
+            <p class="text-xs text-gray-500 mt-2">Paparan rekod dan status pencapaian bagi aktiviti serta projek inovasi.</p>
+        </a>
+
+        <a href="pencapaian_pelajar.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-indigo-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-graduation-cap text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-indigo-700">PROJEK PELAJAR</h3>
+            <p class="text-xs text-gray-500 mt-2">Sistem pengurusan, direktori, dan paparan hasil projek inovasi pelajar.</p>
+        </a>
+        
+        <a href="senarai-pertandingan.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-purple-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-trophy text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-purple-700">SENARAI PERTANDINGAN INOVASI</h3>
+            <p class="text-xs text-gray-500 mt-2">Tarikh-tarikh penting Maklumat pertandingan, Hebahan pertandingan </p>
+        </a>
+
+        <a href="seminar.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-cyan-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-cyan-50 text-cyan-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-users-viewfinder text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-cyan-700">SENARAI SEMINAR / PERSIDANGAN</h3>
+            <p class="text-xs text-gray-500 mt-2">Kalendar persidangan, pembentangan kertas kerja dan seminar.</p>
+        </a>
+
+        <a href="geran.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-sky-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-hand-holding-dollar text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-sky-700">GERAN</h3>
+            <p class="text-xs text-gray-500 mt-2">Maklumat permohonan, pemantauan dan pengurusan geran penyelidikan.</p>
+        </a>
+
+        <a href="komersilan.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-lime-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-lime-50 text-lime-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-lime-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-money-bill-trend-up text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-lime-700">KOMERSIALAN</h3>
+            <p class="text-xs text-gray-500 mt-2">Peluang padanan industri, produk pasaran, dan rekod jualan inovasi.</p>
+        </a>
+
+        <a href="harta-intelek.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-fuchsia-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-fuchsia-50 text-fuchsia-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-fuchsia-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-shield-halved text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-fuchsia-700">HARTA INTELEK</h3>
+            <p class="text-xs text-gray-500 mt-2">Pendaftaran hak cipta, paten, dan perlindungan harta intelek (IP).</p>
+        </a>
+
+        <a href="pengurusan-data.html" id="btnPengurusan" class="hidden group bg-white rounded-2xl shadow-lg border-b-4 border-red-600 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg shadow">KHAS PENGURUSAN</div>
+            <div class="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-unlock-keyhole text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-red-700">PENGURUSAN</h3>
+            <p class="text-xs text-gray-500 mt-2">Ruang khusus Admin, Penyelaras Inovasi/Penyelidikan & KUPIK.</p>
+        </a>
+
+        <a href="manual.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-slate-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-slate-600 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-book-open-reader text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-slate-800">MANUAL PENGGUNA</h3>
+            <p class="text-xs text-gray-500 mt-2">Panduan lengkap cara menggunakan sistem dan portal C-RIE.</p>
+        </a>
+
+        <a href="carta-organisasi.html" class="group bg-white rounded-2xl shadow-lg border-b-4 border-amber-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-sitemap text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-amber-700">CARTA ORGANISASI</h3>
+            <p class="text-xs text-gray-500 mt-2">Paparan struktur organisasi dan pengurusan rasmi C-RIE.</p>
+        </a>
+
+        <a href="aktiviti.html" class="login-required group bg-white rounded-2xl shadow-lg border-b-4 border-rose-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-calendar-days text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-rose-700">AKTIVITI-AKTIVITI C-RIE</h3>
+            <p class="text-xs text-gray-500 mt-2">Takwim program, laporan kemajuan, dan galeri aktiviti rasmi.</p>
+        </a>
+        
+        <a href="tempahan.html" class="group bg-white rounded-2xl shadow-lg border-b-4 border-emerald-500 hover:border-yellow-400 p-8 flex flex-col items-center text-center transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+            <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 shadow-inner">
+                <i class="fa-solid fa-scroll text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-800 uppercase tracking-wide group-hover:text-emerald-700">TEMPAHAN STAND BANTING</h3>
+            <p class="text-xs text-gray-500 mt-2">Sistem permohonan dan semakan tempahan stand banting.</p>
+        </a>
+    </div>
+</main>
+    <footer id="tentang" class="bg-blue-950 text-blue-200 mt-auto border-t border-blue-900">
+        <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div>
+                    <h4 class="text-white font-black text-lg tracking-widest uppercase mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-atom text-yellow-400"></i> Tentang C-RIE
+                    </h4>
+                    <p class="text-sm leading-relaxed opacity-80 text-justify">
+                        Centre of Research & Innovation Excellence (C-RIE) adalah nadi penggerak kecemerlangan akademik di Politeknik Ungku Omar yang menggalakkan pembudayaan penyelidikan dan penghasilan produk inovasi berimpak tinggi.
+                    </p>
+                </div>
+
+                <div class="hidden lg:block"></div>
+
+                <div>
+                    <h4 class="text-white font-black text-lg tracking-widest uppercase mb-2 border-b border-blue-800 pb-1">
+                        Maklumat Untuk Dihubungi
+                    </h4>
+                    <ul class="space-y-2 text-sm opacity-90">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot mt-1 text-yellow-400 w-4"></i>
+                            <span>Pusat Kecemerlangan Penyelidikan & Inovasi (C-RIE),<br> Politeknik Ungku Omar,<br> Jalan Raja Musa Mahadi, 31400 Ipoh, Perak.</span>
+                        </li>
+                        <li class="flex items-center gap-3 hover:text-white transition-colors cursor-pointer">
+                            <i class="fa-solid fa-phone text-emerald-400 w-4"></i>
+                            <span>+605 - 254 1527</span>
+                        </li>
+                        <li class="flex items-center gap-3 hover:text-white transition-colors cursor-pointer">
+                            <i class="fa-solid fa-envelope text-red-400 w-4"></i>
+                            <span>upik@puo.edu.my</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-blue-900/50 mt-6 pt-4 text-center text-xs opacity-60 font-semibold tracking-widest uppercase flex flex-col md:flex-row justify-between items-center gap-2">
+                <span>&copy; 2024 Centre of Research & Innovation Excellence.</span>
+                <span>Hak Cipta Terpelihara.</span>
+            </div>
+        </div>
+    </footer>
+
+ <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 overflow-y-auto py-8">
+    <div id="modalCard" class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border-t-4 border-blue-600 relative mx-4 transform scale-95 transition-transform duration-300 my-auto">
+        
+        <button id="closeModalBtn" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 hover:scale-110 active:scale-95 focus:outline-none z-10">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+        
+        <div id="divLogin">
+            <div class="text-center mb-8">
+                <img src="Logo/Poli_Logo.png" alt="Logo Politeknik" class="mx-auto h-24 w-auto mb-4">
+                <h2 class="text-2xl font-black text-blue-700 tracking-wide mb-1">Sistem Penyelidikan dan Inovasi</h2>
+                <p class="text-sm text-gray-500">Sila log masuk untuk meneruskan</p>
+            </div>
+            
+            <form id="modalLoginForm" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Peranan</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-user-tag text-sm"></i>
+                        </div>
+                        <select id="modalPeranan" required class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm appearance-none bg-white">
+                            <option value="">-- PILIH PERANAN --</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-500">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-building text-sm"></i>
+                        </div>
+                        <select id="modalJabatan" required class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm appearance-none bg-white">
+                            <option value="">-- PILIH JABATAN --</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-500">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">No. Kad Pengenalan</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-id-card text-sm"></i>
+                        </div>
+                        <input type="text" id="modalIC" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Contoh: 901010015566">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Kata Laluan</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </div>
+                        <input type="password" id="modalPassword" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Masukkan kata laluan">
+                    </div>
+                </div>
+                
+                <div id="modalErrorMsg" class="text-xs text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 hidden flex items-start gap-2">
+                    <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+                    <span id="errorText">Pengesahan gagal.</span>
+                </div>
+                
+                <div class="pt-2 flex gap-2">
+                    <button type="button" onclick="closeModal()" class="w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg text-sm transition-all shadow-md">
+                        Batal
+                    </button>
+                    <button type="submit" id="submitModalBtn" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span id="submitText">Log Masuk</span>
+                    </button>
+                </div>
+                
+                <div class="text-center pt-3 space-y-2 text-sm">
+                    <p class="text-gray-600">Pengguna Baru? <a href="#" onclick="tunjukBorang('divDaftar')" class="text-blue-600 font-bold hover:underline">Daftar Sini</a></p>
+                    <a href="#" onclick="tunjukBorang('divReset')" class="text-red-500 font-bold hover:underline block">Lupa Kata Laluan?</a>
+                </div>
+            </form>
+        </div>
+
+        <div id="divDaftar" class="hidden text-left">
+            <h2 class="text-2xl font-bold text-center text-green-700 mb-6 tracking-wide">
+            Pendaftaran Pengguna <br>
+            <span class="text-lg font-medium opacity-90">(Penyelaras dan Penyelia sahaja)</span>
+            </h2>
+            <div id="statusMesejDaftar" class="hidden mb-4 p-3 rounded text-center text-sm font-semibold border"></div>
+            
+            <form id="borangDaftar" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nama Penuh</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-user text-sm"></i>
+                        </div>
+                        <input type="text" id="daftar_nama" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm uppercase" placeholder="NAMA PENUH ANDA">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">No. Kad Pengenalan</label>
+                    <div class="relative">
+                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-id-card text-sm"></i>
+                        </div>
+                        <input type="text" id="daftar_ic" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm" placeholder="Tanpa sengkang ( - )">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Kata Laluan Baru</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </div>
+                        <input type="password" id="daftar_password" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm" placeholder="Cipta kata laluan">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Peranan Sistem</label>
+                    <div class="relative">
+                        <select id="daftar_peranan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm appearance-none bg-white uppercase">
+                            <option value="">⏳ Memuat turun...</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan</label>
+                    <div class="relative">
+                        <select id="daftar_jabatan" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm appearance-none bg-white uppercase">
+                            <option value="">⏳ Memuat turun...</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Bahagian / Unit (Pilihan)</label>
+                    <div class="relative">
+                        <select id="daftar_bahagian" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm appearance-none bg-white uppercase">
+                            <option value="">⏳ Memuat turun...</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Sesi Semasa</label>
+                        <input type="text" id="daftar_sesi" readonly class="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-600 font-bold text-sm outline-none cursor-not-allowed" value="1">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tahun Semasa</label>
+                        <input type="text" id="daftar_tahun" readonly class="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-600 font-bold text-sm outline-none cursor-not-allowed" value="2026">
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeModal()" class="w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg text-sm transition-all shadow-md">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitDaftar" class="w-2/3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-sm transition-all shadow-md hover:shadow-lg">
+                        Hantar Pendaftaran
+                    </button>
+                </div>
+                
+                <div class="text-center pt-2">
+                    <a href="#" onclick="tunjukBorang('divLogin')" class="text-sm text-gray-600 font-bold hover:underline">← Kembali ke Log Masuk</a>
+                </div>
+            </form>
+        </div>
+
+       <div id="divReset" class="hidden">
+            <h2 class="text-2xl font-bold text-center text-red-600 mb-6">Reset Kata Laluan</h2>
+            <div id="statusMesejReset" class="hidden mb-4 p-3 rounded text-center text-sm font-semibold border"></div>
+            
+            <form id="borangReset" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">No. Kad Pengenalan</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-id-card text-sm"></i>
+                        </div>
+                        <input type="text" id="reset_ic" required class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Kata Laluan Baru</label>
+                    <div class="relative">
+                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </div>
+                        <input type="password" id="reset_password" required class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none">
+                    </div>
+                </div>
+                
+                <div class="flex gap-2 mt-2 pt-2">
+                    <button type="button" onclick="closeModal()" class="w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2.5 rounded-lg transition duration-200 shadow-md">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitReset" class="w-2/3 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg transition duration-200 shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Reset & Kemaskini
+                    </button>
+                </div>
+            </form>
+            <div class="mt-4 text-center text-sm">
+                <a href="#" onclick="tunjukBorang('divLogin')" class="text-gray-500 hover:text-gray-800 hover:underline font-semibold">&larr; Kembali ke Log Masuk</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set URL Global untuk Google Apps Script
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec";
+
+        // ==========================================
+        // 🌟 FUNGSI BARU: AMBIL SINGKATAN JABATAN
+        // ==========================================
+        function dapatkanSingkatanJabatan(namaPenuh) {
+            if (!namaPenuh) return "";
+            
+            // Cari perkataan di dalam kurungan (cth: "JABATAN KEJURUTERAAN AWAM (JKA)")
+            const match = namaPenuh.match(/\(([^)]+)\)/);
+            if (match) {
+                return match[1].trim(); // Akan pulangkan "JKA"
+            }
+            
+            // Jika tiada kurungan dijumpai, ia akan papar nama asal yang dipendekkan
+            return namaPenuh.length > 15 ? namaPenuh.substring(0, 15) + "..." : namaPenuh; 
+        }
+window.onload = () => {
+    // 1. Logik pengesahan sesi/login
+    const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
+    const perananPengguna = (sessionStorage.getItem("peranan") || "").trim().toUpperCase();
+
+    if (sudahLogin) {
+        // Sembunyikan Butang Log Masuk
+        const btnLogMasuk = document.getElementById('btnLogMasuk');
+        if (btnLogMasuk) {
+            btnLogMasuk.classList.add('hidden');
+            btnLogMasuk.style.display = 'none';
+        }
+
+        // Paparkan Info Pengguna
+        const infoPengguna = document.getElementById('infoPengguna');
+        if (infoPengguna) {
+            infoPengguna.classList.remove('hidden');
+            infoPengguna.style.display = 'flex'; // Guna flex untuk susunan logo & teks
+        }
+
+        const pNama = document.getElementById('paparNama');
+        const pPeranan = document.getElementById('paparPeranan');
+        const pJabatan = document.getElementById('paparJabatan');
+        
+        if (pNama) pNama.innerText = sessionStorage.getItem("namaPengguna") || "Pengguna";
+        if (pPeranan) pPeranan.innerText = perananPengguna;
+        
+        // Ekstrak singkatan untuk paparan Jabatan
+        if (pJabatan) {
+            let jabatanAsal = sessionStorage.getItem("jabatan") || "TIADA";
+            let paparanJabatan = jabatanAsal;
+            
+            // Cari teks di dalam kurungan (contoh: JKA, JKE)
+            const matchJabatan = jabatanAsal.match(/\(([^)]+)\)/);
+            if (matchJabatan) {
+                paparanJabatan = matchJabatan[1].trim(); // Ambil singkatan sahaja
+            }
+            
+            pJabatan.innerText = paparanJabatan;
+        }
+
+// Paparkan Butang Log Keluar
+const btnLogKeluar = document.getElementById('btnLogKeluar');
+if (btnLogKeluar) {
+    btnLogKeluar.classList.remove('hidden');
+    btnLogKeluar.style.display = 'flex';
+
+    // 🌟 TAMBAH BAIK: Mengatasi fungsi klik untuk paparan pengesahan
+    btnLogKeluar.onclick = function(event) {
+        // Menghentikan tindakan terus (supaya tidak terus log keluar tanpa pengesahan)
+        event.preventDefault(); 
+
+        // Paparkan kotak dialog pengesahan kepada pengguna
+        const sahkanKeluar = confirm("Adakah anda pasti ingin log keluar dari sistem C-RIE?");
+        
+        if (sahkanKeluar) {
+            // Jika pengguna klik 'OK', sistem akan menjalankan fungsi log keluar asal
+            logKeluar(); 
+        }
+        // Jika pengguna klik 'Cancel', dialog akan tertutup & pengguna kekal di halaman semasa
+    };
+}
+
+        // --- PENAMBAHBAIKAN: PAPARKAN BUTANG SESI SEMASA ---
+        const btnSesi = document.getElementById("btnTetapanSesi");
+        const perananSesiDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+        
+        if (btnSesi && perananSesiDibenarkan.includes(perananPengguna)) {
+            btnSesi.style.display = "flex"; // Jadikan ia 'flex' supaya ikon dan teks tersusun kemas
+        }
+        // ---------------------------------------------------
+
+        // Paparan butang pengurusan / penyelaras (bergantung kepada elemen di HTML anda)
+        const btnTukarKataLaluan = document.getElementById('btnTukarKataLaluan');
+        if (btnTukarKataLaluan && perananPengguna !== "STAF" && perananPengguna !== "") {
+            btnTukarKataLaluan.classList.remove('hidden'); 
+            btnTukarKataLaluan.style.display = 'flex';
+        }
+
+        const btnSidePenyelaras = document.getElementById('btnSidePenyelaras');
+        const btnSidePengurusan = document.getElementById('btnSidePengurusan');
+
+        if (["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"].includes(perananPengguna)) {
+            if (btnSidePengurusan) { 
+                btnSidePengurusan.classList.remove('hidden'); 
+                btnSidePengurusan.style.display = 'flex';
+            }
+        }
+        
+        if (perananPengguna !== "STAF" && perananPengguna !== "") {
+            if (btnSidePenyelaras) { 
+                btnSidePenyelaras.classList.remove('hidden'); 
+                btnSidePenyelaras.style.display = 'flex';
+            }
+        }
+    }
+
+    // 2. Aktifkan TAB INOVASI secara automatik jika fungsi wujud
+    if (typeof tukarTab === "function") {
+        tukarTab('INOVASI');
+    }
+};
+
+// Fungsi untuk butang Log Keluar
+function logKeluar() {
+    sessionStorage.clear();
+    window.location.reload(); // Muat semula muka surat, kembali kepada mod tetamu
+}
+
+// Fungsi untuk buka modal
+function bukaTetapanSesi() {
+    const modal = document.getElementById('modalSesi');
+    
+    // PENAMBAHBAIKAN: Gunakan inline style. Ini pasti akan paksa modal untuk dipaparkan.
+    modal.style.display = 'flex';
+    
+    // Reset mesej amaran
+    const pesanan = document.getElementById('pesananSesi');
+    if (pesanan) pesanan.classList.add('hidden');
+    
+    if (typeof muatSesiDanTahun === "function") {
+        muatSesiDanTahun(); 
+    } else {
+        console.warn("Fungsi muatSesiDanTahun() belum wujud.");
+    }
+}
+
+// Fungsi untuk menutup modal
+function tutupModalSesi() {
+    const modal = document.getElementById('modalSesi');
+    
+    // Sembunyikan form
+    modal.style.display = 'none';
+    
+    // Clearkan input
+    document.getElementById('inputSesi').value = "";
+    document.getElementById('inputTahun').value = "";
+}
+
+// Fungsi untuk mengisi data dari Google Sheet ke dalam ruang input
+function muatSesiDanTahun() {
+    const inputSesi = document.getElementById('inputSesi');
+    const inputTahun = document.getElementById('inputTahun');
+
+    inputSesi.disabled = true;
+    inputTahun.disabled = true;
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        // PENAMBAHBAIKAN: Wajib letak headers ini untuk elak Google Apps Script sekat request (CORS Preflight Error)
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+        },
+        body: JSON.stringify({ action: "ambilSesiGlobal" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "BERJAYA") {
+            inputSesi.value = data.sesi;
+            inputTahun.value = data.tahun;
+            
+            localStorage.setItem("sesiAktif", data.sesi);
+            localStorage.setItem("tahunAktif", data.tahun);
+            
+            if (typeof kemaskiniTajukTahun === "function") kemaskiniTajukTahun();
+        }
+        
+        inputSesi.disabled = false;
+        inputTahun.disabled = false;
+    })
+    .catch(err => {
+        console.error("Gagal mengambil data sesi:", err);
+        const sAktif = localStorage.getItem("sesiAktif");
+        const tAktif = localStorage.getItem("tahunAktif");
+        if (sAktif) inputSesi.value = sAktif;
+        if (tAktif) inputTahun.value = tAktif;
+        
+        inputSesi.disabled = false;
+        inputTahun.disabled = false;
+    });
+}
+
+function simpanSesiAktif() {
+    const sesi = document.getElementById('inputSesi').value.trim();
+    const tahun = document.getElementById('inputTahun').value.trim();
+    const btn = document.getElementById('btnSimpanSesi');
+    const pesanan = document.getElementById('pesananSesi');
+
+    if (!sesi || !tahun) {
+        alert("Sila masukkan Sesi dan Tahun!");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Menyimpan ke Cloud...";
+
+    localStorage.setItem("sesiAktif", sesi);
+    localStorage.setItem("tahunAktif", tahun);
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        // PENAMBAHBAIKAN: Header diwajibkan untuk elak Ralat Fetch
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+        },
+        body: JSON.stringify({ action: "simpanSesiGlobal", sesi: sesi, tahun: tahun })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "BERJAYA") {
+            pesanan.innerText = "✅ Tetapan Tahun Semasa dan Sesi dikemaskini!";
+            pesanan.className = "text-center p-2 rounded text-xs font-bold bg-green-100 text-green-700 mt-3";
+            pesanan.classList.remove('hidden');
+
+            setTimeout(() => {
+                tutupModalSesi();
+                pesanan.classList.add('hidden');
+                btn.disabled = false;
+                btn.innerText = "Simpan Tetapan";
+                
+                window.location.reload(); 
+            }, 1500);
+            
+        } else {
+            alert("Gagal: " + data.mesej);
+            btn.disabled = false;
+            btn.innerText = "Simpan Tetapan";
+        }
+    })
+    .catch(err => {
+        console.error("Ralat Fetch:", err);
+        alert("Ralat sistem. Gagal berhubung dengan pangkalan data.");
+        
+        btn.disabled = false;
+        btn.innerText = "Simpan Tetapan";
+    });
+}
+
+// --- FUNGSI UTAMAL: TUKAR VIEW BORANG DALAM MODAL ---
+function tunjukBorang(namaBorang) {
+    const divLogin = document.getElementById('divLogin');
+    const divDaftar = document.getElementById('divDaftar');
+    const divReset = document.getElementById('divReset');
+    const card = document.getElementById('modalCard');
+
+    // Sembunyikan semua bahagian dahulu
+    divLogin.classList.add('hidden');
+    divDaftar.classList.add('hidden');
+    divReset.classList.add('hidden');
+
+    // Paparkan bahagian yang dipilih & adjust warna sempadan atas modal (border-t-4)
+    if (namaBorang === 'divDaftar') {
+        divDaftar.classList.remove('hidden');
+        card.classList.remove('border-blue-600', 'border-red-600');
+        card.classList.add('border-green-600');
+    } else if (namaBorang === 'divReset') {
+        divReset.classList.remove('hidden');
+        card.classList.remove('border-blue-600', 'border-green-600');
+        card.classList.add('border-red-600');
+    } else {
+        divLogin.classList.remove('hidden');
+        card.classList.remove('border-green-600', 'border-red-600');
+        card.classList.add('border-blue-600');
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // --- 1. MUAT TURUN TETAPAN SENARAI (Peranan & Jabatan) ---
+    fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'BERJAYA') {
+            
+            // 🌟 KEMASKINI BARU: Setup Peranan (Asingkan Login & Daftar)
+            let htmlPerananLogin = '<option value="">-- PILIH PERANAN --</option>';
+            let htmlPerananDaftar = '<option value="">-- PILIH PERANAN --</option>';
+            
+            data.PERANAN.forEach(p => {
+                // Masukkan semua peranan untuk Log Masuk
+                htmlPerananLogin += `<option value="${p}">${p}</option>`;
+                
+                // Tapis peranan 'STAF' supaya TIDAK masuk dalam Borang Daftar
+                if (p.toUpperCase() !== 'STAF') {
+                    htmlPerananDaftar += `<option value="${p}">${p}</option>`;
+                }
+            });
+            
+            document.getElementById('modalPeranan').innerHTML = htmlPerananLogin;
+            document.getElementById('daftar_peranan').innerHTML = htmlPerananDaftar;
+
+            // Setup Jabatan (Login & Daftar)
+            let htmlJabatan = '<option value="">-- PILIH JABATAN --</option>';
+            data.JABATAN.forEach(j => {
+                let singkatan = dapatkanSingkatanJabatan(j);
+                htmlJabatan += `<option value="${j}">${singkatan}</option>`;
+            });
+            document.getElementById('modalJabatan').innerHTML = htmlJabatan;
+            document.getElementById('daftar_jabatan').innerHTML = htmlJabatan;
+
+            // Setup Bahagian jika ada dalam data pelayan
+            if(data.BAHAGIAN) {
+                let htmlBahagian = '<option value="">-- TIADA BAHAGIAN --</option>';
+                data.BAHAGIAN.forEach(b => {
+                    htmlBahagian += `<option value="${b}">${b}</option>`;
+                });
+                document.getElementById('daftar_bahagian').innerHTML = htmlBahagian;
+            } else {
+                document.getElementById('daftar_bahagian').innerHTML = '<option value="">-- TIADA BAHAGIAN --</option>';
+            }
+        }
+    })
+    .catch(error => console.error("Gagal menyedut data tetapan."));
+
+
+// --- 2. LOGIK KELAKUAN MODAL POP UP ---
+    const modal = document.getElementById("loginModal");
+    const modalCard = document.getElementById("modalCard");
+    const loginLinks = document.querySelectorAll(".login-required");
+    const closeBtn = document.getElementById("closeModalBtn");
+    const loginForm = document.getElementById("modalLoginForm");
+    const errorMsg = document.getElementById("modalErrorMsg");
+    const errorText = document.getElementById("errorText");
+    
+    const submitBtn = document.getElementById("submitModalBtn");
+    const submitText = document.getElementById("submitText");
+    
+    const perananSelect = document.getElementById('modalPeranan');
+    const icInput = document.getElementById('modalIC');
+    const passInput = document.getElementById('modalPassword');
+    const btnPengurusan = document.getElementById("btnPengurusan"); // 🌟 Ditambah: Element Butang Pengurusan
+
+    // 🌟 PEMBOLEH UBAH UNTUK BORANG DAFTAR
+    const daftarPeranan = document.getElementById('daftar_peranan');
+    const daftarIc = document.getElementById('daftar_ic');
+    const daftarPassword = document.getElementById('daftar_password');
+    let targetUrl = ""; 
+
+// 🌟 FUNGSI BARU: Semakan Peranan Pengguna untuk Akses Butang Pengurusan
+    function kemaskiniAksesPengurusan() {
+        if (!btnPengurusan) return;
+        
+        const userLulus = sessionStorage.getItem("userLulus");
+        const peranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
+        
+        // Senarai peranan yang dibenarkan sahaja
+        const perananDibenarkan = ["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"];
+
+        if (userLulus === "YA" && perananDibenarkan.includes(peranan)) {
+            btnPengurusan.classList.remove('hidden');
+        } else {
+            btnPengurusan.classList.add('hidden');
+        }
+    }
+
+    // Jalankan semakan akses setiap kali skrip dimuatkan (bila halaman di-refresh/buka)
+    kemaskiniAksesPengurusan();
+
+    // 🌟 KESELAMATAN TAMBAHAN: Sekat akses jika butang dipaksa klik (cth: diubah melalui DevTools)
+    if (btnPengurusan) {
+        btnPengurusan.addEventListener("click", function(e) {
+            const peranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
+            const perananDibenarkan = ["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"];
+            
+            if (!perananDibenarkan.includes(peranan)) {
+                e.preventDefault();
+                alert("Akses Ditolak: Anda tidak mempunyai kebenaran untuk mengakses menu Pengurusan.");
+            }
+        });
+    }
+
+// 🌟 SEMBUNYIKAN IC & KATA LALUAN JIKA PERANAN = STAF (BORANG LOG MASUK)
+    if (perananSelect) {
+        perananSelect.addEventListener('change', function() {
+            const divIC = icInput.parentElement;
+            const divPass = passInput.parentElement;
+
+            if (this.value.toUpperCase() === 'STAF') {
+                divIC.classList.add('hidden');
+                divPass.classList.add('hidden');
+                icInput.required = false;
+                passInput.required = false;
+            } else {
+                divIC.classList.remove('hidden');
+                divPass.classList.remove('hidden');
+                icInput.required = true;
+                passInput.required = true;
+            }
+        });
+    }
+	
+// 🌟 KEMASKINI BARU: SEMBUNYIKAN IC & KATA LALUAN JIKA PERANAN = STAF (BORANG DAFTAR)
+// (Nota: Blok ini dikekalkan sebagai langkah berjaga-jaga jika senarai diubah pada masa depan)
+if (daftarPeranan) {
+    daftarPeranan.addEventListener('change', function() {
+        const divDaftarIc = daftarIc.parentElement;
+        const divDaftarPass = daftarPassword.parentElement;
+
+        if (this.value.toUpperCase() === 'STAF') {
+            divDaftarIc.classList.add('hidden');
+            divDaftarPass.classList.add('hidden');
+            daftarIc.required = false;
+            daftarPassword.required = false;
+        } else {
+            divDaftarIc.classList.remove('hidden');
+            divDaftarPass.classList.remove('hidden');
+            daftarIc.required = true;
+            daftarPassword.required = true;
+        }
+    });
+}
+
+
+loginLinks.forEach(link => {
+    link.addEventListener("click", function(e) {
+        e.preventDefault();
+        targetUrl = this.getAttribute("href"); 
+        
+        if (sessionStorage.getItem("userLulus") === "YA") {
+            if (targetUrl && targetUrl !== "#") {
+                window.location.href = targetUrl;
+            }
+            return; 
+        }
+        
+        loginForm.reset();
+        document.getElementById('borangDaftar').reset();
+        errorMsg.classList.add("hidden");
+        tunjukBorang('divLogin'); 
+        
+        icInput.parentElement.classList.remove('hidden');
+        passInput.parentElement.classList.remove('hidden');
+        icInput.required = true;
+        passInput.required = true;
+
+        modal.classList.remove("hidden");
+        setTimeout(() => {
+            modal.classList.remove("opacity-0");
+            modalCard.classList.remove("scale-95");
+            modalCard.classList.add("scale-100");
+        }, 10);
+    });
+});
+
+// 🌟 PENAMBAHBAIKAN 1: Daftar fungsi terus kepada 'window' 
+// supaya ia bersifat global dan boleh dipanggil dari mana-mana.
+window.closeModal = function() {
+    // Ambil elemen modal dan kad
+    const modalEl = document.getElementById("loginModal");
+    const modalCardEl = document.getElementById("modalCard");
+    
+    // Hentikan fungsi jika elemen tiada dalam halaman
+    if (!modalEl || !modalCardEl) return;
+
+    // Mulakan animasi hilang
+    modalEl.classList.add("opacity-0");
+    modalCardEl.classList.remove("scale-100");
+    modalCardEl.classList.add("scale-95");
+    
+    setTimeout(() => {
+        // Sembunyikan sepenuhnya selepas animasi tamat
+        modalEl.classList.add("hidden");
+        
+        // Aktifkan semula butang Log Masuk
+        const submitBtn = document.getElementById("submitModalBtn");
+        const submitText = document.getElementById("submitText");
+        if (submitBtn) submitBtn.disabled = false;
+        if (submitText) submitText.textContent = "Log Masuk";
+        
+        // Aktifkan semula butang Daftar (jika ada)
+        const btnSubmitDaftar = document.getElementById("btnSubmitDaftar");
+        if (btnSubmitDaftar) {
+            btnSubmitDaftar.disabled = false;
+            btnSubmitDaftar.textContent = "Hantar Pendaftaran";
+        }
+
+        // Reset mesej ralat & borang supaya kembali bersih
+        const errorMsg = document.getElementById("modalErrorMsg");
+        if (errorMsg) errorMsg.classList.add("hidden");
+        
+        const loginForm = document.getElementById("modalLoginForm");
+        if (loginForm) loginForm.reset();
+        
+        const borangDaftar = document.getElementById("borangDaftar");
+        if (borangDaftar) borangDaftar.reset();
+        
+        const statusMesejDaftar = document.getElementById("statusMesejDaftar");
+        if (statusMesejDaftar) statusMesejDaftar.classList.add("hidden");
+
+        // Pastikan ia kembali ke paparan Log Masuk untuk sesi seterusnya
+        if (typeof tunjukBorang === "function") {
+            tunjukBorang('divLogin');
+        } else if (typeof window.tunjukBorang === "function") {
+            window.tunjukBorang('divLogin');
+        }
+        
+    }, 300); // Masa selari dengan durasi animasi CSS (300ms)
+};
+
+// =========================================
+// PENGURUSAN KLIK (EVENT DELEGATION)
+// =========================================
+
+// 🌟 PENAMBAHBAIKAN 2: Teknik ini dijamin 100% berkesan untuk kesan butang X.
+// Walaupun butang X lambat dimuat turun, sistem tetap akan mengesannya apabila diklik.
+document.addEventListener("click", function(e) {
+    const closeBtn = document.getElementById("closeModalBtn");
+    
+    // Semak adakah elemen yang diklik itu merupakan butang X atau ikon <i class="..."> di dalamnya
+    if (closeBtn && (e.target === closeBtn || closeBtn.contains(e.target))) {
+        e.preventDefault(); // Elak butang refresh halaman (jika ada)
+        window.closeModal();
+    }
+});
+
+// Matikan tutup modal automatik apabila ruang luar (backdrop) diklik.
+const modalLuar = document.getElementById("loginModal");
+if (modalLuar) {
+    modalLuar.addEventListener("click", function(e) {
+        // Biarkan kosong. Modal kini hanya tertutup jika butang X atau Batal ditekan.
+    });
+}
+// --- 3. PROSES PENGESAHAN LOG MASUK (API REQUEST) ---
+loginForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    const perananInput = document.getElementById("modalPeranan").value.toUpperCase();
+    const jabatanInput = document.getElementById("modalJabatan").value.toUpperCase();
+    const icVal = document.getElementById("modalIC").value.trim();
+    const passwordVal = document.getElementById("modalPassword").value.trim();
+    
+    submitBtn.disabled = true;
+    submitText.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Menyemak...';
+    errorMsg.className = "hidden";
+    
+    const destinasiHala = targetUrl || "utama.html";
+
+    // AKSES UMUM STAF (Direct Bypass)
+    if (perananInput === 'STAF') {
+        errorMsg.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-green-100 text-green-800 border border-green-200';
+        errorText.innerText = 'Log Masuk Akses Umum Berjaya! Mengalih hala...';
+        errorMsg.classList.remove('hidden');
+        
+        sessionStorage.setItem("userLulus", "YA");
+        sessionStorage.setItem("namaPengguna", "STAF " + jabatanInput);
+        sessionStorage.setItem("peranan", "STAF");
+        sessionStorage.setItem("jabatan", jabatanInput);
+        sessionStorage.setItem("bahagian", "");
+        sessionStorage.setItem("no_ic", "");
+
+        kemaskiniAksesPengurusan(); // 🌟 Kemaskini visibiliti butang sebelum alih hala
+
+        setTimeout(() => { window.location.href = destinasiHala; }, 1000);
+        return;
+    }
+
+    const payloadData = {
+        action: "login",
+        PERANAN: perananInput,
+        JABATAN: jabatanInput,
+        NO_IC: icVal,
+        KATA_LALUAN: passwordVal
+    };
+
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payloadData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'BERJAYA') {
+            errorMsg.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-green-100 text-green-800 border border-green-200';
+            errorText.innerText = 'Log Masuk Berjaya! Sesi: ' + (data.sesi || '-') + ' (' + (data.tahun || '-') + ')';
+            errorMsg.classList.remove('hidden');
+            
+            const submitText = document.getElementById('submitText');
+            if (submitText) {
+                submitText.innerText = 'Berjaya!';
+            }
+            
+            sessionStorage.setItem("userLulus", "YA");
+            sessionStorage.setItem("namaPengguna", data.nama);
+            sessionStorage.setItem("peranan", data.peranan);
+            sessionStorage.setItem("jabatan", data.jabatan); 
+            sessionStorage.setItem("bahagian", data.bahagian || "");
+            sessionStorage.setItem("no_ic", icVal);
+            sessionStorage.setItem("sesi_semasa", data.sesi || "");
+            sessionStorage.setItem("tahun_semasa", data.tahun || "");
+
+            kemaskiniAksesPengurusan(); // 🌟 Kemaskini visibiliti butang sebelum alih hala/reload
+
+            setTimeout(() => { 
+                if (!destinasiHala || destinasiHala === '#' || destinasiHala.includes('paparan.html')) {
+                    window.location.reload(); 
+                } else {
+                    window.location.href = destinasiHala; 
+                }
+            }, 1000);
+        }
+        else if (data.status === 'PERLU_DAFTAR_SESI') {
+            errorMsg.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-200';
+            errorText.innerText = 'Rekod lama ditemui. Sila daftar semula untuk sesi ' + data.sesiAktif + ' ' + data.tahunAktif + '.';
+            errorMsg.classList.remove('hidden');
+            
+            document.getElementById('daftar_nama').value = data.nama || "";
+            document.getElementById('daftar_ic').value = icVal;
+            document.getElementById('daftar_peranan').value = perananInput;
+            document.getElementById('daftar_jabatan').value = jabatanInput;
+            
+            submitBtn.disabled = false; 
+            submitText.textContent = "Log Masuk";
+
+            setTimeout(() => { 
+                tunjukBorang('divDaftar'); 
+                errorMsg.classList.add('hidden'); 
+            }, 3000);
+        }
+        else {
+            errorMsg.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-red-100 text-red-800 border border-red-200';
+            errorText.innerText = data.mesej || "Maklumat log masuk tidak sah.";
+            errorMsg.classList.remove('hidden');
+            
+            submitBtn.disabled = false; 
+            submitText.textContent = "Log Masuk";
+
+            if (data.kod === 'MIGRASI_MENUNGGU' || data.kod === 'RALAT_PADANAN_LAMA' || data.kod === 'STATUS_TIDAK_AKTIF') {
+                setTimeout(() => {
+                    loginForm.reset(); 
+                    errorMsg.classList.add('hidden');
+                    errorText.innerText = '';
+                }, 5000);
+            }
+        }
+    })
+    .catch(err => {
+        errorMsg.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-red-100 text-red-800 border border-red-200';
+        errorText.textContent = 'Ralat sistem / pelayan / internet terganggu.';
+        errorMsg.classList.remove("hidden");
+        submitBtn.disabled = false;
+        submitText.textContent = "Log Masuk";
+    });
+});
+
+// --- 4. PROSES PENGANTARAN PENDAFTARAN BARU ---
+document.getElementById('borangDaftar').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btnDaftar = document.getElementById('btnSubmitDaftar');
+    const mesejDaftar = document.getElementById('statusMesejDaftar');
+    
+    btnDaftar.disabled = true;
+    btnDaftar.innerText = 'Memproses Pendaftaran...';
+    mesejDaftar.classList.add('hidden');
+
+    const payloadData = {
+        action: "tambahPengguna", 
+        NAMA: document.getElementById('daftar_nama').value.toUpperCase(),
+        NO_IC: document.getElementById('daftar_ic').value.trim(),
+        KATA_LALUAN: document.getElementById('daftar_password').value,
+        PERANAN: document.getElementById('daftar_peranan').value,
+        JABATAN: document.getElementById('daftar_jabatan').value,
+        BAHAGIAN: document.getElementById('daftar_bahagian').value,
+        SESI: document.getElementById('daftar_sesi').value,
+        TAHUN: document.getElementById('daftar_tahun').value, // 🌟 Dibetulkan: Ditambah tanda koma (,) yang tertinggal
+        STATUS: "MENUNGGU PENGESAHAN"
+    };
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payloadData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'BERJAYA' || data.success) {
+            // 🌟 KEMASKINI BARU: Mengubah suai makluman kepada pengguna mengenai keperluan kelulusan pentadbir
+            mesejDaftar.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300';
+            mesejDaftar.innerHTML = '<i class="fa-solid fa-circle-info"></i> Pendaftaran Berjaya!<br><span class="text-xs font-normal">Akaun anda memerlukan pengesahan & kelulusan daripada pentadbir sebelum anda boleh log masuk ke dalam sistem.</span>';
+            mesejDaftar.classList.remove('hidden');
+            
+            document.getElementById('borangDaftar').reset();
+            
+            // Masa paparan dinaikkan kepada 4000ms (4 saat) supaya pengguna sempat membaca info kelulusan pentadbir
+            setTimeout(() => {
+                tunjukBorang('divLogin');
+                mesejDaftar.classList.add('hidden');
+            }, 4000);
+        } else {
+            mesejDaftar.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-red-100 text-red-800 border border-red-200';
+            mesejDaftar.innerText = data.mesej || 'Gagal mendaftar pengguna.';
+            mesejDaftar.classList.remove('hidden');
+        }
+        btnDaftar.disabled = false;
+        btnDaftar.innerText = 'Hantar Pendaftaran';
+    })
+    .catch(error => {
+        mesejDaftar.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-red-100 text-red-800 border border-red-200';
+        mesejDaftar.innerText = 'Ralat sistem / talian terputus.';
+        mesejDaftar.classList.remove('hidden');
+        btnDaftar.disabled = false;
+        btnDaftar.innerText = 'Hantar Pendaftaran';
+    });
+});
+	
+	 // -------------------------------------------------------------
+        // FUNGSI 3: RESET KATA LALUAN
+        // -------------------------------------------------------------
+        document.getElementById('borangReset').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitReset');
+            const mesej = document.getElementById('statusMesejReset');
+            
+            btn.disabled = true; btn.innerHTML = 'Mengemaskini...'; mesej.classList.add('hidden');
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ 
+                    action: "resetPassword", 
+                    NO_IC: document.getElementById('reset_ic').value, 
+                    KATA_LALUAN: document.getElementById('reset_password').value 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                mesej.className = `mb-4 p-3 rounded text-center text-sm font-semibold ${data.status==='BERJAYA' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`;
+                mesej.innerText = data.mesej;
+                mesej.classList.remove('hidden');
+                
+                if (data.status === 'BERJAYA') {
+                    document.getElementById('borangReset').reset();
+                    setTimeout(() => tunjukBorang('divLogin'), 4000);
+                }
+                btn.disabled = false; btn.innerHTML = 'Reset & Kemaskini';
+            })
+            .catch(error => {
+                mesej.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-red-100 text-red-800 border border-red-200';
+                mesej.innerText = 'Ralat sambungan pelayan.';
+                mesej.classList.remove('hidden');
+                btn.disabled = false; btn.innerHTML = 'Reset & Kemaskini';
+            });
+        });
+	
+	
+});
+</script>
+
+</body>
+</html>

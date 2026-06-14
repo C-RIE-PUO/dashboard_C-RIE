@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Pemantauan KPI C-RIE 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
+	<script>
+        if (sessionStorage.getItem("userLulus") !== "YA") {
+            alert("Sila log masuk terlebih dahulu.");
+            window.location.href = "login.html"; 
+        }
+    </script>
     <style>
         .input-focus:focus { border-color: #1e40af; ring: 2px; ring-color: #1e40af; }
     </style>

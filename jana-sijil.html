@@ -16,7 +16,7 @@
     const userRole = (sessionStorage.getItem("peranan") || "").toUpperCase();
     if (sessionStorage.getItem("userLulus") !== "YA") {
         alert("Sila log masuk terlebih dahulu.");
-        window.location.href = "utama.html";
+        window.location.href = "paparan.html";
     }
     const isAdminMode = ["PENYELARAS INOVASI", "ADMIN", "KUPIK"].includes(userRole);
 </script>

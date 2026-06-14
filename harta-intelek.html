@@ -16,8 +16,10 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-amber-600 text-white shadow-md">
-        <div class="max-w-[95rem] mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+<header class="bg-amber-600 text-white shadow-md">
+    <div class="max-w-[95rem] mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        
+        <div class="flex flex-col gap-3">
             <div class="flex items-center gap-3">
                 <span class="text-3xl">©️</span>
                 <div>
@@ -25,19 +27,34 @@
                     <p class="text-amber-100 mt-1 text-sm">Pengurusan Rekod Paten, Hak Cipta & Cap Dagangan</p>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2">
-                <button onclick="downloadCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow transition text-sm flex items-center gap-2">
-                    📥 Download CSV
-                </button>
-                <button onclick="bukaModalTambah()" class="bg-white text-amber-700 px-4 py-2.5 rounded-lg font-bold shadow hover:bg-amber-50 transition text-sm flex items-center gap-2">
-                    ➕ Tambah Rekod
-                </button>
-                <a href="utama.html" class="bg-amber-800 text-white border border-amber-500 px-4 py-2.5 rounded-lg font-bold shadow hover:bg-amber-900 transition text-sm flex items-center gap-2">
-                    &larr; Utama
-                </a>
+            
+            <div class="flex flex-wrap items-center gap-2 mt-1">
+                <span class="bg-amber-800/60 border border-amber-500/50 text-amber-50 px-3 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm flex items-center gap-2">
+                    <span title="Nama Pengguna">👤</span> <span id="paparNama">Memuatkan...</span>
+                </span>
+                <span class="bg-amber-800/60 border border-amber-500/50 text-amber-50 px-3 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm flex items-center gap-2">
+                    <span title="Jabatan">🏢</span> <span id="paparJabatan">Memuatkan...</span>
+                </span>
+                <span class="bg-amber-800/60 border border-amber-500/50 text-amber-50 px-3 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm flex items-center gap-2">
+                    <span title="Peranan">🔑</span> <span id="paparPeranan">Memuatkan...</span>
+                </span>
             </div>
         </div>
-    </header>
+
+        <div class="flex flex-wrap gap-2 mt-2 md:mt-0">
+            <button onclick="downloadCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow transition text-sm flex items-center gap-2">
+                📥 Download CSV
+            </button>
+            <button onclick="bukaModalTambah()" class="bg-white text-amber-700 px-4 py-2.5 rounded-lg font-bold shadow hover:bg-amber-50 transition text-sm flex items-center gap-2">
+                ➕ Tambah Rekod
+            </button>
+            <a href="paparan.html" class="bg-amber-800 text-white border border-amber-500 px-4 py-2.5 rounded-lg font-bold shadow hover:bg-amber-900 transition text-sm flex items-center gap-2">
+                &larr; Utama
+            </a>
+        </div>
+        
+    </div>
+</header>
 
     <main class="max-w-[95rem] mx-auto px-4 py-8 flex-grow w-full">
         
@@ -203,26 +220,38 @@
     </div>
 
     <script>
-        // ⚠️ MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
+// ⚠️ MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
-        let dataGlobalHI = [];
-        let dataDitapisGlobal = [];
+let dataGlobalHI = [];
+let dataDitapisGlobal = [];
 
-        // TETAPAN PENGGUNA
-        const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
-        const userJabatan = (sessionStorage.getItem("jabatan") || "").toUpperCase();
-        
-        // Approver yang ada kuasa pengesahan penuh
-        const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
-        // Boleh Tambah/Edit/Padam (tapi rekod mereka kena disahkan oleh Approver)
-        const isPenyelarasJabatan = userPeranan === "PENYELARAS JABATAN";
-        const isStaf = userPeranan === "STAF";
+// TETAPAN PENGGUNA (Mengambil NAMA, PERANAN, JABATAN dari sessionStorage)
+// Jika tiada rekod dalam session (mungkin bypass login), ia akan paparkan teks default
+const userNama = (sessionStorage.getItem("nama") || "TETAMU").toUpperCase();
+const userPeranan = (sessionStorage.getItem("peranan") || "TIADA PERANAN").toUpperCase();
+const userJabatan = (sessionStorage.getItem("jabatan") || "TIADA JABATAN").toUpperCase();
 
-        window.onload = () => {
-            muatDropdownSistem();
-            muatDataHI();
-        };
+// Approver yang ada kuasa pengesahan penuh
+const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
+// Boleh Tambah/Edit/Padam (tapi rekod mereka kena disahkan oleh Approver)
+const isPenyelarasJabatan = userPeranan === "PENYELARAS JABATAN";
+const isStaf = userPeranan === "STAF";
+
+window.onload = () => {
+    // 🌟 KEMASKINI BARU: Suntik maklumat pengguna ke dalam Header HTML
+    const paparNamaEl = document.getElementById('paparNama');
+    const paparJabatanEl = document.getElementById('paparJabatan');
+    const paparPerananEl = document.getElementById('paparPeranan');
+    
+    if (paparNamaEl) paparNamaEl.textContent = userNama;
+    if (paparJabatanEl) paparJabatanEl.textContent = userJabatan;
+    if (paparPerananEl) paparPerananEl.textContent = userPeranan;
+
+    // Panggil fungsi-fungsi utama selepas maklumat dipaparkan
+    if (typeof muatDropdownSistem === "function") muatDropdownSistem();
+    if (typeof muatDataHI === "function") muatDataHI();
+};
 
         // FUNGSI SEDUT DROPDOWN DARI SHEET SISTEM
         function muatDropdownSistem() {

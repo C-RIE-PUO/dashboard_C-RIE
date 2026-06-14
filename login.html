@@ -9,7 +9,7 @@
 <body class="bg-gray-100 min-h-screen flex items-center justify-center font-sans p-4">
 
     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-200 relative">
-        <a href="utama.html" class="absolute top-4 left-6 text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 transition">
+        <a href="paparan.html" class="absolute top-4 left-6 text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 transition">
             &larr; Menu Utama
         </a>
         <div class="mt-6"></div>
@@ -283,7 +283,7 @@
                 sessionStorage.setItem("bahagian", "");
                 sessionStorage.setItem("no_ic", "");
 
-                setTimeout(() => { window.location.href = "utama.html"; }, 1000);
+                setTimeout(() => { window.location.href = "paparan.html"; }, 1000);
                 return;
             }
 
@@ -316,7 +316,7 @@
                     sessionStorage.setItem("sesi_semasa", data.sesi || "");
                     sessionStorage.setItem("tahun_semasa", data.tahun || "");
 
-                    setTimeout(() => { window.location.href = "utama.html"; }, 1000);
+                    setTimeout(() => { window.location.href = "paparan.html"; }, 1000);
                 } 
                 else if (data.status === 'PERLU_DAFTAR_SESI') {
                     mesej.className = 'mb-4 p-3 rounded text-center text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-200';

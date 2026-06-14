@@ -2,7 +2,7 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dashboard KPI Penyelidikan & Inovasi</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -46,6 +46,8 @@
             /* Sokongan untuk Firefox */
             scrollbar-width: auto;
             scrollbar-color: #cbd5e1 #f8fafc;
+            /* Tambahan mobile: Jadikan skrol lebih lancar di iOS/Android */
+            -webkit-overflow-scrolling: touch; 
         }
         
         /* Sokongan untuk Chrome, Edge, Safari */
@@ -75,16 +77,52 @@
             /* Letakkan sedikit outline/border-bottom untuk nampak lebih kemas bila skrol */
             box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); 
         }
+
+        /* ==========================================
+           TAMBAH BAIK UNTUK MOBILE WEB (RESPONSIVE)
+           ========================================== */
+        @media (max-width: 768px) {
+            /* Nipiskan scrollbar jadual supaya tidak memakan ruang pada skrin kecil */
+            .scroll-jadual::-webkit-scrollbar {
+                width: 6px; 
+                height: 6px;
+            }
+            .scroll-jadual::-webkit-scrollbar-thumb {
+                border: none;
+                border-radius: 4px;
+            }
+
+            /* Besarkan sedikit padding untuk butang supaya mesra sentuhan jari (touch-friendly) */
+            .sidebar-btn {
+                padding: 1rem 1.2rem;
+                font-size: 0.95rem;
+            }
+
+            /* Kecilkan saiz font pada tajuk jadual untuk mengelakkan sel menjadi terlalu lebar */
+            #headerJadual th {
+                font-size: 0.85rem;
+                padding: 0.75rem 0.5rem;
+                white-space: nowrap; /* Elak teks pecah berbaris dalam th */
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 flex flex-col min-h-screen">
 
 <header class="w-full bg-blue-950 text-white py-4 px-4 md:px-6 shadow-lg z-50 relative border-b border-blue-800 flex items-center justify-center">
     
-    <button onclick="toggleMenu()" class="absolute left-4 md:hidden text-white focus:outline-none hover:text-blue-300 transition">
-        <i class="fa-solid fa-bars text-2xl"></i>
-    </button>
-	<div class="text-center px-14 md:px-0"> 
+    <div class="absolute left-4 md:left-6 flex items-center gap-3">
+        <button onclick="toggleMenu()" class="text-white focus:outline-none hover:text-blue-300 transition md:hidden">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+        
+        <a href="paparan.html" class="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 text-white text-xs md:text-sm font-semibold py-1.5 px-3 rounded-lg border border-blue-600 shadow-md transition-all focus:outline-none">
+            <i class="fa-solid fa-house text-xs md:text-sm"></i>
+            <span class="hidden sm:inline">Menu Utama</span>
+        </a>
+    </div>
+    
+    <div class="text-center px-14 md:px-0"> 
         <h1 class="text-2xl md:text-4xl font-black text-white tracking-widest uppercase mb-1">
             DASHBOARD C-RIE
         </h1>
@@ -1680,11 +1718,26 @@ window.onload = () => {
                 pJabatan.innerText = paparanJabatan;
             }
 
-            const btnLogKeluar = document.getElementById('btnLogKeluar');
-            if (btnLogKeluar) {
-                btnLogKeluar.classList.remove('hidden');
-                btnLogKeluar.style.display = 'flex';
-            }
+const btnLogKeluar = document.getElementById('btnLogKeluar');
+if (btnLogKeluar) {
+    btnLogKeluar.classList.remove('hidden');
+    btnLogKeluar.style.display = 'flex';
+
+    // 🌟 TAMBAH BAIK: Papar dialog pengesahan sebelum log keluar
+    btnLogKeluar.onclick = function(event) {
+        // Paparkan kotak dialog 'Confirm' bawaan pelayar web
+        const sahkanKeluar = confirm("Adakah anda pasti ingin log keluar dari sistem?");
+        
+        if (sahkanKeluar) {
+            // Jika pengguna klik "OK", jalankan fungsi log keluar asal
+            logKeluar(); 
+        } else {
+            // Jika pengguna klik "Cancel/Batal", batalkan tindakan klik
+            event.preventDefault();
+            return false;
+        }
+    };
+}
 
             const btnTukarKataLaluan = document.getElementById('btnTukarKataLaluan');
             if (btnTukarKataLaluan && perananPengguna !== "STAF" && perananPengguna !== "") {
