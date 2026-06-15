@@ -362,25 +362,25 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">No. Kad Pengenalan</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                            <i class="fa-solid fa-id-card text-sm"></i>
-                        </div>
-                        <input type="text" id="modalIC" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Contoh: 901010015566">
-                    </div>
-                </div>
-                
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Kata Laluan</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                            <i class="fa-solid fa-lock text-sm"></i>
-                        </div>
-                        <input type="password" id="modalPassword" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Masukkan kata laluan">
-                    </div>
-                </div>
+				<div id="divIC">
+					<label class="block text-xs font-bold text-gray-700 mb-1">No. Kad Pengenalan</label>
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+							<i class="fa-solid fa-id-card text-sm"></i>
+					</div>
+					<input type="text" id="modalIC" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Contoh: 901010015566">
+					</div>
+				</div>
+
+				<div id="divPassword">
+					<label class="block text-xs font-bold text-gray-700 mb-1">Kata Laluan</label>
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+							<i class="fa-solid fa-lock text-sm"></i>
+					</div>
+					<input type="password" id="modalPassword" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Masukkan kata laluan">
+					</div>
+				</div>
                 
                 <div id="modalErrorMsg" class="text-xs text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 hidden flex items-start gap-2">
                     <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
@@ -879,103 +879,109 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 // --- 2. LOGIK KELAKUAN MODAL POP UP ---
-    const modal = document.getElementById("loginModal");
-    const modalCard = document.getElementById("modalCard");
-    const loginLinks = document.querySelectorAll(".login-required");
-    const closeBtn = document.getElementById("closeModalBtn");
-    const loginForm = document.getElementById("modalLoginForm");
-    const errorMsg = document.getElementById("modalErrorMsg");
-    const errorText = document.getElementById("errorText");
-    
-    const submitBtn = document.getElementById("submitModalBtn");
-    const submitText = document.getElementById("submitText");
-    
-    const perananSelect = document.getElementById('modalPeranan');
-    const icInput = document.getElementById('modalIC');
-    const passInput = document.getElementById('modalPassword');
-    const btnPengurusan = document.getElementById("btnPengurusan"); // 🌟 Ditambah: Element Butang Pengurusan
+const modal = document.getElementById("loginModal");
+const modalCard = document.getElementById("modalCard");
+const loginLinks = document.querySelectorAll(".login-required");
+const closeBtn = document.getElementById("closeModalBtn");
+const loginForm = document.getElementById("modalLoginForm");
+const errorMsg = document.getElementById("modalErrorMsg");
+const errorText = document.getElementById("errorText");
 
-    // 🌟 PEMBOLEH UBAH UNTUK BORANG DAFTAR
-    const daftarPeranan = document.getElementById('daftar_peranan');
-    const daftarIc = document.getElementById('daftar_ic');
-    const daftarPassword = document.getElementById('daftar_password');
-    let targetUrl = ""; 
+const submitBtn = document.getElementById("submitModalBtn");
+const submitText = document.getElementById("submitText");
+
+const perananSelect = document.getElementById('modalPeranan');
+const icInput = document.getElementById('modalIC');
+const passInput = document.getElementById('modalPassword');
+const btnPengurusan = document.getElementById("btnPengurusan"); // 🌟 Ditambah: Element Butang Pengurusan
+
+// 🌟 PEMBOLEH UBAH UNTUK BORANG DAFTAR
+const daftarPeranan = document.getElementById('daftar_peranan');
+const daftarIc = document.getElementById('daftar_ic');
+const daftarPassword = document.getElementById('daftar_password');
+let targetUrl = ""; 
 
 // 🌟 FUNGSI BARU: Semakan Peranan Pengguna untuk Akses Butang Pengurusan
-    function kemaskiniAksesPengurusan() {
-        if (!btnPengurusan) return;
-        
-        const userLulus = sessionStorage.getItem("userLulus");
+function kemaskiniAksesPengurusan() {
+    if (!btnPengurusan) return;
+    
+    const userLulus = sessionStorage.getItem("userLulus");
+    const peranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
+    
+    // Senarai peranan yang dibenarkan sahaja
+    const perananDibenarkan = ["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"];
+
+    if (userLulus === "YA" && perananDibenarkan.includes(peranan)) {
+        btnPengurusan.classList.remove('hidden');
+    } else {
+        btnPengurusan.classList.add('hidden');
+    }
+}
+
+// Jalankan semakan akses setiap kali skrip dimuatkan (bila halaman di-refresh/buka)
+kemaskiniAksesPengurusan();
+
+// 🌟 KESELAMATAN TAMBAHAN: Sekat akses jika butang dipaksa klik (cth: diubah melalui DevTools)
+if (btnPengurusan) {
+    btnPengurusan.addEventListener("click", function(e) {
         const peranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
-        
-        // Senarai peranan yang dibenarkan sahaja
         const perananDibenarkan = ["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"];
-
-        if (userLulus === "YA" && perananDibenarkan.includes(peranan)) {
-            btnPengurusan.classList.remove('hidden');
-        } else {
-            btnPengurusan.classList.add('hidden');
-        }
-    }
-
-    // Jalankan semakan akses setiap kali skrip dimuatkan (bila halaman di-refresh/buka)
-    kemaskiniAksesPengurusan();
-
-    // 🌟 KESELAMATAN TAMBAHAN: Sekat akses jika butang dipaksa klik (cth: diubah melalui DevTools)
-    if (btnPengurusan) {
-        btnPengurusan.addEventListener("click", function(e) {
-            const peranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
-            const perananDibenarkan = ["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"];
-            
-            if (!perananDibenarkan.includes(peranan)) {
-                e.preventDefault();
-                alert("Akses Ditolak: Anda tidak mempunyai kebenaran untuk mengakses menu Pengurusan.");
-            }
-        });
-    }
-
-// 🌟 SEMBUNYIKAN IC & KATA LALUAN JIKA PERANAN = STAF (BORANG LOG MASUK)
-    if (perananSelect) {
-        perananSelect.addEventListener('change', function() {
-            const divIC = icInput.parentElement;
-            const divPass = passInput.parentElement;
-
-            if (this.value.toUpperCase() === 'STAF') {
-                divIC.classList.add('hidden');
-                divPass.classList.add('hidden');
-                icInput.required = false;
-                passInput.required = false;
-            } else {
-                divIC.classList.remove('hidden');
-                divPass.classList.remove('hidden');
-                icInput.required = true;
-                passInput.required = true;
-            }
-        });
-    }
-	
-// 🌟 KEMASKINI BARU: SEMBUNYIKAN IC & KATA LALUAN JIKA PERANAN = STAF (BORANG DAFTAR)
-// (Nota: Blok ini dikekalkan sebagai langkah berjaga-jaga jika senarai diubah pada masa depan)
-if (daftarPeranan) {
-    daftarPeranan.addEventListener('change', function() {
-        const divDaftarIc = daftarIc.parentElement;
-        const divDaftarPass = daftarPassword.parentElement;
-
-        if (this.value.toUpperCase() === 'STAF') {
-            divDaftarIc.classList.add('hidden');
-            divDaftarPass.classList.add('hidden');
-            daftarIc.required = false;
-            daftarPassword.required = false;
-        } else {
-            divDaftarIc.classList.remove('hidden');
-            divDaftarPass.classList.remove('hidden');
-            daftarIc.required = true;
-            daftarPassword.required = true;
+        
+        if (!perananDibenarkan.includes(peranan)) {
+            e.preventDefault();
+            alert("Akses Ditolak: Anda tidak mempunyai kebenaran untuk mengakses menu Pengurusan.");
         }
     });
 }
 
+// 🌟 SEMBUNYIKAN IC & KATA LALUAN JIKA PERANAN = STAF (BORANG LOG MASUK)
+if (perananSelect) {
+    perananSelect.addEventListener('change', function() {
+        // Guna rujukan ID secara terus untuk kestabilan (elak isu parentElement jika HTML berubah)
+        const divIC = document.getElementById('divIC');
+        const divPass = document.getElementById('divPassword');
 
+        if (this.value.toUpperCase() === 'STAF') {
+            if (divIC) divIC.classList.add('hidden');
+            if (divPass) divPass.classList.add('hidden');
+            if (icInput) icInput.required = false;
+            if (passInput) passInput.required = false;
+        } else {
+            if (divIC) divIC.classList.remove('hidden');
+            if (divPass) divPass.classList.remove('hidden');
+            if (icInput) icInput.required = true;
+            if (passInput) passInput.required = true;
+        }
+    });
+    
+    // Cetuskan event 'change' sekali semasa load untuk pastikan paparan awal adalah betul
+    perananSelect.dispatchEvent(new Event('change'));
+}
+
+// 🌟 KEMASKINI BARU: SEMBUNYIKAN IC & KATA LALUAN JIKA PERANAN = STAF (BORANG DAFTAR)
+if (daftarPeranan) {
+    daftarPeranan.addEventListener('change', function() {
+        // Pastikan HTML Borang Daftar anda juga mempunyai id="divDaftarIC" dan id="divDaftarPassword"
+        // Jika belum ada ID, ia akan fallback menggunakan cara asal (parentElement)
+        const divDaftarIc = document.getElementById('divDaftarIC') || daftarIc.closest('div').parentElement;
+        const divDaftarPass = document.getElementById('divDaftarPassword') || daftarPassword.closest('div').parentElement;
+
+        if (this.value.toUpperCase() === 'STAF') {
+            if (divDaftarIc) divDaftarIc.classList.add('hidden');
+            if (divDaftarPass) divDaftarPass.classList.add('hidden');
+            if (daftarIc) daftarIc.required = false;
+            if (daftarPassword) daftarPassword.required = false;
+        } else {
+            if (divDaftarIc) divDaftarIc.classList.remove('hidden');
+            if (divDaftarPass) divDaftarPass.classList.remove('hidden');
+            if (daftarIc) daftarIc.required = true;
+            if (daftarPassword) daftarPassword.required = true;
+        }
+    });
+    
+    // Cetuskan event 'change' sekali semasa load
+    daftarPeranan.dispatchEvent(new Event('change'));
+}
 loginLinks.forEach(link => {
     link.addEventListener("click", function(e) {
         e.preventDefault();
