@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub Aktiviti Penyelidikan & Inovasi</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col">
+
+<header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 text-white shadow-md select-none">
+    <div class="border-b border-white/10 bg-black/10 backdrop-blur-xs">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-2 text-sm">
+            <div class="flex items-center flex-wrap justify-center sm:justify-start gap-2">
+                <i class="fa-solid fa-circle-user text-amber-400 text-lg animate-pulse"></i>
+                <span class="text-indigo-100 flex items-center gap-1.5">
+                    Pengguna: <strong id="paparNamaPengguna" class="text-white tracking-wide uppercase">TETAMU</strong>
+                </span>
+                <span id="paparPerananPengguna" class="px-2 py-0.5 text-[10px] font-extrabold tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-md uppercase">
+                    MEMUATKAN...
+                </span>
+            </div>
+            <div>
+                <a href="paparan.html" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 px-4 py-1.5 rounded-lg transition-all duration-200 font-bold shadow-sm text-xs sm:text-sm tracking-wide group">
+                    <i class="fa-solid fa-house group-hover:animate-bounce"></i> Menu Utama
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-7 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center justify-center sm:justify-start gap-3 drop-shadow-xs">
+                <i class="fa-solid fa-chart-line text-amber-400 animate-pulse"></i>
+                Hub Aktiviti Penyelidikan & Inovasi
+            </h1>
+            <p class="text-indigo-200 mt-1.5 text-xs sm:text-sm max-w-2xl leading-relaxed">
+                Eksplorasi aktiviti, pencapaian, dan kalendar inovasi sepanjang tahun secara real-time.
+            </p>
+        </div>
+        <div class="text-xs sm:text-sm bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 shadow-inner flex items-center gap-2">
+            <i class="fa-regular fa-clock text-amber-400"></i> 
+            <span>Kemaskini Terkini: <strong class="text-amber-400 font-extrabold" id="liveYear">2026</strong></span>
+        </div>
+    </div>
+</header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i class="fa-solid fa-calendar-days text-2xl"></i></div>
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Jumlah Aktiviti</p>
+                    <h3 class="text-2xl font-bold text-gray-800" id="statTotal">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg"><i class="fa-solid fa-microscope text-2xl"></i></div>
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Penyelidikan</p>
+                    <h3 class="text-2xl font-bold text-gray-800" id="statPenyelidikan">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                <div class="p-3 bg-purple-100 text-purple-600 rounded-lg"><i class="fa-solid fa-lightbulb text-2xl"></i></div>
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Inovasi</p>
+                    <h3 class="text-2xl font-bold text-gray-800" id="statInovasi">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                <div class="p-3 bg-amber-100 text-amber-600 rounded-lg"><i class="fa-solid fa-graduation-cap text-2xl"></i></div>
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Bengkel / Impak</p>
+                    <h3 class="text-2xl font-bold text-gray-800" id="statBengkel">0</h3>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="relative w-full md:w-1/3">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="cariAktiviti" oninput="prosesTapisan()" placeholder="Cari nama aktiviti atau info..." 
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+
+            <div class="flex flex-wrap w-full md:w-auto gap-3 justify-end">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-gray-500 uppercase"><i class="fa-solid fa-filter mr-1"></i> Kategori:</label>
+                    <select id="filterKategori" onchange="prosesTapisan()" class="bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500">
+                        <option value="SEMUA">Semua Kategori</option>
+                        <option value="PENYELIDIKAN">Penyelidikan</option>
+                        <option value="INOVASI">Inovasi</option>
+                        <option value="BENGKEL">Bengkel & Seminar</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-gray-500 uppercase"><i class="fa-solid fa-calendar mr-1"></i> Tahun:</label>
+                    <select id="filterTahunAktiviti" onchange="prosesTapisan()" class="bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500">
+                        <option value="SEMUA">Semua Tahun</option>
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section id="kawasanKadAktiviti" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </section>
+
+        <div id="tiadaAktiviti" class="hidden text-center py-16 bg-white rounded-xl shadow-xs border border-gray-200">
+            <i class="fa-regular fa-folder-open text-5xl text-gray-300 mb-3"></i>
+            <p class="text-gray-500 font-medium">Tiada aktiviti ditemui berdasarkan tapisan anda.</p>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-6 border-t border-gray-700 text-center text-sm">
+        <p>&copy; 2026 Sistem Pengurusan Harta Intelek, Penyelidikan & Inovasi.</p>
+    </footer>
+
+    <script>
+        // URL Google Apps Script Web App
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
+
+// Takrifan global pembolehubah data
+let dataAsalAktiviti = [];
+let dataDipaparkan = [];
+
+// KEMASKINI BARU: Dapatkan nama pengguna dari sessionStorage
+const userNama = (sessionStorage.getItem("nama") || "TETAMU").toUpperCase();
+
+window.onload = () => {
+    // 1. Logik pengesahan sesi/login
+    const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
+    const perananPengguna = (sessionStorage.getItem("peranan") || "TETAMU").trim().toUpperCase();
+
+    // Keamanan: Tendang pengguna keluar jika belum sah login
+    if (!sudahLogin) {
+        alert("Akses ditolak! Sila log masuk terlebih dahulu.");
+        window.location.href = "index.html"; 
+        return; 
+    }
+
+    // 2. Paparkan nama pengguna pada UI Header
+    const paparNamaEl = document.getElementById('paparNamaPengguna');
+    if (paparNamaEl) {
+        paparNamaEl.innerText = userNama;
+    }
+
+    // 🌟 KEMASKINI BARU: Paparkan peranan pengguna pada Badge Lencana
+    const paparPerananEl = document.getElementById('paparPerananPengguna');
+    if (paparPerananEl) {
+        paparPerananEl.innerText = perananPengguna;
+        
+        // Memberi warna berbeza secara automatik jika peranan adalah ADMIN
+        if (perananPengguna === "ADMIN" || perananPengguna === "PENTADBIR") {
+            paparPerananEl.className = "px-2 py-0.5 text-[10px] font-extrabold tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-md uppercase";
+        } else {
+            paparPerananEl.className = "px-2 py-0.5 text-[10px] font-extrabold tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-md uppercase";
+        }
+    }
+
+    // Set tahun otomatis pada elemen liveYear
+    const liveYearEl = document.getElementById('liveYear');
+    if (liveYearEl) {
+        liveYearEl.innerText = new Date().getFullYear();
+    }
+
+    // 3. Ambil rekod dari Google Sheets
+    muatDataDariSheets();
+};
+        // 1. FUNGSI FETCH DATA DARI GOOGLE APPS SCRIPT WEB APP
+        async function muatDataDariSheets() {
+            const kontena = document.getElementById('kawasanKadAktiviti');
+            
+            // Papar kesan loading spinner semasa data sedang ditarik
+            kontena.innerHTML = `
+                <div class="col-span-full text-center py-16 bg-white rounded-xl border border-gray-100 shadow-xs">
+                    <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-600 mb-3"></i>
+                    <p class="text-gray-500 font-medium animate-pulse">Sedang memuatkan paparan aktiviti terkini...</p>
+                </div>
+            `;
+
+            try {
+                const respon = await fetch(SCRIPT_URL);
+                if (!respon.ok) throw new Error("Respon rangkaian tidak berjaya.");
+                
+                const dataMentah = await respon.json();
+
+                // Proses data & jana elemen UI (ikon, warna badge) secara dinamik berdasarkan kategori sheet
+                dataAsalAktiviti = dataMentah.map(item => {
+                    const kategoriBersih = (item.kategori || "PENYELIDIKAN").toUpperCase().trim();
+                    let warna = "bg-blue-100 text-blue-800 border-blue-200";
+                    let ikon = "fa-circle-info";
+
+                    if (kategoriBersih === "INOVASI") {
+                        warna = "bg-purple-100 text-purple-800 border-purple-200";
+                        ikon = "fa-lightbulb";
+                    } else if (kategoriBersih === "BENGKEL") {
+                        warna = "bg-amber-100 text-amber-800 border-amber-200";
+                        ikon = "fa-graduation-cap";
+                    } else if (kategoriBersih === "PENYELIDIKAN") {
+                        warna = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                        ikon = "fa-microscope";
+                    }
+
+                    return {
+                        id: item.id || Math.random(),
+                        nama: item.nama || "Tiada Nama Aktiviti",
+                        tahun: String(item.tahun || ""),
+                        tarikh: item.tarikh || "Akan Dikemaskini",
+                        kategori: kategoriBersih,
+                        info: item.info || "Tiada maklumat tambahan berkaitan aktiviti ini buat masa sekarang.",
+                        ikon: ikon,
+                        warnaBadge: warna
+                    };
+                });
+
+                // Selesai memuatkan data, kemaskini dashboard statistik atas dan senarai kad
+                kemaskiniPapanStatistik(dataAsalAktiviti);
+                prosesTapisan();
+
+            } catch (error) {
+                console.error("Ralat muat data Google Sheet:", error);
+                kontena.innerHTML = `
+                    <div class="col-span-full text-center py-16 bg-red-50 text-red-700 rounded-xl border border-red-200">
+                        <i class="fa-solid fa-circle-exclamation text-4xl mb-3"></i>
+                        <h4 class="font-bold text-lg">Gagal Membaca Data</h4>
+                        <p class="text-sm text-red-600 mt-1 max-w-md mx-auto">Sila pastikan skrip Google anda telah di-'Deploy' semula sebagai Web App dengan akses 'Anyone'.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 2. FUNGSI TAPISAN & PENGISIHAN (FILTER & SORT)
+        function prosesTapisan() {
+            const kataKunci = document.getElementById('cariAktiviti').value.toLowerCase().trim();
+            const katDipilih = document.getElementById('filterKategori').value;
+            const tahunDipilih = document.getElementById('filterTahunAktiviti').value;
+
+            // Logik Penapisan
+            dataDipaparkan = dataAsalAktiviti.filter(item => {
+                let matchKataKunci = item.nama.toLowerCase().includes(kataKunci) || item.info.toLowerCase().includes(kataKunci);
+                let matchKategori = (katDipilih === "SEMUA" || item.kategori === katDipilih);
+                let matchTahun = (tahunDipilih === "SEMUA" || item.tahun === tahunDipilih);
+
+                return matchKataKunci && matchKategori && matchTahun;
+            });
+
+            // Isih tahun secara menurun (Tahun Terkini ke Bawah)
+            dataDipaparkan.sort((a, b) => Number(b.tahun) - Number(a.tahun));
+
+            binaKadAktiviti();
+        }
+
+        // 3. FUNGSI STRUKTUR KAD DINAMIK
+        function binaKadAktiviti() {
+            const kontena = document.getElementById('kawasanKadAktiviti');
+            const mesejKosong = document.getElementById('tiadaAktiviti');
+            
+            kontena.innerHTML = "";
+
+            if (dataDipaparkan.length === 0) {
+                mesejKosong.classList.remove('hidden');
+                return;
+            }
+            mesejKosong.classList.add('hidden');
+
+            dataDipaparkan.forEach(item => {
+                const kad = document.createElement('div');
+                kad.className = "bg-white rounded-2xl shadow-xs hover:shadow-xl border border-gray-100 p-6 flex flex-col justify-between transform hover:-translate-y-1 transition duration-300 relative overflow-hidden";
+                
+                let borderWarnaTop = "border-blue-500";
+                if(item.kategori === "INOVASI") borderWarnaTop = "border-purple-500";
+                if(item.kategori === "BENGKEL") borderWarnaTop = "border-amber-500";
+                if(item.kategori === "PENYELIDIKAN") borderWarnaTop = "border-emerald-500";
+                
+                kad.classList.add('border-t-4', borderWarnaTop);
+
+                kad.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-bold border ${item.warnaBadge}">
+                                <i class="fa-solid ${item.ikon} mr-1"></i> ${item.kategori}
+                            </span>
+                            <span class="bg-gray-100 text-gray-800 font-mono font-bold text-xs px-2.5 py-1 rounded-md">
+                                <i class="fa-regular fa-calendar-check mr-1 text-blue-600"></i> ${item.tahun}
+                            </span>
+                        </div>
+                        <h4 class="text-md font-bold text-gray-900 tracking-tight leading-snug uppercase mb-2 hover:text-blue-700 transition cursor-pointer">
+                            ${item.nama}
+                        </h4>
+                        <p class="text-xs text-gray-500 leading-relaxed line-clamp-3 mb-4">
+                            ${item.info}
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600 mt-auto">
+                        <span class="font-medium"><i class="fa-regular fa-clock text-gray-400 mr-1"></i> ${item.tarikh}</span>
+                        <button onclick="paparDetail('${item.nama.replace(/'/g, "\\'")}', '${item.tarikh}', '${item.info.replace(/'/g, "\\'")}')" class="text-blue-600 hover:text-indigo-800 font-bold flex items-center gap-1 cursor-pointer">
+                            Info Lanjut <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
+                `;
+                kontena.appendChild(kad);
+            });
+        }
+
+        // 4. MENGIRA DASHBOARD STATISTIK SECARA DINAMIK
+        function kemaskiniPapanStatistik(senarai) {
+            document.getElementById('statTotal').innerText = senarai.length;
+            document.getElementById('statPenyelidikan').innerText = senarai.filter(i => i.kategori === "PENYELIDIKAN").length;
+            document.getElementById('statInovasi').innerText = senarai.filter(i => i.kategori === "INOVASI").length;
+            document.getElementById('statBengkel').innerText = senarai.filter(i => i.kategori === "BENGKEL").length;
+        }
+
+        // 5. RESPONS POPUP INFO
+        function paparDetail(nama, tarikh, info) {
+            alert(`📌 INFO AKTIVITI\n\nNama: ${nama}\nTarikh: ${tarikh}\n\nKeterangan:\n${info}`);
+        }
+    </script>
+</body>
+</html>

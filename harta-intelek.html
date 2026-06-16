@@ -45,6 +45,11 @@
             <button onclick="downloadCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow transition text-sm flex items-center gap-2">
                 📥 Download CSV
             </button>
+            
+            <button onclick="bukaModalPermohonan()" class="bg-blue-600 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-blue-700 transition text-sm flex items-center gap-2">
+                📝 Mohon Harta Intelek
+            </button>
+
             <button onclick="bukaModalTambah()" class="bg-white text-amber-700 px-4 py-2.5 rounded-lg font-bold shadow hover:bg-amber-50 transition text-sm flex items-center gap-2">
                 ➕ Tambah Rekod
             </button>
@@ -114,9 +119,10 @@
 
     </main>
 
-    <div id="modalBorang" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity p-4 overflow-y-auto">
+<div id="modalBorang" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl my-8 overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-amber-600 p-4 text-white flex justify-between items-center sticky top-0 z-10 flex-shrink-0">
+            
+            <div id="modalHeader" class="bg-amber-600 p-4 text-white flex justify-between items-center sticky top-0 z-10 flex-shrink-0 transition-colors duration-300">
                 <h3 id="tajukModal" class="font-bold text-lg flex items-center gap-2">📝 Borang Harta Intelek</h3>
                 <button onclick="tutupModal()" class="text-white hover:text-amber-200 text-2xl font-bold leading-none">&times;</button>
             </div>
@@ -148,6 +154,9 @@
 
                 <form id="borangHI" onsubmit="hantarBorangHI(event)">
                     <input type="hidden" id="editBil"> 
+                    <input type="hidden" id="in_mode">
+					<input type="hidden" id="in_statusPermohonan">					
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Tahun</label>
@@ -204,11 +213,52 @@
                                 <option value="">-- PILIH JENIS --</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">No. Pendaftaran</label>
-                            <input type="text" id="in_noDaftar" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 bg-gray-50 outline-none uppercase" placeholder="Jika ada">
+                        
+                        <div id="div_noDaftar">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">No. Pendaftaran <span id="labelWajibDaftar" class="text-red-500">*</span></label>
+                            <input type="text" id="in_noDaftar" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 bg-gray-50 outline-none uppercase" placeholder="Masukkan No. Pendaftaran">
                         </div>
                     </div>
+
+<div id="seksyenMuatNaikPDF" class="hidden flex flex-col gap-4 mb-6 border-t pt-4">
+    
+    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 shadow-sm">
+        <div>
+            <h4 class="font-bold text-indigo-800 text-sm flex items-center gap-2">
+                📥 Muat Turun Template Dokumen Rujukan
+            </h4>
+            <p class="text-xs text-indigo-600 mt-1">
+                Sila muat turun template di bawah (jika belum ada), isi dengan lengkap, dan wajib muat naik semula di ruangan bawah.
+            </p>
+        </div>
+        <div class="w-full lg:w-auto flex flex-col sm:flex-row gap-2 flex-shrink-0">
+            <button type="button" onclick="muatTurunTemplateBorang('CR-1')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold shadow text-xs transition flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer">
+                📄 1. Borang Pendaftaran Harta Intelek CR-1
+            </button>
+            <button type="button" onclick="muatTurunTemplateBorang('LAPORAN INOVASI')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow text-xs transition flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer">
+                💡 2. Laporan Inovasi
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+        <div>
+            <label class="block text-xs font-bold text-blue-800 mb-1 flex items-center justify-between">
+                <span>⬆️ Dokumen Sokongan CR-1 (PDF sahaja)</span>
+                <span class="text-red-500 font-extrabold text-[10px] bg-red-50 px-1.5 py-0.5 rounded border border-red-200">* WAJIB</span>
+            </label>
+            <input type="file" id="in_pdf1" accept="application/pdf" required class="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white outline-none text-sm cursor-pointer file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition">
+        </div>
+        
+        <div>
+            <label class="block text-xs font-bold text-blue-800 mb-1 flex items-center justify-between">
+                <span>⬆️ Laporan Inovasi (PDF sahaja)</span>
+                <span class="text-red-500 font-extrabold text-[10px] bg-red-50 px-1.5 py-0.5 rounded border border-red-200">* WAJIB</span>
+            </label>
+            <input type="file" id="in_pdf2" accept="application/pdf" required class="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white outline-none text-sm cursor-pointer file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition">
+        </div>
+    </div>
+</div>
 
                     <div class="flex justify-end gap-3 pt-4 border-t">
                         <button type="button" onclick="tutupModal()" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Batal</button>
@@ -227,19 +277,28 @@ let dataGlobalHI = [];
 let dataDitapisGlobal = [];
 
 // TETAPAN PENGGUNA (Mengambil NAMA, PERANAN, JABATAN dari sessionStorage)
-// Jika tiada rekod dalam session (mungkin bypass login), ia akan paparkan teks default
 const userNama = (sessionStorage.getItem("nama") || "TETAMU").toUpperCase();
 const userPeranan = (sessionStorage.getItem("peranan") || "TIADA PERANAN").toUpperCase();
 const userJabatan = (sessionStorage.getItem("jabatan") || "TIADA JABATAN").toUpperCase();
 
 // Approver yang ada kuasa pengesahan penuh
 const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
-// Boleh Tambah/Edit/Padam (tapi rekod mereka kena disahkan oleh Approver)
+const perananLayakUpload = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "ADMIN", "KUPIK"];
+const layakUpload = perananLayakUpload.some(p => userPeranan.toUpperCase().includes(p));
+
+// ==========================================
+// 2. SENARAI DOKUMEN INOVASI
+// ==========================================
+// NOTA: Jika nak CR-1 ada template juga, tukar hasTemplate: false kepada true
+const senaraiDokumen = [
+    { id: "doc4", tajuk: "LAPORAN INOVASI", failDitemui: [], hasTemplate: true },
+    { id: "doc6", tajuk: "BORANG PENDAFTARAN HARTA INTELEK CR-1", failDitemui: [], hasTemplate: false }
+];
+
 const isPenyelarasJabatan = userPeranan === "PENYELARAS JABATAN";
 const isStaf = userPeranan === "STAF";
 
 window.onload = () => {
-    // 🌟 KEMASKINI BARU: Suntik maklumat pengguna ke dalam Header HTML
     const paparNamaEl = document.getElementById('paparNama');
     const paparJabatanEl = document.getElementById('paparJabatan');
     const paparPerananEl = document.getElementById('paparPeranan');
@@ -248,9 +307,12 @@ window.onload = () => {
     if (paparJabatanEl) paparJabatanEl.textContent = userJabatan;
     if (paparPerananEl) paparPerananEl.textContent = userPeranan;
 
-    // Panggil fungsi-fungsi utama selepas maklumat dipaparkan
     if (typeof muatDropdownSistem === "function") muatDropdownSistem();
     if (typeof muatDataHI === "function") muatDataHI();
+    
+    // Panggil papar UI sekali sahaja dan mulakan carian di Drive
+    if (typeof paparSenaraiDokumen === "function") paparSenaraiDokumen();
+    semakStatusDariDrive();
 };
 
         // FUNGSI SEDUT DROPDOWN DARI SHEET SISTEM
@@ -344,6 +406,11 @@ window.onload = () => {
                 return matchTahun && matchJabatan && matchStatus;
             });
 
+            // 🌟 LOGIK BARU: SUSUN DATA MENGIKUT TAHUN TERKINI (2026, 2025, 2024...)
+            dataDitapisGlobal.sort((a, b) => {
+                return Number(b.tahun || 0) - Number(a.tahun || 0);
+            });
+
             tbody.innerHTML = "";
 
             if (dataDitapisGlobal.length === 0) {
@@ -429,7 +496,6 @@ window.onload = () => {
             // Panggil fungsi untuk bina butang Next & Previous
             if(typeof renderPaginationControls === "function") renderPaginationControls(totalPages);
         }
-
 // 3. FUNGSI UNTUK MEMBINA BUTANG NEXT / PREVIOUS
 function renderPaginationControls(totalPages) {
     const paginationDiv = document.getElementById('paginationControls');
@@ -485,11 +551,14 @@ function tukarPage(arah) {
 
             paparToast("⏳ Menyediakan fail untuk dimuat turun...", "blue");
 
-            let csvContent = "BIL,TAHUN,KETUA,AHLI 1,AHLI 2,AHLI 3,AHLI 4,AHLI 5,TAJUK,JABATAN,PEMILIK,JENIS,NO DAFTAR,STATUS\n";
+            // 🌟 KEMASKINI: Tambah header lajur O hingga R (PERMOHONAN, LINK CR1, LINK LAPORAN, LINK IP)
+            let csvContent = "BIL,TAHUN,KETUA,AHLI 1,AHLI 2,AHLI 3,AHLI 4,AHLI 5,TAJUK,JABATAN,PEMILIK,JENIS,NO DAFTAR,STATUS,PERMOHONAN,LINK CR1,LINK LAPORAN,LINK IP\n";
             
             dataDitapisGlobal.forEach((r, idx) => {
-                let clean = (str) => `"${(str || "").replace(/"/g, '""')}"`;
-                csvContent += `${idx + 1},${clean(r.tahun)},${clean(r.ketua)},${clean(r.ahli1)},${clean(r.ahli2)},${clean(r.ahli3)},${clean(r.ahli4)},${clean(r.ahli5)},${clean(r.tajuk)},${clean(r.jabatan)},${clean(r.pemilik)},${clean(r.jenis)},${clean(r.noDaftar)},${clean(r.statusHI)}\n`;
+                let clean = (str) => `"${(String(str) || "").replace(/"/g, '""')}"`;
+                
+                // 🌟 KEMASKINI: Tambah pemetaan data r.permohonan, r.linkCR1, r.linkLaporan, r.linkIP
+                csvContent += `${idx + 1},${clean(r.tahun)},${clean(r.ketua)},${clean(r.ahli1)},${clean(r.ahli2)},${clean(r.ahli3)},${clean(r.ahli4)},${clean(r.ahli5)},${clean(r.tajuk)},${clean(r.jabatan)},${clean(r.pemilik)},${clean(r.jenis)},${clean(r.noDaftar)},${clean(r.statusHI)},${clean(r.permohonan)},${clean(r.linkCR1)},${clean(r.linkLaporan)},${clean(r.linkIP)}\n`;
             });
 
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -566,28 +635,138 @@ function tukarPage(arah) {
             paparToast("📄 Template CSV berjaya dimuat turun!", "blue");
         }
 
+// 🌟 FUNGSI BARU: Buka Modal Permohonan
+        function bukaModalPermohonan() {
+            document.getElementById('borangHI').reset();
+            document.getElementById('editBil').value = ""; 
+            
+            // Set penanda mode form sebagai PERMOHONAN
+            if(document.getElementById('in_mode')) document.getElementById('in_mode').value = "PERMOHONAN";
+            
+            // 🌟 SET STATUS PERMOHONAN: "DALAM PROSES"
+            if(document.getElementById('in_statusPermohonan')) document.getElementById('in_statusPermohonan').value = "DALAM PROSES";
+
+            // 🌟 KEMASKINI BARU: Masukkan tahun secara automatik berdasarkan sistem komputer
+            const tahunSemasa = new Date().getFullYear();
+            if(document.getElementById('in_tahun')) document.getElementById('in_tahun').value = tahunSemasa;
+            
+            // Tukar tajuk dan warna header modal ke Biru
+            document.getElementById('tajukModal').innerHTML = "📝 Permohonan Harta Intelek Baru";
+            const header = document.getElementById('modalHeader');
+            if(header) header.className = "bg-blue-600 p-4 text-white flex justify-between items-center sticky top-0 z-10 flex-shrink-0 transition-colors duration-300";
+            
+            // Set default Jabatan jika bukan Approver
+            if(!isApprover) document.getElementById('in_jabatan').value = userJabatan;
+            
+            // Sembunyikan fungsi Upload Pukal (CSV)
+            document.getElementById('seksyenUploadCSV').classList.add('hidden');
+            document.getElementById('pemisahBorang').classList.add('hidden');
+            
+            // Paparkan ruangan upload PDF dan jadikan wajib isi (required)
+            document.getElementById('seksyenMuatNaikPDF').classList.remove('hidden');
+            if(document.getElementById('in_pdf1')) document.getElementById('in_pdf1').required = true;
+            if(document.getElementById('in_pdf2')) document.getElementById('in_pdf2').required = true;
+
+            // Sembunyikan ruangan No. Pendaftaran dan batalkan syarat wajib (required)
+            const divNoDaftar = document.getElementById('div_noDaftar');
+            const inputNoDaftar = document.getElementById('in_noDaftar');
+            if(divNoDaftar) divNoDaftar.classList.add('hidden');
+            if(inputNoDaftar) inputNoDaftar.required = false;
+
+            // Tukar butang submit ke gaya Permohonan
+            const btnSubmit = document.getElementById('btnSimpanMod');
+            if(btnSubmit) {
+                btnSubmit.innerText = "Hantar Permohonan";
+                btnSubmit.className = "px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-md";
+            }
+
+            document.getElementById('modalBorang').classList.remove('hidden');
+        }
+        // Kemas kini fungsi bukaModalTambah sedia ada
         function bukaModalTambah() {
             document.getElementById('borangHI').reset();
             document.getElementById('editBil').value = ""; 
+            
+            // Set penanda mode form sebagai TAMBAH REKOD
+            if(document.getElementById('in_mode')) document.getElementById('in_mode').value = "TAMBAH_REKOD";
+            
+            // 🌟 SET STATUS PERMOHONAN: "SELESAI"
+            if(document.getElementById('in_statusPermohonan')) document.getElementById('in_statusPermohonan').value = "SELESAI";
+            
+            // Tukar tajuk dan warna header modal ke Amber (Jingga)
             document.getElementById('tajukModal').innerHTML = "➕ Tambah Rekod Baru";
+            const header = document.getElementById('modalHeader');
+            if(header) header.className = "bg-amber-600 p-4 text-white flex justify-between items-center sticky top-0 z-10 flex-shrink-0 transition-colors duration-300";
             
             if(!isApprover) document.getElementById('in_jabatan').value = userJabatan;
             
+            // Paparkan fungsi Upload Pukal (CSV)
             document.getElementById('seksyenUploadCSV').classList.remove('hidden');
             document.getElementById('pemisahBorang').classList.remove('hidden');
+            
+            // Sembunyikan ruangan PDF dan batalkan wajib isi
+            document.getElementById('seksyenMuatNaikPDF').classList.add('hidden');
+            if(document.getElementById('in_pdf1')) document.getElementById('in_pdf1').required = false;
+            if(document.getElementById('in_pdf2')) document.getElementById('in_pdf2').required = false;
+
+            // Paparkan semula ruangan No. Pendaftaran dan jadikan ia WAJIB diisi
+            const divNoDaftar = document.getElementById('div_noDaftar');
+            const inputNoDaftar = document.getElementById('in_noDaftar');
+            if(divNoDaftar) divNoDaftar.classList.remove('hidden');
+            if(inputNoDaftar) inputNoDaftar.required = true;
+
+            // Tukar butang submit ke gaya Tambah Rekod
+            const btnSubmit = document.getElementById('btnSimpanMod');
+            if(btnSubmit) {
+                btnSubmit.innerText = "Simpan Rekod";
+                btnSubmit.className = "px-6 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 transition shadow-md";
+            }
+            
             document.getElementById('modalBorang').classList.remove('hidden');
         }
-
+        
         function bukaModalKemaskini(bil) {
             const rekod = dataGlobalHI.find(item => item.bil === bil);
             if(!rekod) return;
 
             document.getElementById('editBil').value = rekod.bil;
-            document.getElementById('tajukModal').innerHTML = "✏️ Kemaskini Rekod";
             
+            // Set penanda mode form sebagai KEMASKINI
+            if(document.getElementById('in_mode')) document.getElementById('in_mode').value = "KEMASKINI";
+            
+            // 🌟 LOGIK KEMASKINI:
+            // Jika pengguna (seperti KUPIK, ADMIN dll) tekan edit, status perlu diset kepada "SELESAI" 
+            // (Atau anda boleh menetapkan logik khusus di bahagian Google Apps Script)
+            if(document.getElementById('in_statusPermohonan')) document.getElementById('in_statusPermohonan').value = "SELESAI";
+            
+            // Kembalikan tajuk dan warna header modal ke Amber
+            document.getElementById('tajukModal').innerHTML = "✏️ Kemaskini Rekod";
+            const header = document.getElementById('modalHeader');
+            if(header) header.className = "bg-amber-600 p-4 text-white flex justify-between items-center sticky top-0 z-10 flex-shrink-0 transition-colors duration-300";
+            
+            // Sembunyikan Upload CSV
             document.getElementById('seksyenUploadCSV').classList.add('hidden');
             document.getElementById('pemisahBorang').classList.add('hidden');
             
+            // Sembunyikan PDF untuk form kemaskini biasa
+            document.getElementById('seksyenMuatNaikPDF').classList.add('hidden');
+            if(document.getElementById('in_pdf1')) document.getElementById('in_pdf1').required = false;
+            if(document.getElementById('in_pdf2')) document.getElementById('in_pdf2').required = false;
+
+            // Pastikan ruangan No. Pendaftaran dipaparkan dan wajib diisi apabila mengemaskini
+            const divNoDaftar = document.getElementById('div_noDaftar');
+            const inputNoDaftar = document.getElementById('in_noDaftar');
+            if(divNoDaftar) divNoDaftar.classList.remove('hidden');
+            if(inputNoDaftar) inputNoDaftar.required = true;
+
+            // Tukar butang submit
+            const btnSubmit = document.getElementById('btnSimpanMod');
+            if(btnSubmit) {
+                btnSubmit.innerText = "Kemaskini Rekod";
+                btnSubmit.className = "px-6 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 transition shadow-md";
+            }
+            
+            // Isi nilai form dengan data rekod sedia ada
             document.getElementById('in_tahun').value = rekod.tahun;
             document.getElementById('in_jabatan').value = rekod.jabatan;
             document.getElementById('in_tajuk').value = rekod.tajuk;
@@ -606,11 +785,10 @@ function tukarPage(arah) {
             document.getElementById('in_noDaftar').value = rekod.noDaftar;
             document.getElementById('modalBorang').classList.remove('hidden');
         }
-
+		
         function tutupModal() {
             document.getElementById('modalBorang').classList.add('hidden');
         }
-
         // ================= FUNGSI PELAYAN (API POST) =================
         function hantarBorangHI(e) {
             e.preventDefault();
@@ -619,6 +797,9 @@ function tukarPage(arah) {
 
             const idBil = document.getElementById('editBil').value;
             const actionType = (idBil === "") ? "tambahHI" : "kemaskiniHI";
+
+            // 🌟 AMBIL NILAI STATUS PERMOHONAN DARI INPUT TERSEMBUNYI
+            const statusPermohonanValue = document.getElementById('in_statusPermohonan') ? document.getElementById('in_statusPermohonan').value : "";
 
             const payload = {
                 action: actionType,
@@ -635,7 +816,9 @@ function tukarPage(arah) {
                 PEMILIK: document.getElementById('in_pemilik').value,
                 JENIS: document.getElementById('in_jenis').value,
                 NO_DAFTAR: document.getElementById('in_noDaftar').value,
-                STATUS: (isApprover) ? "DISAHKAN" : "MENUNGGU PENGESAHAN" 
+                STATUS: (isApprover) ? "DISAHKAN" : "MENUNGGU PENGESAHAN",
+                // 🌟 KEMASKINI: Hantar status permohonan ke backend
+                PERMOHONAN: statusPermohonanValue
             };
 
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -667,13 +850,334 @@ function tukarPage(arah) {
             });
         }
 
-        function paparToast(teks, warna) {
-            const msgBox = document.getElementById('paparMesejUI');
-            msgBox.className = `font-bold text-sm px-4 py-2 rounded-lg flex items-center shadow-md text-white fixed top-5 right-5 z-[100] transition-opacity ` + (warna === 'green' ? 'bg-emerald-500' : (warna === 'blue' ? 'bg-blue-500' : 'bg-red-500'));
-            msgBox.innerText = teks;
-            msgBox.classList.remove('hidden');
-            setTimeout(() => msgBox.classList.add('hidden'), 4000);
+function paparToast(teks, warna) {
+    const msgBox = document.getElementById('paparMesejUI') || document.getElementById('mesejUI');
+    if (!msgBox) { alert(teks); return; } // Fallback jika UI tiada
+    
+    msgBox.className = `font-bold text-sm px-4 py-2 rounded-lg flex items-center shadow-md text-white fixed top-5 right-5 z-[100] transition-opacity ` + (warna === 'green' ? 'bg-emerald-500' : (warna === 'blue' ? 'bg-blue-500' : 'bg-red-500'));
+    msgBox.innerText = teks;
+    msgBox.classList.remove('hidden');
+    setTimeout(() => msgBox.classList.add('hidden'), 4000);
+}
+// -------------------------------------------------------------------------
+// PENGURUSAN SISTEM FAIL DARI GOOGLE DRIVE 
+// -------------------------------------------------------------------------
+const FOLDER_ID_DOKUMEN = "1zYRQF7Ftd-9LYz_NWso93N0h66lXeZSA";
+let dataFailDriveSediaAda = {}; 
+
+function semakStatusDariDrive() {
+    const paparNotisSistem = (typeof paparNotis === "function") ? paparNotis : console.log;
+    paparNotisSistem("🔄 Menyemak rekod dokumen di Google Drive...", "biru");
+
+    const payloadJSON = {
+        action: "semakDokumen",
+        folderIdDokumen: FOLDER_ID_DOKUMEN,
+    };
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payloadJSON)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            const failDariDrive = result.data; 
+            dataFailDriveSediaAda = failDariDrive; 
+
+            senaraiDokumen.forEach(doc => {
+                // Cari fail utama pengguna muat naik (Bukan fail borang kosong/template)
+                // Oleh kerana tiada perkataan 'TEMPLATE', kita asumsikan fail kosong/rujukan 
+                // mempunyai nama yang 100% sama dengan tajuk (contoh: "LAPORAN INOVASI.pdf")
+                // Kita elakkan ini bercampur dengan rekod muat naik staf menggunakan .startsWith()
+                // dan menolak fail yang namanya sama sepenuhnya dengan tajuk borang (kerana itu adalah borang kosong)
+                const failDitemui = Object.keys(failDariDrive).filter(namaFail => 
+                    namaFail.toUpperCase().startsWith(doc.tajuk.toUpperCase()) && 
+                    namaFail.toUpperCase() !== doc.tajuk.toUpperCase() + ".PDF" &&
+                    namaFail.toUpperCase() !== doc.tajuk.toUpperCase() + ".DOCX"
+                );
+                
+                if (failDitemui.length > 0) {
+                    doc.failDitemui = failDitemui.map(namaFail => ({
+                        name: namaFail,
+                        url: failDariDrive[namaFail].url
+                    }));
+                    
+                    if (doc.id === "doc5") {
+                        const matchTahun = failDitemui[0].match(/\d{4}/);
+                        if (matchTahun) doc.tahun = matchTahun[0];
+                    }
+                } else {
+                    doc.failDitemui = []; 
+                }
+
+                if (doc.hasTemplate || doc.id === "doc6") { 
+                    const kataKunciCarian = doc.templateKunci ? doc.templateKunci.toUpperCase() : doc.tajuk.toUpperCase();
+                    // KEMASKINI: Buang syarat perkataan "TEMPLATE". Hanya cari berdasarkan kata kunci borang.
+                    // Oleh kerana fail di Drive bernama tepat "BORANG PENDAFTARAN HARTA INTELEK CR-1.pdf",
+                    // ia akan match dengan tajuk secara automatik.
+                    const templateJumpa = Object.keys(failDariDrive).filter(namaFail => 
+                        namaFail.toUpperCase().includes(kataKunciCarian)
+                    );
+
+                    if (templateJumpa.length > 0) {
+                        doc.templatesDitemui = templateJumpa.map(namaFail => ({
+                            name: namaFail,
+                            url: failDariDrive[namaFail].url
+                        }));
+                    } else {
+                        doc.templatesDitemui = []; 
+                    }
+                }
+            });
+
+            if (typeof paparSenaraiDokumen === "function") paparSenaraiDokumen(); 
+            paparNotisSistem("✅ Semakan Google Drive selesai.", "hijau");
         }
+    })
+    .catch(error => {
+        console.error("Ralat Semakan Drive:", error);
+        paparNotisSistem("❌ Gagal menyemak status Drive.", "merah");
+    });
+}
+// FUNGSI DIRECT DOWNLOAD TEMPLATE (Kekal Sama)
+function muatTurunFailAutomatik(url) {
+    const fileIdMatch = url.match(/[-\w]{25,}/);
+    if (fileIdMatch && fileIdMatch[0]) {
+        const directDownloadUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[0]}`;
+        if(typeof paparToast === "function") paparToast("📥 Memuat turun fail secara automatik...", "blue");
+        
+        const link = document.createElement("a");
+        link.href = directDownloadUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        if(typeof paparToast === "function") paparToast("❌ Ralat: URL fail tidak sah di dalam Google Drive.", "red");
+    }
+}
+
+// 🌟 FUNGSI PENCARIAN TEMPLATE (KEMASKINI: Buang carian perkataan "TEMPLATE")
+function muatTurunTemplateBorang(kataKunci) {
+    if (!dataFailDriveSediaAda || Object.keys(dataFailDriveSediaAda).length === 0) {
+        const amaran = "⚠️ Sila tunggu sehingga semakan rekod Google Drive selesai atau muat semula halaman.";
+        if (typeof paparToast === "function") paparToast(amaran, "red"); else alert(amaran);
+        return;
+    }
+    
+    // KEMASKINI: Menyaring fail di Drive yang mengandungi nama borang ('CR-1' atau 'LAPORAN INOVASI')
+    // Perkataan "TEMPLATE" telah dibuang.
+    const padananFail = Object.keys(dataFailDriveSediaAda).find(namaFail => 
+        namaFail.toUpperCase().includes(kataKunci.toUpperCase())
+    );
+
+    if (padananFail && dataFailDriveSediaAda[padananFail].url) {
+        muatTurunFailAutomatik(dataFailDriveSediaAda[padananFail].url);
+    } else {
+        const ralatFail = `❌ Fail dokumen untuk "${kataKunci}" tidak dijumpai di Google Drive Admin.`;
+        if (typeof paparToast === "function") paparToast(ralatFail, "red"); else alert(ralatFail);
+    }
+}
+		
+// FUNGSI UI 
+function paparSenaraiDokumen() {
+    renderSatuBahagian(senaraiDokumen, "senaraiDokumen");
+    // Semak jika senaraiDokumenPenyelidikan wujud sebelum render
+    if (typeof senaraiDokumenPenyelidikan !== 'undefined') {
+        renderSatuBahagian(senaraiDokumenPenyelidikan, "senaraiDokumenPenyelidikan");
+    }
+}
+
+// Fungsi pembantu generik untuk mengelakkan pertindihan kod UI
+function renderSatuBahagian(senarai, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+
+    senarai.forEach((doc, index) => {
+        const hasFile = doc.failDitemui && doc.failDitemui.length > 0;
+        const hasTemplateFile = doc.templatesDitemui && doc.templatesDitemui.length > 0;
+
+        // BAHAGIAN 1: STATUS & BUTANG DOKUMEN UTAMA
+        let statusHtmlUtama = "<span class='text-gray-500 italic'>⚠️ Belum dimuat naik</span>";
+        if (hasFile) {
+            statusHtmlUtama = doc.failDitemui.map(f => `<span class="text-emerald-700">✅ <strong>${f.name}</strong></span>`).join('<br>');
+            if (doc.id === "doc5" && doc.tahun) {
+                statusHtmlUtama += `<br><span class="text-blue-600 font-semibold mt-1 inline-block">📌 (Tahun: ${doc.tahun})</span>`;
+            }
+        }
+
+        let butangAksiHtml = "";
+        if (!hasFile) {
+            if (layakUpload) {
+                butangAksiHtml = `<button onclick="klikInputFail('${doc.id}', false)" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition shadow-sm">📤 Muat Naik Dokumen</button>`;
+            } else {
+                butangAksiHtml = `<span class="text-gray-400 italic text-sm">Tiada Akses Memuat Naik</span>`;
+            }
+        } else {
+            let btnDownload = doc.failDitemui.map(f => {
+                const ext = f.name.split('.').pop().toUpperCase();
+                return `<button onclick="window.open('${f.url}', '_blank')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold shadow-sm transition">📥 Muat Turun ${ext}</button>`;
+            }).join('');
+            
+            let btnTukar = layakUpload ? `<button onclick="klikInputFail('${doc.id}', false)" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow-sm transition" title="Tukar Dokumen">🔄 Tukar</button>` : "";
+            
+            butangAksiHtml = `<div class="flex gap-2 w-full">${btnDownload}${btnTukar}</div>`;
+        }
+
+        // BAHAGIAN 2: STATUS & BUTANG TEMPLATE DOKUMEN
+        let bahagianTemplateHtml = "";
+        if (doc.hasTemplate) {
+            let statusHtmlTemplate = "<span class='text-gray-500 italic'>⚠️ Template belum disediakan</span>";
+            if (hasTemplateFile) {
+                statusHtmlTemplate = doc.templatesDitemui.map(t => `<span class="text-purple-700">✅ <strong>${t.name}</strong></span>`).join('<br>');
+            }
+
+            let butangTemplateHtml = "";
+            if (!hasTemplateFile) {
+                if (layakUpload) {
+                    butangTemplateHtml = `<button onclick="klikInputFail('${doc.id}', true)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition shadow-sm">📤 Upload Template</button>`;
+                } else {
+                    butangTemplateHtml = `<span class="text-gray-400 italic text-sm">Menunggu Admin Muat Naik</span>`;
+                }
+            } else {
+                let btnDownloadTpl = doc.templatesDitemui.map(t => {
+                    const ext = t.name.split('.').pop().toUpperCase();
+                    const btnColor = ext === 'PDF' ? 'bg-red-500 hover:bg-red-600' : (ext.includes('DOC') ? 'bg-blue-600 hover:bg-blue-700' : 'bg-purple-600 hover:bg-purple-700');
+                    // Anggap fungsi muatTurunFailAutomatik telah wujud di bahagian bawah kod anda
+                    return `<button onclick="muatTurunFailAutomatik('${t.url}')" class="flex-1 ${btnColor} text-white px-3 py-2 rounded-lg text-sm font-bold shadow-sm transition">📄 Download ${ext}</button>`;
+                }).join('');
+                
+                let btnTukarTpl = layakUpload ? `<button onclick="klikInputFail('${doc.id}', true)" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-sm font-bold shadow-sm transition" title="Tukar Template">🔄 Tukar</button>` : "";
+                
+                butangTemplateHtml = `<div class="flex gap-2 w-full">${btnDownloadTpl}${btnTukarTpl}</div>`;
+            }
+
+            bahagianTemplateHtml = `
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-100 flex flex-col justify-between">
+                    <div>
+                        <p class="text-[11px] font-bold text-purple-600 mb-2 uppercase tracking-wider border-b border-purple-200 pb-1">📝 Template Dokumen</p>
+                        <div class="text-sm mb-4">${statusHtmlTemplate}</div>
+                    </div>
+                    <div>
+                        ${butangTemplateHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // GABUNGAN REKA BENTUK GRID (KAD UTAMA)
+        const gridClass = doc.hasTemplate ? "grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" : "mt-4";
+        const bgKadUtama = hasFile ? 'bg-white border-gray-200' : 'bg-white border-gray-200';
+
+        const htmlBaris = `
+            <div class="p-5 border-2 rounded-2xl shadow-sm ${bgKadUtama} transition duration-300 relative overflow-hidden">
+                <h3 class="font-bold text-gray-800 uppercase tracking-wide text-[15px] border-b border-gray-200 pb-3">${index + 1}. ${doc.tajuk}</h3>
+                
+                <div class="${gridClass}">
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col justify-between">
+                        <div>
+                            <p class="text-[11px] font-bold text-blue-600 mb-2 uppercase tracking-wider border-b border-blue-200 pb-1">📄 Dokumen Lengkap (Selesai)</p>
+                            <div class="text-sm mb-4">${statusHtmlUtama}</div>
+                        </div>
+                        <div>
+                            ${butangAksiHtml}
+                        </div>
+                    </div>
+
+                    ${bahagianTemplateHtml}
+                </div>
+
+                ${layakUpload ? `
+                    <input type="file" id="input_file_${doc.id}" class="hidden" onchange="handlePilihFail(event, '${doc.id}', false)" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg">
+                    <input type="file" id="input_template_${doc.id}" class="hidden" onchange="handlePilihFail(event, '${doc.id}', true)" accept=".pdf,.doc,.docx,.xls,.xlsx">
+                ` : ''}
+            </div>
+        `;
+        container.innerHTML += htmlBaris;
+    });
+}
+function paparNotis(teks, warna) {
+    const msgBox = document.getElementById('mesejUI');
+    if (!msgBox) {
+        paparToast(teks, warna === 'merah' ? 'red' : (warna === 'hijau' ? 'green' : 'blue'));
+        return;
+    }
+    
+    const colorClass = (warna === 'hijau') ? 'bg-green-100 text-green-800 border-green-200' : 
+                       (warna === 'merah') ? 'bg-red-100 text-red-800 border-red-200' : 
+                       'bg-blue-100 text-blue-800 border-blue-200';
+    
+    msgBox.className = `mb-6 p-4 rounded-xl text-center text-sm font-bold shadow-sm border ${colorClass}`;
+    msgBox.innerHTML = teks; 
+    msgBox.classList.remove('hidden');
+    
+    setTimeout(() => msgBox.classList.add('hidden'), 4000);
+}
+// KEMASKINI: Muat naik fail
+function handlePilihFail(event, id, isTemplate) {
+    const fail = event.target.files[0];
+    if (!fail) return;
+
+    if (id === "doc5") {
+        if(typeof bukaModalTahun === "function") {
+            failSementara = fail;
+            idDokumenSementara = id;
+            bukaModalTahun();
+        }
+        return;
+    }
+
+    paparNotis(`⏳ Sedang memuat naik '${fail.name}' ke Google Drive...`, "biru");
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64Data = e.target.result.split(',')[1]; 
+        
+        // Cari info daripada senarai (Nota: Disuaikan jika senaraiDokumenPenyelidikan wujud)
+        let docInfo = senaraiDokumen.find(d => d.id === id);
+        if(!docInfo && typeof senaraiDokumenPenyelidikan !== 'undefined') {
+            docInfo = senaraiDokumenPenyelidikan.find(d => d.id === id);
+        }
+
+        const extension = fail.name.split('.').pop();
+        
+        let namaFailRasmi = "";
+        if (isTemplate) {
+            const tajukTemplate = docInfo.templateKunci ? docInfo.templateKunci : docInfo.tajuk;
+            namaFailRasmi = `TEMPLATE ${tajukTemplate}.${extension}`;
+        } else {
+            namaFailRasmi = `${docInfo.tajuk}.${extension}`;
+        }
+
+        const payloadJSON = {
+            action: "uploadDokumenBiasa",
+            folderId: FOLDER_ID_DOKUMEN,
+            fileName: namaFailRasmi,
+            mimeType: fail.type,
+            fileData: base64Data
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payloadJSON)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success' || data.status === 'BERJAYA') {
+                paparNotis(`✅ Berjaya! Dokumen disimpan. Sedang menyegarkan paparan...`, "hijau");
+                semakStatusDariDrive(); 
+            } else {
+                paparNotis(`❌ Ralat Google Drive: ${data.message || data.mesej}`, "merah");
+            }
+        })
+        .catch(error => {
+            paparNotis(`❌ Ralat sistem: ${error.message}`, "merah");
+        });
+    };
+    reader.readAsDataURL(fail);
+}
     </script>
 </body>
 </html>
