@@ -357,23 +357,24 @@
             if (typeof paparJadualPaginasi === "function") paparJadualPaginasi(); // Langkah selamat jika fungsi tiada
         }
 
-        // FUNGSI BARU: Kemaskini paparan Penyelaras secara dinamik bila ada lebih dari 1
+        // ⚠️ FUNGSI BARU: Kemaskini paparan Penyelaras secara dinamik bila ada lebih dari 1
         function kemaskiniPaparanPenyelarasUmum() {
             if (stafPenyelarasSemasa.length === 0) return;
 
             const profil = stafPenyelarasSemasa[indexPenyelaras];
-            // KEMASKINI: Tambah fallback "idPengguna" sebab JSON dari GS ada rekod "idPengguna"
-            let icLama   = profil.IC || profil.ic || profil.idPengguna || profil[0] || "-"; 
+            
+            // SELARASKAN PEMBACAAN DATA: Pastikan kunci (keys) & indeks adalah sama antara Umum & Admin
+            let icLama    = String(profil.NO_IC || profil.no_ic || profil.IC || profil.ic || profil.idPengguna || profil[0] || "-").trim(); 
             let paparNama = profil.NAMA || profil.nama || profil.Nama || profil[1] || ""; 
-            let paparJab  = profil.JABATAN || profil.jabatan || profil.Jabatan || profil[3] || ""; 
+            let paparJab  = profil.JABATAN || profil.jabatan || profil.Jabatan || profil[3] || profil[2] || ""; 
             let paparPer  = profil.PERANAN || profil.peranan || profil.Peranan || profil[4] || ""; 
-            let paparStat = profil.STATUS || profil.status || profil.Status || profil[6] || ""; 
+            let paparStat = profil.STATUS || profil.status || profil.Status || profil[6] || profil[5] || ""; 
 
             document.getElementById("paparNamaPenyelaras").innerText = paparNama;
             document.getElementById("paparJabatanPenyelaras").innerText = paparJab;
             document.getElementById("paparPerananPenyelaras").innerText = paparStat ? `${paparPer} (${paparStat})` : paparPer;
             
-            // IC update khusus untuk Penyelaras (STAF punya div kotakIC dah disembunyikan di awal skrip)
+            // IC update khusus untuk Penyelaras
             if (!isStaf && document.getElementById("paparICPenyelaras")) {
                 document.getElementById("paparICPenyelaras").innerText = icLama;
             }
@@ -389,16 +390,20 @@
                 btnNext.classList.add("hidden");
             }
 
-            // Cari Sijil menggunakan IC Penyelaras yang sedang dipaparkan
+            // Cari Sijil menggunakan IC Penyelaras yang sedang dipaparkan dengan pembersihan .trim()
             const pilTahun = document.getElementById('filterTahun').value.trim();
             const btnPenyelaras = document.getElementById("btnDownloadPenyelaras");
             const txtMesej = document.getElementById("mesejSijilPenyelaras");
 
-            const sijilDitemui = rekodSijilPenyelaras.find(r => 
-                String(r.tahun) === pilTahun && 
-                String(r.jabatan).toUpperCase() === paparJab.toUpperCase() &&
-                String(r.ic).trim() === String(icLama).trim()
-            );
+            const sijilDitemui = rekodSijilPenyelaras.find(r => {
+                let rTahun = String(r.tahun || r.TAHUN || "").trim();
+                let rJabatan = String(r.jabatan || r.JABATAN || "").trim().toUpperCase();
+                let rIC = String(r.ic || r.IC || "").trim();
+                
+                return rTahun === pilTahun && 
+                       rJabatan === paparJab.toUpperCase() &&
+                       rIC === icLama;
+            });
             
             if(btnPenyelaras && txtMesej) {
                 if (sijilDitemui && sijilDitemui.url) {
@@ -411,7 +416,6 @@
                 }
             }
         }
-
         // FUNGSI BARU: Untuk pusing array Penyelaras jika diklik
         function paparPenyelarasSeterusnya() {
             if (stafPenyelarasSemasa.length > 1) {
@@ -600,11 +604,16 @@ async function prosesJanaSijilAutomatik(idBil, namaProduk) {
             if(stafPenyelarasSemasa.length > 0) {
                 let staf = stafPenyelarasSemasa[indexPenyelaras];
                 
-                icPenyelarasPapar = staf.NO_IC || staf.no_ic || staf.ic || staf[0] || "-";
+                // SELARASKAN PEMBACAAN DATA: Gunakan fallback rantaian yang sama seperti fungsi Umum
+                icPenyelarasPapar = String(staf.NO_IC || staf.no_ic || staf.IC || staf.ic || staf.idPengguna || staf[0] || "-").trim();
+                let namaPapar     = staf.NAMA || staf.nama || staf.Nama || staf[1] || "-";
+                let jabatanPapar  = staf.JABATAN || staf.jabatan || staf.Jabatan || staf[3] || staf[2] || "-";
+                let perananPapar  = staf.PERANAN || staf.peranan || staf.Peranan || staf[4] || "-";
+
                 document.getElementById("paparICPenyelaras").innerText = icPenyelarasPapar;
-                document.getElementById("paparNamaPenyelaras").innerText = staf.NAMA || staf.nama || staf.Nama || staf[1] || "-";
-                document.getElementById("paparJabatanPenyelaras").innerText = staf.JABATAN || staf.jabatan || staf.Jabatan || staf[2] || "-";
-                document.getElementById("paparPerananPenyelaras").innerText = staf.PERANAN || staf.peranan || staf.Peranan || staf[3] || "-";
+                document.getElementById("paparNamaPenyelaras").innerText = namaPapar;
+                document.getElementById("paparJabatanPenyelaras").innerText = jabatanPapar;
+                document.getElementById("paparPerananPenyelaras").innerText = perananPapar;
 
                 if (stafPenyelarasSemasa.length > 1) {
                     document.getElementById("butangNextPenyelaras").classList.remove("hidden");
@@ -625,46 +634,61 @@ async function prosesJanaSijilAutomatik(idBil, namaProduk) {
             const btnUploadP = document.getElementById("btnUploadPenyelaras");
             const btnViewP = document.getElementById("btnDownloadPenyelarasAdmin");
             const btnDeleteP = document.getElementById("btnDeletePenyelarasAdmin"); 
-            const btnJanaP = document.getElementById("btnJanaSijil"); // 🌟 [KOD BARU] Panggil butang Jana
+            const btnJanaP = document.getElementById("btnJanaSijil"); 
             
-            btnDeleteP.innerHTML = "🗑️ Padam";
-            btnDeleteP.disabled = false;
+            if(btnDeleteP) {
+                btnDeleteP.innerHTML = "🗑️ Padam";
+                btnDeleteP.disabled = false;
+            }
 
-            const sijilDitemui = rekodSijilPenyelaras.find(r => 
-                String(r.tahun) === pilTahun && 
-                String(r.jabatan).toUpperCase() === pilJabatan.toUpperCase() &&
-                String(r.ic) === String(icPenyelarasPapar)
-            );
+            // Cari padanan sijil berdasarkan Tahun, Jabatan, dan ketepatan NO IC (.trim())
+            const sijilDitemui = rekodSijilPenyelaras.find(r => {
+                let rTahun = String(r.tahun || r.TAHUN || "").trim();
+                let rJabatan = String(r.jabatan || r.JABATAN || "").trim().toUpperCase();
+                let rIC = String(r.ic || r.IC || "").trim();
+
+                return rTahun === String(pilTahun).trim() && 
+                       rJabatan === String(pilJabatan).toUpperCase() &&
+                       rIC === icPenyelarasPapar;
+            });
             
-            // 🌟 [KOD BARU] Paparkan butang Upload dan Jana Sijil
-            btnUploadP.classList.remove("hidden");
-            btnJanaP.classList.remove("hidden"); 
+            if(btnUploadP) btnUploadP.classList.remove("hidden");
+            if(btnJanaP) btnJanaP.classList.remove("hidden"); 
 
             if (sijilDitemui && sijilDitemui.url) {
-                statusSijil.innerHTML = `✅ Sijil bagi <b>Penyelaras ini (${pilTahun})</b> telah sedia ada.`;
-                btnUploadP.innerHTML = "🔄 Upload Ganti Sijil";
-                btnViewP.href = sijilDitemui.url; 
-                btnViewP.classList.remove("hidden");
-                btnDeleteP.classList.remove("hidden"); 
+                if(statusSijil) statusSijil.innerHTML = `✅ Sijil bagi <b>Penyelaras ini (${pilTahun})</b> telah sedia ada.`;
+                if(btnUploadP) btnUploadP.innerHTML = "🔄 Upload Ganti Sijil";
+                if(btnViewP) {
+                    btnViewP.href = sijilDitemui.url; 
+                    btnViewP.classList.remove("hidden");
+                }
+                if(btnDeleteP) btnDeleteP.classList.remove("hidden"); 
             } else {
-                statusSijil.innerHTML = `⚠️ Sijil bagi <b>Penyelaras ini (${pilTahun})</b> BELUM ada. Sila Jana atau Upload.`;
-                btnUploadP.innerHTML = "📤 Upload Sijil Manual";
-                btnViewP.classList.add("hidden");
-                btnDeleteP.classList.add("hidden"); 
+                if(statusSijil) statusSijil.innerHTML = `⚠️ Sijil bagi <b>Penyelaras ini (${pilTahun})</b> BELUM ada. Sila Jana atau Upload.`;
+                if(btnUploadP) btnUploadP.innerHTML = "📤 Upload Sijil Manual";
+                if(btnViewP) btnViewP.classList.add("hidden");
+                if(btnDeleteP) btnDeleteP.classList.add("hidden"); 
             }
         }
-        // FUNGSI BARU: Tekan Butang Next
+
+        // FUNGSI BARU: Tekan Butang Next (Dikemaskini untuk menyokong kemaskini serentak)
         function paparPenyelarasSeterusnya() {
+            if (stafPenyelarasSemasa.length === 0) return;
+            
             indexPenyelaras++;
             if (indexPenyelaras >= stafPenyelarasSemasa.length) {
-                indexPenyelaras = 0; // Loop kembali ke orang pertama
+                indexPenyelaras = 0; // Kembali ke orang pertama
             }
             
             const pilTahun = document.getElementById('filterTahun').value;
-            const pilJabatan = document.getElementById('filterJabatan').value;
+            // Gunakan fallback sekiranya id filterJabatan berbeza mengikut peranan HTML anda
+            const elemJabatan = document.getElementById('filterJabatan') || document.getElementById('filterJabatanUtama');
+            const pilJabatan = elemJabatan ? elemJabatan.value : "";
+            
+            // Panggil kedua-dua kemaskini paparan supaya data Umum & Admin sentiasa selari dengan IC terkini
+            kemaskiniPaparanPenyelarasUmum();
             kemaskiniPaparanPenyelarasAdmin(pilTahun, pilJabatan);
-			}
-		
+        }
 			// FUNGSI BARU: Tekan Butang Padam Sijil
 			function padamSijilPenyelaras() {
 			const pilTahun = document.getElementById('filterTahun').value;
