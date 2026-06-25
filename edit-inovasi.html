@@ -28,6 +28,14 @@
             ⏳ Sedang memuatkan data rekod...
         </div>
 
+        <div id="kpVerification" class="hidden bg-gray-50 p-8 rounded-lg border border-gray-300 text-center shadow-inner mt-4">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">🔒 Pengesahan Keselamatan</h2>
+            <p class="text-sm text-gray-600 mb-5">Sila masukkan <b>No Kad Pengenalan Ketua</b> untuk mengakses dan mengemaskini rekod ini.</p>
+            <input type="password" id="inputKPVerify" class="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 mx-auto block text-center tracking-widest font-bold" placeholder="Cth: 900101011234">
+            <button onclick="sahkanKP()" class="mt-4 px-6 py-2.5 bg-gray-800 hover:bg-black text-white rounded-lg font-bold shadow transition">Buka Kunci Rekod</button>
+            <p id="msgRalatKP" class="text-red-600 font-semibold text-sm mt-3 hidden">❌ No Kad Pengenalan tidak sepadan! Sila cuba lagi.</p>
+        </div>
+
         <form id="formEdit" class="hidden space-y-4" onsubmit="hantarKemaskini(event)">
             
             <div class="bg-gray-50 p-3 rounded-lg border">
@@ -52,9 +60,15 @@
                 <p class="text-xs text-gray-500 mt-1">Pisahkan nama dengan koma (,)</p>
             </div>
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700">Produk Inovasi</label>
-                <input type="text" id="produk" name="produk" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700">Produk Inovasi</label>
+                    <input type="text" id="produk" name="produk" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700">No KP Ketua (Lajur P)</label>
+                    <input type="text" id="no_kp" name="no_kp" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-yellow-50" placeholder="Tanpa sengkang (-) cth: 900101011234">
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -101,7 +115,7 @@
             </div>
 
             <div class="p-5 bg-blue-50 border border-blue-200 rounded-lg mt-4 shadow-sm">
-                <label class="block text-base font-bold text-blue-800 mb-3">🎓 Lampiran Sijil Pencapaian (Lajur K)</label>
+                <label class="block text-base font-bold text-blue-800 mb-3">🎓 Sijil Pencapaian (Lajur K)</label>
                 
                 <div id="paparanSijilSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
                     <span class="text-xs text-gray-500 font-bold uppercase">Sijil Sedia Ada:</span>
@@ -110,21 +124,64 @@
 
                 <div class="space-y-4 border-t border-blue-200 pt-4">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan / Paste Link (Pisahkan dengan koma jika lebih dari 1)</label>
-                        <input type="text" id="linkSijilPencapaian" name="linkSijilPencapaian" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none bg-white" placeholder="Contoh: https://drive.google.com/..., https://link-kedua.com/...">
-                        <p class="text-xs text-gray-500 mt-1">*Kosongkan jika anda ingin memuat naik fail dari komputer.</p>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan / Paste Link (Pisahkan koma)</label>
+                        <input type="text" id="linkSijilPencapaian" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
                     </div>
-
                     <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Fail Baharu</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Fail Baharu (PDF Sahaja)</label>
                         <div id="dropZonePencapaian" class="w-full border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:bg-blue-100 transition cursor-pointer bg-white">
-                            <p class="text-sm text-gray-600">Drag & Drop fail sijil di sini atau <span class="text-blue-600 font-bold hover:underline">Klik untuk pilih fail</span></p>
-                            
-                            <p class="text-xs text-red-500 font-semibold mt-1">(Boleh pilih lebih dari 1 fail - Format PDF sahaja)</p>
-                            
-                            <input type="file" id="failPencapaian" name="failPencapaian" class="hidden" multiple accept=".pdf, application/pdf">
+                            <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-blue-600 font-bold">Klik untuk pilih</span></p>
+                            <input type="file" id="failPencapaian" class="hidden" multiple accept=".pdf, application/pdf">
                         </div>
                         <div id="senaraiFailPencapaianUI" class="mt-2 flex flex-col gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 bg-green-50 border border-green-200 rounded-lg mt-4 shadow-sm">
+                <label class="block text-base font-bold text-green-800 mb-3">👥 Gambar Ahli (Lajur N)</label>
+                
+                <div id="paparanAhliSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
+                    <span class="text-xs text-gray-500 font-bold uppercase">Gambar Sedia Ada:</span>
+                    <div id="linkAhliSemasa" class="mt-1 flex flex-col gap-2 text-sm break-all"></div>
+                </div>
+
+                <div class="space-y-4 border-t border-green-200 pt-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan Link Gambar (Pisahkan koma)</label>
+                        <input type="text" id="linkGambarAhli" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Gambar Baharu (JPG/PNG)</label>
+                        <div id="dropZoneAhli" class="w-full border-2 border-dashed border-green-300 rounded-lg p-6 text-center hover:bg-green-100 transition cursor-pointer bg-white">
+                            <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-green-600 font-bold">Klik untuk pilih</span></p>
+                            <input type="file" id="failGambarAhli" class="hidden" multiple accept="image/*">
+                        </div>
+                        <div id="senaraiFailAhliUI" class="mt-2 flex flex-col gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 bg-purple-50 border border-purple-200 rounded-lg mt-4 shadow-sm">
+                <label class="block text-base font-bold text-purple-800 mb-3">📦 Gambar Produk (Lajur O)</label>
+                
+                <div id="paparanProdukSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
+                    <span class="text-xs text-gray-500 font-bold uppercase">Gambar Sedia Ada:</span>
+                    <div id="linkProdukSemasa" class="mt-1 flex flex-col gap-2 text-sm break-all"></div>
+                </div>
+
+                <div class="space-y-4 border-t border-purple-200 pt-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan Link Gambar (Pisahkan koma)</label>
+                        <input type="text" id="linkGambarProduk" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Gambar Baharu (JPG/PNG)</label>
+                        <div id="dropZoneProduk" class="w-full border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:bg-purple-100 transition cursor-pointer bg-white">
+                            <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-purple-600 font-bold">Klik untuk pilih</span></p>
+                            <input type="file" id="failGambarProduk" class="hidden" multiple accept="image/*">
+                        </div>
+                        <div id="senaraiFailProdukUI" class="mt-2 flex flex-col gap-2"></div>
                     </div>
                 </div>
             </div>
@@ -139,22 +196,19 @@
     </div>
 
     <script>
-        // ⚠️ JANGAN LUPA: TAMPAL URL WEB APP ANDA DI BAWAH INI
+// ⚠️ JANGAN LUPA: TAMPAL URL WEB APP ANDA DI BAWAH INI
         const scriptURL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
-        // AMBIL PARAMETER ID DARI URL
         const urlParams = new URLSearchParams(window.location.search);
         const rekodId = urlParams.get('id');
+        let kpKetuaSebenar = ""; // Simpanan sementara KP dari server
 
         window.onload = async () => {
             if (!rekodId) {
                 alert("Ralat: ID Rekod tidak dijumpai.");
-                kembali();
-                return;
+                kembali(); return;
             }
-
             document.getElementById('bil').value = rekodId;
-            
             semakAksesStatus();
             await tarikDataSemasa();
         };
@@ -162,7 +216,6 @@
         function semakAksesStatus() {
             const perananPengguna = sessionStorage.getItem("peranan") || ""; 
             const perananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-            
             if (!perananDibenarkan.includes(perananPengguna.toUpperCase())) {
                 document.getElementById('status').disabled = true;
                 document.getElementById('notaStatus').classList.remove('hidden');
@@ -173,19 +226,22 @@
             try {
                 const fetchUrl = scriptURL.includes('?') ? `${scriptURL}&action=ambilData` : `${scriptURL}?action=ambilData`;
                 const response = await fetch(fetchUrl);
-                
                 if (!response.ok) throw new Error("Ralat rangkaian");
                 
                 const rawText = await response.text();
                 const result = JSON.parse(rawText);
                 
                 let dataDariSheet = [];
+                // Mengambil kira format balasan array dari Apps Script
                 if (Array.isArray(result) && result.length > 0 && typeof result[0] === 'object' && !Array.isArray(result[0])) {
                     dataDariSheet = result.map((r, i) => [
                         r.BIL || (i+1), r.INNOVATOR || "", r.AHLI || "", r.JABATAN || "", 
                         r.PRODUK || "", r.NAMAPERTANDINGAN || "", r.TARIKHTEMPATPERTANDINGAN || "", 
                         r.PINGAT || "", r.TAHUN || "", r.STATUS || "MENUNGGU PENGESAHAN",
-                        r.SIJIL || "", "", r.YURAN || "" // Memetakan Lajur K (10) dan Lajur M (12)
+                        r.SIJIL || "", "", r.YURAN || "", 
+                        r.GAMBAR_AHLI || r.N || r[13] || "", // Lajur N (13)
+                        r.GAMBAR_PRODUK || r.O || r[14] || "", // Lajur O (14)
+                        r.NO_KP_KETUA || r.P || r[15] || ""  // Lajur P (15)
                     ]);
                 } else if (Array.isArray(result) && Array.isArray(result[0])) {
                     dataDariSheet = result;
@@ -196,6 +252,7 @@
                 const rekodJumpa = dataDariSheet.find(row => String(row[0]) === String(rekodId));
 
                 if (rekodJumpa) {
+                    // Masukkan ke ruangan form
                     document.getElementById('innovator').value = rekodJumpa[1] || '';
                     document.getElementById('ahli').value = rekodJumpa[2] || '';
                     document.getElementById('jabatan').value = rekodJumpa[3] || '';
@@ -203,183 +260,200 @@
                     document.getElementById('pertandingan').value = rekodJumpa[5] || '';
                     document.getElementById('tarikh_tempat').value = rekodJumpa[6] || '';
                     document.getElementById('tahun').value = rekodJumpa[8] || '';
-                    
-                    // MEMASUKKAN NILAI YURAN DARI LAJUR M (Index 12) KEDALAM TEXTBOX
                     document.getElementById('yuran').value = rekodJumpa[12] || '';
-
-                    let pingatValue = String(rekodJumpa[7] || '').trim();
-                    let pingatSelect = document.getElementById('pingat');
-                    let foundPingat = false;
-                    for (let i = 0; i < pingatSelect.options.length; i++) {
-                        if (pingatSelect.options[i].value.toLowerCase() === pingatValue.toLowerCase()) {
-                            pingatSelect.selectedIndex = i;
-                            foundPingat = true;
-                            break;
-                        }
-                    }
-                    if (!foundPingat && pingatValue) pingatSelect.value = "Lain-lain";
-
-                    let statusValue = String(rekodJumpa[9] || 'MENUNGGU PENGESAHAN').trim().toUpperCase();
-                    let statusSelect = document.getElementById('status');
-                    let foundStatus = false;
                     
-                    for (let i = 0; i < statusSelect.options.length; i++) {
-                        if (statusSelect.options[i].value === statusValue) {
-                            statusSelect.selectedIndex = i;
-                            foundStatus = true;
-                            break;
-                        }
-                    }
-                    if (!foundStatus) statusSelect.value = "MENUNGGU PENGESAHAN"; 
+                    // Rekod Baru: NO KP KETUA
+                    kpKetuaSebenar = String(rekodJumpa[15] || '').trim();
+                    document.getElementById('no_kp').value = kpKetuaSebenar;
 
-                    // PAPARAN SIJIL PENCAPAIAN DARI LAJUR K (Index 10)
-                    let sijilPencapaian = rekodJumpa[10] || "";
-                    if (sijilPencapaian.trim() !== "") {
-                        document.getElementById('paparanSijilSemasa').classList.remove('hidden');
-                        let linkContainer = document.getElementById('linkSijilSemasa');
-                        linkContainer.innerHTML = "";
-                        
-                        let links = sijilPencapaian.split(/[\n,]+/);
-                        links.forEach(url => {
-                            let urlBersih = url.trim();
-                            if(urlBersih !== "") {
-                                let a = document.createElement('a');
-                                a.href = urlBersih;
-                                a.target = "_blank";
-                                a.className = "text-blue-600 hover:text-blue-800 hover:underline font-semibold flex items-center gap-1";
-                                a.innerHTML = `🔗 Klik Buka: ${urlBersih.substring(0, 45)}...`;
-                                linkContainer.appendChild(a);
-                            }
-                        });
-                        
-                        document.getElementById('linkSijilPencapaian').value = sijilPencapaian;
-                    }
+                    // Set Pingat & Status
+                    setSelectValue('pingat', rekodJumpa[7], "Lain-lain");
+                    setSelectValue('status', rekodJumpa[9], "MENUNGGU PENGESAHAN");
 
+                    // Paparan Pautan Sedia Ada
+                    setupPaparanLink(rekodJumpa[10] || "", 'paparanSijilSemasa', 'linkSijilSemasa', 'linkSijilPencapaian', 'Sijil');
+                    setupPaparanLink(rekodJumpa[13] || "", 'paparanAhliSemasa', 'linkAhliSemasa', 'linkGambarAhli', 'Gambar Ahli');
+                    setupPaparanLink(rekodJumpa[14] || "", 'paparanProdukSemasa', 'linkProdukSemasa', 'linkGambarProduk', 'Gambar Produk');
+
+                    // Selesai muat naik, papar form atau sekuriti
                     document.getElementById('loadingStatus').classList.add('hidden');
-                    document.getElementById('formEdit').classList.remove('hidden');
+                    semakKeperluanKP(); // Periksa jika perlukan kata laluan sebelum tunjuk borang
 
                 } else {
-                    alert("Rekod tidak dijumpai dalam pangkalan data.");
-                    kembali();
+                    alert("Rekod tidak dijumpai dalam pangkalan data."); kembali();
                 }
 
             } catch (error) {
-                console.error("Ralat memuatkan rekod:", error);
                 document.getElementById('loadingStatus').innerHTML = `❌ Ralat memuatkan data: ${error.message}`;
                 document.getElementById('loadingStatus').classList.replace('text-blue-600', 'text-red-600');
             }
         }
 
-        // --- 🌟 FUNGSI BARU: VALIDASI HANYA PDF & MAKSIMUM 2 FAIL ---
-        function sahkanFail(filesSediaAda, filesBaru) {
-            let adaRalatFormat = false;
-            let jumlahFail = filesSediaAda.length + filesBaru.length;
-
-            // Semak Had Maksimum 2 Fail
-            if (jumlahFail > 2) {
-                alert(`❌ Had Maksimum: Anda hanya dibenarkan memuat naik maksimum 2 sijil sahaja.`);
-                return false;
-            }
-
-            // Semak Format PDF
-            for (let i = 0; i < filesBaru.length; i++) {
-                let file = filesBaru[i];
-                if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith('.pdf')) {
-                    alert(`❌ Ralat Format: Fail "${file.name}" tidak disokong. Hanya format PDF sahaja dibenarkan.`);
-                    adaRalatFormat = true;
-                    break;
-                }
-            }
-
-            return !adaRalatFormat; 
-        }
-
-        // --- FUNGSI DRAG & DROP FAIL PENCAPAIAN ---
-        const dropZone = document.getElementById('dropZonePencapaian');
-        const fileInput = document.getElementById('failPencapaian');
-        const fileListUI = document.getElementById('senaraiFailPencapaianUI');
-
-        dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('border-blue-500', 'bg-blue-100');
-        });
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('border-blue-500', 'bg-blue-100');
-        });
-        
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-blue-500', 'bg-blue-100');
-            if (e.dataTransfer.files.length > 0) {
-                
-                // Gabungkan fail sedia ada dengan fail baru yang ditarik masuk
-                const dt = new DataTransfer();
-                for (let i = 0; i < fileInput.files.length; i++) dt.items.add(fileInput.files[i]);
-                for (let i = 0; i < e.dataTransfer.files.length; i++) dt.items.add(e.dataTransfer.files[i]);
-
-                if (sahkanFail(fileInput.files, e.dataTransfer.files)) {
-                    fileInput.files = dt.files;
-                    kemaskiniPaparanFail();
-                }
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (!sahkanFail([], e.target.files)) {
-                fileInput.value = ""; 
-                kemaskiniPaparanFail();
-            } else {
-                kemaskiniPaparanFail();
-            }
-        });
-
-        function kemaskiniPaparanFail() {
-            fileListUI.innerHTML = "";
-            Array.from(fileInput.files).forEach((file, index) => {
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-white border border-blue-200 p-2 rounded shadow-sm text-sm";
-                div.innerHTML = `
-                    <span class="text-blue-800 font-semibold truncate w-4/5">📄 ${file.name} (${(file.size/1024).toFixed(1)} KB)</span>
-                    <button type="button" class="text-red-500 hover:text-red-700 font-bold px-2" onclick="buangFailPencapaian(${index})">X</button>
-                `;
-                fileListUI.appendChild(div);
+        // --- FUNGSI SOKONGAN UI ---
+        function setSelectValue(elementId, value, fallback) {
+            let el = document.getElementById(elementId);
+            let val = String(value || '').trim();
+            let found = Array.from(el.options).some((opt, i) => {
+                if (opt.value.toLowerCase() === val.toLowerCase()) { el.selectedIndex = i; return true; }
             });
+            if (!found && val) el.value = fallback;
         }
 
-        function buangFailPencapaian(indexToRemove) {
-            const dt = new DataTransfer();
-            const { files } = fileInput;
-            for (let i = 0; i < files.length; i++) {
-                if (i !== indexToRemove) dt.items.add(files[i]);
+        function setupPaparanLink(rawStr, containerId, linksId, inputId, label) {
+            if (rawStr.trim() !== "") {
+                document.getElementById(containerId).classList.remove('hidden');
+                let linkContainer = document.getElementById(linksId);
+                linkContainer.innerHTML = "";
+                rawStr.split(/[\n,]+/).forEach(url => {
+                    let u = url.trim();
+                    if (u !== "") {
+                        linkContainer.innerHTML += `<a href="${u}" target="_blank" class="text-blue-600 hover:underline font-semibold flex items-center gap-1">🔗 Buka ${label}: ${u.substring(0, 35)}...</a>`;
+                    }
+                });
+                document.getElementById(inputId).value = rawStr;
             }
-            fileInput.files = dt.files;
-            kemaskiniPaparanFail();
         }
-        // --- TAMAT FUNGSI DRAG & DROP ---
 
-        async function hantarKemaskini(event) {
-            event.preventDefault(); 
+        // --- FUNGSI KESELAMATAN KATA LALUAN (NO KP) ---
+        function semakKeperluanKP() {
+            const perananPengguna = sessionStorage.getItem("peranan") || ""; 
+            const isPenyelaras = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"].includes(perananPengguna.toUpperCase());
             
-            const fileInput = document.getElementById('failPencapaian');
-            const files = fileInput.files;
+            // 🌟 KEMASKINI: Hanya Penyelaras dibenarkan bypass. 
+            // STAF akan sentiasa diarahkan ke bahagian pengesahan walaupun kpKetuaSebenar kosong
+            if (isPenyelaras) {
+                document.getElementById('formEdit').classList.remove('hidden');
+            } else {
+                document.getElementById('kpVerification').classList.remove('hidden');
+            }
+        }
 
-            if (files.length > 2) {
-                alert("❌ Had Maksimum: Anda hanya dibenarkan memuat naik maksimum 2 sijil sahaja. Sila buang fail yang berlebihan.");
+        function sahkanKP() {
+            const inputKPSemasa = document.getElementById('inputKPVerify').value.trim();
+            const msgRalatKP = document.getElementById('msgRalatKP');
+            
+            // 🌟 KEMASKINI: Jangan benarkan staf hantar ruangan kosong
+            if (inputKPSemasa === "") {
+                msgRalatKP.innerText = "Sila masukkan NO KP KETUA. Ruangan tidak boleh dibiarkan kosong!";
+                msgRalatKP.classList.remove('hidden');
                 return;
             }
 
+            if (inputKPSemasa === kpKetuaSebenar) {
+                document.getElementById('kpVerification').classList.add('hidden');
+                document.getElementById('formEdit').classList.remove('hidden');
+            } else {
+                msgRalatKP.innerText = "Akses Ditolak: NO KP KETUA yang dimasukkan adalah salah!";
+                msgRalatKP.classList.remove('hidden');
+            }
+        }
+
+        // --- PENGURUSAN DRAG & DROP FAIL BERGANDA ---
+        function sahkanFail(filesSediaAda, filesBaru, jenisFail) {
+            let adaRalat = false;
+            if ((filesSediaAda.length + filesBaru.length) > 2) {
+                alert(`❌ Anda hanya dibenarkan memuat naik maksimum 2 fail/gambar.`); return false;
+            }
+            for (let file of filesBaru) {
+                if (jenisFail === 'pdf' && file.type !== "application/pdf" && !file.name.toLowerCase().endsWith('.pdf')) {
+                    alert(`❌ Fail "${file.name}" tidak disokong. Hanya PDF dibenarkan.`); adaRalat = true; break;
+                }
+                if (jenisFail === 'gambar' && !file.type.startsWith("image/")) {
+                    alert(`❌ Fail "${file.name}" tidak disokong. Hanya format Gambar (JPG/PNG) dibenarkan.`); adaRalat = true; break;
+                }
+            }
+            return !adaRalat; 
+        }
+
+        function setupDragAndDrop(dropZoneId, inputId, uiId, jenisFail) {
+            const dropZone = document.getElementById(dropZoneId);
+            const fileInput = document.getElementById(inputId);
+            const uiList = document.getElementById(uiId);
+
+            dropZone.addEventListener('click', () => fileInput.click());
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('opacity-50'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('opacity-50'));
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault(); dropZone.classList.remove('opacity-50');
+                if (e.dataTransfer.files.length > 0) processFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => processFiles(e.target.files, true));
+
+            function processFiles(newFiles, isChange = false) {
+                const dt = new DataTransfer();
+                if(!isChange) for (let f of fileInput.files) dt.items.add(f); // Jika drop, kekalkan yg lama
+                for (let f of newFiles) dt.items.add(f);
+
+                if (sahkanFail(isChange ? [] : fileInput.files, newFiles, jenisFail)) {
+                    fileInput.files = dt.files; updateUI();
+                } else if(isChange) { fileInput.value = ""; updateUI(); }
+            }
+
+            function updateUI() {
+                uiList.innerHTML = "";
+                Array.from(fileInput.files).forEach((file, index) => {
+                    uiList.innerHTML += `
+                    <div class="flex justify-between items-center bg-white border p-2 rounded shadow-sm text-sm">
+                        <span class="font-semibold truncate w-4/5">📄 ${file.name}</span>
+                        <button type="button" class="text-red-500 hover:text-red-700 font-bold px-2" onclick="buangFail('${inputId}', '${uiId}', ${index})">X</button>
+                    </div>`;
+                });
+            }
+        }
+
+        function buangFail(inputId, uiId, indexToRemove) {
+            const fileInput = document.getElementById(inputId);
+            const dt = new DataTransfer();
+            for (let i = 0; i < fileInput.files.length; i++) {
+                if (i !== indexToRemove) dt.items.add(fileInput.files[i]);
+            }
+            fileInput.files = dt.files;
+            
+            // Re-render UI
+            const uiList = document.getElementById(uiId);
+            uiList.innerHTML = "";
+            Array.from(fileInput.files).forEach((file, index) => {
+                uiList.innerHTML += `
+                <div class="flex justify-between items-center bg-white border p-2 rounded shadow-sm text-sm">
+                    <span class="font-semibold truncate w-4/5">📄 ${file.name}</span>
+                    <button type="button" class="text-red-500 hover:text-red-700 font-bold px-2" onclick="buangFail('${inputId}', '${uiId}', ${index})">X</button>
+                </div>`;
+            });
+        }
+
+        // Daftarkan semua zon
+        setupDragAndDrop('dropZonePencapaian', 'failPencapaian', 'senaraiFailPencapaianUI', 'pdf');
+        setupDragAndDrop('dropZoneAhli', 'failGambarAhli', 'senaraiFailAhliUI', 'gambar');
+        setupDragAndDrop('dropZoneProduk', 'failGambarProduk', 'senaraiFailProdukUI', 'gambar');
+
+        // --- PENGHANTARAN FORM & BASE64 ---
+        async function convertFilesToBase64(fileInput) {
+            if (!fileInput || fileInput.files.length === 0) return [];
+            const promises = Array.from(fileInput.files).map(file => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve({ nama: file.name, mimeType: file.type, base64: e.target.result.split(',')[1] });
+                    reader.onerror = reject; reader.readAsDataURL(file);
+                });
+            });
+            return await Promise.all(promises);
+        }
+
+        async function hantarKemaskini(event) {
+            event.preventDefault(); 
             const btnSimpan = document.getElementById('btnSimpan');
             btnSimpan.disabled = true;
-            btnSimpan.innerHTML = "⏳ Sedang Memproses Dokumen & Menyimpan...";
+            btnSimpan.innerHTML = "⏳ Sedang Menyimpan...";
             btnSimpan.classList.add('opacity-70', 'cursor-not-allowed');
 
             const statusEl = document.getElementById('status');
             const wasDisabled = statusEl.disabled;
             if (wasDisabled) statusEl.disabled = false; 
 
-            // Susun Payload secara manual
             const form = document.getElementById('formEdit');
+            
             const payload = {
                 action: "kemaskiniData",
                 bil: form.bil.value,
@@ -392,42 +466,24 @@
                 pingat: form.pingat.value,
                 tahun: form.tahun.value,
                 status: form.status.value,
-                yuran: form.yuran.value, // 🌟 MENAMBAH NILAI INPUT YURAN UNTUK DIHANTAR KE BACKEND
+                yuran: form.yuran.value,
+                no_kp: form.no_kp.value, // Data Baru
                 linkSijilPencapaian: form.linkSijilPencapaian.value,
-                failPencapaianBase64: [] 
+                linkGambarAhli: form.linkGambarAhli.value,       // Data Baru
+                linkGambarProduk: form.linkGambarProduk.value,   // Data Baru
+                failPencapaianBase64: [], 
+                failGambarAhliBase64: [],                        // Data Baru
+                failGambarProdukBase64: []                       // Data Baru
             };
             
             if (wasDisabled) statusEl.disabled = true; 
 
-            // 🌟 TUKAR FAIL KEPADA BASE64 SEBELUM HANTAR KE PELAYAN
-            if (files.length > 0) {
-                const filePromises = Array.from(files).map(file => {
-                    return new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = e => {
-                            resolve({
-                                nama: file.name,
-                                mimeType: file.type,
-                                base64: e.target.result.split(',')[1] 
-                            });
-                        };
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    });
-                });
-
-                try {
-                    payload.failPencapaianBase64 = await Promise.all(filePromises);
-                } catch (err) {
-                    alert("Ralat memproses fail fizikal ke Base64.");
-                    btnSimpan.disabled = false;
-                    btnSimpan.innerHTML = "💾 Simpan Perubahan";
-                    btnSimpan.classList.remove('opacity-70', 'cursor-not-allowed');
-                    return;
-                }
-            }
-
             try {
+                // Tukar semua fail yang di-upload ke Base64
+                payload.failPencapaianBase64 = await convertFilesToBase64(document.getElementById('failPencapaian'));
+                payload.failGambarAhliBase64 = await convertFilesToBase64(document.getElementById('failGambarAhli'));
+                payload.failGambarProdukBase64 = await convertFilesToBase64(document.getElementById('failGambarProduk'));
+
                 const response = await fetch(scriptURL, {
                     method: 'POST',
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -440,22 +496,17 @@
                     alert("✅ Rekod dan Dokumen Berjaya Dikemaskini!");
                     kembali(); 
                 } else {
-                    throw new Error(result.mesej || "Sistem memulangkan ralat yang tidak diketahui.");
+                    throw new Error(result.mesej || "Sistem memulangkan ralat.");
                 }
-
             } catch (error) {
-                console.error("Ralat kemaskini:", error);
                 alert(`❌ Gagal mengemaskini rekod.\n\nDetail: ${error.message}`);
-                
                 btnSimpan.disabled = false;
                 btnSimpan.innerHTML = "💾 Simpan Perubahan";
                 btnSimpan.classList.remove('opacity-70', 'cursor-not-allowed');
             }
         }
 
-        function kembali() {
-            window.location.href = "dashboard.html"; 
-        }
+        function kembali() { window.location.href = "dashboard.html"; }
     </script>
 </body>
 </html>

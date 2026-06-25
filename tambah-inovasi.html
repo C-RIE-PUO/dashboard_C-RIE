@@ -43,41 +43,45 @@
             <div id="bahagianManual" class="block">
                 <form id="borangInovasi" class="space-y-6">
                     <div class="bg-gray-50 p-4 rounded border">
-						<label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Anda</label>
-						<input type="text" id="jabatan" name="jabatan" readonly class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none bg-gray-200 text-gray-700 font-bold cursor-not-allowed uppercase">
-					</div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Anda</label>
+                        <input type="text" id="jabatan" name="jabatan" readonly class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none bg-gray-200 text-gray-700 font-bold cursor-not-allowed uppercase">
+                    </div>
 
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div>
-							<label class="block text-sm font-semibold text-gray-700 mb-1">Nama Innovator Utama <span class="text-red-500">*</span></label>
-							<input type="text" name="innovator" required oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
-						</div>
-						<div>
-							<label class="block text-sm font-semibold text-gray-700 mb-1">Ahli Kumpulan (Pisahkan dengan koma)</label>
-							<input type="text" name="ahli_kumpulan" placeholder="Contoh: Ali, Abu, Siti" oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
-						</div>
-					</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Innovator Utama <span class="text-red-500">*</span></label>
+                            <input type="text" name="innovator" required oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">No. KP Ketua <span class="text-red-500">*</span></label>
+                            <input type="text" name="no_kp_ketua" required maxlength="12" placeholder="Contoh: 880101145678" pattern="\d{12}" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Ahli Kumpulan (Pisahkan dengan koma)</label>
+                            <input type="text" name="ahli_kumpulan" placeholder="Contoh: Ali, Abu, Siti" oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
+                        </div>
+                    </div>
 
-				<div>
-						<label class="block text-sm font-semibold text-gray-700 mb-1">Nama Produk Inovasi <span class="text-red-500">*</span></label>
-						<input type="text" name="produk_inovasi" required oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
-					</div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Produk Inovasi <span class="text-red-500">*</span></label>
+                        <input type="text" name="produk_inovasi" required oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
+                    </div>
 
-				<div>
-						<label class="block text-sm font-semibold text-gray-700 mb-1">Tajuk Pertandingan <span class="text-red-500">*</span></label>
-						<input type="text" name="tajuk_pertandingan" required oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
-				</div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tajuk Pertandingan <span class="text-red-500">*</span></label>
+                        <input type="text" name="tajuk_pertandingan" required oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
+                    </div>
 
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-					<div>
-						<label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Pertandingan <span class="text-red-500">*</span></label>
-						<input type="date" name="tarikh_pertandingan" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
-					</div>
-					<div>
-						<label class="block text-sm font-semibold text-gray-700 mb-1">Tempat Pertandingan <span class="text-red-500">*</span></label>
-						<input type="text" name="tempat_pertandingan" required placeholder="Contoh: PICC, Putrajaya" oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
-					</div>
-				</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Pertandingan <span class="text-red-500">*</span></label>
+                            <input type="date" name="tarikh_pertandingan" required class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tempat Pertandingan <span class="text-red-500">*</span></label>
+                            <input type="text" name="tempat_pertandingan" required placeholder="Contoh: PICC, Putrajaya" oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase">
+                        </div>
+                    </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
@@ -99,21 +103,34 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Yuran Penyertaan (RM) <span class="text-red-500">*</span></label>
                             <input type="number" step="0.01" name="yuran_penyertaan" required placeholder="Contoh: 150.00" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
-                        
+
                         <div class="col-span-1 md:col-span-3 border-t pt-4">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Muat Naik Sijil Pencapaian (Maksimum 2 Sijil) <span class="text-xs text-gray-500 font-normal">- Pilihan</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Muat Naik Sijil Pencapaian (Maksimum 2 Sijil PDF) <span class="text-red-500">*</span></label>
                             
                             <div id="kawasanDrop" class="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 hover:bg-blue-100 transition cursor-pointer">
                                 <svg class="w-10 h-10 text-blue-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                                 <p class="text-sm text-gray-700 font-bold">Klik untuk pilih ATAU seret & lepas fail di sini</p>
-                                
                                 <p class="text-xs text-red-500 mt-1 font-semibold">Format: PDF sahaja. (Maksimum 5 MB / fail)</p>
-                                
                                 <input type="file" id="sijilPencapaian" accept=".pdf, application/pdf" multiple class="hidden">
                             </div>
 
                             <ul id="senaraiFailUI" class="mt-3 space-y-2"></ul>
                         </div>
+
+                        <div class="col-span-1 md:col-span-3 border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-indigo-50 p-4 border border-indigo-200 rounded-lg">
+                                <label class="block text-sm font-semibold text-indigo-800 mb-2">📷 Muat Naik Gambar Ahli (JPG/PNG)</label>
+                                <input type="file" id="gambarAhli" accept=".jpg, .jpeg, .png" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                                <p id="statusGambarAhli" class="text-xs text-gray-600 mt-2 italic">Tiada fail dipilih.</p>
+                            </div>
+                            
+                            <div class="bg-indigo-50 p-4 border border-indigo-200 rounded-lg">
+                                <label class="block text-sm font-semibold text-indigo-800 mb-2">🚀 Muat Naik Gambar Produk (JPG/PNG)</label>
+                                <input type="file" id="gambarProduk" accept=".jpg, .jpeg, .png" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                                <p id="statusGambarProduk" class="text-xs text-gray-600 mt-2 italic">Tiada fail dipilih.</p>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="pt-4 border-t">
@@ -132,7 +149,8 @@
                     <div class="bg-white p-4 border border-purple-200 rounded text-left mb-6 text-sm text-gray-700 shadow-sm">
                         <span class="font-bold text-purple-700">💡 Panduan Sijil & Yuran:</span><br>
                         1. Anda boleh memasukkan pautan sijil (Lajur J). Jika terdapat lebih daripada 1 pautan, pisahkan dengan koma (,) dan apit dengan tanda pembuka kata (" ").<br>
-                        2. Masukkan maklumat <strong>Yuran Penyertaan di Lajur M</strong>. Jika tiada, biarkan kosong.<br><br>
+                        2. Masukkan maklumat <strong>Yuran Penyertaan di Lajur M</strong>. Jika tiada, biarkan kosong.<br>
+                        * Format muat naik pukal ini dikhaskan untuk teks/pautan sahaja dan tidak menyokong muat naik fail gambar terus.<br><br>
                         <em>Contoh format dalam Excel/CSV:</em> <br>
                         <code class="bg-gray-100 p-1 text-red-600 rounded">"https://drive.google.com/fail1, https://drive.google.com/fail2" , , , 150.00</code>
                     </div>
@@ -230,13 +248,15 @@
         // URL WEB APP 
         const apiUrl = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
 
-// ==========================================
+        // ==========================================
         // FUNGSI ISI BORANG MANUAL & PROSES FAIL SIJIL (DRAG & DROP)
         // ==========================================
         const form = document.getElementById('borangInovasi');
-        let senaraiSijilBase64 = []; // Pembolehubah global untuk simpan fail
+        let senaraiSijilBase64 = []; 
+        let gambarAhliBase64 = null;   // 🌟 Simpanan Data Gambar Ahli
+        let gambarProdukBase64 = null; // 🌟 Simpanan Data Gambar Produk
 
-        // Deklarasi Elemen UI untuk Drag & Drop
+        // Deklarasi Elemen UI untuk Drag & Drop Sijil
         const kawasanDrop = document.getElementById('kawasanDrop');
         const inputFail = document.getElementById('sijilPencapaian');
         const senaraiFailUI = document.getElementById('senaraiFailUI');
@@ -250,11 +270,11 @@
         // 2. Kesan fail melalui tindakan seret dan lepas (Drag & Drop)
         kawasanDrop.addEventListener('dragover', (e) => {
             e.preventDefault();
-            kawasanDrop.classList.add('border-blue-500', 'bg-blue-100'); // Tukar warna bila hover
+            kawasanDrop.classList.add('border-blue-500', 'bg-blue-100'); 
         });
 
         kawasanDrop.addEventListener('dragleave', () => {
-            kawasanDrop.classList.remove('border-blue-500', 'bg-blue-100'); // Kembali ke warna asal
+            kawasanDrop.classList.remove('border-blue-500', 'bg-blue-100'); 
         });
 
         kawasanDrop.addEventListener('drop', (e) => {
@@ -263,7 +283,7 @@
             prosesFail(e.dataTransfer.files);
         });
 
-        // 3. Fungsi memproses fail (Semakan Jenis PDF, Saiz 5MB & Tukar ke Base64)
+        // 3. Fungsi memproses fail PDF (Semakan Jenis PDF, Saiz 5MB & Tukar ke Base64)
         function prosesFail(files) {
             if (senaraiSijilBase64.length + files.length > 2) {
                 alert("⚠️ Anda hanya dibenarkan memuat naik maksimum 2 fail sijil sahaja.");
@@ -342,11 +362,69 @@
             senaraiSijilBase64.splice(indeks, 1); 
             kemaskiniPaparanFail(); 
         };
+
+        // ==========================================
+        // 🌟 FUNGSI BARU: PROSES GAMBAR (AHLI & PRODUK)
+        // ==========================================
+        function kendaliMuatNaikGambar(inputId, textStatusId, jenis) {
+            const input = document.getElementById(inputId);
+            const statusLabel = document.getElementById(textStatusId);
+
+            input.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) {
+                    statusLabel.innerText = "Tiada fail dipilih.";
+                    statusLabel.classList.replace('text-green-600', 'text-gray-600');
+                    if (jenis === 'ahli') gambarAhliBase64 = null;
+                    if (jenis === 'produk') gambarProdukBase64 = null;
+                    return;
+                }
+
+                // Semakan Format (Mesti imej)
+                if (!file.type.startsWith('image/')) {
+                    alert("❌ Sila pilih fail berformat gambar sahaja (JPG/PNG).");
+                    this.value = '';
+                    statusLabel.innerText = "Tiada fail dipilih.";
+                    return;
+                }
+
+                // Semakan Saiz (Maks 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("⚠️ Saiz gambar terlalu besar. Maksimum dibenarkan ialah 5MB.");
+                    this.value = '';
+                    statusLabel.innerText = "Tiada fail dipilih.";
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function() {
+                    const objGambar = {
+                        nama: file.name,
+                        mimeType: file.type,
+                        base64: reader.result.split(',')[1]
+                    };
+
+                    if (jenis === 'ahli') gambarAhliBase64 = objGambar;
+                    if (jenis === 'produk') gambarProdukBase64 = objGambar;
+
+                    statusLabel.innerText = "✅ Fail sedia: " + file.name;
+                    statusLabel.classList.replace('text-gray-600', 'text-green-600');
+                };
+            });
+        }
+
+        // Aktifkan pemerhati input gambar
+        kendaliMuatNaikGambar('gambarAhli', 'statusGambarAhli', 'ahli');
+        kendaliMuatNaikGambar('gambarProduk', 'statusGambarProduk', 'produk');
         
+        // ==========================================
+
         function dapatkanDataBorang() {
             return {
                 jabatan: document.getElementById('jabatan').value,
                 innovator: document.querySelector('input[name="innovator"]').value,
+                no_kp_ketua: document.querySelector('input[name="no_kp_ketua"]').value, // 🌟 DATA NO KP
                 ahli_kumpulan: document.querySelector('input[name="ahli_kumpulan"]').value,
                 produk_inovasi: document.querySelector('input[name="produk_inovasi"]').value,
                 tajuk_pertandingan: document.querySelector('input[name="tajuk_pertandingan"]').value,
@@ -354,74 +432,76 @@
                 tempat_pertandingan: document.querySelector('input[name="tempat_pertandingan"]').value,
                 pingat: document.querySelector('select[name="pingat"]').value,
                 tahun: document.querySelector('input[name="tahun"]').value,
-                yuran_penyertaan: document.querySelector('input[name="yuran_penyertaan"]').value, // Tambahan Yuran
+                yuran_penyertaan: document.querySelector('input[name="yuran_penyertaan"]').value,
                 dataSijil: senaraiSijilBase64, 
-                bilSijil: senaraiSijilBase64.length
+                bilSijil: senaraiSijilBase64.length,
+                dataGambarAhli: gambarAhliBase64,     // 🌟 DATA GAMBAR AHLI
+                dataGambarProduk: gambarProdukBase64  // 🌟 DATA GAMBAR PRODUK
             };
         }
 
-document.getElementById('btnSemakData').addEventListener('click', () => {
-    // Pastikan pembolehubah 'form' merujuk kepada borang anda
-    const form = document.getElementById('borangInovasi'); 
+        document.getElementById('btnSemakData').addEventListener('click', () => {
+            const form = document.getElementById('borangInovasi'); 
 
-    // 1. Semak validasi input bertulis bawaan HTML (Nama, Tarikh, Yuran dll)
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
-    // Ambil data borang menggunakan fungsi asal anda
-    const data = dapatkanDataBorang();
+            const data = dapatkanDataBorang();
 
-    // 2. SUNTIKAN VALIDASI: Paksa sijil menjadi WAJIB di sini
-    // Jika tiada sijil diisi (bilSijil = 0), sekat proses dan keluar amaran!
-    if (!data.bilSijil || data.bilSijil === 0) {
-        alert("⚠️ Ralat: Muat Naik Sijil Pencapaian adalah WAJIB! Sila masukkan sekurang-kurangnya 1 fail sijil format PDF.");
-        return; // Hentikan fungsi di sini, skrin pratonton tidak akan dibuka
-    }
+            if (!data.bilSijil || data.bilSijil === 0) {
+                alert("⚠️ Ralat: Muat Naik Sijil Pencapaian adalah WAJIB! Sila masukkan sekurang-kurangnya 1 fail sijil format PDF.");
+                return; 
+            }
 
-    // 3. KEKALKAN KOD ASAL ANDA UNTUK PAPARAN PRATONTON
-    document.getElementById('senaraiPratonton').innerHTML = `
-        <li><strong>Jabatan:</strong> ${data.jabatan}</li>
-        <li><strong>Innovator Utama:</strong> ${data.innovator}</li>
-        <li><strong>Ahli Kumpulan:</strong> ${data.ahli_kumpulan || '-'}</li>
-        <li><strong>Produk Inovasi:</strong> ${data.produk_inovasi}</li>
-        <li><strong>Tajuk Pertandingan:</strong> ${data.tajuk_pertandingan}</li>
-        <li><strong>Tarikh Pertandingan:</strong> ${data.tarikh_pertandingan}</li>
-        <li><strong>Tempat Pertandingan:</strong> ${data.tempat_pertandingan}</li>
-        <li><strong>Pingat:</strong> ${data.pingat}</li>
-        <li><strong>Tahun:</strong> ${data.tahun}</li>
-        <li><strong>Yuran Penyertaan:</strong> RM ${data.yuran_penyertaan || '0.00'}</li>
-        <li><strong class="text-blue-700">Lampiran Sijil:</strong> ${data.bilSijil > 0 ? data.bilSijil + ' Fail Disertakan' : 'Tiada Sijil'}</li>
-    `;
-    
-    resetTabs();
-    tabPreview.classList.replace('text-gray-500', 'text-blue-600');
-    tabPreview.classList.add('border-b-2', 'border-blue-600');
-    bahagianPratonton.classList.remove('hidden');
-    window.scrollTo(0, 0);
-});
+            document.getElementById('senaraiPratonton').innerHTML = `
+                <li><strong>Jabatan:</strong> ${data.jabatan}</li>
+                <li><strong>Innovator Utama:</strong> ${data.innovator}</li>
+                <li><strong>No. KP Ketua:</strong> ${data.no_kp_ketua}</li>
+                <li><strong>Ahli Kumpulan:</strong> ${data.ahli_kumpulan || '-'}</li>
+                <li><strong>Produk Inovasi:</strong> ${data.produk_inovasi}</li>
+                <li><strong>Tajuk Pertandingan:</strong> ${data.tajuk_pertandingan}</li>
+                <li><strong>Tarikh Pertandingan:</strong> ${data.tarikh_pertandingan}</li>
+                <li><strong>Tempat Pertandingan:</strong> ${data.tempat_pertandingan}</li>
+                <li><strong>Pingat:</strong> ${data.pingat}</li>
+                <li><strong>Tahun:</strong> ${data.tahun}</li>
+                <li><strong>Yuran Penyertaan:</strong> RM ${data.yuran_penyertaan || '0.00'}</li>
+                <li><strong class="text-blue-700">Lampiran Sijil:</strong> ${data.bilSijil > 0 ? data.bilSijil + ' Fail Disertakan' : 'Tiada Sijil'}</li>
+                <li><strong class="text-indigo-700">Gambar Ahli:</strong> ${data.dataGambarAhli ? 'Sedia untuk dimuat naik ✅' : 'Tidak disertakan ❌'}</li>
+                <li><strong class="text-indigo-700">Gambar Produk:</strong> ${data.dataGambarProduk ? 'Sedia untuk dimuat naik ✅' : 'Tidak disertakan ❌'}</li>
+            `;
+            
+            resetTabs();
+            tabPreview.classList.replace('text-gray-500', 'text-blue-600');
+            tabPreview.classList.add('border-b-2', 'border-blue-600');
+            bahagianPratonton.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        });
 
         document.getElementById('btnEditSemula').addEventListener('click', () => tabManual.click());
 
         document.getElementById('btnSahkanSimpan').addEventListener('click', () => {
             const btn = document.getElementById('btnSahkanSimpan');
             btn.disabled = true;
-            btn.innerHTML = 'Memproses & Memuat Naik... ⏳'; 
+            btn.innerHTML = 'Memproses & Memuat Naik Fail... ⏳'; 
 
             const d = dapatkanDataBorang();
             const dataHantar = {
                 action: 'tambahData',
                 "JABATAN": d.jabatan,
                 "INNOVATOR": d.innovator,
+                "NO_KP_KETUA": d.no_kp_ketua,       // 🌟 HANTAR NO KP
                 "AHLI": d.ahli_kumpulan,
                 "PRODUK": d.produk_inovasi,
                 "NAMA": d.tajuk_pertandingan,
                 "TARIKH": d.tarikh_pertandingan + ' (' + d.tempat_pertandingan + ')',
                 "PINGAT": d.pingat,
                 "TAHUN": d.tahun,
-                "YURAN": d.yuran_penyertaan, // <--- Hantar Yuran ke backend
-                "SIJIL_DATA": d.dataSijil 
+                "YURAN": d.yuran_penyertaan, 
+                "SIJIL_DATA": d.dataSijil,
+                "GAMBAR_AHLI_DATA": d.dataGambarAhli,     // 🌟 HANTAR FAIL GAMBAR AHLI
+                "GAMBAR_PRODUK_DATA": d.dataGambarProduk  // 🌟 HANTAR FAIL GAMBAR PRODUK
             };
             hantarKeGoogleSheet(dataHantar, btn, 'Sahkan & Simpan Data');
         });
@@ -430,6 +510,7 @@ document.getElementById('btnSemakData').addEventListener('click', () => {
         // FUNGSI UPLOAD PUKAL (CSV)
         // ==========================================
         // 🌟 KEMASKINI TEMPLATE: Tambah Lajur K, L dan Lajur M (YURAN_PENYERTAAN)
+        // *Sengaja dikekalkan format ini untuk elak susunan lari pada sistem pengguna.
         const csvTemplateData = "BIL,INNOVATOR,AHLI,JABATAN,PRODUK,NAMA,TARIKH,PINGAT,TAHUN,LINK_SIJIL_PENCAPAIAN,KOSONG_K,KOSONG_L,YURAN_PENYERTAAN\n1,Ali Bin Abu,\"Siti, Ahmad\",JTMK,Sistem Pintar,Inovasi Kebangsaan,2024-05-20 (PICC Putrajaya),EMAS,2024,\"https://link-sijil-1.com, https://link-sijil-2.com\",,,150.00";
 
         document.getElementById('btnDownloadTemplate').addEventListener('click', () => {
@@ -480,10 +561,8 @@ document.getElementById('btnSemakData').addEventListener('click', () => {
                 // Bermula dari index 1 (Abaikan Tajuk/Header)
                 for (let i = 1; i < rows.length; i++) {
                     let d = rows[i];
-                    // 🌟 KEMASKINI PARSER: Baca sehingga lajur ke-10 ke atas
                     if (d.length >= 9 && d[0].trim() !== "") {
                         
-                        // Ekstrak dan potong jika lebih dari 2 link
                         let linkSijilRaw = d[9] ? d[9].trim() : "";
                         let linkArray = linkSijilRaw.split(/[\n,]+/).filter(l => l.trim() !== "");
                         
@@ -492,7 +571,6 @@ document.getElementById('btnSemakData').addEventListener('click', () => {
                             linkArray = linkArray.slice(0, 2); 
                         }
 
-                        // 🌟 Ekstrak Lajur M (Index ke-12) untuk Yuran
                         let yuranCSV = d[12] ? d[12].trim() : "";
                         
                         dataPukal.push({
@@ -506,7 +584,7 @@ document.getElementById('btnSemakData').addEventListener('click', () => {
                             "PINGAT": d[7],
                             "TAHUN": d[8],
                             "LINK_SIJIL": linkArray.join(", "),
-                            "YURAN": yuranCSV, // 🌟 Tangkapan Yuran dari CSV
+                            "YURAN": yuranCSV,
                             "STATUS": "DISAHKAN" 
                         });
                     }
@@ -521,7 +599,6 @@ document.getElementById('btnSemakData').addEventListener('click', () => {
 
                 btn.innerHTML = `Menghantar ${dataPukal.length} Rekod... ⏳`;
                 
-                // Hantar ke Google Sheet dengan action baru
                 const payloadPukal = {
                     action: 'tambahDataPukal',
                     data: dataPukal
@@ -581,6 +658,16 @@ document.getElementById('btnSemakData').addEventListener('click', () => {
             document.getElementById('senaraiFailUI').innerHTML = ''; 
             document.getElementById('sijilPencapaian').value = ''; 
             
+            // 🌟 RESET IMEJ
+            gambarAhliBase64 = null;
+            gambarProdukBase64 = null;
+            document.getElementById('gambarAhli').value = '';
+            document.getElementById('gambarProduk').value = '';
+            document.getElementById('statusGambarAhli').innerText = "Tiada fail dipilih.";
+            document.getElementById('statusGambarProduk').innerText = "Tiada fail dipilih.";
+            document.getElementById('statusGambarAhli').classList.replace('text-green-600', 'text-gray-600');
+            document.getElementById('statusGambarProduk').classList.replace('text-green-600', 'text-gray-600');
+
             const btnSimpan = document.getElementById('btnSahkanSimpan');
             btnSimpan.disabled = false;
             btnSimpan.innerHTML = 'Sahkan & Simpan Data';

@@ -63,47 +63,100 @@
           <input type="hidden" id="editBil">
           <input type="hidden" id="editStatus">
           <input type="hidden" id="editLinkSijil">
+          
           <div class="row mb-2">
             <div class="col-md-6">
-              <label>Innovator</label>
+              <label class="form-label fw-bold">Innovator</label>
               <input type="text" class="form-control" id="editInnovator" required>
             </div>
             <div class="col-md-6">
-              <label>Ahli Kumpulan</label>
+              <label class="form-label fw-bold">Ahli Kumpulan</label>
               <input type="text" class="form-control" id="editAhli">
             </div>
           </div>
+          
           <div class="row mb-2">
             <div class="col-md-6">
-              <label>Jabatan</label>
+              <label class="form-label fw-bold">Jabatan</label>
               <input type="text" class="form-control" id="editJabatan" required>
             </div>
             <div class="col-md-6">
-              <label>Produk</label>
+              <label class="form-label fw-bold">Produk</label>
               <input type="text" class="form-control" id="editProduk" required>
             </div>
           </div>
+          
           <div class="row mb-2">
             <div class="col-md-12">
-              <label>Nama Pertandingan</label>
+              <label class="form-label fw-bold">Nama Pertandingan</label>
               <input type="text" class="form-control" id="editNama" required>
             </div>
           </div>
+          
           <div class="row mb-2">
             <div class="col-md-4">
-              <label>Tarikh / Tempat</label>
+              <label class="form-label fw-bold">Tarikh / Tempat</label>
               <input type="text" class="form-control" id="editTarikh">
             </div>
             <div class="col-md-4">
-              <label>Pingat</label>
+              <label class="form-label fw-bold">Pingat</label>
               <input type="text" class="form-control" id="editPingat">
             </div>
             <div class="col-md-4">
-              <label>Tahun</label>
+              <label class="form-label fw-bold">Tahun</label>
               <input type="number" class="form-control" id="editTahun">
             </div>
           </div>
-          <button type="submit" class="btn btn-primary mt-3 w-100" id="btnSimpanEdit">Simpan Kemaskini</button>
+
+          <hr>
+          <h6 class="text-primary fw-bold mb-3">Maklumat Tambahan & Lampiran</h6>
+          
+          <div class="mb-3 p-3 border rounded bg-light">
+            <label class="form-label fw-bold text-secondary mb-2">Gambar Ahli (Lajur N)</label>
+            <div class="mb-2">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="pilihanAhli" id="radioLinkAhli" value="link" checked onchange="toggleUploadType('Ahli')">
+                <label class="form-check-label" for="radioLinkAhli">Salin Pautan (Link)</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="pilihanAhli" id="radioFileAhli" value="file" onchange="toggleUploadType('Ahli')">
+                <label class="form-check-label" for="radioFileAhli">Muat Naik Fail</label>
+              </div>
+            </div>
+            
+            <input type="text" class="form-control" id="editGambarAhli" placeholder="Masukkan URL atau pautan Google Drive">
+            <input type="file" class="form-control d-none" id="uploadFileAhli" accept="image/*">
+            <input type="hidden" id="base64Ahli">
+            <input type="hidden" id="namaFileAhli">
+            <input type="hidden" id="mimeFileAhli"> </div>
+
+          <div class="mb-3 p-3 border rounded bg-light">
+            <label class="form-label fw-bold text-secondary mb-2">Gambar Produk (Lajur O)</label>
+            <div class="mb-2">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="pilihanProduk" id="radioLinkProduk" value="link" checked onchange="toggleUploadType('Produk')">
+                <label class="form-check-label" for="radioLinkProduk">Salin Pautan (Link)</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="pilihanProduk" id="radioFileProduk" value="file" onchange="toggleUploadType('Produk')">
+                <label class="form-check-label" for="radioFileProduk">Muat Naik Fail</label>
+              </div>
+            </div>
+            
+            <input type="text" class="form-control" id="editGambarProduk" placeholder="Masukkan URL atau pautan Google Drive">
+            <input type="file" class="form-control d-none" id="uploadFileProduk" accept="image/*">
+            <input type="hidden" id="base64Produk">
+            <input type="hidden" id="namaFileProduk">
+            <input type="hidden" id="mimeFileProduk"> </div>
+
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <label class="form-label fw-bold text-secondary text-sm">No. KP Ketua (Lajur P)</label>
+              <input type="text" class="form-control" id="editNoKP" placeholder="Cth: 800101012345">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary mt-2 w-100 fw-bold" id="btnSimpanEdit">Simpan Kemaskini</button>
         </form>
       </div>
     </div>
@@ -116,7 +169,6 @@
     const userPeranan = sessionStorage.getItem("peranan") || "";
     const perananUpper = userPeranan.toUpperCase();
     
-    // Semak jika peranan ada perkataan INOVASI (cth: PENYELARAS INOVASI), atau KUPIK, atau ADMIN
     const isAuthorized = perananUpper.includes("INOVASI") || perananUpper === "KUPIK" || perananUpper === "ADMIN";
 
     if (sessionStorage.getItem("userLulus") !== "YA" || !isAuthorized) {
@@ -126,34 +178,19 @@
 </script>
 
 <script>
-  // =========================================================
-  // 1. TETAPAN ASAS (JIKA LULUS AKSES)
-  // =========================================================
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
-  let dataInovasiSemasa = []; // Simpanan data sementara untuk rujukan butang
+  let dataInovasiSemasa = []; 
 
-  // =========================================================
-  // 🌟 FUNGSI BANTUAN: BAIKI PAUTAN GOOGLE DRIVE 
-  // =========================================================
   function baikiPautanDrive(url) {
     if (!url || typeof url !== 'string' || url.trim() === "") return "";
     var urlBersih = url.trim();
-    
-    // Cari ID fail (25+ aksara) selepas "id=" ATAU "/d/"
     var match = urlBersih.match(/(?:d\/|id=)([\w-]{25,})/);
-    
-    // Jika jumpa ID, bina semula pautan menjadi format "/view" yang bersih
     if (match && match[1]) {
       return "https://drive.google.com/file/d/" + match[1] + "/view";
     }
-    
-    // Jika tak jumpa (mungkin bukan pautan Drive), pulangkan url asal
     return urlBersih;
   }
 
-  // =========================================================
-  // 2. LOAD DATA DARI GOOGLE SHEET
-  // =========================================================
   window.onload = function() {
     loadData();
   };
@@ -167,7 +204,6 @@
       .then(response => {
         document.getElementById("loader").style.display = "none";
         if (response.status === "BERJAYA") {
-          // Filter hanya yang "MENUNGGU PENGESAHAN"
           dataInovasiSemasa = response.data.filter(rekod => rekod[9] === "MENUNGGU PENGESAHAN");
           binaJadual(dataInovasiSemasa);
         } else {
@@ -180,9 +216,6 @@
       });
   }
 
-  // =========================================================
-  // 3. BINA JADUAL HTML (DIKEMASKINI DENGAN FUNGSI BAIKI LINK)
-  // =========================================================
   function binaJadual(data) {
     let tbody = document.getElementById("bodyJadual");
     if (data.length === 0) {
@@ -192,18 +225,13 @@
 
     data.forEach((rekod, index) => {
       let tr = document.createElement("tr");
-      
-      // LOGIK MEMBINA BUTANG SIJIL
       let dataSijil = rekod[10] ? rekod[10].toString().trim() : "";
       let butangSijilHtml = "<span class='text-muted small'>Tiada</span>";
 
       if (dataSijil !== "") {
           let senaraiPautan = dataSijil.split(",");
           butangSijilHtml = senaraiPautan.map((pautan, idx) => {
-              
-              // 🌟 MASUKKAN PAUTAN KE DALAM FUNGSI PEMBERSIH DI SINI
               let linkBersih = baikiPautanDrive(pautan);
-
               return `<a href="${linkBersih}" target="_blank" class="btn btn-sm btn-info text-white me-1 mb-1 shadow-sm" title="Papar Sijil di tab baharu">
                           📄 Sijil ${senaraiPautan.length > 1 ? (idx + 1) : ''}
                       </a><br>`;
@@ -223,9 +251,7 @@
         <td class="text-center">${rekod[7]}</td>
         <td class="text-center">${rekod[8]}</td>
         <td class="text-center"><span class="badge bg-warning text-dark px-2 py-1">${rekod[9]}</span></td>
-        
         <td class="text-center">${butangSijilHtml}</td>
-        
         <td class="text-center">
           <div class="d-flex flex-column gap-1">
             <button class="btn btn-success btn-sm shadow-sm" onclick="sahkanRekod(${index})">✅ Sah</button>
@@ -238,42 +264,56 @@
     });
   }
 
-
-// =========================================================
-  // 4. FUNGSI PENGESAHAN (SAH) - Guna action "ubahStatus"
-  // =========================================================
   function sahkanRekod(index) {
     if(!confirm("Anda pasti mahu mengesahkan inovasi ini?")) return;
-    
     let rekod = dataInovasiSemasa[index];
-    
-    // Payload kini sangat ringan, hanya hantar BIL dan Status sahaja
-    let payload = {
-      action: "ubahStatus",
-      bil: rekod[0],
-      status: "DISAHKAN" 
-    };
-
+    let payload = { action: "ubahStatus", bil: rekod[0], status: "DISAHKAN" };
     hantarKeServer(payload, "Sedang mengesahkan rekod...");
   }
 
-  // =========================================================
-  // 5. FUNGSI PADAM (TOLAK)
-  // =========================================================
   function padamRekod(bilID) {
     if(!confirm("Anda pasti mahu menolak dan memadam rekod ini secara kekal?")) return;
-    
-    let payload = {
-      action: "padamData",
-      bil: bilID
-    };
-
+    let payload = { action: "padamData", bil: bilID };
     hantarKeServer(payload, "Sedang memadam rekod...");
   }
 
-  // =========================================================
-  // 6. FUNGSI EDIT (BUKA MODAL & SIMPAN)
-  // =========================================================
+  // --- FUNGSI TOGGLE UI UPLOAD/LINK ---
+  function toggleUploadType(jenis) {
+    let isFile = document.getElementById(`radioFile${jenis}`).checked;
+    
+    if (isFile) {
+      document.getElementById(`editGambar${jenis}`).classList.add('d-none');
+      document.getElementById(`uploadFile${jenis}`).classList.remove('d-none');
+    } else {
+      document.getElementById(`editGambar${jenis}`).classList.remove('d-none');
+      document.getElementById(`uploadFile${jenis}`).classList.add('d-none');
+    }
+  }
+
+  // --- FUNGSI BACA FAIL KEPADA BASE64 + TANGKAP MIME TYPE ---
+  function setupFileInput(inputId, base64Id, nameId, mimeId) {
+    document.getElementById(inputId).addEventListener('change', function(e) {
+      let file = e.target.files[0];
+      if (file) {
+        let reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById(base64Id).value = event.target.result.split(',')[1];
+          document.getElementById(nameId).value = file.name;
+          document.getElementById(mimeId).value = file.type; // Tangkap mimeType
+        };
+        reader.readAsDataURL(file);
+      } else {
+        document.getElementById(base64Id).value = "";
+        document.getElementById(nameId).value = "";
+        document.getElementById(mimeId).value = "";
+      }
+    });
+  }
+
+  // Bind fungsi dengan id input masing-masing
+  setupFileInput('uploadFileAhli', 'base64Ahli', 'namaFileAhli', 'mimeFileAhli');
+  setupFileInput('uploadFileProduk', 'base64Produk', 'namaFileProduk', 'mimeFileProduk');
+
   const modalEditEl = new bootstrap.Modal(document.getElementById('modalEdit'));
 
   function bukaModalEdit(index) {
@@ -289,7 +329,29 @@
     document.getElementById("editPingat").value = rekod[7];
     document.getElementById("editTahun").value = rekod[8];
     document.getElementById("editStatus").value = rekod[9]; 
-    document.getElementById("editLinkSijil").value = rekod[10]; // 🌟 Simpan link asal di sini
+    document.getElementById("editLinkSijil").value = rekod[10]; 
+    
+    // Reset paparan form Gambar Ahli & Produk ke 'Link'
+    document.getElementById("radioLinkAhli").checked = true;
+    document.getElementById("radioLinkProduk").checked = true;
+    toggleUploadType('Ahli');
+    toggleUploadType('Produk');
+    
+    // Clear input file, base64 dan mimeType jika ada sisa fail lama
+    document.getElementById("uploadFileAhli").value = "";
+    document.getElementById("base64Ahli").value = "";
+    document.getElementById("namaFileAhli").value = "";
+    document.getElementById("mimeFileAhli").value = "";
+    
+    document.getElementById("uploadFileProduk").value = "";
+    document.getElementById("base64Produk").value = "";
+    document.getElementById("namaFileProduk").value = "";
+    document.getElementById("mimeFileProduk").value = "";
+
+    document.getElementById("editGambarAhli").value = rekod[13] || "";
+    document.getElementById("editGambarProduk").value = rekod[14] || "";
+    document.getElementById("editNoKP").value = rekod[15] || "";
+
     modalEditEl.show();
   }
 
@@ -297,6 +359,29 @@
     e.preventDefault();
     document.getElementById("btnSimpanEdit").innerText = "Menyimpan...";
     document.getElementById("btnSimpanEdit").disabled = true;
+
+    let isUploadAhli = document.getElementById("radioFileAhli").checked;
+    let isUploadProduk = document.getElementById("radioFileProduk").checked;
+
+    // Sediakan array objek untuk fail Gambar Ahli sepadan dengan kehendak GAS
+    let arrayBase64Ahli = [];
+    if (isUploadAhli && document.getElementById("base64Ahli").value !== "") {
+        arrayBase64Ahli.push({
+            base64: document.getElementById("base64Ahli").value,
+            nama: document.getElementById("namaFileAhli").value,
+            mimeType: document.getElementById("mimeFileAhli").value
+        });
+    }
+
+    // Sediakan array objek untuk fail Gambar Produk sepadan dengan kehendak GAS
+    let arrayBase64Produk = [];
+    if (isUploadProduk && document.getElementById("base64Produk").value !== "") {
+        arrayBase64Produk.push({
+            base64: document.getElementById("base64Produk").value,
+            nama: document.getElementById("namaFileProduk").value,
+            mimeType: document.getElementById("mimeFileProduk").value
+        });
+    }
 
     let payload = {
       action: "kemaskiniData",
@@ -310,15 +395,21 @@
       pingat: document.getElementById("editPingat").value,
       tahun: document.getElementById("editTahun").value,
       status: document.getElementById("editStatus").value,
-      linkSijilPencapaian: document.getElementById("editLinkSijil").value // 🌟 Tambah ini	  
+      linkSijilPencapaian: document.getElementById("editLinkSijil").value,
+      
+      // LOGIK HANTAR DATA: Ejaan ditukar kepada 'failGambarAhliBase64' berserta struktur array berobjek
+      linkGambarAhli: isUploadAhli ? "" : document.getElementById("editGambarAhli").value,
+      failGambarAhliBase64: arrayBase64Ahli,
+
+      linkGambarProduk: isUploadProduk ? "" : document.getElementById("editGambarProduk").value,
+      failGambarProdukBase64: arrayBase64Produk,
+
+      no_kp: document.getElementById("editNoKP").value
     };
 
     hantarKeServer(payload, "Sedang mengemaskini rekod...", true);
   });
 
-  // =========================================================
-  // 7. FUNGSI PENGHANTARAN POST KE SERVER (FETCH API)
-  // =========================================================
   function hantarKeServer(payload, mesejLoading, dariModal = false) {
     fetch(SCRIPT_URL, {
       method: "POST",
@@ -335,10 +426,7 @@
       
       if (response.status === "BERJAYA") {
         alert("Tindakan Berjaya: " + response.mesej);
-        
-        // Redirect ke dashboard.html selepas berjaya
-        window.location.href = "dashboard.html";
-        
+        loadData();
       } else {
         alert("Ralat: " + response.mesej);
       }
@@ -351,7 +439,6 @@
       }
     });
   }
-
 </script>
 </body>
 </html>

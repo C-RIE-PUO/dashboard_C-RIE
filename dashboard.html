@@ -157,22 +157,28 @@
         const userPeranan = sessionStorage.getItem("peranan") || "STAF";
         const userJabatan = sessionStorage.getItem("jabatan") || "";
 
-        // SEMAK AKSES TINDAKAN (Hanya peranan tertentu boleh lihat Edit/Padam)
+        // SEMAK AKSES TINDAKAN (Kekalkan peranan pentadbiran sedia ada)
         const senaraiPerananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-        const adaAksesTindakan = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase());
+        
+        // 🌟 TAMBAH BAIK: Berikan STAF akses melihat lajur TINDAKAN supaya butang Edit boleh muncul
+        const ialahStaf = userPeranan.toUpperCase() === "STAF";
+        const adaAksesTindakan = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase()) || ialahStaf;
+
+        // 🌟 KEKALKAN LOGIK ASAL: Akses butang pengesahan pengurusan hanya untuk Admin/Penyelaras (STAF disekat)
+        const adaAksesPengesahan = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase());
 
         // PAPAR MAKLUMAT PADA HEADER
         document.getElementById('namaPengguna').innerText = userNama;
         document.getElementById('perananPengguna').innerText = userPeranan;
         document.getElementById('jabatanPengguna').innerText = userJabatan;
         
-        // Papar header TINDAKAN jika ada akses
+        // Papar header TINDAKAN jika ada akses (Termasuk STAF sekarang)
         if (adaAksesTindakan) {
             document.getElementById('headerTindakan').classList.remove('hidden');
         }
 
-        // PAPAR/SEMBUNYIKAN BUTANG PENGESAHAN KHAS UNTUK PENYELARAS INOVASI/PENGURUSAN SAHAJA
-        if (adaAksesTindakan) {
+        // 🌟 KEMASKINI: Gunakan 'adaAksesPengesahan' supaya butang ini kekal TERSEMBUNYI daripada STAF
+        if (adaAksesPengesahan) {
             const btnPengesahan = document.getElementById('btnPengesahan');
             btnPengesahan.classList.remove('hidden');
             btnPengesahan.classList.add('flex');
@@ -186,6 +192,7 @@
             document.getElementById('divFilterJabatan').classList.remove('hidden');
             document.getElementById('divFilterJabatan').classList.add('flex');
         }
+
 
        // 🌟 KEMASKINI 1: Fungsi untuk mendapatkan nama singkatan dari teks jabatan yang panjang
         function dapatkanSingkatanJabatan(teksJabatan) {
@@ -365,23 +372,28 @@ async function ambilData() {
             const endIndex = startIndex + rowsPerPage;
             const dataPaginasi = data.slice(startIndex, endIndex);
 
-            dataPaginasi.forEach((row, index) => {
-                const displayBil = startIndex + index + 1; 
-                const recordID = row[0]; 
-                
-                let tindakanHTML = "";
-                // Paparkan lajur tindakan hanya jika peranan dibenarkan
-                if (adaAksesTindakan) {
-                    tindakanHTML = `
-                    <td class="p-4 text-center min-w-[150px]">
-                        <button onclick="editRekod('${recordID}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-semibold mr-1 shadow-sm transition-colors mb-1 md:mb-0">
-                            ✏️ Edit
-                        </button>
-                        <button onclick="padamRekod('${recordID}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition-colors">
-                            🗑️ Padam
-                        </button>
-                    </td>`;
-                }
+        dataPaginasi.forEach((row, index) => {
+        const displayBil = startIndex + index + 1; 
+        const recordID = row[0]; 
+        
+        let tindakanHTML = "";
+        // Paparkan lajur tindakan hanya jika peranan dibenarkan
+        if (adaAksesTindakan) {
+            // Semak adakah pengguna semasa merupakan STAF
+            const ialahStaf = (typeof userPeranan !== 'undefined' && userPeranan.toUpperCase() === "STAF");
+
+            tindakanHTML = `
+            <td class="p-4 text-center min-w-[150px]">
+                <button onclick="editRekod('${recordID}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-semibold mr-1 shadow-sm transition-colors mb-1 md:mb-0">
+                    ✏️ Edit
+                </button>
+                ${!ialahStaf ? `
+                <button onclick="padamRekod('${recordID}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition-colors">
+                    🗑️ Padam
+                </button>
+                ` : ''}
+            </td>`;
+        }
 
                 // 🌟 KEMASKINI 4: Tukarkan paparan teks lajur Jabatan kepada SINGKATAN pada skrin jadual
                 const singkatanJabatanPapar = dapatkanSingkatanJabatan(row[3]);
