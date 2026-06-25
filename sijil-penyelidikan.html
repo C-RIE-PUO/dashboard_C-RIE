@@ -134,7 +134,7 @@
             <input type="hidden" id="uploadNamaFailKhusus" value="">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Fail (PDF / Imej)</label>
             <input type="file" id="failSijil" accept=".pdf,image/png,image/jpeg" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-emerald-400 bg-gray-50">
-            <p class="text-xs text-red-500 mt-1 font-semibold">* Maksimum saiz fail: 5MB</p>
+            <p class="text-xs text-red-500 mt-1 font-semibold">* Maksimum saiz fail: 10MB</p>
             
             <div id="statusUpload" class="hidden mt-4 text-sm font-bold text-center p-3 rounded border"></div>
 
@@ -316,9 +316,6 @@
                 
                 // Jika Berkuasa - Susunan butang tepat seperti gambar rujukan
                 if (isAuthorized) {
-                    // (Opsyenal) Jika ada fungsi Auto-Jana kelak
-                    // htmlAksi += `<button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-lg text-sm shadow transition flex items-center gap-1">⚙️ Jana Sijil Automatik</button>`;
-                    
                     htmlAksi += `<button onclick="bukaModalUploadPenyelarasKhusus('${jabSemak}', '${filterTahun}', '${icSijil}')" class="bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-lg text-sm shadow transition flex items-center gap-1">🔄 Upload Ganti Sijil</button>`;
                 }
                 
@@ -384,11 +381,12 @@
                 return;
             }
 
-            // TAPISAN MENGAMBIL KIRA JABATAN DAN JUGA TAHUN YANG DIPILIH
+            // TAPISAN MENGAMBIL KIRA JABATAN, TAHUN, DAN KAWALAN IC LOGIN
             let mapPenyelarasUnik = new Map();
             senaraiPenyelaras.filter(u => {
                 let j = u.jabatan || u.JABATAN || u.Jabatan || u[3] || "";
                 let t = u.tahun || u.TAHUN || u.Tahun || u[5] || ""; // Pengecaman medan Tahun
+                let icRekod = u.ic || u.NO_IC || u.no_ic || u[2] || ""; // Pengecaman medan IC
                 
                 let matchJabatan = String(j).toUpperCase() === String(jabSemak).toUpperCase();
                 
@@ -398,7 +396,16 @@
                     matchTahun = String(t) === String(filterTahun);
                 }
                 
-                return matchJabatan && matchTahun;
+                // ⚠️ FUNGSI BARU: KAWALAN PRIVASI PENYELARAS JABATAN
+                let matchIC = true;
+                // Jika pengguna BUKAN staf dan BUKAN admin, bermaksud dia Penyelaras
+                if (!isStaf && !isAuthorized) {
+                    // Ambil IC login semasa (tukar 'userIC' jika nama variable berbeza dalam sistem anda)
+                    let icLoginSemasa = typeof userIC !== "undefined" ? String(userIC).trim() : "";
+                    matchIC = (String(icRekod).trim() === icLoginSemasa);
+                }
+                
+                return matchJabatan && matchTahun && matchIC;
                 
             }).forEach(u => {
                 // Buang pertindihan (Duplicate by IC or Name)
@@ -546,8 +553,22 @@
                 }
 
                 if (isAuthorized) {
-                    let idProjek = item.bil || item.id || (indeksMula + index + 1);
-                    htmlAksiSijil += `<button onclick="bukaModalUploadProjek('${idProjek}', '${(item.tajuk || item.nama_projek || "").replace(/'/g, "\\'")}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded transition shadow-sm text-[11px] block w-max mx-auto">📤 Upload</button>`;
+                    // KAWALAN KESELAMATAN: Pastikan item.bil wujud dari database, bukan rekaan UI
+                    let idProjek = String(item.bil || item.id || "").trim();
+                    
+                    if (idProjek === "") {
+                        // Jika Lajur A (Bil) kosong dalam Sheet, butang akan halang upload
+                        htmlAksiSijil += `<button onclick="alert('Ralat: Sila pastikan Lajur A (Bil) dalam Google Sheet tidak kosong untuk projek ini sebelum muat naik.')" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded transition shadow-sm text-[11px] block w-max mx-auto cursor-not-allowed">⚠️ Ralat ID</button>`;
+                    } else {
+                        // 🌟 PENYELESAIAN UTAMA: Bersihkan tajuk daripada aksara yang merosakkan HTML
+                        let tajukBersih = String(item.tajuk || item.nama_projek || "")
+                                            .replace(/'/g, "\\'")     // Handle single quote (')
+                                            .replace(/"/g, "&quot;")  // Handle double quote (")
+                                            .replace(/\n|\r/g, " ");  // Handle Enter/Newline
+                        
+                        // Butang upload normal jika ID sah
+                        htmlAksiSijil += `<button onclick="bukaModalUploadProjek('${idProjek}', '${tajukBersih}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded transition shadow-sm text-[11px] block w-max mx-auto">📤 Upload</button>`;
+                    }
                 }
 
                 tr.innerHTML = `
@@ -561,7 +582,6 @@
                 tbody.appendChild(tr);
             });
         }
-
         // =======================================================================
         // BAHAGIAN: PENGURUSAN MODAL & PROSES MUAT NAIK
         // =======================================================================
@@ -590,15 +610,53 @@
         function prosesUpload() {
             const fileInput = document.getElementById("failSijil");
             const fail = fileInput.files[0];
+            
             if (!fail) {
                 alert("Sila pilih fail terlebih dahulu!");
                 return;
             }
-            if (fail.size > 5 * 1024 * 1024) {
-                alert("Ralat: Fail melebihi had saiz maksimum 5MB!");
+            if (fail.size > 10 * 1024 * 1024) {
+                alert("Ralat: Fail melebihi had saiz maksimum 10MB!");
                 return;
             }
 
+            // Ambil maklumat awal untuk bina nama unik
+            const jenis = document.getElementById("uploadJenis").value;
+            const idKey = document.getElementById("uploadBil").value;
+
+            // 🌟 PENAMBAHBAIKAN UTAMA: Ekstrak TAHUN & JABATAN yang tepat daripada baris jadual staf yang aktif
+            // Ini bagi memastikan Google Script menemui folder sedia ada dan TIDAK membina folder baru.
+            let rTahun = "";
+            let rJabatan = "";
+            
+            const semuaBaris = document.querySelectorAll("#isiJadualDisahkan tr");
+            semuaBaris.forEach(baris => {
+                const td = baris.querySelectorAll("td");
+                if (td.length >= 6) {
+                    const butang = td[5].querySelector("button");
+                    // Padankan butang muat naik dengan ID staf yang sedang diproses
+                    if (butang && butang.getAttribute("onclick") && butang.getAttribute("onclick").includes(`'${idKey}'`)) {
+                        rJabatan = td[3].innerText.trim().toUpperCase(); // Paksa huruf besar untuk padanan folder sedia ada
+                        rTahun = td[4].innerText.trim();
+                    }
+                }
+            });
+
+            // Pelindung (Fallback) sekiranya gagal ditarik dari jadual, gunakan nilai input/global sedia ada anda
+            if (!rTahun || rTahun === "-") rTahun = document.getElementById("cariTahunSijil") ? document.getElementById("cariTahunSijil").value.trim() : "TIADA_TAHUN";
+            if (!rJabatan || rJabatan === "-") rJabatan = document.getElementById("filterJabatanUtama") ? document.getElementById("filterJabatanUtama").value.trim().toUpperCase() : (typeof userJabatan !== 'undefined' ? userJabatan.trim().toUpperCase() : "TIADA_JABATAN");
+
+            // 🌟 PENAMBAHBAIKAN 1: Pengesahan (Confirm) sebelum mula muat naik
+            if (!confirm(`Adakah anda pasti untuk memuat naik fail "${fail.name}" sebagai Sijil bagi rekod ini?`)) {
+                fileInput.value = ""; // Kosongkan input jika batal
+                return;
+            }
+
+            // 🌟 PENAMBAHBAIKAN 2: Penjanaan nama fail yang lebih selamat dan unik
+            const namaFailBersih = fail.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            const namaFailUnik = `SIJIL_ID${idKey}_${rTahun}_${namaFailBersih}`;
+
+            // Kemas kini UI status sedang muat naik
             const statusDiv = document.getElementById("statusUpload");
             statusDiv.classList.remove("hidden", "bg-red-50", "text-red-700", "bg-emerald-50", "text-emerald-700");
             statusDiv.classList.add("bg-blue-50", "text-blue-700");
@@ -608,21 +666,44 @@
             const pembaca = new FileReader();
             pembaca.onload = function(e) {
                 const base64Data = e.target.result.split(',')[1];
-                const jenis = document.getElementById("uploadJenis").value;
-                const idKey = document.getElementById("uploadBil").value;
                 
-                let rJabatan = document.getElementById("filterJabatanUtama").value || userJabatan;
-                let rTahun = document.getElementById("cariTahunSijil").value.trim();
+                // Ekstrak Nama & IC Penyelaras aktif dari UI secara dinamik (Jika berkaitan)
+                let pNama = "-";
+                let pIC = "-";
+                if (jenis === "PENYELARAS") {
+                    const elemNama = document.getElementById("paparanPenyelarasSemasa") || document.getElementById("paparNamaPenyelaras");
+                    const elemIC = document.getElementById("paparanIC") || document.getElementById("paparICPenyelaras");
+                    if (elemNama) pNama = (elemNama.innerText || elemNama.innerHTML).trim();
+                    if (elemIC) pIC = (elemIC.innerText || elemIC.innerHTML).trim();
+                    
+                    if (typeof senaraiPenyelarasAktif !== "undefined" && senaraiPenyelarasAktif[typeof indeksPenyelaras !== 'undefined' ? indeksPenyelaras : 0]) {
+                        let idx = typeof indeksPenyelaras !== 'undefined' ? indeksPenyelaras : 0;
+                        let u = senaraiPenyelarasAktif[idx];
+                        pIC = String(u.ic || u.NO_IC || u.no_ic || u[2] || pIC).trim();
+                        pNama = String(u.nama || u.NAMA || u[1] || pNama).trim();
+                    }
+                }
 
+                // Sediakan struktur hibrid (Flat + Nested) dengan namaFailUnik yang bersih
                 const payload = {
-                    action: jenis === "PENYELARAS" ? "uploadSijilPenyelarasPenyelidikan" : "uploadSijilProjek",
+                    action: jenis === "PENYELARAS" ? "uploadSijilPenyelarasPenyelidikan" : "kemaskiniSijilPenyelidikan",
                     id: idKey,
+                    bil: idKey, 
                     jabatan: rJabatan,
                     tahun: rTahun,
+                    
+                    // Format Penyelaras:
+                    namaPenyelaras: pNama,
+                    icPenyelaras: pIC,
+                    failBase64: base64Data,
+                    mimeType: fail.type,
+                    namaFail: namaFailUnik, 
+                    
+                    // Format Staf:
                     failSijil: {
                         failBase64: base64Data,
                         mimeType: fail.type,
-                        namaFail: fail.name
+                        namaFail: namaFailUnik 
                     }
                 };
 
@@ -637,11 +718,13 @@
                         statusDiv.className = "mt-4 text-sm font-bold text-center p-3 rounded border bg-emerald-50 text-emerald-700";
                         statusDiv.innerText = "✅ Sijil berjaya dimuat naik!";
                         setTimeout(() => {
-                            tutupModalUpload();
+                            if (typeof tutupModalUpload === "function") tutupModalUpload();
+                            
                             if(jenis === "PENYELARAS") {
-                                muatSijilPenyelaras();
+                                if (typeof muatSijilPenyelaras === "function") muatSijilPenyelaras();
+                                else if (typeof semakSijilPenyelarasSemasa === "function") semakSijilPenyelarasSemasa();
                             } else {
-                                ambilDataProjek();
+                                if (typeof ambilDataProjek === "function") ambilDataProjek();
                             }
                         }, 1500);
                     } else {
@@ -655,6 +738,7 @@
                     statusDiv.innerText = "❌ Ralat sistem rangkaian atau URL Apps Script tidak sah.";
                 });
             };
+            
             pembaca.readAsDataURL(fail);
         }
     </script>
