@@ -459,6 +459,9 @@ function paparJadualPaginasi() {
         let adaSijil = (urlSijilDrive !== "" && urlSijilDrive.includes("http"));
 
         if (adaSijil) {
+            // 👁️ PENAMBAHAN: Butang Lihat Sijil (Dibuka di tab baharu)
+            butangTindakan += `<a href="${urlSijilDrive}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded font-bold shadow text-xs text-center w-full">👁️ Lihat Sijil</a>`;
+            // KEKALKAN: Butang Download sedia ada
             butangTindakan += `<a href="${urlSijilDrive}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded font-bold shadow text-xs text-center w-full">📥 Download</a>`;
         } else if (!isUploader) {
             butangTindakan += `<button disabled class="bg-gray-300 text-gray-500 px-4 py-1.5 rounded font-bold shadow-sm text-xs cursor-not-allowed w-full">⏳ Tiada Sijil</button>`;
@@ -467,7 +470,7 @@ function paparJadualPaginasi() {
         if (isUploader) {
             // OPTION 1: Muat Naik / Tukar Sijil Manual
             let textUpload = adaSijil ? "🔄 Tukar Sijil" : "📤 Muat Naik";
-            let colorUpload = adaSijil ? "bg-blue-500 hover:bg-blue-600" : "bg-emerald-600 hover:bg-emerald-700";
+            let colorUpload = adaSijil ? "bg-emerald-600 hover:bg-emerald-700" : "bg-emerald-600 hover:bg-emerald-700"; // Anda boleh kekalkan atau tukar warna bg-blue-500 jika mahu
             butangTindakan += `<button onclick="bukaModalUpload('${sBil}', '${sProduk.replace(/'/g, "\\'")}', 'KPI', '${urlSijilDrive}')" class="${colorUpload} text-white px-4 py-1.5 rounded font-bold shadow text-xs text-center w-full">${textUpload}</button>`;
             
             // OPTION 2: Jana Automatik menggunakan Template Google Slides (Hanya muncul jika belum ada sijil)
@@ -492,7 +495,6 @@ function paparJadualPaginasi() {
 
     kemaskiniButangPaginasi(dataTapisSemasa.length);
 }
-
 // Fungsi baharu untuk menghantar arahan jana sijil automatik menggunakan API Fetch (POST)
 async function prosesJanaSijilAutomatik(idBil, namaProduk) {
     if (!confirm(`Adakah anda pasti ingin menjana sijil automatik bagi produk: "${namaProduk}"?`)) return;
