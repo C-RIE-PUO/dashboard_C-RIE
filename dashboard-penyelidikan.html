@@ -487,10 +487,28 @@ function paparkanJadualPenyelidikan(senarai) {
         return;
     }
 
-    const jumlahMukaSurat = Math.ceil(senarai.length / saizMukaSurat);
+    // 🌟 PENAMBAHBAIKAN SUSUNAN: SUSUN LOKAL SAHAJA (TIDAK GANGGU DATA ASAL/GOOGLE SHEET)
+    // Membuat salinan sementara array sebelum menyusun (elak mutasi data asal)
+    const senaraiDisusun = [...senarai].sort((a, b) => {
+        const tahunA = Number(a.tahun || a.TAHUN) || 0;
+        const tahunB = Number(b.tahun || b.TAHUN) || 0;
+
+        // Susun mengikut tahun terkini di atas (cth: 2026, 2025, 2024)
+        if (tahunB !== tahunA) {
+            return tahunB - tahunA; 
+        }
+        
+        // Susunan sekunder: Jika tahun sama, susun mengikut BIL/ID terbesar (rekod paling baru)
+        const bilA = Number(a.bil || a.BIL || a.id) || 0;
+        const bilB = Number(b.bil || b.BIL || b.id) || 0;
+        return bilB - bilA;
+    });
+
+    // Gunakan 'senaraiDisusun' untuk logik pagination
+    const jumlahMukaSurat = Math.ceil(senaraiDisusun.length / saizMukaSurat);
     const indeksMula = (mukaSuratSemasa - 1) * saizMukaSurat;
-    const indeksTamat = Math.min(indeksMula + saizMukaSurat, senarai.length);
-    const senaraiDipapar = senarai.slice(indeksMula, indeksTamat);
+    const indeksTamat = Math.min(indeksMula + saizMukaSurat, senaraiDisusun.length);
+    const senaraiDipapar = senaraiDisusun.slice(indeksMula, indeksTamat);
 
     const formatDataKosong = (val) => {
         return (val && val !== '-') ? String(val).toUpperCase() : `<span class="text-gray-300 italic select-none">-</span>`;
@@ -599,7 +617,6 @@ function paparkanJadualPenyelidikan(senarai) {
             </td>
             `;
         }
-
 
         let doiUrlVal = row.doiUrl || row.doi_url || row.DOI || "";
         let htmlDoi = doiUrlVal 

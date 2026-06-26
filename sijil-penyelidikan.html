@@ -343,404 +343,422 @@
         }
 
         // SEMAK DAN BINA BUTANG SIJIL PENYELARAS DINAMIK
-        function semakSijilPenyelarasSemasa() {
-            let filterJabatan = document.getElementById("filterJabatanUtama").value;
-            let filterTahun = document.getElementById("cariTahunSijil").value.trim();
-            const zon = document.getElementById("zonSijilPenyelaras");
-            const aksi = document.getElementById("aksiSijilPenyelaras");
-            const txt = document.getElementById("txtSijilPenyelaras");
-            
-            const gridMaklumat = document.getElementById("maklumatPenyelarasContainer");
-            const mesejArahan = document.getElementById("mesejArahanContainer");
+function semakSijilPenyelarasSemasa() {
+    let filterJabatan = document.getElementById("filterJabatanUtama").value;
+    let filterTahun = document.getElementById("cariTahunSijil").value.trim();
+    const zon = document.getElementById("zonSijilPenyelaras");
+    const aksi = document.getElementById("aksiSijilPenyelaras");
+    const txt = document.getElementById("txtSijilPenyelaras");
+    
+    const gridMaklumat = document.getElementById("maklumatPenyelarasContainer");
+    const mesejArahan = document.getElementById("mesejArahanContainer");
 
-            let jabSemak = filterJabatan || userJabatan;
-            jabatanSemasaPenyelaras = jabSemak;
-            tahunSemasaPenyelaras = filterTahun;
+    let jabSemak = filterJabatan || userJabatan;
+    jabatanSemasaPenyelaras = jabSemak;
+    tahunSemasaPenyelaras = filterTahun;
 
-            // KAWALAN PAPARAN BAGI PENGGUNA BERKUASA
-            if (isAuthorized) {
-                if (filterJabatan === "" || filterTahun === "") {
-                    gridMaklumat.style.display = "none";
-                    zon.style.display = "none";
-                    mesejArahan.style.display = "block";
-                    return; 
-                } else {
-                    gridMaklumat.style.display = "grid";
-                    zon.style.display = "flex";
-                    mesejArahan.style.display = "none";
-                }
+    // KAWALAN PAPARAN BAGI PENGGUNA BERKUASA
+    if (isAuthorized) {
+        if (filterJabatan === "" || filterTahun === "") {
+            gridMaklumat.style.display = "none";
+            zon.style.display = "none";
+            mesejArahan.style.display = "block";
+            return; 
+        } else {
+            gridMaklumat.style.display = "grid";
+            zon.style.display = "flex";
+            mesejArahan.style.display = "none";
+        }
+    } else {
+        gridMaklumat.style.display = "grid";
+        zon.style.display = "flex";
+        mesejArahan.style.display = "none";
+    }
+
+    if (!jabSemak || !filterTahun) {
+        txt.innerHTML = `📜 Sijil Penyelaras Jabatan:`;
+        aksi.innerHTML = `<span class="text-xs text-amber-600 font-semibold italic flex items-center gap-2"><span class="text-lg">⏳</span> Sila taip Tahun dan pilih Jabatan secara spesifik (Bukan 'Semua').</span>`;
+        return;
+    }
+
+    // TAPISAN MENGAMBIL KIRA JABATAN, TAHUN, DAN KAWALAN IC LOGIN
+    let mapPenyelarasUnik = new Map();
+    senaraiPenyelaras.filter(u => {
+        let j = u.jabatan || u.JABATAN || u.Jabatan || u[3] || "";
+        let t = u.tahun || u.TAHUN || u.Tahun || u[5] || ""; // Pengecaman medan Tahun
+        let icRekod = u.ic || u.NO_IC || u.no_ic || u[2] || ""; // Pengecaman medan IC
+        
+        let matchJabatan = String(j).toUpperCase() === String(jabSemak).toUpperCase();
+        
+        // Pastikan tahun penyelaras mematuhi filter tahun
+        let matchTahun = true; 
+        if (t && String(t).trim() !== "") {
+            matchTahun = String(t) === String(filterTahun);
+        }
+        
+        // ⚠️ FUNGSI BARU: KAWALAN PRIVASI PENYELARAS JABATAN
+        let matchIC = true;
+        // Jika pengguna BUKAN staf dan BUKAN admin, bermaksud dia Penyelaras
+        if (!isStaf && !isAuthorized) {
+            // Ambil IC login semasa (tukar 'userIC' jika nama variable berbeza dalam sistem anda)
+            let icLoginSemasa = typeof userIC !== "undefined" ? String(userIC).trim() : "";
+            matchIC = (String(icRekod).trim() === icLoginSemasa);
+        }
+        
+        return matchJabatan && matchTahun && matchIC;
+        
+    }).forEach(u => {
+        // Buang pertindihan (Duplicate by IC or Name)
+        let unikKey = u.ic || u.NO_IC || u.no_ic || u[2] || u.nama || u.NAMA || u[1] || Math.random().toString();
+        if(!mapPenyelarasUnik.has(unikKey)) {
+            mapPenyelarasUnik.set(unikKey, u);
+        }
+    });
+
+    senaraiPenyelarasAktif = Array.from(mapPenyelarasUnik.values());
+
+    // Panggil pemapar UI dan Kad secara dinamik berdasarkan status senarai aktif
+    if (senaraiPenyelarasAktif.length > 0) {
+        indeksPenyelaras = 0;
+        navigasiPenyelaras(0); // Fungsi ini akan kemaskini kesemua kad & butang Sijil secara sepadu
+    } else {
+        // Paparan Fallback Jika Tiada Rekod
+        document.getElementById("paparanPenyelarasSemasa").innerHTML = "TIADA REKOD PENYELARAS JABATAN";
+        document.getElementById("paparanIC").innerHTML = "-";
+        document.getElementById("paparanJabatan").innerHTML = jabSemak;
+        document.getElementById("paparanPeranan").innerHTML = "-";
+        
+        txt.innerHTML = `<span class="font-semibold text-gray-700 text-sm">Sila pilih Tahun & Jabatan untuk uruskan sijil Penyelaras:</span>`;
+        aksi.innerHTML = `<div class="flex items-center text-gray-500 font-semibold text-sm mr-auto bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 mt-2">
+                             <span class="mr-2">⏳</span> Tiada Penyelaras yang didaftarkan bagi tahun ${filterTahun} untuk jabatan ini.
+                          </div>`;
+    }
+}
+
+// Fungsi Padam telah dikemaskini menyokong parameter IC sekiranya perlu untuk spesifik
+function padamSijilPenyelaras(jabatan, tahun, icPenyelaras = "") {
+    if (confirm(`Adakah anda pasti mahu memadam sijil Penyelaras bagi ${jabatan} untuk tahun ${tahun}? Tindakan ini tidak boleh dipadam balik.`)) {
+        
+        const aksi = document.getElementById("aksiSijilPenyelaras");
+        aksi.innerHTML = `<span class="text-xs text-blue-600 font-bold italic">⏳ Sedang memadam rekod fail...</span>`;
+        
+        const payload = {
+            action: "padamSijilPenyelaras", 
+            id: `${jabatan}_${tahun}`,
+            jabatan: jabatan,
+            tahun: tahun,
+            ic: icPenyelaras // Hantar IC supaya App Script tidak terpadam rekod rakan penyelaras di jabatan yang sama
+        };
+
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(hasil => {
+            if (hasil.status === "BERJAYA") {
+                alert("Sijil berjaya dipadam!");
+                muatSijilPenyelaras(); 
             } else {
-                gridMaklumat.style.display = "grid";
-                zon.style.display = "flex";
-                mesejArahan.style.display = "none";
+                alert("Ralat semasa memadam: " + (hasil.mesej || "Sila cuba lagi."));
+                semakSijilPenyelarasSemasa(); 
             }
+        })
+        .catch(err => {
+            alert("Gagal memadam sijil: Ralat pada sistem rangkaian.");
+            semakSijilPenyelarasSemasa();
+        });
+    }
+}
 
-            if (!jabSemak || !filterTahun) {
-                txt.innerHTML = `📜 Sijil Penyelaras Jabatan:`;
-                aksi.innerHTML = `<span class="text-xs text-amber-600 font-semibold italic flex items-center gap-2"><span class="text-lg">⏳</span> Sila taip Tahun dan pilih Jabatan secara spesifik (Bukan 'Semua').</span>`;
-                return;
+// =======================================================================
+// BAHAGIAN: FUNGSI PROJEK/PENYELIDIKAN
+// =======================================================================
+function ambilDataProjek() {
+    const fetchUrl = SCRIPT_URL.includes('?') ? `${SCRIPT_URL}&action=ambilKPIPenyelidikan` : `${SCRIPT_URL}?action=ambilKPIPenyelidikan`;
+
+    fetch(fetchUrl)
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "BERJAYA") {
+                // KEKALKAN KOD SEDIA ADA & TAMBAH ISIH MENGIKUT TAHUN TERKINI (DESCENDING) TANPA GANGGU GOOGLE SHEET
+                if (data.data && Array.isArray(data.data)) {
+                    data.data.sort((a, b) => {
+                        let tahunA = parseInt(a.tahun || a.TAHUN || a.Tahun || 0);
+                        let tahunB = parseInt(b.tahun || b.TAHUN || b.Tahun || 0);
+                        return tahunB - tahunA; // Tahun tinggi di atas (2026, 2025, 2024...)
+                    });
+                }
+
+                let dataDisahkan = data.data.filter(item => (item.statusPengesahan || "").toUpperCase() === "DISAHKAN");
+                
+                if (!isAuthorized && userJabatan) {
+                    dataDisahkan = dataDisahkan.filter(item => item.jabatan === userJabatan);
+                }
+                senaraiSahPenuh = dataDisahkan; 
+
+                let jabatanUnik = [...new Set(dataDisahkan.map(item => item.jabatan))].filter(Boolean);
+                let filterSelect = document.getElementById("filterJabatanUtama");
+                jabatanUnik.forEach(jab => {
+                    if (!filterSelect.querySelector(`option[value="${jab}"]`)) {
+                        filterSelect.innerHTML += `<option value="${jab}">${jab}</option>`;
+                    }
+                });
+
+                tapisSemuaJadual();
             }
+        })
+        .catch(err => {
+            document.getElementById("isiJadualDisahkan").innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Ralat: Gagal menghubungi pangkalan data.</td></tr>`;
+        });
+}
 
-            // TAPISAN MENGAMBIL KIRA JABATAN, TAHUN, DAN KAWALAN IC LOGIN
-            let mapPenyelarasUnik = new Map();
-            senaraiPenyelaras.filter(u => {
-                let j = u.jabatan || u.JABATAN || u.Jabatan || u[3] || "";
-                let t = u.tahun || u.TAHUN || u.Tahun || u[5] || ""; // Pengecaman medan Tahun
-                let icRekod = u.ic || u.NO_IC || u.no_ic || u[2] || ""; // Pengecaman medan IC
-                
-                let matchJabatan = String(j).toUpperCase() === String(jabSemak).toUpperCase();
-                
-                // Pastikan tahun penyelaras mematuhi filter tahun
-                let matchTahun = true; 
-                if (t && String(t).trim() !== "") {
-                    matchTahun = String(t) === String(filterTahun);
-                }
-                
-                // ⚠️ FUNGSI BARU: KAWALAN PRIVASI PENYELARAS JABATAN
-                let matchIC = true;
-                // Jika pengguna BUKAN staf dan BUKAN admin, bermaksud dia Penyelaras
-                if (!isStaf && !isAuthorized) {
-                    // Ambil IC login semasa (tukar 'userIC' jika nama variable berbeza dalam sistem anda)
-                    let icLoginSemasa = typeof userIC !== "undefined" ? String(userIC).trim() : "";
-                    matchIC = (String(icRekod).trim() === icLoginSemasa);
-                }
-                
-                return matchJabatan && matchTahun && matchIC;
-                
-            }).forEach(u => {
-                // Buang pertindihan (Duplicate by IC or Name)
-                let unikKey = u.ic || u.NO_IC || u.no_ic || u[2] || u.nama || u.NAMA || u[1] || Math.random().toString();
-                if(!mapPenyelarasUnik.has(unikKey)) {
-                    mapPenyelarasUnik.set(unikKey, u);
-                }
-            });
+function kemaskiniPaparanJadualProjek() {
+    let totalRekod = senaraiDitapisSemasa.length;
+    let totalHalaman = Math.ceil(totalRekod / rekodPerHalaman) || 1;
+    if (halamanSemasa > totalHalaman) halamanSemasa = totalHalaman;
+    if (halamanSemasa < 1) halamanSemasa = 1;
 
-            senaraiPenyelarasAktif = Array.from(mapPenyelarasUnik.values());
+    let indeksMula = (halamanSemasa - 1) * rekodPerHalaman;
+    let dataHalaman = senaraiDitapisSemasa.slice(indeksMula, indeksMula + rekodPerHalaman);
 
-            // Panggil pemapar UI dan Kad secara dinamik berdasarkan status senarai aktif
-            if (senaraiPenyelarasAktif.length > 0) {
-                indeksPenyelaras = 0;
-                navigasiPenyelaras(0); // Fungsi ini akan kemaskini kesemua kad & butang Sijil secara sepadu
+    binaJadualDisahkan(dataHalaman, indeksMula);
+
+    let rekodHingga = (indeksMula + rekodPerHalaman) > totalRekod ? totalRekod : (indeksMula + rekodPerHalaman);
+    document.getElementById("infoPaginasi").innerText = totalRekod > 0 
+        ? `Menampilkan ${indeksMula + 1} hingga ${rekodHingga} daripada ${totalRekod} rekod`
+        : `Menampilkan 0 hingga 0 daripada 0 rekod`;
+
+    document.getElementById("labelHalamanSemasa").innerText = `${halamanSemasa} / ${totalHalaman}`;
+    document.getElementById("btnSebelumnya").disabled = (halamanSemasa === 1);
+    document.getElementById("btnSeterusnya").disabled = (halamanSemasa === totalHalaman || totalRekod === 0);
+}
+
+function halamanSebelumnya() { if (halamanSemasa > 1) { halamanSemasa--; kemaskiniPaparanJadualProjek(); } }
+function halamanSeterusnya() { 
+    let totalHalaman = Math.ceil(senaraiDitapisSemasa.length / rekodPerHalaman) || 1;
+    if (halamanSemasa < totalHalaman) { halamanSemasa++; kemaskiniPaparanJadualProjek(); } 
+}
+
+function binaJadualDisahkan(senarai, indeksMula) {
+    const tbody = document.getElementById("isiJadualDisahkan");
+    tbody.innerHTML = "";
+
+    if (senarai.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500 italic">✨ Tiada rekod projek untuk kriteria ini. (Pastikan rekod dalam status 'DISAHKAN')</td></tr>`;
+        return;
+    }
+
+    senarai.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition border-b border-gray-100";
+
+        let linkSijil = String(item.linkSijil || item.link_sijil || "").trim();
+        if (linkSijil === "-" || linkSijil.toLowerCase() === "null") linkSijil = "";
+
+        let htmlAksiSijil = "";
+        if (linkSijil === "") {
+            htmlAksiSijil = `<span class="block text-center text-gray-400 italic text-[11px] mb-1">⏳ Belum Dijana</span>`;
+        } else {
+            // TAMBAH BUTANG LIHAT SIJIL SECARA DINAMIK SEKIRANYA LINK URL SUDAH WUJUD
+            htmlAksiSijil = `
+                <div class="flex flex-col sm:flex-row gap-1 justify-center items-center mb-1">
+                    <a href="${linkSijil}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded transition shadow-sm text-[11px] block w-max text-center">👁️ Lihat Sijil</a>
+                    <a href="${linkSijil}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-2 py-1 rounded transition shadow-sm text-[11px] block w-max text-center">📥 Download</a>
+                </div>
+            `;
+        }
+
+        if (isAuthorized) {
+            // KAWALAN KESELAMATAN: Pastikan item.bil wujud dari database, bukan rekaan UI
+            let idProjek = String(item.bil || item.id || "").trim();
+            
+            if (idProjek === "") {
+                // Jika Lajur A (Bil) kosong dalam Sheet, butang akan halang upload
+                htmlAksiSijil += `<button onclick="alert('Ralat: Sila pastikan Lajur A (Bil) dalam Google Sheet tidak kosong untuk projek ini sebelum muat naik.')" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded transition shadow-sm text-[11px] block w-max mx-auto cursor-not-allowed">⚠️ Ralat ID</button>`;
             } else {
-                // Paparan Fallback Jika Tiada Rekod
-                document.getElementById("paparanPenyelarasSemasa").innerHTML = "TIADA REKOD PENYELARAS JABATAN";
-                document.getElementById("paparanIC").innerHTML = "-";
-                document.getElementById("paparanJabatan").innerHTML = jabSemak;
-                document.getElementById("paparanPeranan").innerHTML = "-";
+                // 🌟 PENYELESAIAN UTAMA: Bersihkan tajuk daripada aksara yang merosakkan HTML
+                let tajukBersih = String(item.tajuk || item.nama_projek || "")
+                                    .replace(/'/g, "\\'")     // Handle single quote (')
+                                    .replace(/"/g, "&quot;")  // Handle double quote (")
+                                    .replace(/\n|\r/g, " ");  // Handle Enter/Newline
                 
-                txt.innerHTML = `<span class="font-semibold text-gray-700 text-sm">Sila pilih Tahun & Jabatan untuk uruskan sijil Penyelaras:</span>`;
-                aksi.innerHTML = `<div class="flex items-center text-gray-500 font-semibold text-sm mr-auto bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 mt-2">
-                                     <span class="mr-2">⏳</span> Tiada Penyelaras yang didaftarkan bagi tahun ${filterTahun} untuk jabatan ini.
-                                  </div>`;
+                // Butang upload normal jika ID sah
+                htmlAksiSijil += `<button onclick="bukaModalUploadProjek('${idProjek}', '${tajukBersih}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded transition shadow-sm text-[11px] block w-max mx-auto">📤 Upload</button>`;
             }
         }
-        // Fungsi Padam telah dikemaskini menyokong parameter IC sekiranya perlu untuk spesifik
-        function padamSijilPenyelaras(jabatan, tahun, icPenyelaras = "") {
-            if (confirm(`Adakah anda pasti mahu memadam sijil Penyelaras bagi ${jabatan} untuk tahun ${tahun}? Tindakan ini tidak boleh dipadam balik.`)) {
-                
-                const aksi = document.getElementById("aksiSijilPenyelaras");
-                aksi.innerHTML = `<span class="text-xs text-blue-600 font-bold italic">⏳ Sedang memadam rekod fail...</span>`;
-                
-                const payload = {
-                    action: "padamSijilPenyelaras", 
-                    id: `${jabatan}_${tahun}`,
-                    jabatan: jabatan,
-                    tahun: tahun,
-                    ic: icPenyelaras // Hantar IC supaya App Script tidak terpadam rekod rakan penyelaras di jabatan yang sama
-                };
 
-                fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                })
-                .then(res => res.json())
-                .then(hasil => {
-                    if (hasil.status === "BERJAYA") {
-                        alert("Sijil berjaya dipadam!");
-                        muatSijilPenyelaras(); 
-                    } else {
-                        alert("Ralat semasa memadam: " + (hasil.mesej || "Sila cuba lagi."));
-                        semakSijilPenyelarasSemasa(); 
-                    }
-                })
-                .catch(err => {
-                    alert("Gagal memadam sijil: Ralat pada sistem rangkaian.");
-                    semakSijilPenyelarasSemasa();
-                });
+        tr.innerHTML = `
+            <td class="p-3 text-center font-bold text-gray-500 bg-slate-50/50">${indeksMula + index + 1}</td>
+            <td class="p-3 font-semibold text-gray-900 whitespace-normal max-w-[350px]">${item.tajuk}</td>
+            <td class="p-3 text-gray-600">${item.penulis || "-"}</td>
+            <td class="p-3 text-center font-bold text-slate-700 uppercase">${item.jabatan || "-"}</td>
+            <td class="p-3 text-center font-bold text-purple-800">${item.tahun || "-"}</td>
+            <td class="p-3 text-center align-middle w-44">${htmlAksiSijil}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// =======================================================================
+// BAHAGIAN: PENGURUSAN MODAL & PROSES MUAT NAIK
+// =======================================================================
+function tutupModalUpload() {
+    document.getElementById("modalUpload").classList.add("hidden");
+}
+
+function bukaModalUploadProjek(id, tajuk) {
+    document.getElementById("modalUpload").classList.remove("hidden");
+    document.getElementById("uploadNamaProduk").innerText = tajuk;
+    document.getElementById("uploadJenis").value = "PROJEK";
+    document.getElementById("uploadBil").value = id;
+    document.getElementById("statusUpload").classList.add("hidden");
+    document.getElementById("failSijil").value = "";
+}
+
+function bukaModalUploadPenyelarasKhusus(jab, tah) {
+    document.getElementById("modalUpload").classList.remove("hidden");
+    document.getElementById("uploadNamaProduk").innerHTML = `SIJIL PENYELARAS JABATAN<br><span class="text-emerald-700">${jab} (${tah})</span>`;
+    document.getElementById("uploadJenis").value = "PENYELARAS";
+    document.getElementById("uploadBil").value = `${jab}_${tah}`;
+    document.getElementById("statusUpload").classList.add("hidden");
+    document.getElementById("failSijil").value = "";
+}
+
+function prosesUpload() {
+    const fileInput = document.getElementById("failSijil");
+    const fail = fileInput.files[0];
+    
+    if (!fail) {
+        alert("Sila pilih fail terlebih dahulu!");
+        return;
+    }
+    if (fail.size > 10 * 1024 * 1024) {
+        alert("Ralat: Fail melebihi had saiz maksimum 10MB!");
+        return;
+    }
+
+    // Ambil maklumat awal untuk bina nama unik
+    const jenis = document.getElementById("uploadJenis").value;
+    const idKey = document.getElementById("uploadBil").value;
+
+    // 🌟 PENAMBAHBAIKAN UTAMA: Ekstrak TAHUN & JABATAN yang tepat daripada baris jadual staf yang aktif
+    // Ini bagi memastikan Google Script menemui folder sedia ada dan TIDAK membina folder baru.
+    let rTahun = "";
+    let rJabatan = "";
+    
+    const semuaBaris = document.querySelectorAll("#isiJadualDisahkan tr");
+    semaubaris.forEach(baris => {
+        const td = baris.querySelectorAll("td");
+        if (td.length >= 6) {
+            const butang = td[5].querySelector("button");
+            // Padankan butang muat naik dengan ID staf yang sedang diproses
+            if (butang && butang.getAttribute("onclick") && butang.getAttribute("onclick").includes(`'${idKey}'`)) {
+                rJabatan = td[3].innerText.trim().toUpperCase(); // Paksa huruf besar untuk padanan folder sedia ada
+                rTahun = td[4].innerText.trim();
             }
         }
-        // =======================================================================
-        // BAHAGIAN: FUNGSI PROJEK/PENYELIDIKAN
-        // =======================================================================
-        function ambilDataProjek() {
-            const fetchUrl = SCRIPT_URL.includes('?') ? `${SCRIPT_URL}&action=ambilKPIPenyelidikan` : `${SCRIPT_URL}?action=ambilKPIPenyelidikan`;
+    });
 
-            fetch(fetchUrl)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.status === "BERJAYA") {
-                        let dataDisahkan = data.data.filter(item => (item.statusPengesahan || "").toUpperCase() === "DISAHKAN");
-                        
-                        if (!isAuthorized && userJabatan) {
-                            dataDisahkan = dataDisahkan.filter(item => item.jabatan === userJabatan);
-                        }
-                        senaraiSahPenuh = dataDisahkan; 
+    // Pelindung (Fallback) sekiranya gagal ditarik dari jadual, gunakan nilai input/global sedia ada anda
+    if (!rTahun || rTahun === "-") rTahun = document.getElementById("cariTahunSijil") ? document.getElementById("cariTahunSijil").value.trim() : "TIADA_TAHUN";
+    if (!rJabatan || rJabatan === "-") rJabatan = document.getElementById("filterJabatanUtama") ? document.getElementById("filterJabatanUtama").value.trim().toUpperCase() : (typeof userJabatan !== 'undefined' ? userJabatan.trim().toUpperCase() : "TIADA_JABATAN");
 
-                        let jabatanUnik = [...new Set(dataDisahkan.map(item => item.jabatan))].filter(Boolean);
-                        let filterSelect = document.getElementById("filterJabatanUtama");
-                        jabatanUnik.forEach(jab => {
-                            if (!filterSelect.querySelector(`option[value="${jab}"]`)) {
-                                filterSelect.innerHTML += `<option value="${jab}">${jab}</option>`;
-                            }
-                        });
+    // 🌟 PENAMBAHBAIKAN 1: Pengesahan (Confirm) sebelum mula muat naik
+    if (!confirm(`Adakah anda pasti untuk memuat naik fail "${fail.name}" sebagai Sijil bagi rekod ini?`)) {
+        fileInput.value = ""; // Kosongkan input jika batal
+        return;
+    }
 
-                        tapisSemuaJadual();
-                    }
-                })
-                .catch(err => {
-                    document.getElementById("isiJadualDisahkan").innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Ralat: Gagal menghubungi pangkalan data.</td></tr>`;
-                });
-        }
+    // 🌟 PENAMBAHBAIKAN 2: Penjanaan nama fail yang lebih selamat dan unik
+    const namaFailBersih = fail.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+    const namaFailUnik = `SIJIL_ID${idKey}_${rTahun}_${namaFailBersih}`;
 
-        function kemaskiniPaparanJadualProjek() {
-            let totalRekod = senaraiDitapisSemasa.length;
-            let totalHalaman = Math.ceil(totalRekod / rekodPerHalaman) || 1;
-            if (halamanSemasa > totalHalaman) halamanSemasa = totalHalaman;
-            if (halamanSemasa < 1) halamanSemasa = 1;
+    // Kemas kini UI status sedang muat naik
+    const statusDiv = document.getElementById("statusUpload");
+    statusDiv.classList.remove("hidden", "bg-red-50", "text-red-700", "bg-emerald-50", "text-emerald-700");
+    statusDiv.classList.add("bg-blue-50", "text-blue-700");
+    statusDiv.innerText = "⏳ Memuat naik fail, sila tunggu...";
+    document.getElementById("btnSimpanUpload").disabled = true;
 
-            let indeksMula = (halamanSemasa - 1) * rekodPerHalaman;
-            let dataHalaman = senaraiDitapisSemasa.slice(indeksMula, indeksMula + rekodPerHalaman);
-
-            binaJadualDisahkan(dataHalaman, indeksMula);
-
-            let rekodHingga = (indeksMula + rekodPerHalaman) > totalRekod ? totalRekod : (indeksMula + rekodPerHalaman);
-            document.getElementById("infoPaginasi").innerText = totalRekod > 0 
-                ? `Menampilkan ${indeksMula + 1} hingga ${rekodHingga} daripada ${totalRekod} rekod`
-                : `Menampilkan 0 hingga 0 daripada 0 rekod`;
-
-            document.getElementById("labelHalamanSemasa").innerText = `${halamanSemasa} / ${totalHalaman}`;
-            document.getElementById("btnSebelumnya").disabled = (halamanSemasa === 1);
-            document.getElementById("btnSeterusnya").disabled = (halamanSemasa === totalHalaman || totalRekod === 0);
-        }
-
-        function halamanSebelumnya() { if (halamanSemasa > 1) { halamanSemasa--; kemaskiniPaparanJadualProjek(); } }
-        function halamanSeterusnya() { 
-            let totalHalaman = Math.ceil(senaraiDitapisSemasa.length / rekodPerHalaman) || 1;
-            if (halamanSemasa < totalHalaman) { halamanSemasa++; kemaskiniPaparanJadualProjek(); } 
-        }
-
-        function binaJadualDisahkan(senarai, indeksMula) {
-            const tbody = document.getElementById("isiJadualDisahkan");
-            tbody.innerHTML = "";
-
-            if (senarai.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500 italic">✨ Tiada rekod projek untuk kriteria ini. (Pastikan rekod dalam status 'DISAHKAN')</td></tr>`;
-                return;
-            }
-
-            senarai.forEach((item, index) => {
-                const tr = document.createElement("tr");
-                tr.className = "hover:bg-slate-50 transition border-b border-gray-100";
-
-                let linkSijil = String(item.linkSijil || item.link_sijil || "").trim();
-                if (linkSijil === "-" || linkSijil.toLowerCase() === "null") linkSijil = "";
-
-                let htmlAksiSijil = "";
-                if (linkSijil === "") {
-                    htmlAksiSijil = `<span class="block text-center text-gray-400 italic text-[11px] mb-1">⏳ Belum Dijana</span>`;
-                } else {
-                    htmlAksiSijil = `<a href="${linkSijil}" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1 rounded transition shadow-sm text-[11px] block w-max mx-auto mb-1">📥 Download</a>`;
-                }
-
-                if (isAuthorized) {
-                    // KAWALAN KESELAMATAN: Pastikan item.bil wujud dari database, bukan rekaan UI
-                    let idProjek = String(item.bil || item.id || "").trim();
-                    
-                    if (idProjek === "") {
-                        // Jika Lajur A (Bil) kosong dalam Sheet, butang akan halang upload
-                        htmlAksiSijil += `<button onclick="alert('Ralat: Sila pastikan Lajur A (Bil) dalam Google Sheet tidak kosong untuk projek ini sebelum muat naik.')" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded transition shadow-sm text-[11px] block w-max mx-auto cursor-not-allowed">⚠️ Ralat ID</button>`;
-                    } else {
-                        // 🌟 PENYELESAIAN UTAMA: Bersihkan tajuk daripada aksara yang merosakkan HTML
-                        let tajukBersih = String(item.tajuk || item.nama_projek || "")
-                                            .replace(/'/g, "\\'")     // Handle single quote (')
-                                            .replace(/"/g, "&quot;")  // Handle double quote (")
-                                            .replace(/\n|\r/g, " ");  // Handle Enter/Newline
-                        
-                        // Butang upload normal jika ID sah
-                        htmlAksiSijil += `<button onclick="bukaModalUploadProjek('${idProjek}', '${tajukBersih}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded transition shadow-sm text-[11px] block w-max mx-auto">📤 Upload</button>`;
-                    }
-                }
-
-                tr.innerHTML = `
-                    <td class="p-3 text-center font-bold text-gray-500 bg-slate-50/50">${index + 1}</td>
-                    <td class="p-3 font-semibold text-gray-900 whitespace-normal max-w-[350px]">${item.tajuk}</td>
-                    <td class="p-3 text-gray-600">${item.penulis || "-"}</td>
-                    <td class="p-3 text-center font-bold text-slate-700 uppercase">${item.jabatan || "-"}</td>
-                    <td class="p-3 text-center font-bold text-purple-800">${item.tahun || "-"}</td>
-                    <td class="p-3 text-center align-middle w-40">${htmlAksiSijil}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        // =======================================================================
-        // BAHAGIAN: PENGURUSAN MODAL & PROSES MUAT NAIK
-        // =======================================================================
-        function tutupModalUpload() {
-            document.getElementById("modalUpload").classList.add("hidden");
-        }
-
-        function bukaModalUploadProjek(id, tajuk) {
-            document.getElementById("modalUpload").classList.remove("hidden");
-            document.getElementById("uploadNamaProduk").innerText = tajuk;
-            document.getElementById("uploadJenis").value = "PROJEK";
-            document.getElementById("uploadBil").value = id;
-            document.getElementById("statusUpload").classList.add("hidden");
-            document.getElementById("failSijil").value = "";
-        }
-
-        function bukaModalUploadPenyelarasKhusus(jab, tah) {
-            document.getElementById("modalUpload").classList.remove("hidden");
-            document.getElementById("uploadNamaProduk").innerHTML = `SIJIL PENYELARAS JABATAN<br><span class="text-emerald-700">${jab} (${tah})</span>`;
-            document.getElementById("uploadJenis").value = "PENYELARAS";
-            document.getElementById("uploadBil").value = `${jab}_${tah}`;
-            document.getElementById("statusUpload").classList.add("hidden");
-            document.getElementById("failSijil").value = "";
-        }
-
-        function prosesUpload() {
-            const fileInput = document.getElementById("failSijil");
-            const fail = fileInput.files[0];
+    const pembaca = new FileReader();
+    pembaca.onload = function(e) {
+        const base64Data = e.target.result.split(',')[1];
+        
+        // Ekstrak Nama & IC Penyelaras aktif dari UI secara dinamik (Jika berkaitan)
+        let pNama = "-";
+        let pIC = "-";
+        if (jenis === "PENYELARAS") {
+            const elemNama = document.getElementById("paparanPenyelarasSemasa") || document.getElementById("paparNamaPenyelaras");
+            const elemIC = document.getElementById("paparanIC") || document.getElementById("paparICPenyelaras");
+            if (elemNama) pNama = (elemNama.innerText || elemNama.innerHTML).trim();
+            if (elemIC) pIC = (elemIC.innerText || elemIC.innerHTML).trim();
             
-            if (!fail) {
-                alert("Sila pilih fail terlebih dahulu!");
-                return;
+            if (typeof senaraiPenyelarasAktif !== "undefined" && senaraiPenyelarasAktif[typeof indeksPenyelaras !== 'undefined' ? indeksPenyelaras : 0]) {
+                let idx = typeof indeksPenyelaras !== 'undefined' ? indeksPenyelaras : 0;
+                let u = senaraiPenyelarasAktif[idx];
+                pIC = String(u.ic || u.NO_IC || u.no_ic || u[2] || pIC).trim();
+                pNama = String(u.nama || u.NAMA || u[1] || pNama).trim();
             }
-            if (fail.size > 10 * 1024 * 1024) {
-                alert("Ralat: Fail melebihi had saiz maksimum 10MB!");
-                return;
-            }
-
-            // Ambil maklumat awal untuk bina nama unik
-            const jenis = document.getElementById("uploadJenis").value;
-            const idKey = document.getElementById("uploadBil").value;
-
-            // 🌟 PENAMBAHBAIKAN UTAMA: Ekstrak TAHUN & JABATAN yang tepat daripada baris jadual staf yang aktif
-            // Ini bagi memastikan Google Script menemui folder sedia ada dan TIDAK membina folder baru.
-            let rTahun = "";
-            let rJabatan = "";
-            
-            const semuaBaris = document.querySelectorAll("#isiJadualDisahkan tr");
-            semuaBaris.forEach(baris => {
-                const td = baris.querySelectorAll("td");
-                if (td.length >= 6) {
-                    const butang = td[5].querySelector("button");
-                    // Padankan butang muat naik dengan ID staf yang sedang diproses
-                    if (butang && butang.getAttribute("onclick") && butang.getAttribute("onclick").includes(`'${idKey}'`)) {
-                        rJabatan = td[3].innerText.trim().toUpperCase(); // Paksa huruf besar untuk padanan folder sedia ada
-                        rTahun = td[4].innerText.trim();
-                    }
-                }
-            });
-
-            // Pelindung (Fallback) sekiranya gagal ditarik dari jadual, gunakan nilai input/global sedia ada anda
-            if (!rTahun || rTahun === "-") rTahun = document.getElementById("cariTahunSijil") ? document.getElementById("cariTahunSijil").value.trim() : "TIADA_TAHUN";
-            if (!rJabatan || rJabatan === "-") rJabatan = document.getElementById("filterJabatanUtama") ? document.getElementById("filterJabatanUtama").value.trim().toUpperCase() : (typeof userJabatan !== 'undefined' ? userJabatan.trim().toUpperCase() : "TIADA_JABATAN");
-
-            // 🌟 PENAMBAHBAIKAN 1: Pengesahan (Confirm) sebelum mula muat naik
-            if (!confirm(`Adakah anda pasti untuk memuat naik fail "${fail.name}" sebagai Sijil bagi rekod ini?`)) {
-                fileInput.value = ""; // Kosongkan input jika batal
-                return;
-            }
-
-            // 🌟 PENAMBAHBAIKAN 2: Penjanaan nama fail yang lebih selamat dan unik
-            const namaFailBersih = fail.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-            const namaFailUnik = `SIJIL_ID${idKey}_${rTahun}_${namaFailBersih}`;
-
-            // Kemas kini UI status sedang muat naik
-            const statusDiv = document.getElementById("statusUpload");
-            statusDiv.classList.remove("hidden", "bg-red-50", "text-red-700", "bg-emerald-50", "text-emerald-700");
-            statusDiv.classList.add("bg-blue-50", "text-blue-700");
-            statusDiv.innerText = "⏳ Memuat naik fail, sila tunggu...";
-            document.getElementById("btnSimpanUpload").disabled = true;
-
-            const pembaca = new FileReader();
-            pembaca.onload = function(e) {
-                const base64Data = e.target.result.split(',')[1];
-                
-                // Ekstrak Nama & IC Penyelaras aktif dari UI secara dinamik (Jika berkaitan)
-                let pNama = "-";
-                let pIC = "-";
-                if (jenis === "PENYELARAS") {
-                    const elemNama = document.getElementById("paparanPenyelarasSemasa") || document.getElementById("paparNamaPenyelaras");
-                    const elemIC = document.getElementById("paparanIC") || document.getElementById("paparICPenyelaras");
-                    if (elemNama) pNama = (elemNama.innerText || elemNama.innerHTML).trim();
-                    if (elemIC) pIC = (elemIC.innerText || elemIC.innerHTML).trim();
-                    
-                    if (typeof senaraiPenyelarasAktif !== "undefined" && senaraiPenyelarasAktif[typeof indeksPenyelaras !== 'undefined' ? indeksPenyelaras : 0]) {
-                        let idx = typeof indeksPenyelaras !== 'undefined' ? indeksPenyelaras : 0;
-                        let u = senaraiPenyelarasAktif[idx];
-                        pIC = String(u.ic || u.NO_IC || u.no_ic || u[2] || pIC).trim();
-                        pNama = String(u.nama || u.NAMA || u[1] || pNama).trim();
-                    }
-                }
-
-                // Sediakan struktur hibrid (Flat + Nested) dengan namaFailUnik yang bersih
-                const payload = {
-                    action: jenis === "PENYELARAS" ? "uploadSijilPenyelarasPenyelidikan" : "kemaskiniSijilPenyelidikan",
-                    id: idKey,
-                    bil: idKey, 
-                    jabatan: rJabatan,
-                    tahun: rTahun,
-                    
-                    // Format Penyelaras:
-                    namaPenyelaras: pNama,
-                    icPenyelaras: pIC,
-                    failBase64: base64Data,
-                    mimeType: fail.type,
-                    namaFail: namaFailUnik, 
-                    
-                    // Format Staf:
-                    failSijil: {
-                        failBase64: base64Data,
-                        mimeType: fail.type,
-                        namaFail: namaFailUnik 
-                    }
-                };
-
-                fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                })
-                .then(res => res.json())
-                .then(hasil => {
-                    document.getElementById("btnSimpanUpload").disabled = false;
-                    if (hasil.status === "BERJAYA") {
-                        statusDiv.className = "mt-4 text-sm font-bold text-center p-3 rounded border bg-emerald-50 text-emerald-700";
-                        statusDiv.innerText = "✅ Sijil berjaya dimuat naik!";
-                        setTimeout(() => {
-                            if (typeof tutupModalUpload === "function") tutupModalUpload();
-                            
-                            if(jenis === "PENYELARAS") {
-                                if (typeof muatSijilPenyelaras === "function") muatSijilPenyelaras();
-                                else if (typeof semakSijilPenyelarasSemasa === "function") semakSijilPenyelarasSemasa();
-                            } else {
-                                if (typeof ambilDataProjek === "function") ambilDataProjek();
-                            }
-                        }, 1500);
-                    } else {
-                        statusDiv.className = "mt-4 text-sm font-bold text-center p-3 rounded border bg-red-50 text-red-700";
-                        statusDiv.innerText = "❌ Gagal: " + (hasil.mesej || "Ralat maklum balas pelayan.");
-                    }
-                })
-                .catch(err => {
-                    document.getElementById("btnSimpanUpload").disabled = false;
-                    statusDiv.className = "mt-4 text-sm font-bold text-center p-3 rounded border bg-red-50 text-red-700";
-                    statusDiv.innerText = "❌ Ralat sistem rangkaian atau URL Apps Script tidak sah.";
-                });
-            };
-            
-            pembaca.readAsDataURL(fail);
         }
+
+        // Sediakan struktur hibrid (Flat + Nested) dengan namaFailUnik yang bersih
+        const payload = {
+            action: jenis === "PENYELARAS" ? "uploadSijilPenyelarasPenyelidikan" : "kemaskiniSijilPenyelidikan",
+            id: idKey,
+            bil: idKey, 
+            jabatan: rJabatan,
+            tahun: rTahun,
+            
+            // Format Penyelaras:
+            namaPenyelaras: pNama,
+            icPenyelaras: pIC,
+            failBase64: base64Data,
+            mimeType: fail.type,
+            namaFail: namaFailUnik, 
+            
+            // Format Staf:
+            failSijil: {
+                failBase64: base64Data,
+                mimeType: fail.type,
+                namaFail: namaFailUnik 
+            }
+        };
+
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(hasil => {
+            document.getElementById("btnSimpanUpload").disabled = false;
+            if (hasil.status === "BERJAYA") {
+                statusDiv.className = "mt-4 text-sm font-bold text-center p-3 rounded border bg-emerald-50 text-emerald-700";
+                statusDiv.innerText = "✅ Sijil berjaya dimuat naik!";
+                setTimeout(() => {
+                    if (typeof tutupModalUpload === "function") tutupModalUpload();
+                    
+                    if(jenis === "PENYELARAS") {
+                        if (typeof muatSijilPenyelaras === "function") muatSijilPenyelaras();
+                        else if (typeof semakSijilPenyelarasSemasa === "function") semakSijilPenyelarasSemasa();
+                    } else {
+                        if (typeof ambilDataProjek === "function") ambilDataProjek();
+                    }
+                }, 1500);
+            } else {
+                statusDiv.className = "mt-4 text-sm font-bold text-center p-3 rounded border bg-red-50 text-red-700";
+                statusDiv.innerText = "❌ Gagal: " + (hasil.mesej || "Ralat maklum balas pelayan.");
+            }
+        })
+        .catch(err => {
+            document.getElementById("btnSimpanUpload").disabled = false;
+            statusDiv.className = "mt-4 text-sm font-bold text-center p-3 rounded border bg-red-50 text-red-700";
+            statusDiv.innerText = "❌ Ralat sistem rangkaian atau URL Apps Script tidak sah.";
+        });
+    };
+    
+    pembaca.readAsDataURL(fail);
+}
     </script>
 </body>
 </html>
