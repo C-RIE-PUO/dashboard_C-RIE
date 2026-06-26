@@ -35,50 +35,56 @@
         </div>
 
         <div id="bahagianPenyelaras" class="hidden mb-8 bg-gradient-to-br from-emerald-50 to-amber-50 rounded-xl shadow-md border-2 border-emerald-400 p-6 relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 opacity-10 text-9xl">🎖️</div>
+    <div class="absolute -right-10 -top-10 opacity-10 text-9xl">🎖️</div>
+    
+    <h2 class="text-xl md:text-2xl font-bold text-emerald-800 mb-4 border-b-2 border-emerald-200 pb-2 inline-flex items-center gap-2">
+        🎖️ Pengurusan Sijil Penyelaras Jabatan
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 mb-2 text-sm" id="infoPenyelarasSemasa">
+        <div id="kotakICPenyelaras" class="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm"><span class="font-bold text-gray-500 block text-xs">NO. IC:</span> <span id="paparICPenyelaras" class="font-bold text-gray-800 text-base"></span></div>
+        <div class="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm"><span class="font-bold text-gray-500 block text-xs">NAMA:</span> <span id="paparNamaPenyelaras" class="font-bold text-gray-800 uppercase text-base"></span></div>
+        <div class="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm"><span class="font-bold text-gray-500 block text-xs">JABATAN:</span> <span id="paparJabatanPenyelaras" class="font-bold text-emerald-700 uppercase text-base"></span></div>
+        <div class="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm"><span class="font-bold text-gray-500 block text-xs">PERANAN:</span> <span id="paparPerananPenyelaras" class="font-bold text-gray-800 uppercase text-base"></span></div>
+    </div>
+
+    <div id="butangNextPenyelaras" class="hidden mb-6 flex justify-end items-center gap-3">
+        <span id="indikatorPenyelaras" class="text-xs text-emerald-700 font-bold bg-emerald-100 px-2 py-1 rounded"></span>
+        <button onclick="paparPenyelarasSeterusnya()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-4 rounded-lg shadow transition">
+            Lihat Penyelaras Seterusnya ⏭️
+        </button>
+    </div>
+
+    <div id="kawasanAdminPenyelaras" class="hidden mt-4 p-4 bg-white rounded border border-emerald-200">
+        <p class="text-sm font-bold text-gray-700 mb-2">Sila pilih Tahun & Jabatan untuk uruskan sijil Penyelaras:</p>
+        <div class="flex flex-wrap gap-2 items-center">
+            <p class="text-sm font-bold" id="statusSijilPenyelarasAdmin">⏳ Sila buat pilihan di dropdown atas.</p>
             
-            <h2 class="text-xl md:text-2xl font-bold text-emerald-800 mb-4 border-b-2 border-emerald-200 pb-2 inline-flex items-center gap-2">
-                🎖️ Pengurusan Sijil Penyelaras Jabatan
-            </h2>
+            <a id="btnJanaSijil" href="jana-sijil.html" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition">
+                ⚙️ Jana Sijil Automatik
+            </a>
             
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 mb-2 text-sm" id="infoPenyelarasSemasa">
-                <div id="kotakICPenyelaras" class="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm"><span class="font-bold text-gray-500 block text-xs">NO. IC:</span> <span id="paparICPenyelaras" class="font-bold text-gray-800 text-base"></span></div>
-                <div class="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm"><span class="font-bold text-gray-500 block text-xs">NAMA:</span> <span id="paparNamaPenyelaras" class="font-bold text-gray-800 uppercase text-base"></span></div>
-                <div class="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm"><span class="font-bold text-gray-500 block text-xs">JABATAN:</span> <span id="paparJabatanPenyelaras" class="font-bold text-emerald-700 uppercase text-base"></span></div>
-                <div class="bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm"><span class="font-bold text-gray-500 block text-xs">PERANAN:</span> <span id="paparPerananPenyelaras" class="font-bold text-gray-800 uppercase text-base"></span></div>
-            </div>
-
-            <div id="butangNextPenyelaras" class="hidden mb-6 flex justify-end items-center gap-3">
-                <span id="indikatorPenyelaras" class="text-xs text-emerald-700 font-bold bg-emerald-100 px-2 py-1 rounded"></span>
-                <button onclick="paparPenyelarasSeterusnya()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-4 rounded-lg shadow transition">
-                    Lihat Penyelaras Seterusnya ⏭️
-                </button>
-            </div>
-
-            <div id="kawasanAdminPenyelaras" class="hidden mt-4 p-4 bg-white rounded border border-emerald-200">
-                <p class="text-sm font-bold text-gray-700 mb-2">Sila pilih Tahun & Jabatan untuk uruskan sijil Penyelaras:</p>
-                <div class="flex flex-wrap gap-2 items-center">
-                    <p class="text-sm font-bold" id="statusSijilPenyelarasAdmin">⏳ Sila buat pilihan di dropdown atas.</p>
-                    
-                    <a id="btnJanaSijil" href="jana-sijil.html" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition">
-                        ⚙️ Jana Sijil Automatik
-                    </a>
-                    
-                    <button id="btnUploadPenyelaras" onclick="bukaUploadPenyelaras()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition">📤 Upload Sijil</button>
-                    <a id="btnDownloadPenyelarasAdmin" target="_blank" class="hidden bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition">📥 Lihat Sijil</a>
-                    <button id="btnDeletePenyelarasAdmin" onclick="padamSijilPenyelaras()" class="hidden bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition">🗑️ Padam</button>
-                </div>
-            </div>
-
-            <div id="kawasanPenyelarasSahaja" class="hidden flex-col md:flex-row items-center justify-between bg-white bg-opacity-60 p-4 rounded-lg border border-emerald-100 mt-4">
-                <p class="text-sm text-emerald-800 font-medium mb-3 md:mb-0" id="mesejSijilPenyelaras">
-                    * Sila pilih <b>TAHUN</b> di filter atas untuk menyemak sijil penghargaan anda.
-                </p>
-                <a href="#" id="btnDownloadPenyelaras" target="_blank" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold shadow-md transition inline-flex items-center gap-2 flex-shrink-0">
-                    📥 Download Sijil Penyelaras
-                </a>
-            </div>
+            <button id="btnUploadPenyelaras" onclick="bukaUploadPenyelaras()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition">📤 Upload Sijil</button>
+            <a id="btnDownloadPenyelarasAdmin" target="_blank" class="hidden bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition">📥 Lihat Sijil</a>
+            <button id="btnDeletePenyelarasAdmin" onclick="padamSijilPenyelaras()" class="hidden bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition">🗑️ Padam</button>
         </div>
+    </div>
+
+    <div id="kawasanPenyelarasSahaja" class="hidden flex-col md:flex-row items-center justify-between bg-white bg-opacity-60 p-4 rounded-lg border border-emerald-100 mt-4">
+        <p class="text-sm text-emerald-800 font-medium mb-3 md:mb-0" id="mesejSijilPenyelaras">
+            * Sila pilih <b>TAHUN</b> di filter atas untuk menyemak sijil penghargaan anda.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-2">
+            <a href="#" id="btnLihatPenyelaras" target="_blank" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-md transition inline-flex items-center gap-2 flex-shrink-0">
+                👁️ Lihat Sijil
+            </a>
+            <a href="#" id="btnDownloadPenyelaras" target="_blank" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold shadow-md transition inline-flex items-center gap-2 flex-shrink-0">
+                📥 Download Sijil
+            </a>
+        </div>
+    </div>
+</div>
 
         <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
             <div class="p-4 border-b flex justify-between items-center bg-amber-50">
@@ -358,75 +364,92 @@
         }
 
         // ⚠️ FUNGSI BARU: Kemaskini paparan Penyelaras secara dinamik bila ada lebih dari 1
-        function kemaskiniPaparanPenyelarasUmum() {
-            if (stafPenyelarasSemasa.length === 0) return;
+function kemaskiniPaparanPenyelarasUmum() {
+    if (stafPenyelarasSemasa.length === 0) return;
 
-            const profil = stafPenyelarasSemasa[indexPenyelaras];
-            
-            // SELARASKAN PEMBACAAN DATA: Pastikan kunci (keys) & indeks adalah sama antara Umum & Admin
-            let icLama    = String(profil.NO_IC || profil.no_ic || profil.IC || profil.ic || profil.idPengguna || profil[0] || "-").trim(); 
-            let paparNama = profil.NAMA || profil.nama || profil.Nama || profil[1] || ""; 
-            let paparJab  = profil.JABATAN || profil.jabatan || profil.Jabatan || profil[3] || profil[2] || ""; 
-            let paparPer  = profil.PERANAN || profil.peranan || profil.Peranan || profil[4] || ""; 
-            let paparStat = profil.STATUS || profil.status || profil.Status || profil[6] || profil[5] || ""; 
+    const profil = stafPenyelarasSemasa[indexPenyelaras];
+    
+    // SELARASKAN PEMBACAAN DATA: Pastikan kunci (keys) & indeks adalah sama antara Umum & Admin
+    let icLama    = String(profil.NO_IC || profil.no_ic || profil.IC || profil.ic || profil.idPengguna || profil[0] || "-").trim(); 
+    let paparNama = profil.NAMA || profil.nama || profil.Nama || profil[1] || ""; 
+    let paparJab  = profil.JABATAN || profil.jabatan || profil.Jabatan || profil[3] || profil[2] || ""; 
+    let paparPer  = profil.PERANAN || profil.peranan || profil.Peranan || profil[4] || ""; 
+    let paparStat = profil.STATUS || profil.status || profil.Status || profil[6] || profil[5] || ""; 
 
-            document.getElementById("paparNamaPenyelaras").innerText = paparNama;
-            document.getElementById("paparJabatanPenyelaras").innerText = paparJab;
-            document.getElementById("paparPerananPenyelaras").innerText = paparStat ? `${paparPer} (${paparStat})` : paparPer;
-            
-            // IC update khusus untuk Penyelaras
-            if (!isStaf && document.getElementById("paparICPenyelaras")) {
-                document.getElementById("paparICPenyelaras").innerText = icLama;
+    document.getElementById("paparNamaPenyelaras").innerText = paparNama;
+    document.getElementById("paparJabatanPenyelaras").innerText = paparJab;
+    document.getElementById("paparPerananPenyelaras").innerText = paparStat ? `${paparPer} (${paparStat})` : paparPer;
+    
+    // IC update khusus untuk Penyelaras
+    if (!isStaf && document.getElementById("paparICPenyelaras")) {
+        document.getElementById("paparICPenyelaras").innerText = icLama;
+    }
+
+    // Uruskan butang Next/Previous
+    const btnNext = document.getElementById("butangNextPenyelaras");
+    const indikator = document.getElementById("indikatorPenyelaras");
+    
+    if (stafPenyelarasSemasa.length > 1) {
+        btnNext.classList.remove("hidden");
+        indikator.innerText = `Penyelaras ${indexPenyelaras + 1} dari ${stafPenyelarasSemasa.length}`;
+    } else {
+        btnNext.classList.add("hidden");
+    }
+
+    // Cari Sijil menggunakan IC Penyelaras yang sedang dipaparkan dengan pembersihan .trim()
+    const pilTahun = document.getElementById('filterTahun').value.trim();
+    const btnPenyelaras = document.getElementById("btnDownloadPenyelaras");
+    const btnLihat = document.getElementById("btnLihatPenyelaras"); // 👁️ DEFINISI BUTANG LIHAT
+    const txtMesej = document.getElementById("mesejSijilPenyelaras");
+
+    const sijilDitemui = rekodSijilPenyelaras.find(r => {
+        let rTahun = String(r.tahun || r.TAHUN || "").trim();
+        let rJabatan = String(r.jabatan || r.JABATAN || "").trim().toUpperCase();
+        let rIC = String(r.ic || r.IC || "").trim();
+        
+        return rTahun === pilTahun && 
+               rJabatan === paparJab.toUpperCase() &&
+               rIC === icLama;
+    });
+    
+    if(btnPenyelaras && txtMesej) {
+        if (sijilDitemui && sijilDitemui.url) {
+            // Urus pautan untuk butang Download
+            btnPenyelaras.href = sijilDitemui.url;
+            btnPenyelaras.classList.remove("hidden");
+
+            // 👁️ Urus pautan untuk butang Lihat Sijil
+            if (btnLihat) {
+                btnLihat.href = sijilDitemui.url;
+                btnLihat.classList.remove("hidden");
             }
 
-            // Uruskan butang Next/Previous
-            const btnNext = document.getElementById("butangNextPenyelaras");
-            const indikator = document.getElementById("indikatorPenyelaras");
-            
-            if (stafPenyelarasSemasa.length > 1) {
-                btnNext.classList.remove("hidden");
-                indikator.innerText = `Penyelaras ${indexPenyelaras + 1} dari ${stafPenyelarasSemasa.length}`;
-            } else {
-                btnNext.classList.add("hidden");
+            txtMesej.innerHTML = `Sijil penghargaan bagi Tahun <b>${pilTahun}</b> telah sedia untuk dilihat atau dimuat turun.`;
+        } else {
+            // Sembunyikan butang Download
+            btnPenyelaras.classList.add("hidden");
+
+            // 👁️ Sembunyikan butang Lihat Sijil
+            if (btnLihat) {
+                btnLihat.classList.add("hidden");
             }
 
-            // Cari Sijil menggunakan IC Penyelaras yang sedang dipaparkan dengan pembersihan .trim()
-            const pilTahun = document.getElementById('filterTahun').value.trim();
-            const btnPenyelaras = document.getElementById("btnDownloadPenyelaras");
-            const txtMesej = document.getElementById("mesejSijilPenyelaras");
-
-            const sijilDitemui = rekodSijilPenyelaras.find(r => {
-                let rTahun = String(r.tahun || r.TAHUN || "").trim();
-                let rJabatan = String(r.jabatan || r.JABATAN || "").trim().toUpperCase();
-                let rIC = String(r.ic || r.IC || "").trim();
-                
-                return rTahun === pilTahun && 
-                       rJabatan === paparJab.toUpperCase() &&
-                       rIC === icLama;
-            });
-            
-            if(btnPenyelaras && txtMesej) {
-                if (sijilDitemui && sijilDitemui.url) {
-                    btnPenyelaras.href = sijilDitemui.url;
-                    btnPenyelaras.classList.remove("hidden");
-                    txtMesej.innerHTML = `Sijil penghargaan bagi Tahun <b>${pilTahun}</b> telah sedia untuk dimuat turun.`;
-                } else {
-                    btnPenyelaras.classList.add("hidden");
-                    txtMesej.innerHTML = `⚠️ Sijil Penyelaras untuk <b>${paparNama}</b> belum dimuat naik oleh Admin.`;
-                }
-            }
+            txtMesej.innerHTML = `⚠️ Sijil Penyelaras untuk <b>${paparNama}</b> belum dimuat naik oleh Admin.`;
         }
-        // FUNGSI BARU: Untuk pusing array Penyelaras jika diklik
-        function paparPenyelarasSeterusnya() {
-            if (stafPenyelarasSemasa.length > 1) {
-                indexPenyelaras++;
-                // Reset ke 0 jika dah sampai hujung array
-                if (indexPenyelaras >= stafPenyelarasSemasa.length) {
-                    indexPenyelaras = 0; 
-                }
-                kemaskiniPaparanPenyelarasUmum(); // Panggil semula fungsi paparan
-            }
+    }
+}
+
+// FUNGSI BARU: Untuk pusing array Penyelaras jika diklik
+function paparPenyelarasSeterusnya() {
+    if (stafPenyelarasSemasa.length > 1) {
+        indexPenyelaras++;
+        // Reset ke 0 jika dah sampai hujung array
+        if (indexPenyelaras >= stafPenyelarasSemasa.length) {
+            indexPenyelaras = 0; 
         }
+        kemaskiniPaparanPenyelarasUmum(); // Panggil semula fungsi paparan
+    }
+}
 function paparJadualPaginasi() {
     const tbody = document.getElementById('isiJadual');
     tbody.innerHTML = "";

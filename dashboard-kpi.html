@@ -505,7 +505,7 @@ function drawTable() {
                 urlArray.forEach((link, idx) => {
                     let linkValid = link.startsWith("http") ? link : "https://" + link;
                     let namaButang = labelDokumen[idx] ? labelDokumen[idx] : `Fail ${idx + 1}`;
-                    pautanHtml += `<a href="${linkValid}" target="_blank" class="block mb-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-2.5 py-1.5 rounded font-semibold text-[10px] truncate max-w-[130px] mx-auto shadow-sm" title="${linkValid}">📄 ${namaButang}</a>`;
+                    pautanHtml += `<a href="${linkValid}" target="_blank" class="block mb-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-2.5 py-1.5 rounded font-semibold text-[10px] truncate max-w-[130px] mx-auto shadow-sm transition-colors" title="${linkValid}">📄 ${namaButang}</a>`;
                 });
             } else {
                 pautanHtml = "<span class='text-gray-400 italic text-xs'>Tiada Fail</span>";
@@ -513,39 +513,60 @@ function drawTable() {
         }
 
         const urlSijil = row[14] ? String(row[14]).trim() : "";
+        
+        // Pembolehubah untuk butang-butang Sijil
         let btnUploadHTML = "";
-        let btnDownloadHTML = ""; 
+        let btnSijilHTML = ""; 
 
         if (urlSijil === "") {
-            btnUploadHTML = `<button onclick="uploadSijil('${idRekodDB}', '')" class="bg-amber-500 hover:bg-amber-600 text-white p-1.5 rounded shadow-sm text-xs mr-1" title="Muat Naik Sijil">📄</button>`;
+            btnUploadHTML = `<button onclick="uploadSijil('${idRekodDB}', '')" class="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1.5 rounded shadow-sm hover:shadow-md active:scale-95 transition-all text-xs font-medium" title="Muat Naik Sijil">📤 Muat Naik</button>`;
         } else {
-            btnUploadHTML = `<button onclick="uploadSijil('${idRekodDB}', '${urlSijil}')" class="bg-indigo-500 hover:bg-indigo-600 text-white p-1.5 rounded shadow-sm text-xs mr-1" title="Tukar Sijil">🔄</button>`;
-            btnDownloadHTML = `<a href="${urlSijil}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white p-1.5 rounded shadow-sm text-xs mr-1 inline-block" title="Lihat / Muat Turun Sijil">📥</a>`;
+            btnUploadHTML = `<button onclick="uploadSijil('${idRekodDB}', '${urlSijil}')" class="flex items-center gap-1 bg-indigo-500 hover:bg-indigo-600 text-white px-2.5 py-1.5 rounded shadow-sm hover:shadow-md active:scale-95 transition-all text-xs font-medium" title="Tukar Sijil">🔄 Tukar</button>`;
+            
+            // Mengasingkan butang Lihat & Muat Turun
+            btnSijilHTML = `
+                <a href="${urlSijil}" target="_blank" class="flex items-center gap-1 bg-cyan-500 hover:bg-cyan-600 text-white px-2.5 py-1.5 rounded shadow-sm hover:shadow-md active:scale-95 transition-all text-xs font-medium" title="Lihat Sijil">👁️ Lihat</a>
+                <a href="${urlSijil}" target="_blank" download class="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded shadow-sm hover:shadow-md active:scale-95 transition-all text-xs font-medium" title="Muat Turun Sijil">📥 Muat Turun</a>
+            `;
         }
+
+        // Pembolehubah untuk butang Edit & Padam
+        const btnEdit = `<button onclick="editRekod('${idRekodDB}')" class="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2.5 py-1.5 rounded shadow-sm hover:shadow-md active:scale-95 transition-all text-xs font-medium" title="Edit Data">✏️ Edit</button>`;
+        const btnDelete = `<button onclick="padamRekod('${idRekodDB}')" class="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-2.5 py-1.5 rounded shadow-sm hover:shadow-md active:scale-95 transition-all text-xs font-medium" title="Padam Rekod">🗑️ Padam</button>`;
 
         let tindakanHTML = "";
         
         if (canEditDisahkan) {
             if (statusVal === 'DISAHKAN') {
                 tindakanHTML = `
-                    <td class="p-2 text-center whitespace-nowrap sel-tindakan">
-                        <button onclick="editRekod('${idRekodDB}')" class="bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded shadow-sm text-xs mr-1" title="Edit Data">✏️</button>
-                        ${btnUploadHTML} 
-                        ${btnDownloadHTML}
-                        <button onclick="padamRekod('${idRekodDB}')" class="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded shadow-sm text-xs" title="Padam Rekod">🗑️</button>
+                    <td class="p-2 align-middle sel-tindakan">
+                        <div class="flex flex-wrap items-center justify-center gap-1.5 min-w-[160px]">
+                            ${btnEdit}
+                            ${btnUploadHTML} 
+                            ${btnSijilHTML}
+                            ${btnDelete}
+                        </div>
                     </td>
                 `;
             } else {
                 tindakanHTML = `
-                    <td class="p-2 text-center whitespace-nowrap sel-tindakan">
-                        <button onclick="editRekod('${idRekodDB}')" class="bg-blue-500 hover:bg-blue-600 text-white p-1.5 rounded shadow-sm text-xs mr-1" title="Edit Data">✏️</button>
-                        <button onclick="padamRekod('${idRekodDB}')" class="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded shadow-sm text-xs" title="Padam Rekod">🗑️</button>
+                    <td class="p-2 align-middle sel-tindakan">
+                        <div class="flex flex-wrap items-center justify-center gap-1.5 min-w-[160px]">
+                            ${btnEdit}
+                            ${btnDelete}
+                        </div>
                     </td>
                 `;
             }
         } else {
             if (statusVal === 'DISAHKAN' && urlSijil !== "") {
-                tindakanHTML = `<td class="p-2 text-center whitespace-nowrap sel-tindakan">${btnDownloadHTML}</td>`;
+                tindakanHTML = `
+                    <td class="p-2 align-middle sel-tindakan">
+                        <div class="flex flex-wrap items-center justify-center gap-1.5 min-w-[160px]">
+                            ${btnSijilHTML}
+                        </div>
+                    </td>
+                `;
             } else if (statusVal === 'DISAHKAN' && urlSijil === "") {
                 tindakanHTML = `<td class="p-2 text-center text-gray-400 text-[11px] italic sel-tindakan">Sijil belum dimuat naik</td>`;
             } else {
@@ -557,7 +578,7 @@ function drawTable() {
         tr.className = "border-b hover:bg-blue-50 transition text-sm";
         
         tr.innerHTML = `
-            <td class="p-4 font-bold text-gray-600">${rowNumUI}</td>
+            <td class="p-4 font-bold text-gray-600 text-center">${rowNumUI}</td>
             <td class="p-4 font-semibold text-gray-800">${row[1] || '-'}</td>
             <td class="p-4 font-medium text-gray-700">${row[2] || '-'}</td>
             <td class="p-4 text-gray-500 text-xs uppercase">${row[5] || '-'}</td> 
@@ -578,7 +599,6 @@ function drawTable() {
         paparPagination(currentFilteredData.length);
     }
 }
-
         function tutupModal(idModal) {
             document.getElementById(idModal).classList.add('hidden');
         }
