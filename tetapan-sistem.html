@@ -56,6 +56,8 @@
         <button onclick="tukarTab('PERANAN', 'PERANAN')" id="tab_PERANAN" class="px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap">👤 PERANAN</button>
         
         <button onclick="tukarTab('BAHAGIAN', 'BAHAGIAN')" id="tab_BAHAGIAN" class="px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap">📁 BAHAGIAN</button>
+
+        <button onclick="tukarTab('KATEGORI_PRODUK', 'KATEGORI PRODUK INOVASI')" id="tab_KATEGORI_PRODUK" class="px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap">📦 KATEGORI PRODUK INOVASI</button>
         
         <button onclick="tukarTab('HARTA_INTELEK', 'HARTA INTELEK')" id="tab_HARTA_INTELEK" class="px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap">©️ HARTA INTELEK</button>
         
@@ -307,23 +309,28 @@
     </div>
 </div>
     <script>
-        // ⚠️ MASUKKAN URL WEB APP ANDA DI SINI
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
+// ⚠️ MASUKKAN URL WEB APP ANDA DI SINI
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
-        let tabSemasa = 'JABATAN';
-        let labelSemasa = 'JABATAN';
-		let dataGlobal = { SESI: [], TAHUN_SEMASA: [], JABATAN: [], PERANAN: [], BAHAGIAN: [], HARTA_INTELEK: [], PERINGKAT: [], PROGRAM: [], PENETAPAN_KPI: [] };
-        let currentPageSistem = 1;
-		const rowsPerPageSistem = 10;
-        // PEMBOLEHUBAH UNTUK PAGINATION (TARGET SEMASA)
-        let senaraiTargetGlobal = [];
-        let currentPageTarget = 1;
-        const rowsPerPageTarget = 5;
+let tabSemasa = 'JABATAN';
+let labelSemasa = 'JABATAN';
 
-        window.onload = () => {
-            muatData();
-            binaDropdownSukuan(); 
-        };
+// 🌟 TAMBAHAN BARU: Masukkan KATEGORI_PRODUK ke dalam dataGlobal
+let dataGlobal = { SESI: [], TAHUN_SEMASA: [], JABATAN: [], PERANAN: [], BAHAGIAN: [], KATEGORI_PRODUK: [], HARTA_INTELEK: [], PERINGKAT: [], PROGRAM: [], PENETAPAN_KPI: [] };
+
+let currentPageSistem = 1;
+const rowsPerPageSistem = 10;
+// PEMBOLEHUBAH UNTUK PAGINATION (TARGET SEMASA)
+let senaraiTargetGlobal = [];
+let currentPageTarget = 1;
+const rowsPerPageTarget = 5;
+
+window.onload = () => {
+    muatData();
+    binaDropdownSukuan(); 
+};
+
+// ... (Fungsi tambahData() dikekalkan sama sepenuhnya kerana ia sudah dinamik berdasarkan `tabSemasa`) ...
 
         function formatTarikh(tarikhString) {
             if (!tarikhString) return "-";
@@ -352,136 +359,136 @@
 		}
 
 // ========================================================
-        // 🌟 KEMASKINI: FUNGSI TUKAR TAB YANG TELAH DIGABUNGKAN
-        // ========================================================
-        function tukarTab(idTabBaru, labelBaru) {
-            tabSemasa = idTabBaru;
-            labelSemasa = labelBaru;
-            currentPageSistem = 1; // 🌟 TAMBAH BARIS INI: Supaya reset ke page 1
-            
-            // 1. Kawal Butang Tab (Aktif / Tidak Aktif)
-            ['SESI', 'TAHUN_SEMASA', 'JABATAN', 'PERANAN', 'BAHAGIAN', 'HARTA_INTELEK', 'PERINGKAT', 'PROGRAM', 'PENETAPAN_KPI', 'CARTA'].forEach(t => {
-                let tabEl = document.getElementById('tab_' + t);
-                if (tabEl) {
-                    tabEl.className = "px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap";
-                }
-            });
-            
-            let tabAktif = document.getElementById('tab_' + tabSemasa);
-            if (tabAktif) {
-                tabAktif.className = "px-6 py-4 text-center transition duration-300 tab-aktif outline-none whitespace-nowrap";
+// 🌟 KEMASKINI: FUNGSI TUKAR TAB YANG TELAH DIGABUNGKAN
+// ========================================================
+function tukarTab(idTabBaru, labelBaru) {
+    tabSemasa = idTabBaru;
+    labelSemasa = labelBaru;
+    currentPageSistem = 1; // 🌟 TAMBAH BARIS INI: Supaya reset ke page 1
+    
+    // 1. Kawal Butang Tab (Aktif / Tidak Aktif)
+    // 🌟 KEMASKINI TAMBAHAN: Memasukkan 'KATEGORI_PRODUK' ke dalam senarai
+    ['SESI', 'TAHUN_SEMASA', 'JABATAN', 'PERANAN', 'BAHAGIAN', 'KATEGORI_PRODUK', 'HARTA_INTELEK', 'PERINGKAT', 'PROGRAM', 'PENETAPAN_KPI', 'CARTA'].forEach(t => {
+        let tabEl = document.getElementById('tab_' + t);
+        if (tabEl) {
+            tabEl.className = "px-6 py-4 text-center transition duration-300 tab-tidak-aktif outline-none whitespace-nowrap";
+        }
+    });
+    
+    let tabAktif = document.getElementById('tab_' + tabSemasa);
+    if (tabAktif) {
+        tabAktif.className = "px-6 py-4 text-center transition duration-300 tab-aktif outline-none whitespace-nowrap";
+    }
+
+    if (document.getElementById('labelKategori')) {
+        document.getElementById('labelKategori').innerText = labelSemasa;
+    }
+
+    // 2. Deklarasi Panel UI
+    const panelKiri = document.getElementById('panelKiri');
+    const panelKanan = document.getElementById('panelKanan');
+    const kontenCARTA = document.getElementById('kontenCARTA');
+    
+    const borangTambah = document.getElementById('borangTambah');
+    const kpiContainer = document.getElementById('kpiContainer');
+    const containerSingkatanTambah = document.getElementById('containerSingkatanTambah');
+    
+    // 🌟 KEMASKINI PENAMBAHBAIKAN: Tangkap DIV pembungkus dan SELECT secara berasingan
+    const divJabatanTambah = document.getElementById('containerJabatanTambah');
+    const selectJabatanProgram = document.getElementById('jabatanProgram');
+
+    // 3. Logik Paparan Interface
+    if (tabSemasa === "CARTA") {
+        // Sembunyikan borang & jadual, tunjuk UI Carta sahaja (Span Full)
+        if(panelKiri) panelKiri.classList.add('hidden');
+        if(panelKanan) panelKanan.classList.add('hidden');
+        if(kontenCARTA) kontenCARTA.classList.remove('hidden'); 
+
+    } else if (tabSemasa === "PENETAPAN_KPI") {
+        // Paparkan panel kiri & kanan, tapi tunjuk form KPI
+        if(panelKiri) panelKiri.classList.remove('hidden');
+        if(panelKanan) panelKanan.classList.remove('hidden');
+        if(kontenCARTA) kontenCARTA.classList.add('hidden'); 
+        
+        if(borangTambah) borangTambah.classList.add('hidden');
+        if(kpiContainer) kpiContainer.classList.remove('hidden'); 
+        document.getElementById('inputData').removeAttribute('required'); 
+        
+        // Sembunyikan Dropdown Jabatan Program
+        if(divJabatanTambah) divJabatanTambah.classList.add('hidden');
+        if(selectJabatanProgram) selectJabatanProgram.removeAttribute('required');
+        
+        paparJadual();
+
+    } else {
+        // TAB BIASA (Jabatan, Peranan, Program, Kategori Produk Inovasi dll)
+        if(panelKiri) panelKiri.classList.remove('hidden');
+        if(panelKanan) panelKanan.classList.remove('hidden');
+        if(kontenCARTA) kontenCARTA.classList.add('hidden'); 
+        
+        if(kpiContainer) kpiContainer.classList.add('hidden');
+        if(borangTambah) borangTambah.classList.remove('hidden');
+        
+        // KAWAL PAPARAN KOTAK SINGKATAN
+        if (tabSemasa === "JABATAN") {
+            if (containerSingkatanTambah) {
+                containerSingkatanTambah.classList.remove('hidden');
+                document.getElementById('inputSingkatan').setAttribute('required', 'true');
             }
-
-            if (document.getElementById('labelKategori')) {
-                document.getElementById('labelKategori').innerText = labelSemasa;
-            }
-
-            // 2. Deklarasi Panel UI
-            const panelKiri = document.getElementById('panelKiri');
-            const panelKanan = document.getElementById('panelKanan');
-            const kontenCARTA = document.getElementById('kontenCARTA');
-            
-            const borangTambah = document.getElementById('borangTambah');
-            const kpiContainer = document.getElementById('kpiContainer');
-            const containerSingkatanTambah = document.getElementById('containerSingkatanTambah');
-            
-            // 🌟 KEMASKINI PENAMBAHBAIKAN: Tangkap DIV pembungkus dan SELECT secara berasingan
-            const divJabatanTambah = document.getElementById('containerJabatanTambah');
-            const selectJabatanProgram = document.getElementById('jabatanProgram');
-
-            // 3. Logik Paparan Interface
-            if (tabSemasa === "CARTA") {
-                // Sembunyikan borang & jadual, tunjuk UI Carta sahaja (Span Full)
-                if(panelKiri) panelKiri.classList.add('hidden');
-                if(panelKanan) panelKanan.classList.add('hidden');
-                if(kontenCARTA) kontenCARTA.classList.remove('hidden'); 
-
-            } else if (tabSemasa === "PENETAPAN_KPI") {
-                // Paparkan panel kiri & kanan, tapi tunjuk form KPI
-                if(panelKiri) panelKiri.classList.remove('hidden');
-                if(panelKanan) panelKanan.classList.remove('hidden');
-                if(kontenCARTA) kontenCARTA.classList.add('hidden'); 
-                
-                if(borangTambah) borangTambah.classList.add('hidden');
-                if(kpiContainer) kpiContainer.classList.remove('hidden'); 
-                document.getElementById('inputData').removeAttribute('required'); 
-                
-                // Sembunyikan Dropdown Jabatan Program
-                if(divJabatanTambah) divJabatanTambah.classList.add('hidden');
-                if(selectJabatanProgram) selectJabatanProgram.removeAttribute('required');
-                
-                paparJadual();
-
-            } else {
-                // TAB BIASA (Jabatan, Peranan, Program dll)
-                if(panelKiri) panelKiri.classList.remove('hidden');
-                if(panelKanan) panelKanan.classList.remove('hidden');
-                if(kontenCARTA) kontenCARTA.classList.add('hidden'); 
-                
-                if(kpiContainer) kpiContainer.classList.add('hidden');
-                if(borangTambah) borangTambah.classList.remove('hidden');
-                
-                // KAWAL PAPARAN KOTAK SINGKATAN
-                if (tabSemasa === "JABATAN") {
-                    if (containerSingkatanTambah) {
-                        containerSingkatanTambah.classList.remove('hidden');
-                        document.getElementById('inputSingkatan').setAttribute('required', 'true');
-                    }
-                } else {
-                    if (containerSingkatanTambah) {
-                        containerSingkatanTambah.classList.add('hidden');
-                        document.getElementById('inputSingkatan').removeAttribute('required');
-                    }
-                }
-                
-                // 🌟 KEMASKINI PENAMBAHBAIKAN: KAWAL PAPARAN DROPDOWN JABATAN PADA TAB PROGRAM
-                if (tabSemasa === "PROGRAM") {
-                    if (divJabatanTambah) {
-                        divJabatanTambah.classList.remove('hidden'); // Gunakan class Tailwind 'hidden'
-                    }
-                    if (selectJabatanProgram) {
-                        selectJabatanProgram.setAttribute('required', 'true');
-                        
-                        // Panggil muatDropdownJabatan jika ia masih belum diisi (mengelakkan ia kosong)
-                        if (selectJabatanProgram.options.length <= 1) {
-                            if (typeof muatDropdownJabatan === 'function') {
-                                muatDropdownJabatan();
-                            }
-                        }
-                    }
-                } else {
-                    if (divJabatanTambah) {
-                        divJabatanTambah.classList.add('hidden'); // Sembunyikan semula jika bukan tab PROGRAM
-                    }
-                    if (selectJabatanProgram) {
-                        selectJabatanProgram.removeAttribute('required');
-                    }
-                }
-
-                const inputData = document.getElementById('inputData');
-                if (inputData) {
-                    inputData.setAttribute('required', 'true');
-                    inputData.placeholder = "Masukkan " + labelSemasa + " baru...";
-                    inputData.value = "";
-                }
-
-                if (document.getElementById('labelInput')) {
-                    document.getElementById('labelInput').innerText = "NAMA " + labelSemasa;
-                }
-                
-                if (document.getElementById('inputSingkatan')) {
-                    document.getElementById('inputSingkatan').value = ""; // Reset singkatan juga
-                }
-                
-                // Reset dropdown jabatan
-                if (selectJabatanProgram) {
-                    selectJabatanProgram.value = ""; 
-                }
-                
-                paparJadual();
+        } else {
+            if (containerSingkatanTambah) {
+                containerSingkatanTambah.classList.add('hidden');
+                document.getElementById('inputSingkatan').removeAttribute('required');
             }
         }
-	
+        
+        // 🌟 KEMASKINI PENAMBAHBAIKAN: KAWAL PAPARAN DROPDOWN JABATAN PADA TAB PROGRAM
+        if (tabSemasa === "PROGRAM") {
+            if (divJabatanTambah) {
+                divJabatanTambah.classList.remove('hidden'); // Gunakan class Tailwind 'hidden'
+            }
+            if (selectJabatanProgram) {
+                selectJabatanProgram.setAttribute('required', 'true');
+                
+                // Panggil muatDropdownJabatan jika ia masih belum diisi (mengelakkan ia kosong)
+                if (selectJabatanProgram.options.length <= 1) {
+                    if (typeof muatDropdownJabatan === 'function') {
+                        muatDropdownJabatan();
+                    }
+                }
+            }
+        } else {
+            if (divJabatanTambah) {
+                divJabatanTambah.classList.add('hidden'); // Sembunyikan semula jika bukan tab PROGRAM
+            }
+            if (selectJabatanProgram) {
+                selectJabatanProgram.removeAttribute('required');
+            }
+        }
+
+        const inputData = document.getElementById('inputData');
+        if (inputData) {
+            inputData.setAttribute('required', 'true');
+            inputData.placeholder = "Masukkan " + labelSemasa + " baru...";
+            inputData.value = "";
+        }
+
+        if (document.getElementById('labelInput')) {
+            document.getElementById('labelInput').innerText = "NAMA " + labelSemasa;
+        }
+        
+        if (document.getElementById('inputSingkatan')) {
+            document.getElementById('inputSingkatan').value = ""; // Reset singkatan juga
+        }
+        
+        // Reset dropdown jabatan
+        if (selectJabatanProgram) {
+            selectJabatanProgram.value = ""; 
+        }
+        
+        paparJadual();
+    }
+}
 	// ========================================================
     // 🌟 KEMASKINI: TAMBAH FUNGSI PREVIEW & UPLOAD CARTA DI BAWAH INI
     // ========================================================
@@ -550,34 +557,39 @@
 	
 	
 
-        function muatData() {
-            document.getElementById('kawasanJadual').innerHTML = `<div class="p-10 text-center font-bold text-indigo-500 animate-pulse bg-white rounded-2xl shadow-md border border-gray-200">⏳ Memuat turun pangkalan data...</div>`;
+function muatData() {
+    document.getElementById('kawasanJadual').innerHTML = `<div class="p-10 text-center font-bold text-indigo-500 animate-pulse bg-white rounded-2xl shadow-md border border-gray-200">⏳ Memuat turun pangkalan data...</div>`;
+    
+    fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
+    .then(res => res.json())
+    .then(result => {
+        if(result.status === "BERJAYA") {
+            dataGlobal.SESI = result.SESI || [];
+            dataGlobal.TAHUN_SEMASA = result.TAHUN_SEMASA || [];
+            dataGlobal.JABATAN = result.JABATAN || [];
+            dataGlobal.PERANAN = result.PERANAN || [];
+            dataGlobal.BAHAGIAN = result.BAHAGIAN || [];
             
-            fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
-            .then(res => res.json())
-            .then(result => {
-                if(result.status === "BERJAYA") {
-                    dataGlobal.SESI = result.SESI || [];
-                    dataGlobal.TAHUN_SEMASA = result.TAHUN_SEMASA || [];
-                    dataGlobal.JABATAN = result.JABATAN || [];
-                    dataGlobal.PERANAN = result.PERANAN || [];
-                    dataGlobal.BAHAGIAN = result.BAHAGIAN || [];
-                    dataGlobal.HARTA_INTELEK = result.HARTA_INTELEK || []; 
-                    dataGlobal.PERINGKAT = result.PERINGKAT || [];
-                    // 🌟 TAMBAHAN UNTUK TAB PROGRAM
-                    dataGlobal.PROGRAM = result.PROGRAM || [];
-                    dataGlobal.PENETAPAN_KPI = result.PENETAPAN_KPI || [];
-					dataGlobal.PENYATAAN_KPI = result.PENYATAAN_KPI || [];
-                    paparJadual();
-                    
-                    // 🌟 KEMASKINI PENTING: Panggil fungsi ini supaya semua combo box diisi data dari lajur B
-                    muatDropdownJabatan(); 
-                    
-                } else {
-                    paparNotis("❌ Gagal memuat turun: " + result.mesej, "merah");
-                }
-            }).catch(err => paparNotis("⚠️ Ralat pelayan. Pastikan Google Apps Script anda sedia.", "merah"));
+            // 🌟 TAMBAHAN BARU: Memuatkan KATEGORI PRODUK INOVASI
+            dataGlobal.KATEGORI_PRODUK = result.KATEGORI_PRODUK || []; 
+            
+            dataGlobal.HARTA_INTELEK = result.HARTA_INTELEK || []; 
+            dataGlobal.PERINGKAT = result.PERINGKAT || [];
+            // 🌟 TAMBAHAN UNTUK TAB PROGRAM
+            dataGlobal.PROGRAM = result.PROGRAM || [];
+            dataGlobal.PENETAPAN_KPI = result.PENETAPAN_KPI || [];
+            dataGlobal.PENYATAAN_KPI = result.PENYATAAN_KPI || [];
+            
+            paparJadual();
+            
+            // 🌟 KEMASKINI PENTING: Panggil fungsi ini supaya semua combo box diisi data dari lajur B
+            muatDropdownJabatan(); 
+            
+        } else {
+            paparNotis("❌ Gagal memuat turun: " + result.mesej, "merah");
         }
+    }).catch(err => paparNotis("⚠️ Ralat pelayan. Pastikan Google Apps Script anda sedia.", "merah"));
+}
 
 function binaDropdownSukuan() {
             const selectSukuan = document.getElementById('kpiSukuan');
@@ -643,271 +655,271 @@ function binaDropdownSukuan() {
         }
 		
 function paparJadual() {
-            if (tabSemasa === "CARTA") return;
-            const kawasanJadual = document.getElementById('kawasanJadual');
-            let senaraiData = dataGlobal[tabSemasa] || [];
-            
-            if (tabSemasa === "PENETAPAN_KPI") {
-                
-                // 💡 PENTING KETAT: Asingkan jadual secara tegas.
-                let senaraiTarikh = senaraiData.filter(item => item.sukuan && item.sukuan.toString().trim() !== "" && item.sukuan.toString().trim().toUpperCase() !== "TARGET");
-                
-                // Jika Lajur A kosong (atau tertulis "TARGET" sbg fail-safe), ia adalah Target Semasa.
-                senaraiTargetGlobal = senaraiData.filter(item => (!item.sukuan || item.sukuan.toString().trim() === "" || item.sukuan.toString().trim().toUpperCase() === "TARGET") && item.tahun && item.tahun.toString().trim() !== "");
-                
-                currentPageTarget = 1;
+    if (tabSemasa === "CARTA") return;
+    const kawasanJadual = document.getElementById('kawasanJadual');
+    let senaraiData = dataGlobal[tabSemasa] || [];
+    
+    if (tabSemasa === "PENETAPAN_KPI") {
+        
+        // 💡 PENTING KETAT: Asingkan jadual secara tegas.
+        let senaraiTarikh = senaraiData.filter(item => item.sukuan && item.sukuan.toString().trim() !== "" && item.sukuan.toString().trim().toUpperCase() !== "TARGET");
+        
+        // Jika Lajur A kosong (atau tertulis "TARGET" sbg fail-safe), ia adalah Target Semasa.
+        senaraiTargetGlobal = senaraiData.filter(item => (!item.sukuan || item.sukuan.toString().trim() === "" || item.sukuan.toString().trim().toUpperCase() === "TARGET") && item.tahun && item.tahun.toString().trim() !== "");
+        
+        currentPageTarget = 1;
 
-                // ------------------------------------
-                // JADUAL 1: TARIKH PENTING
-                // ------------------------------------
-                let htmlKPI = `
-                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-8">
-                        <div class="bg-indigo-50 p-5 border-b border-indigo-100 flex justify-between items-center">
-                            <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📅 Senarai Tarikh Penting</h2>
-                            <button onclick="muatData()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">🔄 Refresh</button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
-                                <thead class="bg-indigo-600 text-white uppercase tracking-wide text-[11px]">
-                                    <tr>
-                                        <th class="p-3 border-b text-center w-12">BIL</th>
-                                        <th class="p-3 border-b text-center">SUKUAN</th>
-                                        <th class="p-3 border-b text-center">TAHUN</th>
-                                        <th class="p-3 border-b text-center">TUTUP DATA</th>
-                                        <th class="p-3 border-b text-center">VALIDASI</th>
-                                        <th class="p-3 border-b text-center">ANALISIS</th>
-                                        <th class="p-3 border-b text-center">PELAPORAN</th>
-                                        <th class="p-3 border-b text-center w-36">TINDAKAN</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-gray-700 bg-white">
-                `;
-
-                if (senaraiTarikh.length === 0) {
-                    htmlKPI += `<tr><td colspan="8" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai.</td></tr>`;
-                } else {
-                    senaraiTarikh.forEach((item, index) => {
-                        // 🌟 PENAMBAHBAIKAN: Melindungi (Escape) string untuk elak kerosakan HTML pada butang
-                        let sukuanAman = String(item.sukuan || '').replace(/'/g, "\\'");
-                        let tahunAman = String(item.tahun || '').replace(/'/g, "\\'");
-                        let tutupAman = String(item.sistemTutup || '').replace(/'/g, "\\'");
-                        let validasiAman = String(item.validasiData || '').replace(/'/g, "\\'");
-                        let analisisAman = String(item.analisis || '').replace(/'/g, "\\'");
-                        let pelaporanAman = String(item.pelaporan || '').replace(/'/g, "\\'");
-
-                        htmlKPI += `
-                            <tr class="border-b hover:bg-indigo-50 transition text-xs">
-                                <td class="p-3 border-r text-center font-bold text-gray-600">${index + 1}</td>
-                                <td class="p-3 border-r text-center font-bold text-gray-800 uppercase">${item.sukuan || '-'}</td>
-                                <td class="p-3 border-r text-center">${item.tahun || '-'}</td>
-                                <td class="p-3 border-r text-center font-medium text-red-600">${formatTarikh(item.sistemTutup)}</td>
-                                <td class="p-3 border-r text-center font-medium text-amber-600">${formatTarikh(item.validasiData)}</td>
-                                <td class="p-3 border-r text-center font-medium text-blue-600">${formatTarikh(item.analisis)}</td>
-                                <td class="p-3 border-r text-center font-medium text-green-600">${formatTarikh(item.pelaporan)}</td>
-                                <td class="p-3 text-center">
-                                    <div class="flex justify-center gap-1.5">
-                                        <button onclick="editTarikh('${sukuanAman}', '${tahunAman}', '${tutupAman}', '${validasiAman}', '${analisisAman}', '${pelaporanAman}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded shadow-sm font-bold transition">Edit</button>
-                                        <button onclick="padamData('${sukuanAman}', true)" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded shadow-sm font-bold transition">Padam</button>
-                                    </div>
-                                </td>
+        // ------------------------------------
+        // JADUAL 1: TARIKH PENTING
+        // ------------------------------------
+        let htmlKPI = `
+            <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-8">
+                <div class="bg-indigo-50 p-5 border-b border-indigo-100 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📅 Senarai Tarikh Penting</h2>
+                    <button onclick="muatData()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">🔄 Refresh</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
+                        <thead class="bg-indigo-600 text-white uppercase tracking-wide text-[11px]">
+                            <tr>
+                                <th class="p-3 border-b text-center w-12">BIL</th>
+                                <th class="p-3 border-b text-center">SUKUAN</th>
+                                <th class="p-3 border-b text-center">TAHUN</th>
+                                <th class="p-3 border-b text-center">TUTUP DATA</th>
+                                <th class="p-3 border-b text-center">VALIDASI</th>
+                                <th class="p-3 border-b text-center">ANALISIS</th>
+                                <th class="p-3 border-b text-center">PELAPORAN</th>
+                                <th class="p-3 border-b text-center w-36">TINDAKAN</th>
                             </tr>
-                        `;
-                    });
-                }
-                htmlKPI += `</tbody></table></div></div>`;
+                        </thead>
+                        <tbody class="text-gray-700 bg-white">
+        `;
 
-                // ------------------------------------
-                // JADUAL 2: TARGET SEMASA
-                // ------------------------------------
-                htmlKPI += `
-                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-8">
-                        <div class="bg-emerald-50 p-5 border-b border-emerald-100 flex justify-between items-center">
-                            <h2 class="text-lg font-bold text-emerald-800 flex items-center gap-2">🎯 Senarai Target Semasa</h2>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
-                                <thead class="bg-emerald-600 text-white uppercase tracking-wide text-[11px]">
-                                    <tr>
-                                        <th class="p-3 border-b text-center w-12">BIL</th>
-                                        <th class="p-3 border-b text-center">TAHUN</th>
-                                        <th class="p-3 border-b text-center">TGT PENYELIDIKAN</th>
-                                        <th class="p-3 border-b text-center">TGT INOVASI</th>
-                                        <th class="p-3 border-b text-center w-36">TINDAKAN</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="isiJadualTarget" class="text-gray-700 bg-white">
-                                    </tbody>
-                            </table>
-                        </div>
-                        <div class="bg-emerald-50 p-3 border-t border-emerald-100 flex justify-between items-center text-sm">
-                            <button id="btnPrevTarget" onclick="prevPageTarget()" class="px-4 py-1.5 bg-emerald-600 text-white rounded-lg disabled:opacity-50 font-bold shadow-sm transition">« Prev</button>
-                            <span id="targetNavText" class="font-bold text-emerald-800">Muka 1</span>
-                            <button id="btnNextTarget" onclick="nextPageTarget()" class="px-4 py-1.5 bg-emerald-600 text-white rounded-lg disabled:opacity-50 font-bold shadow-sm transition">Next »</button>
-                        </div>
-                    </div>
-                `;
-                
-                // ------------------------------------
-                // JADUAL 3: PENYATAAN KPI
-                // ------------------------------------
-                let senaraiPenyataan = dataGlobal.PENYATAAN_KPI || [];
-                let htmlPenyataanRows = "";
-
-                if (senaraiPenyataan.length === 0) {
-                    htmlPenyataanRows = `<tr><td colspan="6" class="p-10 text-center text-gray-500 font-medium">Tiada rekod Penyataan KPI dijumpai.</td></tr>`;
-                } else {
-                    senaraiPenyataan.forEach((item, index) => {
-                        let teksPenyataan = String(item.penyataan || '-'); 
-						// 🌟 PENAMBAHBAIKAN: Escape yang jauh lebih ketat untuk elak butang rosak
-                        let penyataanEscaped = teksPenyataan
-                            .replace(/\\/g, "\\\\")   // Escape backslash
-                            .replace(/'/g, "\\'")     // Escape single quotes
-                            .replace(/"/g, "&quot;")  // Escape double quotes
-                            .replace(/\n/g, "\\n")    // Escape 'Enter' (baris baharu)
-                            .replace(/\r/g, "");      // Buang carriage return
-                        let kategoriAman = String(item.kategori || '').replace(/'/g, "\\'");
-                        let tahunAman = String(item.tahun || '-').replace(/'/g, "\\'");
-                        let noKpiAman = String(item.noKpi || '-').replace(/'/g, "\\'");
-                        
-                        htmlPenyataanRows += `
-                            <tr class="border-b hover:bg-amber-50 transition text-xs">
-                                <td class="p-3 border-r text-center font-bold text-gray-600">${index + 1}</td>
-                                <td class="p-3 border-r text-center font-bold text-gray-800">${tahunAman}</td>
-                                <td class="p-3 border-r text-center font-bold text-amber-700">${kategoriAman}</td>
-                                <td class="p-3 border-r text-center font-bold text-gray-800">${noKpiAman}</td>
-                                <td class="p-3 border-r text-left font-medium text-gray-700 whitespace-normal break-words">${teksPenyataan}</td>
-                                <td class="p-3 text-center">
-                                    <div class="flex justify-center gap-1.5">
-                                        <button onclick="editDataPenyataan(${index})" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded shadow-sm font-bold transition">Edit</button>
-                                        <button onclick="padamDataPenyataan('${penyataanEscaped}', '${kategoriAman}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded shadow-sm font-bold transition">Padam</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                }
+        if (senaraiTarikh.length === 0) {
+            htmlKPI += `<tr><td colspan="8" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai.</td></tr>`;
+        } else {
+            senaraiTarikh.forEach((item, index) => {
+                // 🌟 PENAMBAHBAIKAN: Melindungi (Escape) string untuk elak kerosakan HTML pada butang
+                let sukuanAman = String(item.sukuan || '').replace(/'/g, "\\'");
+                let tahunAman = String(item.tahun || '').replace(/'/g, "\\'");
+                let tutupAman = String(item.sistemTutup || '').replace(/'/g, "\\'");
+                let validasiAman = String(item.validasiData || '').replace(/'/g, "\\'");
+                let analisisAman = String(item.analisis || '').replace(/'/g, "\\'");
+                let pelaporanAman = String(item.pelaporan || '').replace(/'/g, "\\'");
 
                 htmlKPI += `
-                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mt-8">
-                        <div class="bg-amber-50 p-5 border-b border-amber-100 flex justify-between items-center">
-                            <h2 class="text-lg font-bold text-amber-800 flex items-center gap-2">📝 Senarai Penyataan KPI</h2>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm">
-                                <thead class="bg-amber-600 text-white uppercase tracking-wide text-[11px]">
-                                    <tr>
-                                        <th class="p-3 border-b text-center w-12">BIL</th>
-                                        <th class="p-3 border-b text-center w-24">TAHUN</th>
-                                        <th class="p-3 border-b text-center w-40">KATEGORI</th>
-                                        <th class="p-3 border-b text-center w-24">NO KPI</th>
-                                        <th class="p-3 border-b">PENYATAAN KPI</th>
-                                        <th class="p-3 border-b text-center w-36">TINDAKAN</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-gray-700 bg-white">
-                                    ${htmlPenyataanRows}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <tr class="border-b hover:bg-indigo-50 transition text-xs">
+                        <td class="p-3 border-r text-center font-bold text-gray-600">${index + 1}</td>
+                        <td class="p-3 border-r text-center font-bold text-gray-800 uppercase">${item.sukuan || '-'}</td>
+                        <td class="p-3 border-r text-center">${item.tahun || '-'}</td>
+                        <td class="p-3 border-r text-center font-medium text-red-600">${formatTarikh(item.sistemTutup)}</td>
+                        <td class="p-3 border-r text-center font-medium text-amber-600">${formatTarikh(item.validasiData)}</td>
+                        <td class="p-3 border-r text-center font-medium text-blue-600">${formatTarikh(item.analisis)}</td>
+                        <td class="p-3 border-r text-center font-medium text-green-600">${formatTarikh(item.pelaporan)}</td>
+                        <td class="p-3 text-center">
+                            <div class="flex justify-center gap-1.5">
+                                <button onclick="editTarikh('${sukuanAman}', '${tahunAman}', '${tutupAman}', '${validasiAman}', '${analisisAman}', '${pelaporanAman}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded shadow-sm font-bold transition">Edit</button>
+                                <button onclick="padamData('${sukuanAman}', true)" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded shadow-sm font-bold transition">Padam</button>
+                            </div>
+                        </td>
+                    </tr>
                 `;
+            });
+        }
+        htmlKPI += `</tbody></table></div></div>`;
 
-                // Letak struktur HTML ke dalam halaman
-                kawasanJadual.innerHTML = htmlKPI;
-                
-                // Jalankan fungsi pagination untuk Target Semasa (kerana ia mempunyai elemen <tbody> berasingan)
-                if (typeof renderJadualTarget === 'function') {
-                    renderJadualTarget(); 
-                }
-
-            } else {
-                
-                // ==========================================
-                // 🌟 PAGINATION UNTUK TAB BIASA (PROGRAM DLL)
-                // ==========================================
-                
-                let totalRows = senaraiData.length;
-                let totalPages = Math.ceil(totalRows / rowsPerPageSistem);
-                
-                if (totalPages === 0) totalPages = 1;
-                if (currentPageSistem > totalPages) currentPageSistem = totalPages;
-
-                let startIndex = (currentPageSistem - 1) * rowsPerPageSistem;
-                let endIndex = startIndex + rowsPerPageSistem;
-                let senaraiMukaSurat = senaraiData.slice(startIndex, endIndex);
-
-                let htmlStandard = `
-                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
-                        <div class="bg-indigo-50 p-5 border-b border-gray-200 flex justify-between items-center">
-                            <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📊 Senarai ${labelSemasa}</h2>
-                            <button onclick="muatData()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">🔄 Refresh</button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
-                                <thead class="bg-indigo-600 text-white uppercase tracking-wide text-xs">
-                                    <tr>
-                                        <th class="p-3 border-b text-center w-16">BIL</th>
-                                        <th class="p-3 border-b">NAMA ${labelSemasa}</th>
-                                        ${tabSemasa === "PROGRAM" ? `<th class="p-3 border-b">JABATAN</th>` : ''}
-                                        <th class="p-3 border-b text-center w-48">TINDAKAN</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-gray-700 bg-white">
-                `;
-
-                if (senaraiMukaSurat.length === 0) {
-                    let jumlahColspan = tabSemasa === "PROGRAM" ? 4 : 3;
-                    htmlStandard += `<tr><td colspan="${jumlahColspan}" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai bagi ${labelSemasa}.</td></tr>`;
-                } else {
-                    senaraiMukaSurat.forEach((item, index) => {
-                        let nomborSebenar = startIndex + index + 1;
-                        
-                        let namaPaparan = "";
-                        let jabatanPaparan = "";
-                        
-                        if (item !== null && typeof item === 'object') {
-                            namaPaparan = item.nilai || item.NILAI || item.nama || item.NAMA || "";
-                            jabatanPaparan = item.jabatan || item.JABATAN || "";
-                        } else {
-                            namaPaparan = String(item || "");
-                        }
-
-                        let nilaiEscaped = namaPaparan.replace(/'/g, "\\'");
-                        let jabatanEscaped = jabatanPaparan.replace(/'/g, "\\'");
-
-                        htmlStandard += `
-                            <tr class="border-b hover:bg-indigo-50 transition">
-                                <td class="p-3 text-center font-bold text-gray-600">${nomborSebenar}</td>
-                                <td class="p-3 font-bold text-gray-800 uppercase">${namaPaparan}</td>
-                                ${tabSemasa === "PROGRAM" ? `<td class="p-3 font-medium text-gray-600 uppercase">${jabatanPaparan || '-'}</td>` : ''}
-                                <td class="p-3 text-center">
-                                    <div class="flex justify-center gap-2">
-                                        <button onclick="bukaModalKemaskini('${nilaiEscaped}', '${jabatanEscaped}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold transition">✏️ Edit</button>
-                                        <button onclick="padamData('${nilaiEscaped}', false)" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold transition">🗑️ Padam</button>
-                                    </div>
-                                </td>
+        // ------------------------------------
+        // JADUAL 2: TARGET SEMASA
+        // ------------------------------------
+        htmlKPI += `
+            <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mb-8">
+                <div class="bg-emerald-50 p-5 border-b border-emerald-100 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-emerald-800 flex items-center gap-2">🎯 Senarai Target Semasa</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
+                        <thead class="bg-emerald-600 text-white uppercase tracking-wide text-[11px]">
+                            <tr>
+                                <th class="p-3 border-b text-center w-12">BIL</th>
+                                <th class="p-3 border-b text-center">TAHUN</th>
+                                <th class="p-3 border-b text-center">TGT PENYELIDIKAN</th>
+                                <th class="p-3 border-b text-center">TGT INOVASI</th>
+                                <th class="p-3 border-b text-center w-36">TINDAKAN</th>
                             </tr>
-                        `;
-                    });
-                }
-                
-                htmlStandard += `</tbody></table></div>`;
+                        </thead>
+                        <tbody id="isiJadualTarget" class="text-gray-700 bg-white">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="bg-emerald-50 p-3 border-t border-emerald-100 flex justify-between items-center text-sm">
+                    <button id="btnPrevTarget" onclick="prevPageTarget()" class="px-4 py-1.5 bg-emerald-600 text-white rounded-lg disabled:opacity-50 font-bold shadow-sm transition">« Prev</button>
+                    <span id="targetNavText" class="font-bold text-emerald-800">Muka 1</span>
+                    <button id="btnNextTarget" onclick="nextPageTarget()" class="px-4 py-1.5 bg-emerald-600 text-white rounded-lg disabled:opacity-50 font-bold shadow-sm transition">Next »</button>
+                </div>
+            </div>
+        `;
+        
+        // ------------------------------------
+        // JADUAL 3: PENYATAAN KPI
+        // ------------------------------------
+        let senaraiPenyataan = dataGlobal.PENYATAAN_KPI || [];
+        let htmlPenyataanRows = "";
 
-                let prevDisabled = currentPageSistem === 1;
-                let nextDisabled = currentPageSistem === totalPages || totalPages === 1;
+        if (senaraiPenyataan.length === 0) {
+            htmlPenyataanRows = `<tr><td colspan="6" class="p-10 text-center text-gray-500 font-medium">Tiada rekod Penyataan KPI dijumpai.</td></tr>`;
+        } else {
+            senaraiPenyataan.forEach((item, index) => {
+                let teksPenyataan = String(item.penyataan || '-'); 
+                // 🌟 PENAMBAHBAIKAN: Escape yang jauh lebih ketat untuk elak butang rosak
+                let penyataanEscaped = teksPenyataan
+                    .replace(/\\/g, "\\\\")   // Escape backslash
+                    .replace(/'/g, "\\'")     // Escape single quotes
+                    .replace(/"/g, "&quot;")  // Escape double quotes
+                    .replace(/\n/g, "\\n")    // Escape 'Enter' (baris baharu)
+                    .replace(/\r/g, "");      // Buang carriage return
+                let kategoriAman = String(item.kategori || '').replace(/'/g, "\\'");
+                let tahunAman = String(item.tahun || '-').replace(/'/g, "\\'");
+                let noKpiAman = String(item.noKpi || '-').replace(/'/g, "\\'");
+                
+                htmlPenyataanRows += `
+                    <tr class="border-b hover:bg-amber-50 transition text-xs">
+                        <td class="p-3 border-r text-center font-bold text-gray-600">${index + 1}</td>
+                        <td class="p-3 border-r text-center font-bold text-gray-800">${tahunAman}</td>
+                        <td class="p-3 border-r text-center font-bold text-amber-700">${kategoriAman}</td>
+                        <td class="p-3 border-r text-center font-bold text-gray-800">${noKpiAman}</td>
+                        <td class="p-3 border-r text-left font-medium text-gray-700 whitespace-normal break-words">${teksPenyataan}</td>
+                        <td class="p-3 text-center">
+                            <div class="flex justify-center gap-1.5">
+                                <button onclick="editDataPenyataan(${index})" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded shadow-sm font-bold transition">Edit</button>
+                                <button onclick="padamDataPenyataan('${penyataanEscaped}', '${kategoriAman}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded shadow-sm font-bold transition">Padam</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        htmlKPI += `
+            <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden mt-8">
+                <div class="bg-amber-50 p-5 border-b border-amber-100 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-amber-800 flex items-center gap-2">📝 Senarai Penyataan KPI</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead class="bg-amber-600 text-white uppercase tracking-wide text-[11px]">
+                            <tr>
+                                <th class="p-3 border-b text-center w-12">BIL</th>
+                                <th class="p-3 border-b text-center w-24">TAHUN</th>
+                                <th class="p-3 border-b text-center w-40">KATEGORI</th>
+                                <th class="p-3 border-b text-center w-24">NO KPI</th>
+                                <th class="p-3 border-b">PENYATAAN KPI</th>
+                                <th class="p-3 border-b text-center w-36">TINDAKAN</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 bg-white">
+                            ${htmlPenyataanRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        // Letak struktur HTML ke dalam halaman
+        kawasanJadual.innerHTML = htmlKPI;
+        
+        // Jalankan fungsi pagination untuk Target Semasa (kerana ia mempunyai elemen <tbody> berasingan)
+        if (typeof renderJadualTarget === 'function') {
+            renderJadualTarget(); 
+        }
+
+    } else {
+        
+        // =========================================================================
+        // 🌟 PAGINATION UNTUK TAB BIASA (PROGRAM, KATEGORI PRODUK INOVASI, DLL)
+        // =========================================================================
+        
+        let totalRows = senaraiData.length;
+        let totalPages = Math.ceil(totalRows / rowsPerPageSistem);
+        
+        if (totalPages === 0) totalPages = 1;
+        if (currentPageSistem > totalPages) currentPageSistem = totalPages;
+
+        let startIndex = (currentPageSistem - 1) * rowsPerPageSistem;
+        let endIndex = startIndex + rowsPerPageSistem;
+        let senaraiMukaSurat = senaraiData.slice(startIndex, endIndex);
+
+        let htmlStandard = `
+            <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                <div class="bg-indigo-50 p-5 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2">📊 Senarai ${labelSemasa}</h2>
+                    <button onclick="muatData()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">🔄 Refresh</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
+                        <thead class="bg-indigo-600 text-white uppercase tracking-wide text-xs">
+                            <tr>
+                                <th class="p-3 border-b text-center w-16">BIL</th>
+                                <th class="p-3 border-b">NAMA ${labelSemasa}</th>
+                                ${tabSemasa === "PROGRAM" ? `<th class="p-3 border-b">JABATAN</th>` : ''}
+                                <th class="p-3 border-b text-center w-48">TINDAKAN</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 bg-white">
+        `;
+
+        if (senaraiMukaSurat.length === 0) {
+            let jumlahColspan = tabSemasa === "PROGRAM" ? 4 : 3;
+            htmlStandard += `<tr><td colspan="${jumlahColspan}" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai bagi ${labelSemasa}.</td></tr>`;
+        } else {
+            senaraiMukaSurat.forEach((item, index) => {
+                let nomborSebenar = startIndex + index + 1;
+                
+                let namaPaparan = "";
+                let jabatanPaparan = "";
+                
+                if (item !== null && typeof item === 'object') {
+                    namaPaparan = item.nilai || item.NILAI || item.nama || item.NAMA || "";
+                    jabatanPaparan = item.jabatan || item.JABATAN || "";
+                } else {
+                    namaPaparan = String(item || "");
+                }
+
+                let nilaiEscaped = namaPaparan.replace(/'/g, "\\'");
+                let jabatanEscaped = jabatanPaparan.replace(/'/g, "\\'");
 
                 htmlStandard += `
-                        <div class="bg-indigo-50 p-3 border-t border-indigo-100 flex justify-between items-center text-sm">
-                            <button onclick="tukarPageSistem(-1)" ${prevDisabled ? 'disabled class="px-4 py-1.5 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-bold shadow-sm"' : 'class="px-4 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold shadow-sm transition"'}>« Prev</button>
-                            <span class="font-bold text-indigo-800">Muka ${currentPageSistem} / ${totalPages}</span>
-                            <button onclick="tukarPageSistem(1)" ${nextDisabled ? 'disabled class="px-4 py-1.5 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-bold shadow-sm"' : 'class="px-4 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold shadow-sm transition"'}>Next »</button>
-                        </div>
-                    </div>
+                    <tr class="border-b hover:bg-indigo-50 transition">
+                        <td class="p-3 text-center font-bold text-gray-600">${nomborSebenar}</td>
+                        <td class="p-3 font-bold text-gray-800 uppercase">${namaPaparan}</td>
+                        ${tabSemasa === "PROGRAM" ? `<td class="p-3 font-medium text-gray-600 uppercase">${jabatanPaparan || '-'}</td>` : ''}
+                        <td class="p-3 text-center">
+                            <div class="flex justify-center gap-2">
+                                <button onclick="bukaModalKemaskini('${nilaiEscaped}', '${jabatanEscaped}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold transition">✏️ Edit</button>
+                                <button onclick="padamData('${nilaiEscaped}', false)" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold transition">🗑️ Padam</button>
+                            </div>
+                        </td>
+                    </tr>
                 `;
-
-                kawasanJadual.innerHTML = htmlStandard;
-            }
+            });
         }
+        
+        htmlStandard += `</tbody></table></div>`;
+
+        let prevDisabled = currentPageSistem === 1;
+        let nextDisabled = currentPageSistem === totalPages || totalPages === 1;
+
+        htmlStandard += `
+                <div class="bg-indigo-50 p-3 border-t border-indigo-100 flex justify-between items-center text-sm">
+                    <button onclick="tukarPageSistem(-1)" ${prevDisabled ? 'disabled class="px-4 py-1.5 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-bold shadow-sm"' : 'class="px-4 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold shadow-sm transition"'}>« Prev</button>
+                    <span class="font-bold text-indigo-800">Muka ${currentPageSistem} / ${totalPages}</span>
+                    <button onclick="tukarPageSistem(1)" ${nextDisabled ? 'disabled class="px-4 py-1.5 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-bold shadow-sm"' : 'class="px-4 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold shadow-sm transition"'}>Next »</button>
+                </div>
+            </div>
+        `;
+
+        kawasanJadual.innerHTML = htmlStandard;
+    }
+}
         // FUNGSI RENDER PAGINATION UNTUK TARGET
         function renderJadualTarget() {
             const tbody = document.getElementById('isiJadualTarget');

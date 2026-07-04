@@ -36,163 +36,174 @@
             <p id="msgRalatKP" class="text-red-600 font-semibold text-sm mt-3 hidden">❌ No Kad Pengenalan tidak sepadan! Sila cuba lagi.</p>
         </div>
 
-        <form id="formEdit" class="hidden space-y-4" onsubmit="hantarKemaskini(event)">
-            
-            <div class="bg-gray-50 p-3 rounded-lg border">
-                <label class="block text-xs font-bold text-gray-500 uppercase">ID Rekod (BIL)</label>
-                <input type="text" id="bil" name="bil" readonly class="mt-1 block w-full bg-transparent font-bold text-gray-700 outline-none cursor-not-allowed">
-            </div>
+ <form id="formEdit" class="hidden space-y-4" onsubmit="hantarKemaskini(event)">
+    
+    <div class="bg-gray-50 p-3 rounded-lg border">
+        <label class="block text-xs font-bold text-gray-500 uppercase">ID Rekod (BIL)</label>
+        <input type="text" id="bil" name="bil" readonly class="mt-1 block w-full bg-transparent font-bold text-gray-700 outline-none cursor-not-allowed">
+    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Nama Innovator</label>
-                    <input type="text" id="innovator" name="innovator" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Jabatan</label>
-                    <input type="text" id="jabatan" name="jabatan" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Nama Innovator</label>
+            <input type="text" id="innovator" name="innovator" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Jabatan</label>
+            <input type="text" id="jabatan" name="jabatan" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        </div>
+    </div>
 
+    <div>
+        <label class="block text-sm font-semibold text-gray-700">Ahli Kumpulan</label>
+        <textarea id="ahli" name="ahli" rows="2" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+        <p class="text-xs text-gray-500 mt-1">Pisahkan nama dengan koma (,)</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Produk Inovasi</label>
+            <input type="text" id="produk" name="produk" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Kategori Produk Inovasi</label>
+            <select id="kategori_produk" name="kategori_produk" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                <option value="">⏳ Memuatkan kategori...</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">No KP Ketua (Lajur P)</label>
+            <input type="text" id="no_kp" name="no_kp" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-yellow-50" placeholder="Tanpa sengkang (-) cth: 900101011234">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">No. HP Ketua</label>
+            <input type="text" id="no_hp_ketua" name="no_hp_ketua" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Cth: 0123456789">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Email Ketua</label>
+            <input type="email" id="email_ketua" name="email_ketua" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Cth: ketua@gmail.com">
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Nama Pertandingan</label>
+            <input type="text" id="pertandingan" name="pertandingan" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Tarikh & Tempat</label>
+            <input type="text" id="tarikh_tempat" name="tarikh_tempat" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Pingat / Pencapaian</label>
+            <select id="pingat" name="pingat" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                <option value="">Pilih Pingat...</option>
+                <option value="Emas">🥇 Emas</option>
+                <option value="Perak">🥈 Perak</option>
+                <option value="Gangsa">🥉 Gangsa</option>
+                <option value="Sijil">📜 Sijil Penyertaan</option>
+                <option value="Lain-lain">Lain-lain</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Tahun</label>
+            <input type="number" id="tahun" name="tahun" required min="2000" max="2100" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-gray-700">Yuran Penyertaan (RM)</label>
+            <input type="text" id="yuran" name="yuran" placeholder="Contoh: 150.00" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        </div>
+    </div>
+
+    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mt-4 shadow-sm">
+        <label class="block text-sm font-bold text-gray-800 mb-2">Status Pengesahan Rekod</label>
+        <select id="status" name="status" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white font-bold disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
+            <option value="MENUNGGU PENGESAHAN">🟡 MENUNGGU PENGESAHAN</option>
+            <option value="DISAHKAN">🟢 DISAHKAN</option>
+            <option value="DITOLAK">🔴 DITOLAK</option>
+        </select>
+        <p id="notaStatus" class="text-xs text-red-500 mt-2 hidden">*Hanya pihak Pengurusan/Penyelaras dibenarkan mengubah status ini.</p>
+    </div>
+
+    <div class="p-5 bg-blue-50 border border-blue-200 rounded-lg mt-4 shadow-sm">
+        <label class="block text-base font-bold text-blue-800 mb-3">🎓 Sijil Pencapaian (Lajur K)</label>
+        <div id="paparanSijilSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
+            <span class="text-xs text-gray-500 font-bold uppercase">Sijil Sedia Ada:</span>
+            <div id="linkSijilSemasa" class="mt-1 flex flex-col gap-2 text-sm break-all"></div>
+        </div>
+        <div class="space-y-4 border-t border-blue-200 pt-4">
             <div>
-                <label class="block text-sm font-semibold text-gray-700">Ahli Kumpulan</label>
-                <textarea id="ahli" name="ahli" rows="2" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-                <p class="text-xs text-gray-500 mt-1">Pisahkan nama dengan koma (,)</p>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan / Paste Link (Pisahkan koma)</label>
+                <input type="text" id="linkSijilPencapaian" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Produk Inovasi</label>
-                    <input type="text" id="produk" name="produk" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Fail Baharu (PDF Sahaja)</label>
+                <div id="dropZonePencapaian" class="w-full border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:bg-blue-100 transition cursor-pointer bg-white">
+                    <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-blue-600 font-bold">Klik untuk pilih</span></p>
+                    <input type="file" id="failPencapaian" class="hidden" multiple accept=".pdf, application/pdf">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">No KP Ketua (Lajur P)</label>
-                    <input type="text" id="no_kp" name="no_kp" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-yellow-50" placeholder="Tanpa sengkang (-) cth: 900101011234">
-                </div>
+                <div id="senaraiFailPencapaianUI" class="mt-2 flex flex-col gap-2"></div>
             </div>
+        </div>
+    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Nama Pertandingan</label>
-                    <input type="text" id="pertandingan" name="pertandingan" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Tarikh & Tempat</label>
-                    <input type="text" id="tarikh_tempat" name="tarikh_tempat" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
+    <div class="p-5 bg-green-50 border border-green-200 rounded-lg mt-4 shadow-sm">
+        <label class="block text-base font-bold text-green-800 mb-3">👥 Gambar Ahli (Lajur N)</label>
+        <div id="paparanAhliSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
+            <span class="text-xs text-gray-500 font-bold uppercase">Gambar Sedia Ada:</span>
+            <div id="linkAhliSemasa" class="mt-1 flex flex-col gap-2 text-sm break-all"></div>
+        </div>
+        <div class="space-y-4 border-t border-green-200 pt-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan Link Gambar (Pisahkan koma)</label>
+                <input type="text" id="linkGambarAhli" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white">
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Pingat / Pencapaian</label>
-                    <select id="pingat" name="pingat" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
-                        <option value="">Pilih Pingat...</option>
-                        <option value="Emas">🥇 Emas</option>
-                        <option value="Perak">🥈 Perak</option>
-                        <option value="Gangsa">🥉 Gangsa</option>
-                        <option value="Sijil">📜 Sijil Penyertaan</option>
-                        <option value="Lain-lain">Lain-lain</option>
-                    </select>
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Gambar Baharu (JPG/PNG)</label>
+                <div id="dropZoneAhli" class="w-full border-2 border-dashed border-green-300 rounded-lg p-6 text-center hover:bg-green-100 transition cursor-pointer bg-white">
+                    <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-green-600 font-bold">Klik untuk pilih</span></p>
+                    <input type="file" id="failGambarAhli" class="hidden" multiple accept="image/*">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Tahun</label>
-                    <input type="number" id="tahun" name="tahun" required min="2000" max="2100" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">Yuran Penyertaan (RM)</label>
-                    <input type="text" id="yuran" name="yuran" placeholder="Contoh: 150.00" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
+                <div id="senaraiFailAhliUI" class="mt-2 flex flex-col gap-2"></div>
             </div>
+        </div>
+    </div>
 
-            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg mt-4 shadow-sm">
-                <label class="block text-sm font-bold text-gray-800 mb-2">Status Pengesahan Rekod</label>
-                <select id="status" name="status" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white font-bold disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
-                    <option value="MENUNGGU PENGESAHAN">🟡 MENUNGGU PENGESAHAN</option>
-                    <option value="DISAHKAN">🟢 DISAHKAN</option>
-                    <option value="DITOLAK">🔴 DITOLAK</option>
-                </select>
-                <p id="notaStatus" class="text-xs text-red-500 mt-2 hidden">*Hanya pihak Pengurusan/Penyelaras dibenarkan mengubah status ini.</p>
+    <div class="p-5 bg-purple-50 border border-purple-200 rounded-lg mt-4 shadow-sm">
+        <label class="block text-base font-bold text-purple-800 mb-3">📦 Gambar Produk (Lajur O)</label>
+        <div id="paparanProdukSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
+            <span class="text-xs text-gray-500 font-bold uppercase">Gambar Sedia Ada:</span>
+            <div id="linkProdukSemasa" class="mt-1 flex flex-col gap-2 text-sm break-all"></div>
+        </div>
+        <div class="space-y-4 border-t border-purple-200 pt-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan Link Gambar (Pisahkan koma)</label>
+                <input type="text" id="linkGambarProduk" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 bg-white">
             </div>
-
-            <div class="p-5 bg-blue-50 border border-blue-200 rounded-lg mt-4 shadow-sm">
-                <label class="block text-base font-bold text-blue-800 mb-3">🎓 Sijil Pencapaian (Lajur K)</label>
-                
-                <div id="paparanSijilSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
-                    <span class="text-xs text-gray-500 font-bold uppercase">Sijil Sedia Ada:</span>
-                    <div id="linkSijilSemasa" class="mt-1 flex flex-col gap-2 text-sm break-all"></div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Gambar Baharu (JPG/PNG)</label>
+                <div id="dropZoneProduk" class="w-full border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:bg-purple-100 transition cursor-pointer bg-white">
+                    <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-purple-600 font-bold">Klik untuk pilih</span></p>
+                    <input type="file" id="failGambarProduk" class="hidden" multiple accept="image/*">
                 </div>
-
-                <div class="space-y-4 border-t border-blue-200 pt-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan / Paste Link (Pisahkan koma)</label>
-                        <input type="text" id="linkSijilPencapaian" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Fail Baharu (PDF Sahaja)</label>
-                        <div id="dropZonePencapaian" class="w-full border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:bg-blue-100 transition cursor-pointer bg-white">
-                            <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-blue-600 font-bold">Klik untuk pilih</span></p>
-                            <input type="file" id="failPencapaian" class="hidden" multiple accept=".pdf, application/pdf">
-                        </div>
-                        <div id="senaraiFailPencapaianUI" class="mt-2 flex flex-col gap-2"></div>
-                    </div>
-                </div>
+                <div id="senaraiFailProdukUI" class="mt-2 flex flex-col gap-2"></div>
             </div>
+        </div>
+    </div>
 
-            <div class="p-5 bg-green-50 border border-green-200 rounded-lg mt-4 shadow-sm">
-                <label class="block text-base font-bold text-green-800 mb-3">👥 Gambar Ahli (Lajur N)</label>
-                
-                <div id="paparanAhliSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
-                    <span class="text-xs text-gray-500 font-bold uppercase">Gambar Sedia Ada:</span>
-                    <div id="linkAhliSemasa" class="mt-1 flex flex-col gap-2 text-sm break-all"></div>
-                </div>
-
-                <div class="space-y-4 border-t border-green-200 pt-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan Link Gambar (Pisahkan koma)</label>
-                        <input type="text" id="linkGambarAhli" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Gambar Baharu (JPG/PNG)</label>
-                        <div id="dropZoneAhli" class="w-full border-2 border-dashed border-green-300 rounded-lg p-6 text-center hover:bg-green-100 transition cursor-pointer bg-white">
-                            <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-green-600 font-bold">Klik untuk pilih</span></p>
-                            <input type="file" id="failGambarAhli" class="hidden" multiple accept="image/*">
-                        </div>
-                        <div id="senaraiFailAhliUI" class="mt-2 flex flex-col gap-2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-5 bg-purple-50 border border-purple-200 rounded-lg mt-4 shadow-sm">
-                <label class="block text-base font-bold text-purple-800 mb-3">📦 Gambar Produk (Lajur O)</label>
-                
-                <div id="paparanProdukSemasa" class="hidden mb-4 p-3 bg-white border border-gray-300 rounded-md shadow-sm">
-                    <span class="text-xs text-gray-500 font-bold uppercase">Gambar Sedia Ada:</span>
-                    <div id="linkProdukSemasa" class="mt-1 flex flex-col gap-2 text-sm break-all"></div>
-                </div>
-
-                <div class="space-y-4 border-t border-purple-200 pt-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 1: Masukkan Link Gambar (Pisahkan koma)</label>
-                        <input type="text" id="linkGambarProduk" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilihan 2: Muat Naik Gambar Baharu (JPG/PNG)</label>
-                        <div id="dropZoneProduk" class="w-full border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:bg-purple-100 transition cursor-pointer bg-white">
-                            <p class="text-sm text-gray-600">Drag & Drop atau <span class="text-purple-600 font-bold">Klik untuk pilih</span></p>
-                            <input type="file" id="failGambarProduk" class="hidden" multiple accept="image/*">
-                        </div>
-                        <div id="senaraiFailProdukUI" class="mt-2 flex flex-col gap-2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pt-4 flex justify-end gap-3 border-t mt-4">
-                <button type="button" onclick="kembali()" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition">Batal</button>
-                <button type="submit" id="btnSimpan" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-md transition flex items-center gap-2">
-                    💾 Simpan Perubahan
-                </button>
-            </div>
-        </form>
+    <div class="pt-4 flex justify-end gap-3 border-t mt-4">
+        <button type="button" onclick="kembali()" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition">Batal</button>
+        <button type="submit" id="btnSimpan" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-md transition flex items-center gap-2">
+            💾 Simpan Perubahan
+        </button>
+    </div>
+</form>
     </div>
 
     <script>
@@ -204,14 +215,17 @@
         let kpKetuaSebenar = ""; // Simpanan sementara KP dari server
 
         window.onload = async () => {
-            if (!rekodId) {
-                alert("Ralat: ID Rekod tidak dijumpai.");
-                kembali(); return;
-            }
-            document.getElementById('bil').value = rekodId;
-            semakAksesStatus();
-            await tarikDataSemasa();
-        };
+		if (!rekodId) {
+        alert("Ralat: ID Rekod tidak dijumpai.");
+        kembali(); return;
+		}
+		document.getElementById('bil').value = rekodId;
+		semakAksesStatus();
+    
+		// 🌟 TAMBAHAN: Muat naik tetapan dropdown kategori produk terlebih dahulu
+		await muatNaikTetapanDropdown(); 
+		await tarikDataSemasa();
+		};
 
         function semakAksesStatus() {
             const perananPengguna = sessionStorage.getItem("peranan") || ""; 
@@ -221,74 +235,103 @@
                 document.getElementById('notaStatus').classList.remove('hidden');
             }
         }
+		
+		// 🌟 TAMBAHAN: Fungsi untuk tarik senarai Kategori Produk dari tab SISTEM
+	async function muatNaikTetapanDropdown() {
+    try {
+        const fetchUrl = scriptURL.includes('?') ? `${scriptURL}&action=ambilTetapanSenarai` : `${scriptURL}?action=ambilTetapanSenarai`;
+        const response = await fetch(fetchUrl);
+        if (!response.ok) throw new Error("Ralat memuatkan tetapan senarai");
+        const result = await response.json();
+        
+        if (result.status === "BERJAYA" && result.KATEGORI_PRODUK) {
+            const selectKategori = document.getElementById('kategori_produk');
+            selectKategori.innerHTML = '<option value="">Pilih Kategori...</option>';
+            result.KATEGORI_PRODUK.forEach(kategori => {
+                const option = document.createElement('option');
+                option.value = kategori;
+                option.textContent = kategori;
+                selectKategori.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error("Gagal memuatkan kategori produk:", error);
+    }
+}
 
         async function tarikDataSemasa() {
-            try {
-                const fetchUrl = scriptURL.includes('?') ? `${scriptURL}&action=ambilData` : `${scriptURL}?action=ambilData`;
-                const response = await fetch(fetchUrl);
-                if (!response.ok) throw new Error("Ralat rangkaian");
-                
-                const rawText = await response.text();
-                const result = JSON.parse(rawText);
-                
-                let dataDariSheet = [];
-                // Mengambil kira format balasan array dari Apps Script
-                if (Array.isArray(result) && result.length > 0 && typeof result[0] === 'object' && !Array.isArray(result[0])) {
-                    dataDariSheet = result.map((r, i) => [
-                        r.BIL || (i+1), r.INNOVATOR || "", r.AHLI || "", r.JABATAN || "", 
-                        r.PRODUK || "", r.NAMAPERTANDINGAN || "", r.TARIKHTEMPATPERTANDINGAN || "", 
-                        r.PINGAT || "", r.TAHUN || "", r.STATUS || "MENUNGGU PENGESAHAN",
-                        r.SIJIL || "", "", r.YURAN || "", 
-                        r.GAMBAR_AHLI || r.N || r[13] || "", // Lajur N (13)
-                        r.GAMBAR_PRODUK || r.O || r[14] || "", // Lajur O (14)
-                        r.NO_KP_KETUA || r.P || r[15] || ""  // Lajur P (15)
-                    ]);
-                } else if (Array.isArray(result) && Array.isArray(result[0])) {
-                    dataDariSheet = result;
-                } else if (result.status === "BERJAYA" || result.status === "berjaya") {
-                    dataDariSheet = result.data || [];
-                }
-
-                const rekodJumpa = dataDariSheet.find(row => String(row[0]) === String(rekodId));
-
-                if (rekodJumpa) {
-                    // Masukkan ke ruangan form
-                    document.getElementById('innovator').value = rekodJumpa[1] || '';
-                    document.getElementById('ahli').value = rekodJumpa[2] || '';
-                    document.getElementById('jabatan').value = rekodJumpa[3] || '';
-                    document.getElementById('produk').value = rekodJumpa[4] || '';
-                    document.getElementById('pertandingan').value = rekodJumpa[5] || '';
-                    document.getElementById('tarikh_tempat').value = rekodJumpa[6] || '';
-                    document.getElementById('tahun').value = rekodJumpa[8] || '';
-                    document.getElementById('yuran').value = rekodJumpa[12] || '';
-                    
-                    // Rekod Baru: NO KP KETUA
-                    kpKetuaSebenar = String(rekodJumpa[15] || '').trim();
-                    document.getElementById('no_kp').value = kpKetuaSebenar;
-
-                    // Set Pingat & Status
-                    setSelectValue('pingat', rekodJumpa[7], "Lain-lain");
-                    setSelectValue('status', rekodJumpa[9], "MENUNGGU PENGESAHAN");
-
-                    // Paparan Pautan Sedia Ada
-                    setupPaparanLink(rekodJumpa[10] || "", 'paparanSijilSemasa', 'linkSijilSemasa', 'linkSijilPencapaian', 'Sijil');
-                    setupPaparanLink(rekodJumpa[13] || "", 'paparanAhliSemasa', 'linkAhliSemasa', 'linkGambarAhli', 'Gambar Ahli');
-                    setupPaparanLink(rekodJumpa[14] || "", 'paparanProdukSemasa', 'linkProdukSemasa', 'linkGambarProduk', 'Gambar Produk');
-
-                    // Selesai muat naik, papar form atau sekuriti
-                    document.getElementById('loadingStatus').classList.add('hidden');
-                    semakKeperluanKP(); // Periksa jika perlukan kata laluan sebelum tunjuk borang
-
-                } else {
-                    alert("Rekod tidak dijumpai dalam pangkalan data."); kembali();
-                }
-
-            } catch (error) {
-                document.getElementById('loadingStatus').innerHTML = `❌ Ralat memuatkan data: ${error.message}`;
-                document.getElementById('loadingStatus').classList.replace('text-blue-600', 'text-red-600');
-            }
+    try {
+        const fetchUrl = scriptURL.includes('?') ? `${scriptURL}&action=ambilData` : `${scriptURL}?action=ambilData`;
+        const response = await fetch(fetchUrl);
+        if (!response.ok) throw new Error("Ralat rangkaian");
+        
+        const rawText = await response.text();
+        const result = JSON.parse(rawText);
+        
+        let dataDariSheet = [];
+        if (Array.isArray(result) && result.length > 0 && typeof result[0] === 'object' && !Array.isArray(result[0])) {
+            dataDariSheet = result.map((r, i) => [
+                r.BIL || (i+1), r.INNOVATOR || "", r.AHLI || "", r.JABATAN || "", 
+                r.PRODUK || "", r.NAMAPERTANDINGAN || "", r.TARIKHTEMPATPERTANDINGAN || "", 
+                r.PINGAT || "", r.TAHUN || "", r.STATUS || "MENUNGGU PENGESAHAN",
+                r.SIJIL || "", "", r.YURAN || "", 
+                r.GAMBAR_AHLI || r.N || r[13] || "", // Lajur N (13)
+                r.GAMBAR_PRODUK || r.O || r[14] || "", // Lajur O (14)
+                r.NO_KP_KETUA || r.P || r[15] || "",   // Lajur P (15)
+                r.KATEGORI_PRODUK || r.Q || r[16] || "", // 🌟 DIPERBAIKI: Lajur Q (index 16)
+                r.EMAIL_KETUA || r.R || r[17] || "",     // 🌟 DIPERBAIKI: Lajur R (index 17)
+                r.NO_HP_KETUA || r.S || r[18] || ""      // 🌟 DIPERBAIKI: Lajur S (index 18)
+            ]);
+        } else if (Array.isArray(result) && Array.isArray(result[0])) {
+            dataDariSheet = result;
+        } else if (result.status === "BERJAYA" || result.status === "berjaya") {
+            dataDariSheet = result.data || [];
         }
 
+        const rekodJumpa = dataDariSheet.find(row => String(row[0]) === String(rekodId));
+
+        if (rekodJumpa) {
+            // Masukkan ke ruangan form
+            document.getElementById('innovator').value = rekodJumpa[1] || '';
+            document.getElementById('ahli').value = rekodJumpa[2] || '';
+            document.getElementById('jabatan').value = rekodJumpa[3] || '';
+            document.getElementById('produk').value = rekodJumpa[4] || '';
+            document.getElementById('pertandingan').value = rekodJumpa[5] || '';
+            document.getElementById('tarikh_tempat').value = rekodJumpa[6] || '';
+            document.getElementById('tahun').value = rekodJumpa[8] || '';
+            document.getElementById('yuran').value = rekodJumpa[12] || '';
+            
+            // NO KP KETUA
+            kpKetuaSebenar = String(rekodJumpa[15] || '').trim();
+            document.getElementById('no_kp').value = kpKetuaSebenar;
+
+            // 🌟 TAMBAHAN: Set nilai No HP, Email, dan Dropdown Kategori semasa muat (Load) ikut susunan indeks yang betul
+            setSelectValue('kategori_produk', rekodJumpa[16], ""); // Lajur Q
+            document.getElementById('email_ketua').value = rekodJumpa[17] || ''; // Lajur R
+            document.getElementById('no_hp_ketua').value = rekodJumpa[18] || ''; // Lajur S
+
+            // Set Pingat & Status
+            setSelectValue('pingat', rekodJumpa[7], "Lain-lain");
+            setSelectValue('status', rekodJumpa[9], "MENUNGGU PENGESAHAN");
+
+            // Paparan Pautan Sedia Ada
+            setupPaparanLink(rekodJumpa[10] || "", 'paparanSijilSemasa', 'linkSijilSemasa', 'linkSijilPencapaian', 'Sijil');
+            setupPaparanLink(rekodJumpa[13] || "", 'paparanAhliSemasa', 'linkAhliSemasa', 'linkGambarAhli', 'Gambar Ahli');
+            setupPaparanLink(rekodJumpa[14] || "", 'paparanProdukSemasa', 'linkProdukSemasa', 'linkGambarProduk', 'Gambar Produk');
+
+            // Selesai muat naik, papar form atau sekuriti
+            document.getElementById('loadingStatus').classList.add('hidden');
+            semakKeperluanKP(); 
+
+        } else {
+            alert("Rekod tidak dijumpai dalam pangkalan data."); kembali();
+        }
+
+    } catch (error) {
+        document.getElementById('loadingStatus').innerHTML = `❌ Ralat memuatkan data: ${error.message}`;
+        document.getElementById('loadingStatus').classList.replace('text-blue-600', 'text-red-600');
+    }
+}
         // --- FUNGSI SOKONGAN UI ---
         function setSelectValue(elementId, value, fallback) {
             let el = document.getElementById(elementId);
@@ -442,39 +485,42 @@
         }
 
         async function hantarKemaskini(event) {
-            event.preventDefault(); 
-            const btnSimpan = document.getElementById('btnSimpan');
-            btnSimpan.disabled = true;
-            btnSimpan.innerHTML = "⏳ Sedang Menyimpan...";
-            btnSimpan.classList.add('opacity-70', 'cursor-not-allowed');
+    event.preventDefault(); 
+    const btnSimpan = document.getElementById('btnSimpan');
+    btnSimpan.disabled = true;
+    btnSimpan.innerHTML = "⏳ Sedang Menyimpan...";
+    btnSimpan.classList.add('opacity-70', 'cursor-not-allowed');
 
-            const statusEl = document.getElementById('status');
-            const wasDisabled = statusEl.disabled;
-            if (wasDisabled) statusEl.disabled = false; 
+    const statusEl = document.getElementById('status');
+    const wasDisabled = statusEl.disabled;
+    if (wasDisabled) statusEl.disabled = false; 
 
-            const form = document.getElementById('formEdit');
-            
-            const payload = {
-                action: "kemaskiniData",
-                bil: form.bil.value,
-                innovator: form.innovator.value,
-                jabatan: form.jabatan.value,
-                ahli: form.ahli.value,
-                produk: form.produk.value,
-                pertandingan: form.pertandingan.value,
-                tarikh_tempat: form.tarikh_tempat.value,
-                pingat: form.pingat.value,
-                tahun: form.tahun.value,
-                status: form.status.value,
-                yuran: form.yuran.value,
-                no_kp: form.no_kp.value, // Data Baru
-                linkSijilPencapaian: form.linkSijilPencapaian.value,
-                linkGambarAhli: form.linkGambarAhli.value,       // Data Baru
-                linkGambarProduk: form.linkGambarProduk.value,   // Data Baru
-                failPencapaianBase64: [], 
-                failGambarAhliBase64: [],                        // Data Baru
-                failGambarProdukBase64: []                       // Data Baru
-            };
+    const form = document.getElementById('formEdit');
+    
+    const payload = {
+        action: "kemaskiniData",
+        bil: form.bil.value,
+        innovator: form.innovator.value,
+        jabatan: form.jabatan.value,
+        ahli: form.ahli.value,
+        produk: form.produk.value,
+        kategori_produk: form.kategori_produk.value, // 🌟 TAMBAHAN DATA BARU
+        pertandingan: form.pertandingan.value,
+        tarikh_tempat: form.tarikh_tempat.value,
+        pingat: form.pingat.value,
+        tahun: form.tahun.value,
+        status: form.status.value,
+        yuran: form.yuran.value,
+        no_kp: form.no_kp.value, 
+        no_hp_ketua: form.no_hp_ketua.value,         // 🌟 TAMBAHAN DATA BARU
+        email_ketua: form.email_ketua.value,         // 🌟 TAMBAHAN DATA BARU
+        linkSijilPencapaian: form.linkSijilPencapaian.value,
+        linkGambarAhli: form.linkGambarAhli.value,       
+        linkGambarProduk: form.linkGambarProduk.value,   
+        failPencapaianBase64: [], 
+        failGambarAhliBase64: [],                        
+        failGambarProdukBase64: []                       
+    };
             
             if (wasDisabled) statusEl.disabled = true; 
 
