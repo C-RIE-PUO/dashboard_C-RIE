@@ -317,29 +317,6 @@ async function muatTetapanSenarai() {
     }
 }
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-
         // ==========================================
         // FUNGSI ISI BORANG MANUAL & PROSES FAIL SIJIL (DRAG & DROP)
         // ==========================================
@@ -586,27 +563,27 @@ async function muatTetapanSenarai() {
             btn.innerHTML = 'Memproses & Memuat Naik Fail... ⏳'; 
 
             const d = dapatkanDataBorang();
-            const dataHantar = {
+			const dataHantar = {
                 action: 'tambahData',
                 "JABATAN": d.jabatan,
                 "INNOVATOR": d.innovator,
-                "NO_KP_KETUA": d.no_kp_ketua,       // 🌟 HANTAR NO KP
-                "EMAIL_KETUA": d.email_ketua,       // 🌟 HANTAR EMAIL KETUA (Lajur R)
-                "NO_HP_KETUA": d.no_hp_ketua,       // 🌟 HANTAR NO HP KETUA (Lajur S)
+                "NO_KP_KETUA": d.no_kp_ketua,       // Lajur P: NO KP KETUA
+                "EMAIL_KETUA": d.email_ketua,       // Lajur R: EMAIL KETUA
+                "NO_HP_KETUA": d.no_hp_ketua,       // Lajur S: NO HP KETUA
                 "AHLI": d.ahli_kumpulan,
                 "PRODUK": d.produk_inovasi,
-                "KATEGORI_PRODUK": d.kategori_produk, // 🌟 HANTAR KATEGORI PRODUK (Lajur Q)
+                "KATEGORI_PRODUK": d.kategori_produk, // Lajur Q: KATEGORI PRODUK
                 "NAMA": d.tajuk_pertandingan,
                 "TARIKH": d.tarikh_pertandingan + ' (' + d.tempat_pertandingan + ')',
                 "PINGAT": d.pingat,
                 "TAHUN": d.tahun,
                 "YURAN": d.yuran_penyertaan, 
                 "SIJIL_DATA": d.dataSijil,
-                "GAMBAR_AHLI_DATA": d.dataGambarAhli,     // 🌟 HANTAR FAIL GAMBAR AHLI
-                "GAMBAR_PRODUK_DATA": d.dataGambarProduk  // 🌟 HANTAR FAIL GAMBAR PRODUK
+                "GAMBAR_AHLI_DATA": d.dataGambarAhli,     // Lajur N: GAMBAR AHLI
+                "GAMBAR_PRODUK_DATA": d.dataGambarProduk  // Lajur O: GAMBAR PRODUK
             };
             hantarKeGoogleSheet(dataHantar, btn, 'Sahkan & Simpan Data');
-        });
+        }); // --- C. TAMBAH DATA INOVASI ---
 
         // ==========================================
         // FUNGSI UPLOAD PUKAL (CSV)
