@@ -86,11 +86,20 @@
 
         <div id="statusMesejUI" class="hidden mb-4 p-4 rounded-xl text-center text-sm font-bold shadow-sm"></div>
 
-        <div class="grid grid-cols-2 gap-4 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <!-- 1. Kad Menunggu Pengesahan -->
             <div class="bg-orange-50 border border-orange-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
                 <h3 class="text-orange-800 font-bold text-sm md:text-base uppercase tracking-wide">Menunggu Pengesahan</h3>
                 <p class="text-4xl md:text-5xl font-extrabold text-orange-600 mt-2" id="statMenunggu">0</p>
             </div>
+
+            <!-- 2. 🌟 TAMBAHAN BARU: Kad Baiki Semula -->
+            <div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
+                <h3 class="text-amber-800 font-bold text-sm md:text-base uppercase tracking-wide">Baiki Semula</h3>
+                <p class="text-4xl md:text-5xl font-extrabold text-amber-600 mt-2" id="statBaiki">0</p>
+            </div>
+
+            <!-- 3. Kad Projek Disahkan -->
             <div class="bg-green-50 border border-green-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
                 <h3 class="text-green-800 font-bold text-sm md:text-base uppercase tracking-wide">Projek Disahkan</h3>
                 <p class="text-4xl md:text-5xl font-extrabold text-green-600 mt-2" id="statDisahkan">0</p>
@@ -125,6 +134,7 @@
         <option value="">Semua Status</option>
         <option value="MENUNGGU PENGESAHAN">Menunggu Pengesahan</option>
         <option value="DISAHKAN">Disahkan</option>
+		<option value="BAIKI SEMULA">Baiki semula</option>
     </select>
 
     <button onclick="muatDataStatus()" class="bg-teal-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-sm cursor-pointer whitespace-nowrap">
@@ -518,10 +528,10 @@ function terapkanTapisan() {
 
     let cMenunggu = 0;
     let cDisahkan = 0;
+    let cBaiki = 0; // 🌟 TAMBAHAN: Pembolehubah kaunter khusus untuk status Baiki Semula
 
     dataTapis = dataAsal.filter(row => {
         // 1. Semakan Tahun 
-        // 🌟 DIKEMASKINI: Carian tahun kini merangkumi tahun dari Tarikh Mula ATAU Tahun Daftar
         const checkTarikhMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
         const tahunMulaStr = (checkTarikhMula && !isNaN(new Date(checkTarikhMula).getFullYear())) ? new Date(checkTarikhMula).getFullYear().toString() : "";
         const tahunDaftarStr = String(dapatkanData(row, ["tahunDaftar", "TAHUN_DAFTAR"]) || "");
@@ -533,9 +543,19 @@ function terapkanTapisan() {
         let checkJabatan = (valJab === "" || dbJabatan === valJab);
         if (!isApprover && userPeranan !== "PENYELARAS JABATAN") checkJabatan = (dbJabatan === userJabatan);
 
-        // 3. Semakan Status
+        // 3. Semakan Status (🌟 DIKEMASKINI: Sokongan untuk teks ulasan pada status BAIKI SEMULA)
         const dbStatus = dapatkanData(row, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN";
-        let checkStatus = (valStatus === "" || dbStatus.toUpperCase() === valStatus.toUpperCase());
+        const statusUpper = dbStatus.toUpperCase();
+        
+        let checkStatus = true;
+        if (valStatus !== "") {
+            if (valStatus.toUpperCase() === "BAIKI SEMULA") {
+                // Gunakan .startsWith() supaya ulasan di belakang perkataan tidak mengganggu tapisan
+                checkStatus = statusUpper.startsWith("BAIKI SEMULA");
+            } else {
+                checkStatus = (statusUpper === valStatus.toUpperCase());
+            }
+        }
 
         // 4. Semakan Carian (Tajuk, Ketua, Ahli 1-5)
         let checkCarian = true;
@@ -548,7 +568,6 @@ function terapkanTapisan() {
             const a4 = String(dapatkanData(row, ["ahli4", "AHLI_4", "namaAhli4"])).toLowerCase();
             const a5 = String(dapatkanData(row, ["ahli5", "AHLI_5", "namaAhli5"])).toLowerCase();
 
-            // Jika kata kunci dijumpai di mana-mana bahagian di bawah, ia akan melepasi tapisan
             checkCarian = dbTajuk.includes(valCari) || 
                           dbKetua.includes(valCari) || 
                           a1.includes(valCari) || 
@@ -561,10 +580,15 @@ function terapkanTapisan() {
         // Gabungkan semua tapisan
         let isSesuai = checkTahun && checkJabatan && checkStatus && checkCarian;
         
-        // Pengiraan untuk kad ringkasan di atas jadual (Akan update secara dinamik berdasarkan carian)
+        // 🌟 DIKEMASKINI: Pengiraan kad ringkasan diasingkan dengan tepat
         if(isSesuai) {
-            if(dbStatus.toUpperCase() === "DISAHKAN") cDisahkan++;
-            else cMenunggu++;
+            if (statusUpper === "DISAHKAN") {
+                cDisahkan++;
+            } else if (statusUpper.startsWith("BAIKI SEMULA")) {
+                cBaiki++;
+            } else {
+                cMenunggu++;
+            }
         }
 
         return isSesuai;
@@ -572,18 +596,23 @@ function terapkanTapisan() {
 
     document.getElementById('statMenunggu').innerText = cMenunggu;
     document.getElementById('statDisahkan').innerText = cDisahkan;
+    
+    // 🌟 TAMBAHAN: Kemaskini kad statistik Baiki Semula (jika elemen wujud dalam HTML anda)
+    const elBaiki = document.getElementById('statBaiki') || document.getElementById('statBaikiSemula');
+    if (elBaiki) elBaiki.innerText = cBaiki;
 
-    // 🌟 PENAMBAHBAIKAN: Logik Isihan (Sorting) Tersuai
+    // Logik Isihan (Sorting) Tersuai
     dataTapis.sort((a, b) => {
         const statusA = (dapatkanData(a, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN").toUpperCase();
         const statusB = (dapatkanData(b, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN").toUpperCase();
         
-        const isMenungguA = statusA !== "DISAHKAN";
-        const isMenungguB = statusB !== "DISAHKAN";
+        // 🌟 DIKEMASKINI: Kedua-dua status MENUNGGU dan BAIKI SEMULA dikategorikan sebagai "Memerlukan Tindakan"
+        const isTindakanA = statusA !== "DISAHKAN";
+        const isTindakanB = statusB !== "DISAHKAN";
 
-        // Peraturan 1: Letakkan status "MENUNGGU PENGESAHAN" atau selain "DISAHKAN" di atas sekali
-        if (isMenungguA && !isMenungguB) return -1;
-        if (!isMenungguA && isMenungguB) return 1;
+        // Peraturan 1: Letakkan status yang memerlukan tindakan di atas sekali
+        if (isTindakanA && !isTindakanB) return -1;
+        if (!isTindakanA && isTindakanB) return 1;
 
         // Peraturan 2: Jika status sama, susun mengikut tahun pada tarikh surat secara menurun (Desc)
         const tSuratA = dapatkanData(a, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
@@ -592,12 +621,11 @@ function terapkanTapisan() {
         const yrA = (tSuratA && !isNaN(new Date(tSuratA).getFullYear())) ? new Date(tSuratA).getFullYear() : 0;
         const yrB = (tSuratB && !isNaN(new Date(tSuratB).getFullYear())) ? new Date(tSuratB).getFullYear() : 0;
 
-        // Jika tahun berbeza, susun tahun terbesar (terkini) di atas
         if (yrB !== yrA) {
             return yrB - yrA;
         }
 
-        // Jika tahun surat juga sama, kekalkan susunan asal mengikut ID/Bil baris secara menurun
+        // Peraturan 3: Kekalkan susunan asal mengikut ID/Bil baris secara menurun
         const bilA = parseInt(dapatkanData(a, ["bil", "BIL"])) || 0;
         const bilB = parseInt(dapatkanData(b, ["bil", "BIL"])) || 0;
         return bilB - bilA;
@@ -643,11 +671,11 @@ function paparJadual() {
         const a5 = dapatkanData(row, ["ahli5", "AHLI_5", "namaAhli5"]);
         let senaraiAhli = [a1, a2, a3, a4, a5].filter(a => a && String(a).trim() !== "");
 
-        let paparanStatus = sStatus === 'DISAHKAN' 
-            ? `<span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">✅ DISAHKAN</span>` 
-            : `<span class="bg-orange-100 text-orange-800 border border-orange-300 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">⏳ MENUNGGU</span>`;
+        // 🌟 PENAMBAHBAIKAN UTAMA: Pengesanan 3 Keadaan Status (Disahkan, Baiki Semula, & Menunggu)
+        let paparanStatus = "";
 
         if (sStatus === 'DISAHKAN') {
+            paparanStatus = `<span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">✅ DISAHKAN</span>`;
             const noRujukan = dapatkanData(row, ["noRujukan", "NO_RUJUKAN", "rujukan", "rujukanSurat"]);
             const tarikhSuratRaw = dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
             
@@ -662,6 +690,23 @@ function paparJadual() {
                     <div class="text-teal-700 leading-tight">${paparanTarikhSurat}</div>
                 </div>
             `;
+        } 
+        else if (sStatus.startsWith('BAIKI SEMULA')) {
+            // Asingkan teks "BAIKI SEMULA:" daripada ulasan menggunakan .split(':')
+            let bahagian = dbStatus.split(':');
+            let ulasanTeks = bahagian.length > 1 ? bahagian.slice(1).join(':').trim() : 'Sila semak semula maklumat pendaftaran projek ini.';
+            
+            paparanStatus = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">⚠️ BAIKI SEMULA</span>`;
+            paparanStatus += `
+                <div class="mt-2 text-[10px] text-left bg-amber-50 border border-amber-200 p-1.5 rounded-md min-w-[120px] max-w-[150px] mx-auto whitespace-normal shadow-sm">
+                    <div class="font-bold text-amber-900 mb-0.5">Sebab / Ulasan:</div>
+                    <div class="text-amber-800 leading-tight break-words font-medium">${ulasanTeks}</div>
+                </div>
+            `;
+        } 
+        else {
+            // Status lalai untuk MENUNGGU PENGESAHAN atau status lain
+            paparanStatus = `<span class="bg-orange-100 text-orange-800 border border-orange-300 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">⏳ MENUNGGU</span>`;
         }
 
         const urlMaklumat = dapatkanData(row, ["urlMaklumat", "URL_MAKLUMAT"]);
@@ -689,12 +734,17 @@ function paparJadual() {
         
         if (isApprover) {
             let btnSahkan = '';
+            let btnBaiki = ''; 
+            
             if (sStatus !== 'DISAHKAN') {
                 btnSahkan = `<button onclick="sahkanTindakan('${dbBil}', '${dbTajuk.replace(/'/g, "\\'")}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1.5 rounded font-bold shadow-sm transition text-[10px] w-full mb-1">✅ Sahkan</button>`;
+                btnBaiki = `<button onclick="baikiSemulaTindakan('${dbBil}', '${dbTajuk.replace(/'/g, "\\'")}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1 mb-1">⚠️ Baiki Semula</button>`;
             }
+            
             actionBtn = `
                 <div class="flex flex-col gap-1 w-full min-w-[80px]">
                     ${btnSahkan}
+                    ${btnBaiki}
                     <button onclick="bukaModalKemaskini('${dbBil}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">✏️ Edit</button>
                     <button onclick="padamRekod('${dbBil}', '${dbTajuk.replace(/'/g, "\\'")}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">🗑️ Padam</button>
                 </div>
@@ -710,7 +760,6 @@ function paparJadual() {
         const tr = document.createElement('tr');
         tr.className = "border-b hover:bg-teal-50 transition";
         
-        // --- PERUBAHAN UTAMA DI SINI ---
         let tdContent = `
             <td class="p-3 text-center font-bold text-gray-600 align-top">${Mula + index + 1}</td>
             <td class="p-3 whitespace-normal align-top min-w-[300px]">
@@ -1005,7 +1054,61 @@ async function hantarKemaskini(e) {
             window.scrollTo(0, 0); setTimeout(() => sm.classList.add('hidden'), 5000);
         }
 		
-		
+// 🌟 TAMBAHAN BARU: Fungsi untuk memaparkan Pop-up ulasan dan hantar ke server (Diselaraskan dengan sistem sedia ada)
+function baikiSemulaTindakan(bilId, tajuk) {
+    var ulasan = prompt(`Sila masukkan ULASAN / SEBAB BAIKI SEMULA untuk projek:\n"${tajuk}"\n\nUlasan ini akan dipaparkan pada status jadual.`);
+    
+    if (ulasan === null) return; // Pengguna tekan Cancel
+    
+    if (ulasan.trim() === "") {
+        alert("❌ Ulasan tidak boleh dibiarkan kosong! Sila masukkan sebab baiki semula.");
+        return;
+    }
+
+    if (confirm(`Adakah anda pasti untuk menukar status projek ini kepada:\n"BAIKI SEMULA: ${ulasan}"?`)) {
+        
+        // Paparkan status sedang diproses pada UI (Sama seperti fungsi padam/kemaskini)
+        paparUI('⏳ Sedang mengemaskini status projek...', 'bg-yellow-100 text-yellow-800 border-yellow-200');
+
+        // 1. Bina objek payload lengkap (Seragam dengan kod kemaskini dan padam)
+        const payloadData = {
+            action: "baikiSemula",
+            BIL: bilId,
+            ULASAN: ulasan
+        };
+
+        // 2. Hantar menggunakan format JSON & SCRIPT_URL yang sama dengan kod sedia ada anda
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payloadData)
+        })
+        .then(res => res.json()) // Terus parse sebagai JSON seperti fungsi padamRekod
+        .then(data => {
+            if (data.status === "BERJAYA" || data.status === "berjaya") {
+                paparUI("✅ Status berjaya dikemaskini kepada Baiki Semula!", 'bg-green-100 text-green-800 border-green-200');
+                alert("✅ Status berjaya dikemaskini kepada Baiki Semula!");
+                
+                // 3. Panggil fungsi rasmi sistem anda untuk memuat turun / refresh jadual
+                if (typeof muatDataStatus === 'function') {
+                    muatDataStatus();
+                } else if (typeof tarikDataSemasa === 'function') {
+                    tarikDataSemasa();
+                } else {
+                    location.reload(); // Fallback jika fungsi refresh tiada
+                }
+            } else {
+                paparUI("❌ Ralat: " + (data.mesej || "Gagal mengemaskini status"), 'bg-red-100 text-red-800 border-red-200');
+                alert("❌ Gagal mengemaskini status: " + (data.mesej || "Ralat tidak diketahui dari server."));
+            }
+        })
+        .catch(err => {
+            paparUI("⚠️ Gagal menghubungi server. Sila semak sambungan internet anda.", 'bg-red-100 text-red-800 border-red-200');
+            console.error("Error Fetch Baiki Semula:", err);
+            alert("❌ Ralat Sistem: " + err.message);
+        });
+    }
+}
 		
 	// 🔒 FUNGSI KESELAMATAN KHAS UNTUK STAF
 function semakKataLuanDanEdit(bil) {
