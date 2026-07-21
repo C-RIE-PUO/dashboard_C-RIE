@@ -35,8 +35,8 @@
                 <p class="text-gray-500 text-sm mt-1 ml-12">Analisis & Pemantauan Peruntukan Geran Penyelidikan</p>
             </div>
             <div class="flex flex-wrap justify-center gap-3">
-                <button id="btnMuatNaikPukal" onclick="bukaModalPukal()" class="hidden bg-orange-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Data
+                <button id="btnTambahData" onclick="bukaModalTambahData()" class="hidden bg-orange-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle"></i> Tambah Data
                 </button>
                 <a href="paparan.html" class="bg-white text-gray-700 border border-gray-300 px-5 py-2.5 rounded-xl font-bold shadow-sm hover:bg-gray-50 transition-all text-sm flex items-center gap-2">
                     <i class="fa-solid fa-house"></i> Utama
@@ -47,35 +47,33 @@
 
     <main class="max-w-[90rem] mx-auto px-4 py-8 flex-grow w-full space-y-8">
         
-<div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-    <div class="relative w-full md:w-2/5">
-        <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
-        <input type="text" id="carianTeks" onkeyup="terapkanTapisan()" placeholder="Cari nama ketua, ahli, tajuk atau No. Rujukan..." class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-    </div>
-    
-    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-        
-        <div class="relative">
-            <i class="fa-regular fa-calendar absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
-            <input type="text" id="filterTahun" onkeyup="terapkanTapisan()" placeholder="Tahun..." class="w-full sm:w-32 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+        <div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+            <div class="relative w-full md:w-2/5">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                <input type="text" id="carianTeks" onkeyup="terapkanTapisan()" placeholder="Cari nama ketua, ahli, tajuk atau No. Rujukan..." class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div class="relative">
+                    <i class="fa-regular fa-calendar absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
+                    <input type="text" id="filterTahun" onkeyup="terapkanTapisan()" placeholder="Tahun..." class="w-full sm:w-32 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                
+                <div class="relative">
+                    <i class="fa-solid fa-building absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
+                    <select id="filterJabatan" onchange="terapkanTapisan()" class="w-full sm:w-48 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none transition-all">
+                        <option value="">Semua Jabatan</option>
+                    </select>
+                </div>
+                
+                <div class="relative">
+                    <i class="fa-solid fa-list-check absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
+                    <select id="filterStatus" onchange="terapkanTapisan()" class="w-full sm:w-40 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none transition-all">
+                        <option value="">Semua Status</option>
+                    </select>
+                </div>
+            </div>
         </div>
-        
-        <div class="relative">
-            <i class="fa-solid fa-building absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
-            <select id="filterJabatan" onchange="terapkanTapisan()" class="w-full sm:w-48 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none transition-all">
-                <option value="">Semua Jabatan</option>
-            </select>
-        </div>
-        
-        <div class="relative">
-            <i class="fa-solid fa-list-check absolute left-4 top-3.5 text-gray-400 pointer-events-none"></i>
-            <select id="filterStatus" onchange="terapkanTapisan()" class="w-full sm:w-40 pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none transition-all">
-                <option value="">Semua Status</option>
-            </select>
-        </div>
-        
-    </div>
-</div>
 
         <div id="kpiCards" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500 animate-pulse col-span-full">Menyemak pangkalan data...</div>
@@ -109,7 +107,7 @@
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse whitespace-nowrap min-w-[1200px]">
-					<thead>
+                    <thead>
                         <tr class="bg-slate-800 text-slate-100 uppercase tracking-wider text-[11px]">
                             <th class="p-4 text-center w-16">Bil</th>
                             <th class="p-4 w-[400px]">Ketua & Penyelidik</th>
@@ -137,49 +135,168 @@
         </div>
     </main>
 
-    <div id="modalUploadPukal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
-            <div class="bg-gradient-to-r from-blue-800 to-blue-900 p-5 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg flex items-center"><i class="fa-solid fa-file-excel mr-3 text-2xl opacity-80"></i> Muat Naik Data Pukal</h3>
-                <button onclick="tutupModalPukal()" class="text-white hover:text-red-300 text-2xl font-bold leading-none transition">&times;</button>
+    <!-- MODAL: TAMBAH DATA (MANUAL & PUKAL) -->
+    <div id="modalTambahData" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all scale-100 flex flex-col max-h-[90vh]">
+            
+            <div class="bg-gradient-to-r from-blue-800 to-blue-900 p-5 text-white flex justify-between items-center flex-shrink-0">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-folder-plus text-xl text-orange-400"></i> Pengurusan Tambah Data Geran
+                </h3>
+                <button onclick="tutupModalTambahData()" class="text-white hover:text-red-300 text-2xl font-bold leading-none transition">&times;</button>
             </div>
-            <div class="p-6 space-y-5">
-                <div class="bg-blue-50/50 border border-blue-100 p-4 rounded-xl text-sm text-blue-800">
-                    <p class="font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-info text-blue-500"></i> Arahan Muat Naik:</p>
-                    <ol class="list-decimal ml-5 space-y-1.5 text-gray-700">
-                        <li>Muat turun templat CSV di bawah.</li>
-                        <li>Pastikan maklumat diisi mengikut struktur templat dengan betul.</li>
-                        <li>Format nilai <b>Mesti</b> dalam bentuk nombor sahaja (Cth: 52000).</li>
-                    </ol>
-                </div>
+
+            <div class="flex border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                <button id="tabBtnManual" onclick="tukarTab('manual')" class="flex-1 py-3 text-center font-bold text-sm text-blue-600 border-b-2 border-blue-600 transition flex items-center justify-center gap-2 bg-white">
+                    <i class="fa-solid fa-pen-to-square"></i> Tambah secara Manual
+                </button>
+                <button id="tabBtnPukal" onclick="tukarTab('pukal')" class="flex-1 py-3 text-center font-bold text-sm text-gray-500 hover:text-blue-600 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-csv"></i> Muat Naik secara Pukal
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-grow custom-scrollbar">
                 
-                <div class="flex justify-center my-2">
-                    <button onclick="muatTurunTemplate()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-5 py-2.5 rounded-xl font-bold hover:bg-emerald-100 transition text-sm flex items-center gap-2 w-full justify-center">
-                        <i class="fa-solid fa-download"></i> Muat Turun Templat (.csv)
-                    </button>
+                <!-- TAB 1: KANDUNGAN MANUAL -->
+                <div id="tabKandunganManual">
+                    <form id="formTambahManual" onsubmit="hantarDataManual(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Nama Ketua Penyelidik <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_m_ketua" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Cth: Dr. Ahmad Bin Ali">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">No. HP Ketua</label>
+                                <input type="text" id="in_m_noHp" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Cth: 0123456789">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Jabatan / Unit (Ketua) <span class="text-red-500">*</span></label>
+                                <select id="in_m_jabatan" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                                    <option value="">-- Pilih Jabatan / Unit --</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Jenis Geran <span class="text-red-500">*</span></label>
+                                <select id="in_m_jenis" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                                    <option value="">-- Pilih Jenis Geran --</option>
+                                </select>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Tajuk Projek <span class="text-red-500">*</span></label>
+                                <textarea id="in_m_tajuk" rows="2" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan tajuk penuh projek penyelidikan"></textarea>
+                            </div>
+
+                            <div class="md:col-span-2 bg-blue-50/60 p-4 rounded-xl border border-blue-100 space-y-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                    <label class="block text-xs font-bold text-blue-900 uppercase tracking-wide">
+                                        <i class="fa-solid fa-users mr-1 text-blue-600"></i> Bilangan Ahli Kumpulan Penyelidik
+                                    </label>
+                                    <select id="in_m_bil_ahli" onchange="janaFieldAhli()" class="w-full sm:w-56 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm cursor-pointer transition-all">
+                                        <option value="0">0 - Tiada Ahli Tambahan</option>
+                                        <option value="1">1 Orang Ahli</option>
+                                        <option value="2">2 Orang Ahli</option>
+                                        <option value="3">3 Orang Ahli</option>
+                                        <option value="4">4 Orang Ahli</option>
+                                        <option value="5">5 Orang Ahli</option>
+                                        <option value="6">6 Orang Ahli (Maksimum)</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="container_ahli" class="space-y-3 pt-1"></div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">No. Rujukan Geran</label>
+                                <input type="text" id="in_m_noRuj" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Cth: PKS/2026/GERAN/01">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Tahun Mula</label>
+                                    <input type="text" id="in_m_mula" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2026">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Tahun Tamat</label>
+                                    <input type="text" id="in_m_tamat" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2027">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Peruntukan (RM) <span class="text-red-500">*</span></label>
+                                    <input type="number" step="0.01" id="in_m_nilai" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono font-bold text-emerald-600 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="50000">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Peratus Belanja (%)</label>
+                                    <input type="number" step="0.1" id="in_m_peratus" value="0" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono font-bold text-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Status Geran</label>
+                                <select id="in_m_status" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="AKTIF">AKTIF / SEDANG BERJALAN</option>
+                                    <option value="SELESAI">SELESAI / LULUS</option>
+                                    <option value="TUNGGU">TUNGGU / DALAM PROSES</option>
+                                    <option value="TOLAK">TOLAK / BATAL</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex justify-end gap-3 border-t border-gray-100">
+                            <button type="button" onclick="tutupModalTambahData()" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition text-sm">Batal</button>
+                            <button type="submit" id="btnSubmitManual" class="px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition shadow-md hover:shadow-lg text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Data Geran
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
-                <div class="relative flex py-2 items-center">
-                    <div class="flex-grow border-t border-gray-200"></div>
-                    <span class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase font-bold tracking-wider">Upload Fail</span>
-                    <div class="flex-grow border-t border-gray-200"></div>
-                </div>
-
-                <form onsubmit="hantarDataPukal(event)" class="space-y-4">
-                    <div>
-                        <input type="file" id="in_fail_pukal" accept=".csv, .xlsx, .xls" required class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-600 bg-gray-50 focus:border-blue-500 focus:bg-blue-50 outline-none transition cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                <!-- TAB 2: KANDUNGAN PUKAL (DITAMBAH BAIK) -->
+                <div id="tabKandunganPukal" class="hidden space-y-5">
+                    <div class="bg-blue-50/70 border border-blue-200 p-4 rounded-xl text-sm text-blue-900 shadow-sm">
+                        <p class="font-bold mb-2 flex items-center gap-2 text-blue-800"><i class="fa-solid fa-circle-info text-blue-600 text-base"></i> Arahan & Formatting Muat Naik CSV:</p>
+                        <ol class="list-decimal ml-5 space-y-1.5 text-xs text-gray-700 font-medium leading-relaxed">
+                            <li>Muat turun templat CSV contoh melalui butang di bawah.</li>
+                            <li>Pastikan senarai lajur mengikut templat yang disediakan.</li>
+                            <li><b>Bagi Ahli Kumpulan Penyelidik > 2 Orang</b>: Isikan senarai nama ahli & jabatan menggunakan baris baru (*line break* / <code>Alt + Enter</code> dalam Microsoft Excel) dalam sel yang sama.</li>
+                            <li>Format nilai peruntukan <b>mesti</b> dalam bentuk angka sahaja tanpa simbol (Cth: <code>50000</code>).</li>
+                        </ol>
                     </div>
-                    <div class="pt-4 flex justify-end gap-3">
-                        <button type="button" onclick="tutupModalPukal()" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition text-sm">Batal</button>
-                        <button type="submit" id="btnUploadPukal" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-md hover:shadow-lg text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Sekarang
+                    
+                    <div class="flex justify-center my-2">
+                        <button onclick="muatTurunTemplate()" class="bg-emerald-600 text-white border border-emerald-700 px-5 py-3 rounded-xl font-bold hover:bg-emerald-700 transition text-sm flex items-center justify-center gap-2 w-full shadow-sm hover:shadow">
+                            <i class="fa-solid fa-file-csv text-lg"></i> Muat Turun Templat CSV (Contoh > 2 Ahli)
                         </button>
                     </div>
-                </form>
+
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-gray-200"></div>
+                        <span class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase font-bold tracking-wider">Muat Naik Fail Anda</span>
+                        <div class="flex-grow border-t border-gray-200"></div>
+                    </div>
+
+                    <form onsubmit="hantarDataPukal(event)" class="space-y-4">
+                        <div>
+                            <input type="file" id="in_fail_pukal" accept=".csv, .xlsx, .xls" required class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-600 bg-gray-50 focus:border-blue-500 focus:bg-blue-50 outline-none transition cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200">
+                        </div>
+                        <div class="pt-4 flex justify-end gap-3">
+                            <button type="button" onclick="tutupModalTambahData()" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition text-sm">Batal</button>
+                            <button type="submit" id="btnUploadPukal" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-md hover:shadow-lg text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Sekarang
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
         </div>
     </div>
 	
+    <!-- MODAL EDIT GERAN -->
 	<div id="modalEditGeran" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all scale-100">
             <div class="bg-gradient-to-r from-blue-700 to-blue-800 p-5 text-white flex justify-between items-center">
@@ -195,18 +312,26 @@
                         <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Nama Ketua</label>
                         <input type="text" id="edit_ketua" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" required>
                     </div>
+                    
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Jabatan/Unit</label>
-                        <input type="text" id="edit_jabatan" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" required>
+                        <select id="edit_jabatan" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                            <option value="">-- Pilih Jabatan / Unit --</option>
+                        </select>
                     </div>
+
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Tajuk Projek</label>
                         <textarea id="edit_tajuk" rows="2" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" required></textarea>
                     </div>
+                    
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Jenis Geran</label>
-                        <input type="text" id="edit_jenis" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                        <select id="edit_jenis" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                            <option value="">-- Pilih Jenis Geran --</option>
+                        </select>
                     </div>
+
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">No. Rujukan (ID)</label>
                         <input type="text" id="edit_noRuj" class="w-full px-4 py-2.5 bg-gray-200 border border-gray-300 text-gray-500 rounded-xl text-sm cursor-not-allowed" readonly title="No rujukan tidak boleh diubah">
@@ -243,6 +368,7 @@
         </div>
     </div>
 
+    <!-- MODAL KEMASKINI STATUS -->
     <div id="modalStatusGeran" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100">
             <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-white flex justify-between items-center">
@@ -282,15 +408,12 @@
     </div>
 
     <script>
-       const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
         const userJabatan = sessionStorage.getItem("jabatan") || "";
         const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
         
-        // Mempunyai akses muat naik pukal (Penyelaras, Kupik, Admin)
         const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "PENYELARAS GERAN", "KUPIK", "ADMIN"].includes(userPeranan);
-        
-        // 🌟 KEMASKINI BARU: Superpower hanya untuk ADMIN & KUPIK
         const isSuperAdmin = ["ADMIN", "KUPIK"].includes(userPeranan);
 
         let dataGeranPenuh = [];
@@ -300,10 +423,14 @@
         let halamanSemasa = 1;
         const rekodPerHalaman = 10;
 
+        let senaraiJabatanSistem = [];
+        let senaraiJenisGeranSistem = [];
+
         window.onload = () => {
-            if(isApprover) document.getElementById('btnMuatNaikPukal').classList.remove('hidden');
+            if(isApprover && document.getElementById('btnTambahData')) {
+                document.getElementById('btnTambahData').classList.remove('hidden');
+            }
             
-            // 🌟 KEMASKINI BARU: Tambah lajur "Tindakan" pada tajuk jadual (Header) secara automatik jika pengguna adalah Super Admin
             if (isSuperAdmin) {
                 const headerRow = document.querySelector("#isiJadual").previousElementSibling.querySelector("tr");
                 if (headerRow) {
@@ -314,114 +441,173 @@
                 }
             }
             
+            muatTetapanSenarai();
             muatDataGeran();
         };
 
-        // ==========================================
-// 1. FETCH DATA DARI GOOGLE SCRIPT & PREPROCESS (MENGGABUNGKAN BARIS KOSONG)
-// ==========================================
-function muatDataGeran() {
-    // Papar indikator loading
-    document.getElementById('isiJadual').innerHTML = `
-        <tr>
-            <td colspan="7" class="p-12 text-center font-bold text-blue-500 animate-pulse">
-                <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memuat turun data geran...
-            </td>
-        </tr>`;
-    
-    // Fungsi pembantu untuk membuang format nombor di awal nama (cth: "1. ", "2) ")
-    const bersihkanNama = (nama) => {
-        if (!nama) return "";
-        // Regex ini membuang digit diikuti titik/kurungan dan ruang kosong di awal teks
-        return nama.replace(/^\d+[\.\)]\s*/, "").trim();
-    };
-
-    fetch(`${SCRIPT_URL}?action=ambilGeran`)
-    .then(res => res.json())
-    .then(result => {
-        if (result.status === "BERJAYA") {
-            let rawData = result.data || [];
-            if (rawData.length === 0) {
-                document.getElementById('isiJadual').innerHTML = `
-                    <tr>
-                        <td colspan="7" class="p-10 text-center text-gray-500 font-medium">
-                            Tiada data geran ditemui.
-                        </td>
-                    </tr>`;
-                return;
-            }
-            
-            // PREPROCESS: Gabungkan nama penyelidik yang berada pada baris kosong di bawah ketua yang sama
-            let processedData = [];
-            let currentProject = null;
-
-            rawData.forEach(row => {
-                // Jika ada 'Bil' (Lajur A/Indeks 0), bermaksud ini rekod ketua/projek baru
-                if (String(row[0]).trim() !== "") {
-                    // Masukkan projek sebelumnya ke dalam senarai sebelum mulakan yang baru
-                    if (currentProject) processedData.push(currentProject);
-                    
-                    // Salin data baris tersebut
-                    currentProject = [...row]; 
-                    
-                    let ahliAsal = String(row[4] || "").trim();
-                    let jabatanAhliAsal = String(row[5] || "").trim();
-                    
-                    // Tukar Lajur E (Indeks 4) daripada String kepada Array untuk simpan ramai ahli
-                    currentProject[4] = []; 
-                    
-                    if (ahliAsal) {
-                        currentProject[4].push({ 
-                            nama: bersihkanNama(ahliAsal), // Bersihkan nama di sini
-                            jabatan: jabatanAhliAsal 
-                        });
-                    }
-                } 
-                // Jika 'Bil' kosong, bermaksud ini adalah baris sambungan ahli untuk projek di atasnya
-                else if (currentProject) {
-                    let ahliSambungan = String(row[4] || "").trim();
-                    let jabatanSambungan = String(row[5] || "").trim();
-                    
-                    if(ahliSambungan) {
-                        currentProject[4].push({ 
-                            nama: bersihkanNama(ahliSambungan), // Bersihkan nama di sini
-                            jabatan: jabatanSambungan 
-                        });
-                    }
-                }
-            });
-
-            // Push projek terakhir yang diproses dalam loop
-            if (currentProject) processedData.push(currentProject);
-
-            // Simpan data dalam pembolehubah global
-            dataGeranPenuh = processedData;
-            
-            // Jana dropdown filter & papar data ke jadual
-            janaPilihanFilter(dataGeranPenuh);
-            terapkanTapisan();
-            
-        } else {
-            paparRalat(`❌ Gagal: ${result.mesej}`);
+        function dapatkanNamaPendekJabatan(teks) {
+            if (!teks || teks === "-") return "-";
+            let teksBersih = String(teks).trim();
+            let match = teksBersih.match(/\(([^)]+)\)/);
+            return match ? match[1].trim().toUpperCase() : teksBersih.toUpperCase();
         }
-    })
-    .catch(err => {
-        console.error("Error:", err);
-        paparRalat("⚠️ Ralat rangkaian: Gagal berhubung dengan pangkalan data.");
-    });
-}
-		// ==========================================
-        // 2. DROPDOWN & FILTER LOGIC
-        // ==========================================
+
+        function muatTetapanSenarai() {
+            fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`)
+            .then(res => {
+                if (!res.ok) throw new Error(`Ralat HTTP! Status: ${res.status}`);
+                return res.json();
+            })
+            .then(result => {
+                if (result.status === "BERJAYA" || result.data || result.senaraiJabatan || result.JABATAN) {
+                    const data = result.data || result;
+                    senaraiJabatanSistem = data.JABATAN || data.jabatan || data.senaraiJabatan || [];
+                    senaraiJenisGeranSistem = data.JENIS_GERAN || data.jenisGeran || data.senaraiJenisGeran || data.jenis || [];
+                    
+                    if (Array.isArray(senaraiJabatanSistem) && Array.isArray(senaraiJenisGeranSistem)) {
+                        isiDropdownSistem();
+                    } else {
+                        console.warn("Format data senarai jabatan/geran tidak sah (bukan array).");
+                    }
+                } else {
+                    console.warn("Respons backend tidak mengandungi data tetapan:", result.mesej || result);
+                }
+            })
+            .catch(err => {
+                console.error("Gagal memuat turun tetapan senarai SISTEM:", err);
+            });
+        }
+
+        function isiDropdownSistem() {
+            const elJabatanKetua = document.getElementById('in_m_jabatan');
+            const elJenisGeran = document.getElementById('in_m_jenis');
+            const elEditJabatan = document.getElementById('edit_jabatan');
+            const elEditJenis = document.getElementById('edit_jenis');
+
+            if (elJabatanKetua) {
+                elJabatanKetua.innerHTML = '<option value="">-- Pilih Jabatan / Unit --</option>';
+                senaraiJabatanSistem.forEach(j => elJabatanKetua.innerHTML += `<option value="${j}">${j}</option>`);
+            }
+            if (elJenisGeran) {
+                elJenisGeran.innerHTML = '<option value="">-- Pilih Jenis Geran --</option>';
+                senaraiJenisGeranSistem.forEach(jg => elJenisGeran.innerHTML += `<option value="${jg}">${jg}</option>`);
+            }
+            if (elEditJabatan) {
+                elEditJabatan.innerHTML = '<option value="">-- Pilih Jabatan / Unit --</option>';
+                senaraiJabatanSistem.forEach(j => elEditJabatan.innerHTML += `<option value="${j}">${j}</option>`);
+            }
+            if (elEditJenis) {
+                elEditJenis.innerHTML = '<option value="">-- Pilih Jenis Geran --</option>';
+                senaraiJenisGeranSistem.forEach(jg => elEditJenis.innerHTML += `<option value="${jg}">${jg}</option>`);
+            }
+
+            janaFieldAhli();
+        }
+
+        function muatDataGeran() {
+            document.getElementById('isiJadual').innerHTML = `
+                <tr>
+                    <td colspan="7" class="p-12 text-center font-bold text-blue-500 animate-pulse">
+                        <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memuat turun data geran...
+                    </td>
+                </tr>`;
+            
+            const bersihkanNama = (nama) => {
+                if (!nama) return "";
+                return nama.replace(/^\d+[\.\)]\s*/, "").trim();
+            };
+
+            const prosesAhliDanJabatan = (teksAhli, teksJabatan) => {
+                if (!teksAhli) return [];
+                let senaraiAhli = teksAhli.split(/\r?\n/).map(a => a.trim()).filter(a => a !== "");
+                if (senaraiAhli.length === 1 && teksAhli.includes(",")) {
+                    senaraiAhli = teksAhli.split(",").map(a => a.trim()).filter(a => a !== "");
+                }
+                
+                let senaraiJbt = teksJabatan.split(/\r?\n/).map(j => j.trim()).filter(j => j !== "");
+                if (senaraiJbt.length === 1 && teksJabatan.includes(",")) {
+                    senaraiJbt = teksJabatan.split(",").map(j => j.trim()).filter(j => j !== "");
+                }
+                
+                return senaraiAhli.map((namaAhli, idx) => ({
+                    nama: bersihkanNama(namaAhli),
+                    jabatan: dapatkanNamaPendekJabatan(senaraiJbt[idx] || senaraiJbt[0] || "-")
+                }));
+            };
+
+            fetch(`${SCRIPT_URL}?action=ambilGeran`)
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === "BERJAYA") {
+                    let rawData = result.data || [];
+                    if (rawData.length === 0) {
+                        document.getElementById('isiJadual').innerHTML = `
+                            <tr>
+                                <td colspan="7" class="p-10 text-center text-gray-500 font-medium">
+                                    Tiada data geran ditemui.
+                                </td>
+                            </tr>`;
+                        return;
+                    }
+                    
+                    let processedData = [];
+                    let currentProject = null;
+
+                    rawData.forEach(row => {
+                        if (String(row[0]).trim() !== "") {
+                            if (currentProject) processedData.push(currentProject);
+                            currentProject = [...row]; 
+                            let ahliAsal = String(row[4] || "").trim();
+                            let jabatanAhliAsal = String(row[5] || "").trim();
+                            
+                            currentProject[4] = prosesAhliDanJabatan(ahliAsal, jabatanAhliAsal);
+                        } 
+                        else if (currentProject) {
+                            let ahliSambungan = String(row[4] || "").trim();
+                            let jabatanSambungan = String(row[5] || "").trim();
+                            
+                            if(ahliSambungan) {
+                                currentProject[4].push(...prosesAhliDanJabatan(ahliSambungan, jabatanSambungan));
+                            }
+                        }
+                    });
+
+                    if (currentProject) processedData.push(currentProject);
+                    dataGeranPenuh = processedData;
+                    
+                    janaPilihanFilter(dataGeranPenuh);
+                    terapkanTapisan();
+                    
+                } else {
+                    paparRalat(`❌ Gagal: ${result.mesej}`);
+                }
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                paparRalat("⚠️ Ralat rangkaian: Gagal berhubung dengan pangkalan data.");
+            });
+        }
+
         function janaPilihanFilter(data) {
             const setJabatan = new Set();
             const setStatus = new Set(); 
+            const setJenis = new Set();
             
             data.forEach(r => {
-                if(r[3]) setJabatan.add(String(r[3]).trim()); // Jabatan Ketua
-                if(r[13]) setStatus.add(String(r[13]).trim().toUpperCase()); // Status
+                if(r[3]) setJabatan.add(dapatkanNamaPendekJabatan(String(r[3]).trim())); 
+                if(r[7]) setJenis.add(String(r[7]).trim());
+                if(r[13]) setStatus.add(String(r[13]).trim().toUpperCase()); 
             });
             
+            if (senaraiJabatanSistem.length === 0) {
+                senaraiJabatanSistem = [...setJabatan].sort();
+                isiDropdownSistem();
+            }
+            if (senaraiJenisGeranSistem.length === 0) {
+                senaraiJenisGeranSistem = [...setJenis].sort();
+                isiDropdownSistem();
+            }
+
             const selJabatan = document.getElementById('filterJabatan');
             const selStatus = document.getElementById('filterStatus'); 
             
@@ -439,70 +625,58 @@ function muatDataGeran() {
             }
             
             if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
-                selJabatan.value = userJabatan;
+                selJabatan.value = dapatkanNamaPendekJabatan(userJabatan);
                 selJabatan.disabled = true;
                 selJabatan.classList.add('bg-gray-200', 'cursor-not-allowed', 'opacity-70');
             }
         }
 
         function terapkanTapisan() {
-    const txtCari = document.getElementById('carianTeks').value.toLowerCase().trim();
-    const valTahun = document.getElementById('filterTahun').value.trim(); 
-    
-    // 🌟 KEMASKINI 1: Buang jarak kosong (trim) dan tukar ke huruf besar
-    let valJabatan = document.getElementById('filterJabatan').value.trim().toUpperCase();
-    const elStatus = document.getElementById('filterStatus');
-    const valStatus = elStatus ? elStatus.value.trim().toUpperCase() : "";
+            const txtCari = document.getElementById('carianTeks').value.toLowerCase().trim();
+            const valTahun = document.getElementById('filterTahun').value.trim(); 
+            let valJabatan = document.getElementById('filterJabatan').value.trim().toUpperCase();
+            const elStatus = document.getElementById('filterStatus');
+            const valStatus = elStatus ? elStatus.value.trim().toUpperCase() : "";
 
-    if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
-        // Seragamkan juga userJabatan jika ia diambil dari session
-        valJabatan = (userJabatan || "").trim().toUpperCase();
-    }
+            if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
+                valJabatan = dapatkanNamaPendekJabatan(userJabatan);
+            }
 
-    dataTapis = dataGeranPenuh.filter(row => {
-        const dbKetua = String(row[1] || "").toLowerCase();
-        
-        // 🌟 KEMASKINI 2: Bersihkan data dari database (buang jarak & huruf besar)
-        const dbJabatanRaw = String(row[3] || "").trim().toUpperCase(); 
-        const dbJabatanLow = dbJabatanRaw.toLowerCase();
-        
-        const dbTajuk = String(row[6] || "").toLowerCase();
-        const dbJenis = String(row[7] || "").toLowerCase();
-        const dbNoRuj = String(row[8] || "").toLowerCase();
-        const dbTahun = String(row[9] || "");
-        const dbStatus = String(row[13] || "").trim().toUpperCase(); 
-        
-        let matchAhli = false;
-        if(Array.isArray(row[4])) {
-            matchAhli = row[4].some(a => String(a.nama).toLowerCase().includes(txtCari));
+            dataTapis = dataGeranPenuh.filter(row => {
+                const dbKetua = String(row[1] || "").toLowerCase();
+                const dbJabatanRaw = dapatkanNamaPendekJabatan(String(row[3] || "").trim()); 
+                const dbJabatanLow = dbJabatanRaw.toLowerCase();
+                
+                const dbTajuk = String(row[6] || "").toLowerCase();
+                const dbJenis = String(row[7] || "").toLowerCase();
+                const dbNoRuj = String(row[8] || "").toLowerCase();
+                const dbTahun = String(row[9] || "");
+                const dbStatus = String(row[13] || "").trim().toUpperCase(); 
+                
+                let matchAhli = false;
+                if(Array.isArray(row[4])) {
+                    matchAhli = row[4].some(a => String(a.nama).toLowerCase().includes(txtCari));
+                }
+
+                let matchCari = txtCari === "" || 
+                                dbKetua.includes(txtCari) || 
+                                dbTajuk.includes(txtCari) || 
+                                dbNoRuj.includes(txtCari) || 
+                                dbJabatanLow.includes(txtCari) || 
+                                dbJenis.includes(txtCari) || 
+                                matchAhli;
+
+                let matchTahun = valTahun === "" || dbTahun.includes(valTahun);
+                let matchJabatan = valJabatan === "" || dbJabatanRaw === valJabatan;
+                let matchStatus = valStatus === "" || dbStatus === valStatus;
+
+                return matchCari && matchTahun && matchJabatan && matchStatus;
+            });
+
+            halamanSemasa = 1;
+            kemaskiniDashboard(dataTapis);
         }
 
-        // Semakan Carian Bebas
-        let matchCari = txtCari === "" || 
-                        dbKetua.includes(txtCari) || 
-                        dbTajuk.includes(txtCari) || 
-                        dbNoRuj.includes(txtCari) || 
-                        dbJabatanLow.includes(txtCari) || 
-                        dbJenis.includes(txtCari) || 
-                        matchAhli;
-
-        // Semakan Tahun menggunakan includes() untuk partial matching
-        let matchTahun = valTahun === "" || dbTahun.includes(valTahun);
-        
-        // 🌟 KEMASKINI 3: Sekarang ia membandingkan rentetan yang telah bersih
-        let matchJabatan = valJabatan === "" || dbJabatanRaw === valJabatan;
-        let matchStatus = valStatus === "" || dbStatus === valStatus;
-
-        return matchCari && matchTahun && matchJabatan && matchStatus;
-    });
-
-    halamanSemasa = 1;
-    kemaskiniDashboard(dataTapis);
-}
-
-        // ==========================================
-        // 3. STATISTIK & CARTA (KPI CARDS & CHARTS)
-        // ==========================================
         function kemaskiniDashboard(data) {
             const stats = kiraStatsGeran(data);
             renderKadKPI(stats);
@@ -517,9 +691,7 @@ function muatDataGeran() {
             
             data.forEach(r => {
                 let jbtAsal = String(r[3] || 'LAIN-LAIN').trim();
-                // Ekstrak Singkatan (Cth: JABATAN KEJURUTERAAN AWAM (JKA) -> JKA)
-                let match = jbtAsal.match(/\(([^)]+)\)/); 
-                let jbt = match ? match[1].trim() : jbtAsal;
+                let jbt = dapatkanNamaPendekJabatan(jbtAsal);
 
                 let jenis = String(r[7] || 'TIADA JENIS').trim().toUpperCase();
                 let nilaiRaw = String(r[11] || "0").replace(/[^0-9.-]+/g,"");
@@ -558,7 +730,6 @@ function muatDataGeran() {
             if (barChartInstance) barChartInstance.destroy();
             if (pieChartInstance) pieChartInstance.destroy();
             
-            // Palet Warna Menarik
             const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
 
             barChartInstance = new Chart(document.getElementById('barChart'), {
@@ -589,16 +760,11 @@ function muatDataGeran() {
             });
         }
 
-       // ==========================================
-        // 4. JADUAL & PAGINASI
-        // ==========================================
         function paparJadual() {
             const tbody = document.getElementById('isiJadual');
             tbody.innerHTML = "";
             
-            // ... (Kekalkan kod semakan dataTapis.length === 0 seperti sedia ada)
             if (dataTapis.length === 0) {
-                // Pastikan colspan ditambah 1 jika SuperAdmin (8 + 1 = 9)
                 let colSpan = isSuperAdmin ? 9 : 8;
                 tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-12 text-center text-gray-500 font-medium bg-gray-50/50"><i class="fa-solid fa-folder-open text-2xl text-gray-300 mb-2 block"></i> Tiada data dijumpai berdasarkan carian.</td></tr>`;
                 document.getElementById('infoPaginasi').innerText = `Papar 0 - 0 dari 0 rekod`;
@@ -612,7 +778,7 @@ function muatDataGeran() {
 
             dataHalaman.forEach((row, idx) => {
                 const ketua = row[1] || "-";
-                const jbtKetua = row[3] || "-";
+                const jbtKetua = dapatkanNamaPendekJabatan(row[3] || "-");
                 
                 let htmlAhli = "";
                 if(Array.isArray(row[4]) && row[4].length > 0) {
@@ -649,10 +815,8 @@ function muatDataGeran() {
                 else if (statusGeran.includes("TOLAK") || statusGeran.includes("BATAL") || statusGeran.includes("GAGAL")) colorStatus = "text-red-700 bg-red-50 border-red-200";
                 else if (statusGeran.includes("TUNGGU") || statusGeran.includes("PROSES")) colorStatus = "text-amber-700 bg-amber-50 border-amber-200";
 
-                // 🌟 KEMASKINI BARU: Butang Tindakan Khas Super Admin
                 let htmlTindakan = "";
                 if (isSuperAdmin) {
-                    // ID Baris atau No Rujukan digunakan untuk trigger function edit (contoh: row[8] sebagai No Rujukan)
                     let idRekod = row[8] || idx; 
                     htmlTindakan = `
                     <td class="p-4 text-center align-top">
@@ -717,29 +881,34 @@ function muatDataGeran() {
             if(document.getElementById('btnNext')) document.getElementById('btnNext').disabled = (mula + rekodPerHalaman) >= dataTapis.length;
         }
 
-// ==========================================
-        // 5. FUNGSI TINDAKAN (EDIT, STATUS, PADAM)
-        // ==========================================
-        
-        // ---------- A. FUNGSI EDIT GERAN ----------
+        function setSelectValueSafe(selectId, value) {
+            const el = document.getElementById(selectId);
+            if (!el || !value) return;
+            let valClean = String(value).trim();
+            let exists = Array.from(el.options).some(opt => opt.value === valClean);
+            if (!exists && valClean !== "") {
+                el.innerHTML += `<option value="${valClean}">${valClean}</option>`;
+            }
+            el.value = valClean;
+        }
+
         function editGeran(id) {
-            // Cari data asal dari array dataGeranPenuh menggunakan id (row[8] atau index)
             let row = dataGeranPenuh.find((r, index) => (r[8] || index) == id);
             if(!row) return alert("Rekod tidak dijumpai!");
             
-            // Masukkan data ke dalam borang
             document.getElementById('edit_idRekod').value = id;
             document.getElementById('edit_ketua').value = row[1] || "";
-            document.getElementById('edit_jabatan').value = row[3] || "";
+            
+            setSelectValueSafe('edit_jabatan', row[3] || "");
+            setSelectValueSafe('edit_jenis', row[7] || "");
+
             document.getElementById('edit_tajuk').value = row[6] || "";
-            document.getElementById('edit_jenis').value = row[7] || "";
             document.getElementById('edit_noRuj').value = row[8] || "TIADA NO RUJUKAN";
             document.getElementById('edit_mula').value = row[9] || "";
             document.getElementById('edit_tamat').value = row[10] || "";
             document.getElementById('edit_nilai').value = row[11] ? String(row[11]).replace(/[^0-9.-]+/g,"") : "";
             document.getElementById('edit_peratus').value = row[12] ? String(row[12]).replace(/[^0-9.-]+/g,"") : "";
             
-            // Buka Modal
             document.getElementById('modalEditGeran').classList.remove('hidden');
         }
         
@@ -753,12 +922,11 @@ function muatDataGeran() {
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
 
-            // Struktur data yang akan dihantar ke Google Script (doPost)
             const payload = {
                 action: "editGeran",
                 idRekod: document.getElementById('edit_idRekod').value,
                 ketua: document.getElementById('edit_ketua').value,
-                jabatan: document.getElementById('edit_jabatan').value,
+                jabatan: dapatkanNamaPendekJabatan(document.getElementById('edit_jabatan').value),
                 tajuk: document.getElementById('edit_tajuk').value,
                 jenis: document.getElementById('edit_jenis').value,
                 mula: document.getElementById('edit_mula').value,
@@ -777,7 +945,7 @@ function muatDataGeran() {
                 if(data.status === "BERJAYA") {
                     alert("✅ Maklumat geran berjaya dikemaskini.");
                     tutupModalEdit();
-                    muatDataGeran(); // Refresh jadual
+                    muatDataGeran();
                 } else {
                     alert("❌ Ralat: " + data.mesej);
                 }
@@ -789,7 +957,6 @@ function muatDataGeran() {
             });
         }
 
-        // ---------- B. FUNGSI STATUS GERAN ----------
         function kemaskiniStatusGeran(id) {
             let row = dataGeranPenuh.find((r, index) => (r[8] || index) == id);
             if(!row) return alert("Rekod tidak dijumpai!");
@@ -797,7 +964,6 @@ function muatDataGeran() {
             document.getElementById('status_idRekod').value = id;
             document.getElementById('label_status_noRuj').innerText = row[8] || "TIADA NO RUJUKAN";
             
-            // Padankan status semasa dengan pilihan dropdown
             let statusSemasa = String(row[13] || "").toUpperCase();
             let elSelect = document.getElementById('status_pilihan');
             
@@ -835,7 +1001,7 @@ function muatDataGeran() {
                 if(data.status === "BERJAYA") {
                     alert("✅ Status geran berjaya dikemaskini.");
                     tutupModalStatus();
-                    muatDataGeran(); // Refresh jadual
+                    muatDataGeran();
                 } else {
                     alert("❌ Ralat: " + data.mesej);
                 }
@@ -847,10 +1013,8 @@ function muatDataGeran() {
             });
         }
 
-        // ---------- C. FUNGSI PADAM GERAN ----------
         function padamGeran(id) {
             if(confirm("AWAS! Adakah anda pasti mahu memadam rekod ini secara kekal?\nTindakan ini tidak boleh dipulihkan.")) {
-                
                 const payload = { action: "padamGeran", idRekod: id };
                 
                 fetch(SCRIPT_URL, {
@@ -862,7 +1026,7 @@ function muatDataGeran() {
                 .then(data => {
                     if(data.status === "BERJAYA") {
                         alert("✅ Rekod geran telah dipadam.");
-                        muatDataGeran(); // Refresh jadual
+                        muatDataGeran();
                     } else {
                         alert("❌ Ralat pemadaman: " + data.mesej);
                     }
@@ -870,25 +1034,146 @@ function muatDataGeran() {
                 .catch(err => alert("⚠️ Gagal berhubung dengan pelayan."));
             }
         }
+        
         function ubahHalaman(arah) { halamanSemasa += arah; paparJadual(); }
         function paparRalat(t) { document.getElementById('isiJadual').innerHTML = `<tr><td colspan="7" class="p-12 text-center text-red-500 font-bold bg-red-50"><i class="fa-solid fa-triangle-exclamation mr-2"></i> ${t}</td></tr>`; }
-        
-        // ==========================================
-        // 5. MODAL UPLOAD PUKAL
-        // ==========================================
-        function bukaModalPukal() { 
-            const modal = document.getElementById('modalUploadPukal');
+
+        function bukaModalTambahData() { 
+            const modal = document.getElementById('modalTambahData');
             modal.classList.remove('hidden');
-            setTimeout(() => { modal.firstElementChild.classList.remove('scale-95', 'opacity-0'); }, 10);
-        }
-        function tutupModalPukal() { 
-            const modal = document.getElementById('modalUploadPukal');
-            modal.firstElementChild.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+            tukarTab('manual');
+            
+            document.getElementById('in_m_bil_ahli').value = "0";
+            janaFieldAhli();
         }
 
-		function muatTurunTemplate() {
-            // 1. Definisi Header (Tambah 'Status' di hujung sekali - Lajur N)
+        function tutupModalTambahData() { 
+            const modal = document.getElementById('modalTambahData');
+            modal.classList.add('hidden');
+        }
+
+        function tukarTab(jenisTab) {
+            const btnManual = document.getElementById('tabBtnManual');
+            const btnPukal = document.getElementById('tabBtnPukal');
+            const tabManual = document.getElementById('tabKandunganManual');
+            const tabPukal = document.getElementById('tabKandunganPukal');
+
+            if (jenisTab === 'manual') {
+                btnManual.className = "flex-1 py-3 text-center font-bold text-sm text-blue-600 border-b-2 border-blue-600 transition flex items-center justify-center gap-2 bg-white";
+                btnPukal.className = "flex-1 py-3 text-center font-bold text-sm text-gray-500 hover:text-blue-600 transition flex items-center justify-center gap-2 bg-gray-50";
+                tabManual.classList.remove('hidden');
+                tabPukal.classList.add('hidden');
+            } else {
+                btnPukal.className = "flex-1 py-3 text-center font-bold text-sm text-blue-600 border-b-2 border-blue-600 transition flex items-center justify-center gap-2 bg-white";
+                btnManual.className = "flex-1 py-3 text-center font-bold text-sm text-gray-500 hover:text-blue-600 transition flex items-center justify-center gap-2 bg-gray-50";
+                tabPukal.classList.remove('hidden');
+                tabManual.classList.add('hidden');
+            }
+        }
+
+        function janaFieldAhli() {
+            const bil = parseInt(document.getElementById('in_m_bil_ahli').value) || 0;
+            const container = document.getElementById('container_ahli');
+            container.innerHTML = '';
+
+            if (bil === 0) return;
+
+            let pilihanJabatan = '<option value="">-- Pilih Jabatan / Unit --</option>';
+            senaraiJabatanSistem.forEach(jbt => {
+                pilihanJabatan += `<option value="${jbt}">${jbt}</option>`;
+            });
+
+            for (let i = 1; i <= bil; i++) {
+                const div = document.createElement('div');
+                div.className = "p-3 bg-white rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-3 transition-all";
+                div.innerHTML = `
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                            <i class="fa-solid fa-user text-gray-400 mr-1"></i> Nama Ahli Ke-${i}
+                        </label>
+                        <input type="text" id="in_m_ahli_${i}" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Cth: Abu Bin Bakar">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                            <i class="fa-solid fa-building text-gray-400 mr-1"></i> Jabatan / Unit (Ahli Ke-${i})
+                        </label>
+                        <select id="in_m_jabatanAhli_${i}" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                            ${pilihanJabatan}
+                        </select>
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function hantarDataManual(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitManual');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...`;
+
+            let senaraiAhli = [];
+            let senaraiJabatanAhli = [];
+            const bilAhli = parseInt(document.getElementById('in_m_bil_ahli').value) || 0;
+            
+            for (let i = 1; i <= bilAhli; i++) {
+                const elNama = document.getElementById(`in_m_ahli_${i}`);
+                const elJbt = document.getElementById(`in_m_jabatanAhli_${i}`);
+                if (elNama && elNama.value.trim() !== "") {
+                    senaraiAhli.push(elNama.value.trim());
+                    let jbtVal = elJbt && elJbt.value.trim() !== "" ? elJbt.value.trim() : "-";
+                    senaraiJabatanAhli.push(dapatkanNamaPendekJabatan(jbtVal));
+                }
+            }
+
+            const payload = {
+                action: "tambahGeranManual",
+                ketua: document.getElementById('in_m_ketua').value,
+                noHp: document.getElementById('in_m_noHp').value,
+                jabatan: dapatkanNamaPendekJabatan(document.getElementById('in_m_jabatan').value),
+                ahli: senaraiAhli.join("\n"), 
+                jabatanAhli: senaraiJabatanAhli.join("\n"),
+                tajuk: document.getElementById('in_m_tajuk').value,
+                jenis: document.getElementById('in_m_jenis').value,
+                noRuj: document.getElementById('in_m_noRuj').value,
+                mula: document.getElementById('in_m_mula').value,
+                tamat: document.getElementById('in_m_tamat').value,
+                nilai: document.getElementById('in_m_nilai').value,
+                peratus: document.getElementById('in_m_peratus').value,
+                status: document.getElementById('in_m_status').value
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "BERJAYA") {
+                    alert("✅ Data geran berjaya ditambah secara manual.");
+                    document.getElementById('formTambahManual').reset();
+                    document.getElementById('in_m_bil_ahli').value = "0";
+                    janaFieldAhli();
+                    tutupModalTambahData();
+                    muatDataGeran();
+                } else {
+                    alert("❌ Ralat: " + data.mesej);
+                }
+            })
+            .catch(err => alert("⚠️ Gagal berhubung dengan pelayan."))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Data Geran`;
+            });
+        }
+
+        /* ========================================================
+           🌟 PENAMBAHBAIKAN FUNGSI MUAT TURUN TEMPLAT CSV 🌟
+           Menyediakan contoh projek dengan lebih daripada 2 orang
+           ahli Kumpulan Penyelidik mengikut format baris baru.
+           ======================================================== */
+        function muatTurunTemplate() {
             const headerArr = [
                 "Bil", 
                 "Nama Ketua Geran", 
@@ -902,86 +1187,137 @@ function muatDataGeran() {
                 "Tahun Mula", 
                 "Tahun Tamat", 
                 "Jumlah Peruntukan Diluluskan (RM)", 
-                "Peratus Perbelanjaan",
-                "Status" // <-- Lajur N Baru
+                "Peratus Perbelanjaan", 
+                "Status"
             ];
 
-            // 2. Tambah satu baris contoh (Optional) untuk memudahkan pengguna
-            const contohData = [
-                "1",
-                "Dr. Ahmad Bin Ali",
-                "0123456789",
-                "JKM",
-                "Ali Bin Abu",
-                "JKM",
-                "Tajuk Projek Contoh",
-                "T-AIGS",
-                "PKS/2024/01",
-                "2024",
-                "2025",
-                "50000",
-                "10",
+            // Contoh 1: Projek Penyelidikan dengan 3 Orang Ahli (Lebih dari 2 orang)
+            const contohProjek1 = [
+                "1", 
+                "Dr. Ahmad Bin Ali", 
+                "0123456789", 
+                "JKM", 
+                "1. Dr. Abu Bin Bakar\n2. Siti Binti Hassan\n3. Muhammad Bin Rahman", 
+                "JKM\nJKA\nJKE", 
+                "Penyelidikan Sistem Robotik Auto-Tani Bersepadu", 
+                "T-AIGS", 
+                "PKS/2026/GERAN/01", 
+                "2026", 
+                "2027", 
+                "50000", 
+                "15", 
                 "AKTIF"
             ];
 
-            // Gabungkan header dan data contoh
-            // \ufeff adalah BOM (Byte Order Mark) supaya Excel kesan format UTF-8 dengan betul
-            const csvContent = "\ufeff" + 
-                               headerArr.join(",") + "\n" + 
-                               contohData.join(",");
+            // Contoh 2: Projek Penyelidikan dengan 4 Orang Ahli (Lebih dari 2 orang)
+            const contohProjek2 = [
+                "2", 
+                "Prof. Madya Dr. Noraini Binti Zakaria", 
+                "0198765432", 
+                "JTMK", 
+                "1. Farah Binti Ismail\n2. Mohd Rizal Bin Osman\n3. Tan Wei Ming\n4. K. Rajan A/L Kumar", 
+                "JTMK\nJP\nJPA\nJTMK", 
+                "Pembangunan Platform Pemantauan Tenaga Boleh Baharu", 
+                "MAIN", 
+                "PKS/2026/GERAN/02", 
+                "2026", 
+                "2028", 
+                "75000", 
+                "30", 
+                "AKTIF"
+            ];
 
-            // 3. Gunakan Blob untuk kestabilan muat turun (lebih baik daripada data:text/csv)
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            // Fungsi Format CSV untuk memastikan sel yang mempunyai koma atau baris baru (line break) dibalut dengan pembuka ""
+            const formatBarisCSV = (arr) => arr.map(cell => {
+                let teks = String(cell !== undefined && cell !== null ? cell : '');
+                if (teks.includes('"') || teks.includes(',') || teks.includes('\n') || teks.includes('\r')) {
+                    teks = '"' + teks.replace(/"/g, '""') + '"';
+                }
+                return teks;
+            }).join(",");
+
+            const barisHeader = formatBarisCSV(headerArr);
+            const barisData1 = formatBarisCSV(contohProjek1);
+            const barisData2 = formatBarisCSV(contohProjek2);
+
+            const kandungCSV = "\ufeff" + [barisHeader, barisData1, barisData2].join("\n");
+            
+            const blob = new Blob([kandungCSV], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
 
-            // 4. Proses muat turun
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "Template_Data_Geran_Status.csv");
-            link.style.visibility = 'hidden';
+            const pautan = document.createElement("a");
+            pautan.setAttribute("href", url);
+            pautan.setAttribute("download", "Template_Data_Geran_Pukal.csv");
+            pautan.style.visibility = 'hidden';
             
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Bersihkan URL objek daripada memori
+            document.body.appendChild(pautan);
+            pautan.click();
+            document.body.removeChild(pautan);
             URL.revokeObjectURL(url);
         }
 
+        /* ========================================================
+           🌟 PENAMBAHBAIKAN FUNGSI MUAT NAIK PUKAL 🌟
+           ======================================================== */
         function hantarDataPukal(e) {
             e.preventDefault();
             const failInput = document.getElementById('in_fail_pukal');
             const btn = document.getElementById('btnUploadPukal');
-            if(!failInput.files.length) return;
+            
+            if(!failInput.files || failInput.files.length === 0) {
+                alert("Sila pilih fail CSV atau Excel terlebih dahulu.");
+                return;
+            }
             
             const fail = failInput.files[0];
+
+            // Semakan saiz fail (had maksima 5MB)
+            if (fail.size > 5 * 1024 * 1024) {
+                alert("⚠️ Saiz fail melebihi 5MB. Sila muat naik fail yang lebih kecil.");
+                return;
+            }
+
             const reader = new FileReader();
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Sedang Memproses...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Sedang Memproses Fail...`;
 
             reader.onload = function(e_read) {
-                const base64Data = e_read.target.result.split(',')[1];
-                fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        action: "muatNaikPukalGeran",
-                        FAIL: { dataBase64: base64Data, mimeType: fail.type, namaFail: fail.name }
+                try {
+                    const base64Data = e_read.target.result.split(',')[1];
+                    fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: "muatNaikPukalGeran",
+                            FAIL: { dataBase64: base64Data, mimeType: fail.type, namaFail: fail.name }
+                        })
                     })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.status === "BERJAYA") {
-                        alert("✅ Data berjaya dimuat naik dan dikemas kini.");
-                        tutupModalPukal();
-                        muatDataGeran();
-                    } else alert("❌ Ralat Pelayan: " + data.mesej);
-                })
-                .finally(() => {
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.status === "BERJAYA") {
+                            alert("✅ Data geran secara pukal berjaya dimuat naik ke pangkalan data.");
+                            failInput.value = "";
+                            tutupModalTambahData();
+                            muatDataGeran();
+                        } else {
+                            alert("❌ Ralat Pelayan: " + (data.mesej || "Gagal memproses fail pukal."));
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Ralat Muat Naik Pukal:", err);
+                        alert("⚠️ Ralat Rangkaian: Gagal berhubung dengan pelayan backend.");
+                    })
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Sekarang`;
+                    });
+                } catch(ex) {
+                    alert("⚠️ Ralat membaca fail. Sila pastikan fail CSV berada dalam format yang sah.");
                     btn.disabled = false;
                     btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Sekarang`;
-                });
+                }
             };
+            
             reader.readAsDataURL(fail);
         }
     </script>

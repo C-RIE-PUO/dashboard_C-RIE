@@ -15,7 +15,7 @@
 
 <div class="container-fluid px-4 mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3>Senarai Inovasi: <span class="text-warning">Menunggu Pengesahan</span></h3>
+    <h3>Senarai Inovasi: <span class="text-warning" id="labelStatusHeader">Menunggu Pengesahan</span></h3>
     
     <div>
       <a href="paparan.html" class="btn btn-secondary me-2">🏠 Utama</a>
@@ -28,8 +28,35 @@
     <p>Sedang memuat turun data...</p>
   </div>
 
+  <!-- 🌟 PENAMBAHBAIKAN: KOTAK TAPISAN (FILTER) -->
+  <div class="card mb-3 shadow-sm border-0">
+    <div class="card-body bg-light rounded p-3">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label fw-bold small text-secondary mb-1">🏢 Tapisan Jabatan</label>
+          <select id="filterJabatan" class="form-select form-select-sm" onchange="terapkanTapisan()">
+            <option value="">-- Semua Jabatan --</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold small text-secondary mb-1">📅 Tapisan Tahun (Textbox)</label>
+          <input type="text" id="filterTahun" class="form-control form-control-sm" placeholder="Cari Tahun... (Cth: 2024)" oninput="terapkanTapisan()">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold small text-secondary mb-1">📌 Tapisan Status</label>
+          <select id="filterStatus" class="form-select form-select-sm" onchange="terapkanTapisan()">
+            <option value="MENUNGGU PENGESAHAN">MENUNGGU PENGESAHAN</option>
+            <option value="BAIKI SEMULA">BAIKI SEMULA</option>
+            <option value="DISAHKAN">DISAHKAN</option>
+            <option value="">-- SEMUA STATUS --</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="table-container table-responsive">
-    <table class="table table-bordered table-hover mt-3 align-middle" id="jadualInovasi">
+    <table class="table table-bordered table-hover mt-1 align-middle" id="jadualInovasi">
     <thead class="table-dark text-center">
     <tr>
     <th>No.</th>
@@ -51,6 +78,7 @@
   </div>
 </div>
 
+<!-- MODAL EDIT ASAL -->
 <div class="modal fade" id="modalEdit" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -163,6 +191,28 @@
   </div>
 </div>
 
+<!-- 🌟 PENAMBAHBAIKAN: MODAL BAIKI SEMULA -->
+<div class="modal fade" id="modalBaiki" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title fw-bold">⚠️ Baiki Semula Rekod Inovasi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formBaiki">
+          <input type="hidden" id="baikiBil">
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark">Ulasan / Sebab Baiki Semula:</label>
+            <textarea class="form-control" id="inputUlasanBaiki" rows="4" placeholder="Nyatakan maklumat yang perlu diperbetulkan atau dilampirkan semula..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-warning w-100 fw-bold shadow-sm" id="btnSimpanBaiki">Simpan Ulasan & Hantar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -179,6 +229,7 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
+  let dataAsalInovasi = []; // 🌟 TAMBAHAN: Menyimpan keseluruhan data dari server
   let dataInovasiSemasa = []; 
 
   function baikiPautanDrive(url) {
@@ -204,8 +255,10 @@
       .then(response => {
         document.getElementById("loader").style.display = "none";
         if (response.status === "BERJAYA") {
-          dataInovasiSemasa = response.data.filter(rekod => rekod[9] === "MENUNGGU PENGESAHAN");
-          binaJadual(dataInovasiSemasa);
+          // 🌟 KEMASKINI: Simpan semua data tanpa tapisan awal
+          dataAsalInovasi = response.data || [];
+          iisiDropdownJabatan(dataAsalInovasi);
+          terapkanTapisan(); // Terapkan tapisan berdasarkan pilihan dropdown semasa
         } else {
           alert("Gagal mengambil data: " + response.mesej);
         }
@@ -216,10 +269,63 @@
       });
   }
 
+  // 🌟 PENAMBAHBAIKAN: Isi dropdown Jabatan secara automatik
+  function iisiDropdownJabatan(data) {
+    const selectJab = document.getElementById("filterJabatan");
+    const valSemasa = selectJab.value;
+    selectJab.innerHTML = '<option value="">-- Semua Jabatan --</option>';
+    
+    const senaraiJabatan = [...new Set(data.map(item => item[3]).filter(j => j && String(j).trim() !== ""))].sort();
+    senaraiJabatan.forEach(jab => {
+      let opt = document.createElement("option");
+      opt.value = jab;
+      opt.textContent = jab;
+      if (jab === valSemasa) opt.selected = true;
+      selectJab.appendChild(opt);
+    });
+  }
+
+  // 🌟 PENAMBAHBAIKAN: Logik Tapisan (Jabatan, Tahun Textbox, Status)
+  function terapkanTapisan() {
+    const valJab = document.getElementById("filterJabatan").value;
+    const valTahun = document.getElementById("filterTahun").value.trim();
+    const valStatus = document.getElementById("filterStatus").value;
+    
+    // Kemaskini label tajuk di atas jadual
+    const labelHeader = document.getElementById("labelStatusHeader");
+    if (labelHeader) {
+      labelHeader.textContent = valStatus === "" ? "Semua Status" : valStatus;
+    }
+
+    dataInovasiSemasa = dataAsalInovasi.filter(rekod => {
+      // 1. Semakan Jabatan
+      let matchJab = (valJab === "" || rekod[3] === valJab);
+      // 2. Semakan Tahun (Textbox)
+      let matchTahun = (valTahun === "" || String(rekod[8]).includes(valTahun));
+      // 3. Semakan Status (Sokongan ulasan pada Baiki Semula)
+      let statusRekod = String(rekod[9] || "").toUpperCase();
+      let matchStatus = true;
+      if (valStatus !== "") {
+        if (valStatus === "BAIKI SEMULA") {
+          matchStatus = statusRekod.startsWith("BAIKI SEMULA");
+        } else {
+          matchStatus = (statusRekod === valStatus);
+        }
+      }
+      return matchJab && matchTahun && matchStatus;
+    });
+
+    binaJadual(dataInovasiSemasa);
+  }
+
   function binaJadual(data) {
     let tbody = document.getElementById("bodyJadual");
+    
+    // 🛠️ PEMBETULAN: Bersihkan baris jadual lama terlebih dahulu
+    tbody.innerHTML = "";
+
     if (data.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='11' class='text-center text-muted py-4'>Tiada rekod yang menunggu pengesahan.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='11' class='text-center text-muted py-4'>Tiada rekod dijumpai berdasarkan tapisan ini.</td></tr>";
       return;
     }
 
@@ -238,6 +344,25 @@
           }).join("");
       }
 
+      // 🌟 PENAMBAHBAIKAN: Pengesanan Status (Disahkan, Baiki Semula & Ulasan, Menunggu)
+      let statusText = rekod[9] ? rekod[9].toString().trim() : "MENUNGGU PENGESAHAN";
+      let statusUpper = statusText.toUpperCase();
+      let paparanStatus = "";
+
+      if (statusUpper === "DISAHKAN") {
+          paparanStatus = `<span class="badge bg-success px-2 py-1">✅ DISAHKAN</span>`;
+      } else if (statusUpper.startsWith("BAIKI SEMULA")) {
+          let ulasan = statusText.split(':').slice(1).join(':').trim() || "Sila semak semula maklumat pendaftaran.";
+          paparanStatus = `
+              <span class="badge bg-danger px-2 py-1 mb-1 shadow-sm">⚠️ BAIKI SEMULA</span>
+              <div class="p-1 bg-warning bg-opacity-25 border border-warning rounded text-start text-dark mt-1 mx-auto shadow-sm" style="font-size: 11px; max-width: 170px; white-space: normal;">
+                  <strong class="text-danger">Ulasan:</strong><br>${ulasan}
+              </div>
+          `;
+      } else {
+          paparanStatus = `<span class="badge bg-warning text-dark px-2 py-1">⏳ ${statusText}</span>`;
+      }
+
       tr.innerHTML = `
         <td class="text-center">${rekod[0]}</td>
         <td>
@@ -250,12 +375,13 @@
         <td>${rekod[6]}</td>
         <td class="text-center">${rekod[7]}</td>
         <td class="text-center">${rekod[8]}</td>
-        <td class="text-center"><span class="badge bg-warning text-dark px-2 py-1">${rekod[9]}</span></td>
+        <td class="text-center">${paparanStatus}</td>
         <td class="text-center">${butangSijilHtml}</td>
         <td class="text-center">
           <div class="d-flex flex-column gap-1">
             <button class="btn btn-success btn-sm shadow-sm" onclick="sahkanRekod(${index})">✅ Sah</button>
-            <button class="btn btn-warning btn-sm shadow-sm" onclick="bukaModalEdit(${index})">✏️ Edit</button>
+            <button class="btn btn-warning text-dark fw-bold btn-sm shadow-sm" style="background-color: #ffc107; border-color: #ffc107;" onclick="bukaModalBaiki(${index})">⚠️ Baiki Semula</button>
+            <button class="btn btn-primary btn-sm shadow-sm" onclick="bukaModalEdit(${index})">✏️ Edit</button>
             <button class="btn btn-danger btn-sm shadow-sm" onclick="padamRekod('${rekod[0]}')">🗑️ Tolak</button>
           </div>
         </td>
@@ -315,6 +441,56 @@
   setupFileInput('uploadFileProduk', 'base64Produk', 'namaFileProduk', 'mimeFileProduk');
 
   const modalEditEl = new bootstrap.Modal(document.getElementById('modalEdit'));
+  const modalBaikiEl = new bootstrap.Modal(document.getElementById('modalBaiki')); // 🌟 TAMBAHAN: Modal Baiki
+
+  // 🌟 PENAMBAHBAIKAN: Fungsi buka modal dan simpan ulasan Baiki Semula
+  function bukaModalBaiki(index) {
+    let rekod = dataInovasiSemasa[index];
+    document.getElementById("baikiBil").value = rekod[0];
+    document.getElementById("inputUlasanBaiki").value = "";
+    modalBaikiEl.show();
+  }
+
+  document.getElementById("formBaiki").addEventListener("submit", function(e) {
+    e.preventDefault();
+    let bilID = document.getElementById("baikiBil").value;
+    let ulasan = document.getElementById("inputUlasanBaiki").value.trim();
+    
+    if (!ulasan) {
+      alert("Sila masukkan ulasan untuk dibaiki semula.");
+      return;
+    }
+
+    let statusBaru = "BAIKI SEMULA: " + ulasan;
+    let payload = { action: "ubahStatus", bil: bilID, status: statusBaru };
+
+    document.getElementById("btnSimpanBaiki").innerText = "Menyimpan...";
+    document.getElementById("btnSimpanBaiki").disabled = true;
+
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "text/plain;charset=utf-8" }
+    })
+    .then(res => res.json())
+    .then(response => {
+      document.getElementById("btnSimpanBaiki").innerText = "Simpan Ulasan & Hantar";
+      document.getElementById("btnSimpanBaiki").disabled = false;
+      modalBaikiEl.hide();
+      
+      if (response.status === "BERJAYA") {
+        alert("Berjaya: Status telah dikemaskini kepada BAIKI SEMULA.");
+        loadData();
+      } else {
+        alert("Ralat: " + response.mesej);
+      }
+    })
+    .catch(err => {
+      alert("Ralat sambungan: " + err.message);
+      document.getElementById("btnSimpanBaiki").innerText = "Simpan Ulasan & Hantar";
+      document.getElementById("btnSimpanBaiki").disabled = false;
+    });
+  });
 
   function bukaModalEdit(index) {
     let rekod = dataInovasiSemasa[index];
