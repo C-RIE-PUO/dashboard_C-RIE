@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Library untuk eksport PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         if (sessionStorage.getItem("userLulus") !== "YA") {
             alert("Sila log masuk terlebih dahulu.");
@@ -35,6 +37,10 @@
                 <p class="text-gray-500 text-sm mt-1 ml-12">Analisis & Pemantauan Peruntukan Geran Penyelidikan</p>
             </div>
             <div class="flex flex-wrap justify-center gap-3">
+                <!-- BUTANG LAPORAN -->
+                <button id="btnLaporan" onclick="bukaModalLaporan()" class="bg-rose-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:bg-rose-700 hover:shadow-lg transition-all text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Laporan
+                </button>
                 <button id="btnTambahData" onclick="bukaModalTambahData()" class="hidden bg-orange-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all text-sm flex items-center gap-2">
                     <i class="fa-solid fa-plus-circle"></i> Tambah Data
                 </button>
@@ -204,7 +210,6 @@
                                         <option value="6">6 Orang Ahli (Maksimum)</option>
                                     </select>
                                 </div>
-                                
                                 <div id="container_ahli" class="space-y-3 pt-1"></div>
                             </div>
 
@@ -255,7 +260,7 @@
                     </form>
                 </div>
 
-                <!-- TAB 2: KANDUNGAN PUKAL (DITAMBAH BAIK) -->
+                <!-- TAB 2: KANDUNGAN PUKAL -->
                 <div id="tabKandunganPukal" class="hidden space-y-5">
                     <div class="bg-blue-50/70 border border-blue-200 p-4 rounded-xl text-sm text-blue-900 shadow-sm">
                         <p class="font-bold mb-2 flex items-center gap-2 text-blue-800"><i class="fa-solid fa-circle-info text-blue-600 text-base"></i> Arahan & Formatting Muat Naik CSV:</p>
@@ -404,6 +409,47 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL LAPORAN PDF (DIKEMASKINI) -->
+    <div id="modalLaporan" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden transform transition-all scale-100 flex flex-col max-h-[95vh]">
+            <div class="bg-gradient-to-r from-rose-600 to-rose-800 p-5 text-white flex justify-between items-center flex-shrink-0">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-xl text-rose-200"></i> Penjanaan Laporan Statistik PDF
+                </h3>
+                <button onclick="tutupModalLaporan()" class="text-white hover:text-rose-200 text-2xl font-bold leading-none transition">&times;</button>
+            </div>
+            
+            <div class="p-5 border-b border-gray-200 bg-gray-50 flex gap-4 items-end flex-wrap flex-shrink-0">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Pilih Tahun</label>
+                    <input type="text" id="lap_tahun" placeholder="Cth: 2026 (Kosongkan utk Semua)" class="px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm font-bold text-gray-800 focus:ring-2 focus:ring-rose-500 outline-none w-56">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Pilih Jabatan</label>
+                    <select id="lap_jabatan" class="px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm font-bold text-gray-800 focus:ring-2 focus:ring-rose-500 outline-none w-64">
+                        <option value="SEMUA">Semua Jabatan</option>
+                    </select>
+                </div>
+                <button onclick="janaLaporan()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-md text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i> Jana
+                </button>
+                <button id="btnMuatTurunPDF" onclick="muatTurunPDF()" class="hidden ml-auto px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition shadow-md text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> Muat Turun PDF
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-grow custom-scrollbar bg-gray-100">
+                <div id="kandunganLaporanPDF" class="bg-white p-10 rounded-xl shadow-sm border border-gray-200 min-h-[500px] hidden text-gray-800">
+                    <!-- Laporan will be injected here -->
+                </div>
+                <div id="placeholderLaporan" class="flex flex-col items-center justify-center h-full text-gray-400 py-10">
+                    <i class="fa-solid fa-file-invoice mb-4 text-6xl opacity-30"></i>
+                    <p class="font-medium text-sm">Sila isi tahun dan pilih jabatan, kemudian klik "Jana" untuk memaparkan laporan.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -677,13 +723,6 @@
             kemaskiniDashboard(dataTapis);
         }
 
-        function kemaskiniDashboard(data) {
-            const stats = kiraStatsGeran(data);
-            renderKadKPI(stats);
-            renderCarta(stats);
-            paparJadual();
-        }
-
         function kiraStatsGeran(data) {
             let statsJabatan = {};
             let statsJenis = {};
@@ -702,6 +741,13 @@
                 totalNilai += nilai;
             });
             return { jabatan: statsJabatan, jenis: statsJenis, totalNilai: totalNilai, totalProjek: data.length };
+        }
+
+        function kemaskiniDashboard(data) {
+            const stats = kiraStatsGeran(data);
+            renderKadKPI(stats);
+            renderCarta(stats);
+            paparJadual();
         }
 
         function renderKadKPI(stats) {
@@ -1168,66 +1214,14 @@
             });
         }
 
-        /* ========================================================
-           🌟 PENAMBAHBAIKAN FUNGSI MUAT TURUN TEMPLAT CSV 🌟
-           Menyediakan contoh projek dengan lebih daripada 2 orang
-           ahli Kumpulan Penyelidik mengikut format baris baru.
-           ======================================================== */
         function muatTurunTemplate() {
             const headerArr = [
-                "Bil", 
-                "Nama Ketua Geran", 
-                "NO HP", 
-                "Jabatan/Unit (Ketua)", 
-                "Ahli Kumpulan Penyelidik", 
-                "Jabatan/Unit (Ahli)", 
-                "Tajuk Projek", 
-                "Jenis Geran", 
-                "No. Rujukan Geran", 
-                "Tahun Mula", 
-                "Tahun Tamat", 
-                "Jumlah Peruntukan Diluluskan (RM)", 
-                "Peratus Perbelanjaan", 
-                "Status"
+                "Bil", "Nama Ketua Geran", "NO HP", "Jabatan/Unit (Ketua)", "Ahli Kumpulan Penyelidik", "Jabatan/Unit (Ahli)", "Tajuk Projek", "Jenis Geran", "No. Rujukan Geran", "Tahun Mula", "Tahun Tamat", "Jumlah Peruntukan Diluluskan (RM)", "Peratus Perbelanjaan", "Status"
             ];
 
-            // Contoh 1: Projek Penyelidikan dengan 3 Orang Ahli (Lebih dari 2 orang)
-            const contohProjek1 = [
-                "1", 
-                "Dr. Ahmad Bin Ali", 
-                "0123456789", 
-                "JKM", 
-                "1. Dr. Abu Bin Bakar\n2. Siti Binti Hassan\n3. Muhammad Bin Rahman", 
-                "JKM\nJKA\nJKE", 
-                "Penyelidikan Sistem Robotik Auto-Tani Bersepadu", 
-                "T-AIGS", 
-                "PKS/2026/GERAN/01", 
-                "2026", 
-                "2027", 
-                "50000", 
-                "15", 
-                "AKTIF"
-            ];
+            const contohProjek1 = [ "1", "Dr. Ahmad Bin Ali", "0123456789", "JKM", "1. Dr. Abu Bin Bakar\n2. Siti Binti Hassan\n3. Muhammad Bin Rahman", "JKM\nJKA\nJKE", "Penyelidikan Sistem Robotik Auto-Tani Bersepadu", "T-AIGS", "PKS/2026/GERAN/01", "2026", "2027", "50000", "15", "AKTIF" ];
+            const contohProjek2 = [ "2", "Prof. Madya Dr. Noraini Binti Zakaria", "0198765432", "JTMK", "1. Farah Binti Ismail\n2. Mohd Rizal Bin Osman\n3. Tan Wei Ming\n4. K. Rajan A/L Kumar", "JTMK\nJP\nJPA\nJTMK", "Pembangunan Platform Pemantauan Tenaga Boleh Baharu", "MAIN", "PKS/2026/GERAN/02", "2026", "2028", "75000", "30", "AKTIF" ];
 
-            // Contoh 2: Projek Penyelidikan dengan 4 Orang Ahli (Lebih dari 2 orang)
-            const contohProjek2 = [
-                "2", 
-                "Prof. Madya Dr. Noraini Binti Zakaria", 
-                "0198765432", 
-                "JTMK", 
-                "1. Farah Binti Ismail\n2. Mohd Rizal Bin Osman\n3. Tan Wei Ming\n4. K. Rajan A/L Kumar", 
-                "JTMK\nJP\nJPA\nJTMK", 
-                "Pembangunan Platform Pemantauan Tenaga Boleh Baharu", 
-                "MAIN", 
-                "PKS/2026/GERAN/02", 
-                "2026", 
-                "2028", 
-                "75000", 
-                "30", 
-                "AKTIF"
-            ];
-
-            // Fungsi Format CSV untuk memastikan sel yang mempunyai koma atau baris baru (line break) dibalut dengan pembuka ""
             const formatBarisCSV = (arr) => arr.map(cell => {
                 let teks = String(cell !== undefined && cell !== null ? cell : '');
                 if (teks.includes('"') || teks.includes(',') || teks.includes('\n') || teks.includes('\r')) {
@@ -1256,9 +1250,6 @@
             URL.revokeObjectURL(url);
         }
 
-        /* ========================================================
-           🌟 PENAMBAHBAIKAN FUNGSI MUAT NAIK PUKAL 🌟
-           ======================================================== */
         function hantarDataPukal(e) {
             e.preventDefault();
             const failInput = document.getElementById('in_fail_pukal');
@@ -1271,7 +1262,6 @@
             
             const fail = failInput.files[0];
 
-            // Semakan saiz fail (had maksima 5MB)
             if (fail.size > 5 * 1024 * 1024) {
                 alert("⚠️ Saiz fail melebihi 5MB. Sila muat naik fail yang lebih kecil.");
                 return;
@@ -1320,6 +1310,220 @@
             
             reader.readAsDataURL(fail);
         }
-    </script>
+
+        // ==========================================================
+        // 🌟 FUNGSI LAPORAN PDF (KEMASKINI BARU) 🌟
+        // ==========================================================
+        function bukaModalLaporan() {
+            document.getElementById('modalLaporan').classList.remove('hidden');
+            
+            // Masukkan data Jabatan ke dalam dropdown (Hanya Menggunakan Singkatan Jabatan)
+            const selJabatan = document.getElementById('lap_jabatan');
+            selJabatan.innerHTML = '<option value="SEMUA">Semua Jabatan</option>';
+            
+            const setJabatan = new Set();
+            senaraiJabatanSistem.forEach(j => setJabatan.add(dapatkanNamaPendekJabatan(j)));
+            [...setJabatan].sort().forEach(j => selJabatan.innerHTML += `<option value="${j}">${j}</option>`);
+
+            // Halang pengguna biasa daripada memilih jabatan lain
+            if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
+                const userDept = dapatkanNamaPendekJabatan(userJabatan);
+                selJabatan.disabled = true;
+                selJabatan.classList.add('bg-gray-200', 'cursor-not-allowed', 'opacity-70');
+                
+                // Pastikan jabatan wujud
+                if(!Array.from(selJabatan.options).some(opt => opt.value === userDept)) {
+                    selJabatan.innerHTML += `<option value="${userDept}">${userDept}</option>`;
+                }
+                selJabatan.value = userDept;
+            }
+        }
+
+        function tutupModalLaporan() {
+            document.getElementById('modalLaporan').classList.add('hidden');
+            document.getElementById('kandunganLaporanPDF').classList.add('hidden');
+            document.getElementById('placeholderLaporan').classList.remove('hidden');
+            document.getElementById('btnMuatTurunPDF').classList.add('hidden');
+        }
+
+        function janaLaporan() {
+            let valTahun = document.getElementById('lap_tahun').value.trim();
+            if(valTahun === "") valTahun = "SEMUA"; 
+            
+            const valJabatan = document.getElementById('lap_jabatan').value;
+
+            // Tapis data mengikut pilihan tahun & dropdown
+            let dataLap = dataGeranPenuh.filter(row => {
+                const dbTahun = String(row[9] || "").trim();
+                const dbJabatan = dapatkanNamaPendekJabatan(String(row[3] || "").trim());
+                
+                let matchTahun = (valTahun === "SEMUA") || (dbTahun === valTahun);
+                let matchJabatan = (valJabatan === "SEMUA") || (dbJabatan === valJabatan);
+                return matchTahun && matchJabatan;
+            });
+
+            const stats = kiraStatsGeran(dataLap);
+
+            let html = `
+                <div class="text-center mb-8 border-b-2 border-gray-800 pb-6">
+                    <h1 class="text-2xl font-bold uppercase tracking-wider text-gray-900">Laporan Statistik Geran Penyelidikan</h1>
+                    <p class="text-gray-600 font-medium mt-2">Tahun: ${valTahun === 'SEMUA' ? 'Keseluruhan' : valTahun} | Jabatan: ${valJabatan === 'SEMUA' ? 'Semua Jabatan' : valJabatan}</p>
+                    <p class="text-gray-400 text-xs mt-1">Dijana pada: ${new Date().toLocaleString('ms-MY')}</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg text-center" style="page-break-inside: avoid;">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Jumlah Projek</p>
+                        <p class="text-3xl font-black text-blue-700 mt-1">${stats.totalProjek}</p>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg text-center" style="page-break-inside: avoid;">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Jumlah Peruntukan (RM)</p>
+                        <p class="text-3xl font-black text-emerald-700 mt-1">${stats.totalNilai.toLocaleString('en-MY', {minimumFractionDigits:2})}</p>
+                    </div>
+                </div>
+
+                <div class="mb-8" style="page-break-inside: avoid;">
+                    <h3 class="text-sm font-bold text-gray-800 uppercase mb-3 border-b border-gray-200 pb-2">Pecahan Mengikut Jenis Geran</h3>
+                    <table class="w-full text-sm border-collapse border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="border border-gray-300 p-2 text-left">Jenis Geran</th>
+                                <th class="border border-gray-300 p-2 text-center w-32">Bil. Projek</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            let sumProjek = 0;
+            for(let jenis in stats.jenis) {
+                html += `<tr style="page-break-inside: avoid;"><td class="border border-gray-300 p-2 font-medium">${jenis}</td><td class="border border-gray-300 p-2 text-center">${stats.jenis[jenis]}</td></tr>`;
+                sumProjek += stats.jenis[jenis];
+            }
+            if(sumProjek === 0) html += `<tr><td colspan="2" class="border border-gray-300 p-4 text-center text-gray-500">Tiada Data Ditemui</td></tr>`;
+
+            html += `</tbody></table></div>`;
+
+            if (dataLap.length === 0) {
+                html += `
+                    <div style="page-break-inside: avoid;">
+                        <h3 class="text-sm font-bold text-gray-800 uppercase mb-3 border-b border-gray-200 pb-2">Senarai Ringkas Projek</h3>
+                        <table class="w-full text-xs border-collapse border border-gray-300">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="border border-gray-300 p-2 text-center w-10">Bil</th>
+                                    <th class="border border-gray-300 p-2 text-left">Ketua / Jabatan</th>
+                                    <th class="border border-gray-300 p-2 text-left">Tajuk Projek</th>
+                                    <th class="border border-gray-300 p-2 text-right w-24">Peruntukan (RM)</th>
+                                    <th class="border border-gray-300 p-2 text-center w-20">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="5" class="border border-gray-300 p-4 text-center text-gray-500">Tiada projek direkodkan pada pilihan ini.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+            } else {
+                html += `
+                    <div> 
+                        <h3 class="text-sm font-bold text-gray-800 uppercase mb-3 border-b border-gray-200 pb-2">Senarai Ringkas Projek</h3>
+                        <table class="w-full text-xs border-collapse border border-gray-300" style="page-break-inside: auto;">
+                            <thead class="bg-gray-100" style="display: table-header-group;">
+                                <tr>
+                                    <th class="border border-gray-300 p-2 text-center w-10">Bil</th>
+                                    <th class="border border-gray-300 p-2 text-left">Ketua / Jabatan</th>
+                                    <th class="border border-gray-300 p-2 text-left">Tajuk Projek</th>
+                                    <th class="border border-gray-300 p-2 text-right w-24">Peruntukan (RM)</th>
+                                    <th class="border border-gray-300 p-2 text-center w-20">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                dataLap.forEach((r, idx) => {
+                    const paparanIndex = idx + 1;
+                    const ketua = r[1] || "-";
+                    const jbt = dapatkanNamaPendekJabatan(r[3] || "-");
+                    const tajuk = r[6] || "-";
+                    const thnMula = r[9] || "-"; 
+                    const thnTamat = r[10] || "-"; 
+                    const nilai = parseFloat(String(r[11] || "0").replace(/[^0-9.-]+/g,"")) || 0;
+                    const status = String(r[13] || "-").toUpperCase();
+                    
+                    html += `
+                        <tr style="page-break-inside: avoid; break-inside: avoid;">
+                            <td class="border border-gray-300 p-2 text-center align-top">${paparanIndex}</td>
+                            <td class="border border-gray-300 p-2 align-top"><b>${ketua}</b><br><span class="text-gray-500">${jbt}</span></td>
+                            <td class="border border-gray-300 p-2 align-top">
+                                ${tajuk}
+                                <div class="mt-1 text-xs text-gray-600 font-medium">Tempoh: ${thnMula} - ${thnTamat}</div>
+                            </td>
+                            <td class="border border-gray-300 p-2 text-right align-top">${nilai.toLocaleString('en-MY', {minimumFractionDigits:2})}</td>
+                            <td class="border border-gray-300 p-2 text-center align-top">${status}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            const container = document.getElementById('kandunganLaporanPDF');
+            container.innerHTML = html;
+            
+            container.classList.remove('hidden');
+            document.getElementById('placeholderLaporan').classList.add('hidden');
+            document.getElementById('btnMuatTurunPDF').classList.remove('hidden');
+        }
+		
+        function muatTurunPDF() {
+            const element = document.getElementById('kandunganLaporanPDF');
+            
+            let valTahun = document.getElementById('lap_tahun').value.trim();
+            if(valTahun === "") valTahun = "SEMUA";
+            
+            const valJabatan = document.getElementById('lap_jabatan').value;
+            const filename = `Laporan_Geran_${valJabatan}_${valTahun}.pdf`;
+
+            const opt = {
+                margin:       [15, 10, 20, 10], 
+                filename:     filename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    scrollY: 0, // Memastikan enjin tidak mengambil kira scroll asal modal
+                    windowHeight: element.scrollHeight // Membaca sepenuhnya elemen tersembunyi 
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'], avoid: 'tr' } 
+            };
+
+            const btn = document.getElementById('btnMuatTurunPDF');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menjana PDF...';
+            btn.disabled = true;
+
+            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+                var totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(9); 
+                    pdf.setTextColor(100);
+                    
+                    let txtLabel = `Laporan Statistik Geran Penyelidikan | Tahun: ${valTahun === 'SEMUA' ? 'Keseluruhan' : valTahun} | Jabatan: ${valJabatan === 'SEMUA' ? 'Semua' : valJabatan}`;
+                    pdf.text(txtLabel, 10, 12);
+                    pdf.text(`Muka Surat ${i} / ${totalPages}`, pdf.internal.pageSize.getWidth() - 30, 12);
+                    
+                    pdf.setDrawColor(200);
+                    pdf.line(10, 15, pdf.internal.pageSize.getWidth() - 10, 15);
+                }
+            }).save().then(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+		</script>
 </body>
 </html>
