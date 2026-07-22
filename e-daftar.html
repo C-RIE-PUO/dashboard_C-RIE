@@ -984,13 +984,19 @@ async function hantarKemaskini(e) {
         fileProposalData = await bacaFailAsBase64(fileProposalInput);
     }
 
+    // 🌟 PERUBAHAN BARU: Semakan dan pertukaran automatik status BAIKI SEMULA -> MENUNGGU PENGESAHAN
+    let statusUntukDisimpan = document.getElementById('edit_status').value;
+    if ((userPeranan === "STAF" || userPeranan === "PENYELARAS JABATAN") && statusUntukDisimpan.toUpperCase().startsWith("BAIKI SEMULA")) {
+        statusUntukDisimpan = "MENUNGGU PENGESAHAN";
+    }
+
     // Bina objek payload lengkap
     const payloadData = {
         action: "kemaskiniProjek",
         BIL: document.getElementById('edit_bil').value,
         TAJUK: document.getElementById('edit_tajuk').value.toUpperCase(),
         JABATAN: document.getElementById('edit_jabatan').value.toUpperCase(),
-        STATUS: document.getElementById('edit_status').value,
+        STATUS: statusUntukDisimpan, // Gunakan status yang telah diproses di atas
         TARIKH_MULA: tarikhMulaEdit,
         TARIKH_AKHIR: tarikhAkhirEdit,
         KETUA: document.getElementById('edit_ketua').value.toUpperCase(),
