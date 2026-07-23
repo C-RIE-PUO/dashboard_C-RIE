@@ -127,6 +127,8 @@
             <option value="MENUNGGU PENGESAHAN">🟡 MENUNGGU PENGESAHAN</option>
             <option value="DISAHKAN">🟢 DISAHKAN</option>
             <option value="DITOLAK">🔴 DITOLAK</option>
+            <!-- Pilihan BAIKI SEMULA ditambah agar boleh dipaparkan jika rekod asal bertatus sedemikian -->
+            <option value="BAIKI SEMULA">🟠 BAIKI SEMULA</option>
         </select>
         <p id="notaStatus" class="text-xs text-red-500 mt-2 hidden">*Hanya pihak Pengurusan/Penyelaras dibenarkan mengubah status ini.</p>
     </div>
@@ -213,6 +215,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const rekodId = urlParams.get('id');
         let kpKetuaSebenar = ""; // Simpanan sementara KP dari server
+        let statusAsalRekod = ""; // 🌟 TAMBAHAN: Menyimpan status asal dari pangkalan data
 
         window.onload = async () => {
 		if (!rekodId) {
@@ -312,7 +315,10 @@
 
             // Set Pingat & Status
             setSelectValue('pingat', rekodJumpa[7], "Lain-lain");
-            setSelectValue('status', rekodJumpa[9], "MENUNGGU PENGESAHAN");
+            
+            // 🌟 TAMBAHAN: Simpan status asal untuk semakan semasa proses hantar kemaskini
+            statusAsalRekod = String(rekodJumpa[9] || "MENUNGGU PENGESAHAN").trim();
+            setSelectValue('status', statusAsalRekod, "MENUNGGU PENGESAHAN");
 
             // Paparan Pautan Sedia Ada
             setupPaparanLink(rekodJumpa[10] || "", 'paparanSijilSemasa', 'linkSijilSemasa', 'linkSijilPencapaian', 'Sijil');
@@ -337,7 +343,10 @@
             let el = document.getElementById(elementId);
             let val = String(value || '').trim();
             let found = Array.from(el.options).some((opt, i) => {
-                if (opt.value.toLowerCase() === val.toLowerCase()) { el.selectedIndex = i; return true; }
+                if (opt.value.toLowerCase() === val.toLowerCase() || val.toUpperCase().includes(opt.value.toUpperCase())) { 
+                    el.selectedIndex = i; 
+                    return true; 
+                }
             });
             if (!found && val) el.value = fallback;
         }
@@ -497,6 +506,12 @@
 
     const form = document.getElementById('formEdit');
     
+    // 🌟 PENAMBAHBAIKAN: Jika status asal atau semasa ialah "BAIKI SEMULA", auto-tukar kepada "MENUNGGU PENGESAHAN"
+    let statusHantar = form.status.value;
+    if (statusAsalRekod.toUpperCase().includes("BAIKI") || statusHantar.toUpperCase().includes("BAIKI")) {
+        statusHantar = "MENUNGGU PENGESAHAN";
+    }
+
     const payload = {
         action: "kemaskiniData",
         bil: form.bil.value,
@@ -504,16 +519,16 @@
         jabatan: form.jabatan.value,
         ahli: form.ahli.value,
         produk: form.produk.value,
-        kategori_produk: form.kategori_produk.value, // 🌟 TAMBAHAN DATA BARU
+        kategori_produk: form.kategori_produk.value, 
         pertandingan: form.pertandingan.value,
         tarikh_tempat: form.tarikh_tempat.value,
         pingat: form.pingat.value,
         tahun: form.tahun.value,
-        status: form.status.value,
+        status: statusHantar, // 🌟 Menggunakan status yang telah diverifikasi
         yuran: form.yuran.value,
         no_kp: form.no_kp.value, 
-        no_hp_ketua: form.no_hp_ketua.value,         // 🌟 TAMBAHAN DATA BARU
-        email_ketua: form.email_ketua.value,         // 🌟 TAMBAHAN DATA BARU
+        no_hp_ketua: form.no_hp_ketua.value,         
+        email_ketua: form.email_ketua.value,         
         linkSijilPencapaian: form.linkSijilPencapaian.value,
         linkGambarAhli: form.linkGambarAhli.value,       
         linkGambarProduk: form.linkGambarProduk.value,   
