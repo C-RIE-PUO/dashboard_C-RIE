@@ -6,8 +6,6 @@
     <title>Dashboard Inovasi (Akses Berpusat)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
@@ -93,6 +91,17 @@
                         </select>
                     </div>
 
+                    <!-- 🌟 KEMASKINI: Ditambah Filter Status (DISAHKAN, MENUNGGU PENGESAHAN, BAIKI SEMULA) -->
+                    <div id="divFilterStatus" class="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-1.5 shadow-sm shrink-0 max-w-[230px]">
+                        <span class="text-xs font-bold text-gray-500 mr-2 uppercase">Status:</span>
+                        <select id="filterStatus" onchange="tapisData()" class="bg-transparent focus:outline-none font-semibold text-blue-700 text-sm w-full truncate cursor-pointer">
+                            <option value="Semua">Semua</option>
+                            <option value="DISAHKAN">DISAHKAN</option>
+                            <option value="MENUNGGU PENGESAHAN">MENUNGGU PENGESAHAN</option>
+                            <option value="BAIKI SEMULA">BAIKI SEMULA</option>
+                        </select>
+                    </div>
+
                     <div class="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-1.5 shadow-sm shrink-0 w-full sm:w-32">
                         <span class="text-xs font-bold text-gray-500 mr-2 uppercase">Tahun:</span>
                         <input type="text" id="filterTahun" onkeyup="tapisData()" placeholder="Cth: 2024" class="bg-transparent focus:outline-none font-semibold text-blue-700 text-sm w-full" autocomplete="off">
@@ -141,7 +150,7 @@
     </div>
 
     <script>
-// ⚠️ JANGAN LUPA: TAMPAL URL WEB APP ANDA DI BAWAH INI
+        // ⚠️ JANGAN LUPA: TAMPAL URL WEB APP ANDA DI BAWAH INI
         const scriptURL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
         
         let semuaData = []; 
@@ -157,14 +166,10 @@
         const userPeranan = sessionStorage.getItem("peranan") || "STAF";
         const userJabatan = sessionStorage.getItem("jabatan") || "";
 
-        // SEMAK AKSES TINDAKAN (Kekalkan peranan pentadbiran sedia ada)
+        // SEMAK AKSES TINDAKAN
         const senaraiPerananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-        
-        // 🌟 TAMBAH BAIK: Berikan STAF akses melihat lajur TINDAKAN supaya butang Edit boleh muncul
         const ialahStaf = userPeranan.toUpperCase() === "STAF";
         const adaAksesTindakan = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase()) || ialahStaf;
-
-        // 🌟 KEKALKAN LOGIK ASAL: Akses butang pengesahan pengurusan hanya untuk Admin/Penyelaras (STAF disekat)
         const adaAksesPengesahan = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase());
 
         // PAPAR MAKLUMAT PADA HEADER
@@ -172,19 +177,16 @@
         document.getElementById('perananPengguna').innerText = userPeranan;
         document.getElementById('jabatanPengguna').innerText = userJabatan;
         
-        // Papar header TINDAKAN jika ada akses (Termasuk STAF sekarang)
         if (adaAksesTindakan) {
             document.getElementById('headerTindakan').classList.remove('hidden');
         }
 
-        // 🌟 KEMASKINI: Gunakan 'adaAksesPengesahan' supaya butang ini kekal TERSEMBUNYI daripada STAF
         if (adaAksesPengesahan) {
             const btnPengesahan = document.getElementById('btnPengesahan');
             btnPengesahan.classList.remove('hidden');
             btnPengesahan.classList.add('flex');
         }
 
-        // PAPAR TAJUK JADUAL & FILTER BERDASARKAN PERANAN
         if(userPeranan.toUpperCase() === "STAF" && userJabatan) {
             document.getElementById('tajukJadual').innerText = `(${userJabatan})`;
         } else {
@@ -193,22 +195,40 @@
             document.getElementById('divFilterJabatan').classList.add('flex');
         }
 
-
-       // 🌟 KEMASKINI 1: Fungsi untuk mendapatkan nama singkatan dari teks jabatan yang panjang
         function dapatkanSingkatanJabatan(teksJabatan) {
             if (!teksJabatan || teksJabatan === "-") return "-";
-            
-            // Cari string di dalam kurungan cth: (JKA)
             const padananKurungan = teksJabatan.match(/\(([^)]+)\)/);
             if (padananKurungan && padananKurungan[1]) {
-                return padananKurungan[1].trim().toUpperCase(); // Kembalikan 'JKA'
+                return padananKurungan[1].trim().toUpperCase();
             }
-            
-            // Jika tiada kurungan, kekalkan teks asal
             return teksJabatan.trim().toUpperCase();
         }
 
-async function ambilData() {
+        // 🌟 KEMASKINI BAHARU: Fungsi untuk memisahkan Status dan Ulasan dari Lajur J (Index 9) sahaja
+        function pisahkanStatusDanUlasan(teksLajurJ) {
+            let statusRaw = String(teksLajurJ || 'MENUNGGU PENGESAHAN').trim();
+            let status = statusRaw;
+            let ulasan = "";
+
+            if (statusRaw.toUpperCase().includes("BAIKI")) {
+                status = "BAIKI SEMULA";
+                // Buang kata kunci BAIKI SEMULA dari teks untuk mengambil baki ulasan di lajur J
+                let bakiTeks = statusRaw.replace(/i?BAIKI\s*(SEMULA)?/i, "").trim();
+                
+                // Bersihkan simbol pemisah di hadapan ulasan (cth: "-", ":", "(Sebab:", dll.)
+                bakiTeks = bakiTeks.replace(/^[-:–—\s()]+/, "")
+                                   .replace(/^(Sebab|Ulasan|Catatan|Komen)\s*[:=-]\s*/i, "")
+                                   .replace(/\)+$/, "")
+                                   .trim();
+                
+                if (bakiTeks.length > 0) {
+                    ulasan = bakiTeks;
+                }
+            }
+            return { status, ulasan };
+        }
+
+        async function ambilData() {
             const tbody = document.getElementById('isiJadual');
             const paginationControls = document.getElementById('paginationControls');
             
@@ -238,7 +258,7 @@ async function ambilData() {
                 let dataDariSheet = [];
 
                 if (Array.isArray(result) && result.length > 0 && typeof result[0] === 'object' && !Array.isArray(result[0])) {
-                    // Tambah r.STATUS || "MENUNGGU" di hujung (index ke-9)
+                    // 🌟 KEMASKINI: Lajur J (Index 9) menyimpan Status & Ulasan sekaligus. Tiada lagi rujukan pada index 10 atau 11.
                     dataDariSheet = result.map((r, i) => [
                         r.BIL || (i+1), r.INNOVATOR || "-", r.AHLI || "-", r.JABATAN || "-", 
                         r.PRODUK || "-", r.NAMAPERTANDINGAN || "-", r.TARIKHTEMPATPERTANDINGAN || "-", 
@@ -253,19 +273,17 @@ async function ambilData() {
                     return;
                 }
 
-                // 🌟 KEMASKINI BARU: Tukar semua teks paparan rekod kepada Huruf Besar (Kecuali URL/Pautan)
                 if (dataDariSheet.length > 0) {
                     dataDariSheet = dataDariSheet.map(row => 
                         row.map(cell => {
                             if (typeof cell === 'string') {
                                 let trimmed = cell.trim();
-                                // Kekalkan format asal jika cell merupakan pautan/URL supaya tidak rosak
                                 if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
                                     return cell;
                                 }
                                 return cell.toUpperCase();
                             }
-                            return cell; // Kekalkan jika data berbentuk angka/nombor (cth: BIL atau TAHUN)
+                            return cell; 
                         })
                     );
                 }
@@ -306,18 +324,13 @@ async function ambilData() {
             tapisData();
         }
 
-        // 🌟 KEMASKINI 2: Membina Dropdown Jabatan Berdasarkan Singkatan
         function binaFilter(data) {
             if (userPeranan.toUpperCase() !== "STAF") {
                 const dropJabatan = document.getElementById('filterJabatan');
-                
-                // Kumpulkan nama penuh unik dari data sheet
                 const jabatanPenuhUnik = [...new Set(data.map(r => String(r[3]).trim()).filter(j => j !== "" && j !== "-"))].sort();
-                
                 const pilJabatanAsal = dropJabatan.value;
                 dropJabatan.innerHTML = '<option value="Semua">Semua</option>';
                 
-                // Masukkan nama penuh sebagai `value`, tetapi paparkan SINGKATAN sahaja kepada pengguna
                 jabatanPenuhUnik.forEach(jab => { 
                     dropJabatan.innerHTML += `<option value="${jab}">${dapatkanSingkatanJabatan(jab)}</option>`; 
                 });
@@ -326,9 +339,11 @@ async function ambilData() {
             }
         }
 
+        // 🌟 KEMASKINI: Ditambah logik penapisan untuk Status
         function tapisData() {
             const tahunDipilih = document.getElementById('filterTahun').value.trim();
             const jabatanDipilih = document.getElementById('filterJabatan') ? document.getElementById('filterJabatan').value : "Semua";
+            const statusDipilih = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : "Semua";
             
             let dataDitapis = semuaData;
 
@@ -336,13 +351,21 @@ async function ambilData() {
                 dataDitapis = dataDitapis.filter(r => String(r[8]).includes(tahunDipilih));
             }
 
-            // 🌟 KEMASKINI 3: Logik Filter akan mengambil `value` asal (Nama Penuh) untuk dipadankan 
-            // dengan data Google Sheet. Ini mengekalkan data sheet tidak terusik.
             if (jabatanDipilih !== "Semua" && userPeranan.toUpperCase() !== "STAF") {
                 dataDitapis = dataDitapis.filter(r => String(r[3]).trim().toUpperCase() === jabatanDipilih.toUpperCase());
             }
+
+            if (statusDipilih !== "Semua") {
+                dataDitapis = dataDitapis.filter(r => {
+                    const { status: statusTeks } = pisahkanStatusDanUlasan(r[9]);
+                    const statusAtas = statusTeks.trim().toUpperCase();
+                    if (statusDipilih === "DISAHKAN") {
+                        return statusAtas.includes("DISAHKAN") || statusAtas.includes("LULUS");
+                    }
+                    return statusAtas === statusDipilih.toUpperCase();
+                });
+            }
             
-            // Susun rekod mengikut tahun terkini secara menurun (Descending)
             dataDitapis.sort((a, b) => {
                 let tahunA = parseInt(a[8]) || 0; 
                 let tahunB = parseInt(b[8]) || 0;
@@ -372,45 +395,64 @@ async function ambilData() {
             const endIndex = startIndex + rowsPerPage;
             const dataPaginasi = data.slice(startIndex, endIndex);
 
-        dataPaginasi.forEach((row, index) => {
-        const displayBil = startIndex + index + 1; 
-        const recordID = row[0]; 
-        
-        let tindakanHTML = "";
-        // Paparkan lajur tindakan hanya jika peranan dibenarkan
-        if (adaAksesTindakan) {
-            // Semak adakah pengguna semasa merupakan STAF
-            const ialahStaf = (typeof userPeranan !== 'undefined' && userPeranan.toUpperCase() === "STAF");
+            dataPaginasi.forEach((row, index) => {
+                const displayBil = startIndex + index + 1; 
+                const recordID = row[0]; 
+                
+                let tindakanHTML = "";
+                if (adaAksesTindakan) {
+                    const ialahStaf = (typeof userPeranan !== 'undefined' && userPeranan.toUpperCase() === "STAF");
 
-            tindakanHTML = `
-            <td class="p-4 text-center min-w-[150px]">
-                <button onclick="editRekod('${recordID}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-semibold mr-1 shadow-sm transition-colors mb-1 md:mb-0">
-                    ✏️ Edit
-                </button>
-                ${!ialahStaf ? `
-                <button onclick="padamRekod('${recordID}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition-colors">
-                    🗑️ Padam
-                </button>
-                ` : ''}
-            </td>`;
-        }
+                    tindakanHTML = `
+                    <td class="p-4 text-center min-w-[150px] align-middle">
+                        <button onclick="editRekod('${recordID}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-semibold mr-1 shadow-sm transition-colors mb-1 md:mb-0">
+                            ✏️ Edit
+                        </button>
+                        ${!ialahStaf ? `
+                        <button onclick="padamRekod('${recordID}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition-colors">
+                            🗑️ Padam
+                        </button>
+                        ` : ''}
+                    </td>`;
+                }
 
-                // 🌟 KEMASKINI 4: Tukarkan paparan teks lajur Jabatan kepada SINGKATAN pada skrin jadual
                 const singkatanJabatanPapar = dapatkanSingkatanJabatan(row[3]);
+
+                // 🌟 KEMASKINI: Pengambilan status dan ulasan hanya daripada Lajur J (row[9])
+                const { status: statusTeks, ulasan: ulasanTeks } = pisahkanStatusDanUlasan(row[9]);
+
+                let paparanStatusHTML = "";
+                if (statusTeks.toUpperCase() === "BAIKI SEMULA") {
+                    paparanStatusHTML = `
+                        <div class="flex flex-col gap-2 min-w-[170px] max-w-[240px] my-1">
+                            <div>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase bg-yellow-100 text-amber-800 border border-yellow-300 shadow-sm">
+                                    ⚠️ BAIKI SEMULA
+                                </span>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-left shadow-sm">
+                                <p class="text-xs font-bold text-amber-950 mb-1">Sebab / Ulasan:</p>
+                                <p class="text-xs text-amber-900 font-semibold leading-relaxed break-words whitespace-pre-wrap">${ulasanTeks || 'TIADA ULASAN DINYATAKAN'}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    paparanStatusHTML = `<span class="px-3 py-1 rounded-md text-[11px] font-bold uppercase ${getStatusWarna(statusTeks)}">${statusTeks}</span>`;
+                }
 
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-blue-50 transition text-sm";
                 tr.innerHTML = `
-                    <td class="p-4 font-bold text-gray-600">${displayBil}</td>
-                    <td class="p-4 font-semibold text-gray-800">${row[1] || '-'}</td>
-                    <td class="p-4 text-gray-600">${row[2] || '-'}</td>
-                    <td class="p-4 font-bold text-blue-700" title="${row[3]}">${singkatanJabatanPapar}</td>
-                    <td class="p-4 font-semibold">${row[4] || '-'}</td>
-                    <td class="p-4 text-gray-700">${row[5] || '-'}</td>
-                    <td class="p-4 text-xs text-gray-600">${row[6] || '-'}</td>
-                    <td class="p-4"><span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase ${getPingatWarna(row[7])}">${row[7] || 'TIADA'}</span></td>
-                    <td class="p-4 font-mono font-bold">${row[8] || '-'}</td>
-                    <td class="p-4"><span class="px-3 py-1 rounded-md text-[11px] font-bold uppercase ${getStatusWarna(row[9])}">${row[9] || 'MENUNGGU'}</span></td>
+                    <td class="p-4 font-bold text-gray-600 align-middle">${displayBil}</td>
+                    <td class="p-4 font-semibold text-gray-800 align-middle">${row[1] || '-'}</td>
+                    <td class="p-4 text-gray-600 align-middle">${row[2] || '-'}</td>
+                    <td class="p-4 font-bold text-blue-700 align-middle" title="${row[3]}">${singkatanJabatanPapar}</td>
+                    <td class="p-4 font-semibold align-middle">${row[4] || '-'}</td>
+                    <td class="p-4 text-gray-700 align-middle">${row[5] || '-'}</td>
+                    <td class="p-4 text-xs text-gray-600 align-middle">${row[6] || '-'}</td>
+                    <td class="p-4 align-middle"><span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase ${getPingatWarna(row[7])}">${row[7] || 'TIADA'}</span></td>
+                    <td class="p-4 font-mono font-bold align-middle">${row[8] || '-'}</td>
+                    <td class="p-4 align-middle">${paparanStatusHTML}</td>
                     ${tindakanHTML}
                 `;
                 tbody.appendChild(tr);
@@ -431,16 +473,14 @@ async function ambilData() {
                 tbody.innerHTML = `<tr><td colspan="11" class="p-10 text-center font-semibold text-red-500 animate-pulse">⏳ Sedang memadam rekod BIL: ${id}...</td></tr>`;
 
                 try {
-                    // 🌟 PEMBETULAN UTAMA: Tukar kepada kaedah POST dan hantar body JSON
                     const response = await fetch(scriptURL, {
                         method: 'POST',
                         headers: { 
-                            // Gunakan text/plain untuk elak isu CORS (Cross-Origin) pada Google Script
                             'Content-Type': 'text/plain;charset=utf-8' 
                         },
                         body: JSON.stringify({ 
                             action: "padamData", 
-                            bil: id  // <-- Ini sepadan dengan payload.bil di backend anda
+                            bil: id
                         })
                     });
                     
@@ -500,13 +540,13 @@ async function ambilData() {
             return "bg-blue-100 text-blue-800 border border-blue-200";
         }
 
-        // Fungsi baru untuk menentukan warna status
         function getStatusWarna(status) {
             if (!status) return "bg-yellow-100 text-yellow-800 border border-yellow-300";
             const s = String(status).toUpperCase();
             if (s.includes("DISAHKAN") || s.includes("LULUS")) return "bg-green-100 text-green-800 border border-green-300";
             if (s.includes("DITOLAK")) return "bg-red-100 text-red-800 border border-red-300";
-            return "bg-yellow-100 text-yellow-800 border border-yellow-300"; // Default (Menunggu)
+            if (s.includes("BAIKI")) return "bg-yellow-100 text-amber-800 border border-yellow-300";
+            return "bg-yellow-100 text-yellow-800 border border-yellow-300"; 
         }
 
         function kemaskiniStatistik(data) {
@@ -516,16 +556,12 @@ async function ambilData() {
             document.getElementById('statGangsa').innerText = data.filter(r => String(r[7]).toUpperCase().includes("GANGSA")).length;
         }
 
-    function kemaskiniCarta(data) {
+        function kemaskiniCarta(data) {
             const rekodJabatan = {};
             
             data.forEach(r => { 
                 let jAsal = String(r[3] || "N/A").trim(); 
-                
-                // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
-                // Cari perkataan di dalam kurungan cth: (JKA)
                 let match = jAsal.match(/\(([^)]+)\)/); 
-                // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
                 let j = match ? match[1].trim() : jAsal;
                 
                 rekodJabatan[j] = (rekodJabatan[j] || 0) + 1; 
@@ -580,7 +616,6 @@ async function ambilData() {
                 return;
             }
 
-            // Kemaskini header CSV dengan tambahan Link Pencapaian, Link Penghargaan & Yuran
             let csvContent = "BIL,INNOVATOR,AHLI KUMPULAN,JABATAN,PRODUK INOVASI,PERTANDINGAN,TARIKH & TEMPAT,PINGAT,TAHUN,STATUS,LINK PENCAPAIAN,LINK PENGHARGAAN,YURAN\n";
 
             dataSemasa.forEach(row => {
@@ -604,10 +639,6 @@ async function ambilData() {
             document.body.removeChild(link);
         }
 		
-		
-// =================================================================
-        // 🌟 FUNGSI BARU: MUAT TURUN LAPORAN PDF INOVASI (STATISTIK & JADUAL)
-        // =================================================================
         function muatTurunPDFLaporan() {
             let dataUntukEksport = dataSemasa && dataSemasa.length > 0 ? dataSemasa : semuaData;
 
@@ -621,36 +652,29 @@ async function ambilData() {
                 return;
             }
 
-            // 1. Prompt untuk Input Khas KPI/Pencapaian
             let inputKpi = prompt(
                 "Sila semak dan kemaskini teks pencapaian/KPI yang ingin dipaparkan:", 
                 "Paparan Pencapaian Inovasi"
             );
 
-            if (inputKpi === null) return; // Batal jika pengguna tekan Cancel
+            if (inputKpi === null) return;
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape'); 
 
-            // 2. Ambil nilai Tapisan Semasa 
             let fTahun = document.getElementById('filterTahun').value.trim() || "Semua Tahun";
-            
             let selJabatan = document.getElementById('filterJabatan');
             
-            // 🌟 KEMASKINI: Logik Tajuk Jabatan Dinamik mengikut tapisan (Filter)
             let fJabatan = "";
             let nilaiFilterJabatan = selJabatan ? selJabatan.value : "Semua";
             
             if (nilaiFilterJabatan === "Semua") {
-                // Jika "Semua" dipilih, tukar paparan tajuk kepada SEMUA JABATAN
                 fJabatan = "SEMUA JABATAN";
             } else {
-                // Jika jabatan tertentu dipilih, gunakan nama jabatan tersebut
                 fJabatan = nilaiFilterJabatan;
             }
             fJabatan = fJabatan.toUpperCase();
 
-            // 3. Masukkan Header Imej / Logo
             try {
                 if (typeof logoJPPKKBase64 !== 'undefined' && logoJPPKKBase64.length > 100) {
                     doc.addImage(logoJPPKKBase64, 'PNG', 14, 15, 30, 15);
@@ -662,23 +686,19 @@ async function ambilData() {
                 console.warn("Ralat memasukkan imej logo ke PDF:", e);
             }
 
-            // 4. Teks Header Laporan Dinamik 
             doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
-            doc.setTextColor(30, 41, 59); // Slate 800
+            doc.setTextColor(30, 41, 59); 
             
             const pageWidth = doc.internal.pageSize.width;
             doc.text("RUMUSAN PENCAPAIAN PRODUK INOVASI", pageWidth / 2, 20, { align: "center" });
-            
-            // Memaparkan nama jabatan secara dinamik (SEMUA JABATAN atau Nama Jabatan yang dipilih)
             doc.text(fJabatan, pageWidth / 2, 27, { align: "center" }); 
             doc.text("POLITEKNIK UNGKU OMAR", pageWidth / 2, 34, { align: "center" });
 
-            // 5. Teks Input Khas 
             let splitKpiText = doc.splitTextToSize(inputKpi, 250); 
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.setTextColor(71, 85, 105); // Slate 600
+            doc.setTextColor(71, 85, 105); 
             
             let yPos = 45; 
             if(inputKpi.trim() !== "") {
@@ -690,7 +710,6 @@ async function ambilData() {
             doc.text(`Tahun Tapisan: ${fTahun}`, 14, yPos);
             yPos += 5;
 
-            // 6. Kira & Lukis Kotak Rumusan Statistik Pingat
             const total = dataUntukEksport.length;
             const emas = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("EMAS")).length;
             const perak = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("PERAK")).length;
@@ -710,31 +729,35 @@ async function ambilData() {
 
             yPos += 18; 
 
-            // 7. Sediakan Data untuk Jadual PDF
             const tableColumn = ["Bil", "Innovator", "Ahli Kumpulan", "Jabatan", "Produk Inovasi", "Pertandingan", "Tarikh & Tempat", "Pingat", "Tahun", "Status"];
             const tableRows = [];
 
             dataUntukEksport.forEach((row, index) => {
-                // Gunakan fungsi singkatan untuk lajur Jabatan di dalam jadual PDF
                 let namaJabatanAsal = String(row[3] || '-');
                 let jabatanSingkatan = typeof dapatkanSingkatanJabatan === 'function' ? dapatkanSingkatanJabatan(namaJabatanAsal) : namaJabatanAsal;
+
+                // 🌟 KEMASKINI: Ambil status & ulasan untuk PDF terus dari Lajur J (row[9])
+                const { status: statusParsed, ulasan: ulasanPDF } = pisahkanStatusDanUlasan(row[9]);
+                let statusPDF = statusParsed.toUpperCase();
+                if (statusPDF === "BAIKI SEMULA" && ulasanPDF) {
+                    statusPDF = `BAIKI SEMULA\n(Sebab: ${ulasanPDF})`;
+                }
 
                 const rowData = [
                     index + 1,
                     String(row[1] || '-'),
                     String(row[2] || '-'),
-                    jabatanSingkatan, // Kekal menunjukkan singkatan (cth: JKA, JKM) dalam sel jadual
+                    jabatanSingkatan, 
                     String(row[4] || '-').toUpperCase(),
                     String(row[5] || '-'),
                     String(row[6] || '-'),
                     String(row[7] || '-').toUpperCase(),
                     String(row[8] || '-'),
-                    String(row[9] || 'MENUNGGU').toUpperCase()
+                    statusPDF
                 ];
                 tableRows.push(rowData);
             });
 
-            // 8. Jana Jadual Menggunakan AutoTable
             doc.autoTable({
                 startY: yPos,
                 head: [tableColumn],
@@ -743,16 +766,16 @@ async function ambilData() {
                 styles: { fontSize: 8, cellPadding: 3, font: 'helvetica' },
                 headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' }, 
                 columnStyles: {
-                    0: { cellWidth: 10, halign: 'center' },      // Bil
-                    1: { cellWidth: 30 },                        // Innovator
-                    2: { cellWidth: 35 },                        // Ahli
-                    3: { cellWidth: 20, halign: 'center' },      // Jabatan
-                    4: { cellWidth: 40 },                        // Produk
-                    5: { cellWidth: 40 },                        // Pertandingan
-                    6: { cellWidth: 30 },                        // Tarikh & Tempat
-                    7: { cellWidth: 20, halign: 'center' },      // Pingat
-                    8: { cellWidth: 15, halign: 'center' },      // Tahun
-                    9: { cellWidth: 25, halign: 'center' }       // Status
+                    0: { cellWidth: 10, halign: 'center' },
+                    1: { cellWidth: 30 },
+                    2: { cellWidth: 35 },
+                    3: { cellWidth: 20, halign: 'center' },
+                    4: { cellWidth: 40 },
+                    5: { cellWidth: 40 },
+                    6: { cellWidth: 30 },
+                    7: { cellWidth: 20, halign: 'center' },
+                    8: { cellWidth: 15, halign: 'center' },
+                    9: { cellWidth: 30, halign: 'center' }
                 },
                 didDrawPage: function (data) {
                     let str = 'Muka Surat ' + doc.internal.getNumberOfPages();
@@ -762,13 +785,13 @@ async function ambilData() {
                 }
             });
 
-            // 9. Simpan Fail PDF
             let namaJabatanFail = fJabatan.replace(/ /g, '_').replace(/[^a-zA-Z0-9_]/g, '');
             let fTahunDinamik = fTahun === "Semua Tahun" ? "SemuaTahun" : fTahun;
             let fileName = `Laporan_Inovasi_${namaJabatanFail}_${fTahunDinamik}.pdf`;
             
             doc.save(fileName);
         }
+
         function logKeluar() {
             sessionStorage.clear();
             window.location.href = "login.html";
