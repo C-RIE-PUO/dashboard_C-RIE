@@ -176,10 +176,12 @@
         const userPeranan = sessionStorage.getItem("peranan") || "STAF";
         const userJabatan = sessionStorage.getItem("jabatan") || "";
 
-        // SEMAK AKSES TINDAKAN
+        // SEMAK AKSES TINDAKAN DENGAN PERANAN BAHARU
         const senaraiPerananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-        const ialahStaf = userPeranan.toUpperCase() === "STAF";
-        const adaAksesTindakan = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase()) || ialahStaf;
+        const senaraiPerananJabatan = ["STAF", "PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN"];
+        
+        const ialahPerananJabatan = senaraiPerananJabatan.includes(userPeranan.toUpperCase());
+        const adaAksesTindakan = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase()) || ialahPerananJabatan;
         const adaAksesPengesahan = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase());
 
         // PAPAR MAKLUMAT PADA HEADER
@@ -197,7 +199,7 @@
             btnPengesahan.classList.add('flex');
         }
 
-        if(userPeranan.toUpperCase() === "STAF" && userJabatan) {
+        if(ialahPerananJabatan && userJabatan) {
             document.getElementById('tajukJadual').innerText = `(${userJabatan})`;
         } else {
             document.getElementById('tajukJadual').innerText = `(Semua Jabatan)`;
@@ -268,7 +270,7 @@
                 let dataDariSheet = [];
 
                 if (Array.isArray(result) && result.length > 0 && typeof result[0] === 'object' && !Array.isArray(result[0])) {
-                    // 🌟 KEMASKINI: Lajur J (Index 9) menyimpan Status & Ulasan sekaligus. Tiada lagi rujukan pada index 10 atau 11.
+                    // 🌟 KEMASKINI: Lajur J (Index 9) menyimpan Status & Ulasan sekaligus.
                     dataDariSheet = result.map((r, i) => [
                         r.BIL || (i+1), r.INNOVATOR || "-", r.AHLI || "-", r.JABATAN || "-", 
                         r.PRODUK || "-", r.NAMAPERTANDINGAN || "-", r.TARIKHTEMPATPERTANDINGAN || "-", 
@@ -299,11 +301,14 @@
                 }
 
                 if (dataDariSheet.length > 0) {
-                    if (userPeranan.toUpperCase() === "STAF" && userJabatan !== "") {
+                    // Tapis data sekiranya peranan pengguna terhad kepada jabatan masing-masing
+                    if (ialahPerananJabatan && userJabatan !== "") {
                         dataDariSheet = dataDariSheet.filter(row => {
                             const rekodJabatan = String(row[3] || "").trim().toUpperCase();
                             const jabatanPilihan = String(userJabatan).trim().toUpperCase();
-                            return rekodJabatan === jabatanPilihan;
+                            const singkatanRekod = dapatkanSingkatanJabatan(rekodJabatan);
+                            const singkatanUser = dapatkanSingkatanJabatan(jabatanPilihan);
+                            return rekodJabatan === jabatanPilihan || singkatanRekod === singkatanUser;
                         });
                     }
 
@@ -335,7 +340,7 @@
         }
 
         function binaFilter(data) {
-            if (userPeranan.toUpperCase() !== "STAF") {
+            if (!ialahPerananJabatan) {
                 const dropJabatan = document.getElementById('filterJabatan');
                 const jabatanPenuhUnik = [...new Set(data.map(r => String(r[3]).trim()).filter(j => j !== "" && j !== "-"))].sort();
                 const pilJabatanAsal = dropJabatan.value;
@@ -349,7 +354,6 @@
             }
         }
 
-        // 🌟 KEMASKINI: Ditambah logik penapisan untuk Status
         function tapisData() {
             const tahunDipilih = document.getElementById('filterTahun').value.trim();
             const jabatanDipilih = document.getElementById('filterJabatan') ? document.getElementById('filterJabatan').value : "Semua";
@@ -361,7 +365,7 @@
                 dataDitapis = dataDitapis.filter(r => String(r[8]).includes(tahunDipilih));
             }
 
-            if (jabatanDipilih !== "Semua" && userPeranan.toUpperCase() !== "STAF") {
+            if (jabatanDipilih !== "Semua" && !ialahPerananJabatan) {
                 dataDitapis = dataDitapis.filter(r => String(r[3]).trim().toUpperCase() === jabatanDipilih.toUpperCase());
             }
 
@@ -411,24 +415,46 @@
                 
                 let tindakanHTML = "";
                 if (adaAksesTindakan) {
-                    const ialahStaf = (typeof userPeranan !== 'undefined' && userPeranan.toUpperCase() === "STAF");
+                    const ialahAdminAtauPusat = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase());
+                    
+                    // Semak sama ada jabatan rekod sepadan dengan jabatan pengguna yang log masuk
+                    const rekodJabatan = String(row[3] || "").trim().toUpperCase();
+                    const userJabatanUpper = String(userJabatan || "").trim().toUpperCase();
+                    
+                    const singkatanRekod = dapatkanSingkatanJabatan(rekodJabatan);
+                    const singkatanUser = dapatkanSingkatanJabatan(userJabatanUpper);
 
-                    tindakanHTML = `
-                    <td class="p-4 text-center min-w-[150px] align-middle">
-                        <button onclick="editRekod('${recordID}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-semibold mr-1 shadow-sm transition-colors mb-1 md:mb-0">
-                            ✏️ Edit
-                        </button>
-                        ${!ialahStaf ? `
-                        <button onclick="padamRekod('${recordID}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition-colors">
-                            🗑️ Padam
-                        </button>
-                        ` : ''}
-                    </td>`;
+                    const samaJabatan = (rekodJabatan === userJabatanUpper) || 
+                                        (singkatanRekod === singkatanUser && singkatanUser !== "-") ||
+                                        (rekodJabatan.includes(userJabatanUpper) && userJabatanUpper !== "") ||
+                                        (userJabatanUpper.includes(rekodJabatan) && rekodJabatan !== "");
+
+                    const bolehEdit = ialahAdminAtauPusat || samaJabatan;
+                    const bolehPadam = ialahAdminAtauPusat; // Padam terhad untuk Admin/Pusat sahaja
+
+                    if (bolehEdit) {
+                        tindakanHTML = `
+                        <td class="p-4 text-center min-w-[150px] align-middle">
+                            <button onclick="editRekod('${recordID}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-semibold mr-1 shadow-sm transition-colors mb-1 md:mb-0">
+                                ✏️ Edit
+                            </button>
+                            ${bolehPadam ? `
+                            <button onclick="padamRekod('${recordID}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold shadow-sm transition-colors">
+                                🗑️ Padam
+                            </button>
+                            ` : ''}
+                        </td>`;
+                    } else {
+                        tindakanHTML = `
+                        <td class="p-4 text-center min-w-[150px] align-middle text-gray-400 text-xs italic">
+                            -
+                        </td>`;
+                    }
                 }
 
                 const singkatanJabatanPapar = dapatkanSingkatanJabatan(row[3]);
 
-                // 🌟 KEMASKINI: Pengambilan status dan ulasan hanya daripada Lajur J (row[9])
+                // Pengambilan status dan ulasan daripada Lajur J (row[9])
                 const { status: statusTeks, ulasan: ulasanTeks } = pisahkanStatusDanUlasan(row[9]);
 
                 let paparanStatusHTML = "";
@@ -559,14 +585,12 @@
             return "bg-yellow-100 text-yellow-800 border border-yellow-300"; 
         }
 
-        // 🌟 KEMASKINI: Ditambah pengiraan untuk statistik Sijil/Lain
         function kemaskiniStatistik(data) {
             document.getElementById('statJumlah').innerText = data.length;
             document.getElementById('statEmas').innerText = data.filter(r => String(r[7]).toUpperCase().includes("EMAS")).length;
             document.getElementById('statPerak').innerText = data.filter(r => String(r[7]).toUpperCase().includes("PERAK")).length;
             document.getElementById('statGangsa').innerText = data.filter(r => String(r[7]).toUpperCase().includes("GANGSA")).length;
             
-            // Pengiraan bilangan Sijil / Lain (yang tidak mengandungi perkataan Emas, Perak, atau Gangsa)
             document.getElementById('statLain').innerText = data.filter(r => {
                 const p = String(r[7]).toUpperCase();
                 return !p.includes("EMAS") && !p.includes("PERAK") && !p.includes("GANGSA");
@@ -617,7 +641,6 @@
                 else pCounts.Lain++;
             });
 
-            // 🌟 KEMASKINI CARTA DOUGHNUT: Ditambah responsive, maintainAspectRatio, & kedudukan lagenda yang optimum
             if (pingatChartInstance) pingatChartInstance.destroy();
             pingatChartInstance = new Chart(document.getElementById('pingatChart'), {
                 type: 'doughnut',
@@ -759,7 +782,6 @@
             const emas = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("EMAS")).length;
             const perak = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("PERAK")).length;
             const gangsa = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("GANGSA")).length;
-            // 🌟 KEMASKINI: Ditambah penapisan untuk jumlah Sijil / Lain di dalam laporan PDF
             const lain = dataUntukEksport.filter(r => {
                 const p = String(r[7]).toUpperCase();
                 return !p.includes("EMAS") && !p.includes("PERAK") && !p.includes("GANGSA");
@@ -775,7 +797,6 @@
             doc.text("Rumusan Pingat Keseluruhan:", 18, yPos + 6);
             
             doc.setFont("helvetica", "normal");
-            // 🌟 KEMASKINI: Ditambah paparan Sijil/Lain di dalam kotak rumusan PDF
             doc.text(`Jumlah Projek: ${total}   |   Emas: ${emas}   |   Perak: ${perak}   |   Gangsa: ${gangsa}   |   Sijil/Lain: ${lain}`, 18, yPos + 11);
 
             yPos += 18; 
@@ -787,7 +808,6 @@
                 let namaJabatanAsal = String(row[3] || '-');
                 let jabatanSingkatan = typeof dapatkanSingkatanJabatan === 'function' ? dapatkanSingkatanJabatan(namaJabatanAsal) : namaJabatanAsal;
 
-                // 🌟 KEMASKINI: Ambil status & ulasan untuk PDF terus dari Lajur J (row[9])
                 const { status: statusParsed, ulasan: ulasanPDF } = pisahkanStatusDanUlasan(row[9]);
                 let statusPDF = statusParsed.toUpperCase();
                 if (statusPDF === "BAIKI SEMULA" && ulasanPDF) {
