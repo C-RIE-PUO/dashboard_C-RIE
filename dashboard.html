@@ -46,7 +46,8 @@
         </div>
 
         <div id="bahagianAtas" class="hidden">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- 🌟 KEMASKINI: Ditukar kepada grid 5 kolum (lg:grid-cols-5) & ditambah kad Sijil/Lain -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
                     <p class="text-gray-500 text-sm font-medium uppercase">Jumlah Projek</p>
                     <h3 id="statJumlah" class="text-3xl font-bold text-gray-800">0</h3>
@@ -63,16 +64,25 @@
                     <p class="text-gray-500 text-sm font-medium uppercase">Pingat Gangsa</p>
                     <h3 id="statGangsa" class="text-3xl font-bold text-gray-800">0</h3>
                 </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-slate-400">
+                    <p class="text-gray-500 text-sm font-medium uppercase">Sijil / Lain</p>
+                    <h3 id="statLain" class="text-3xl font-bold text-gray-800">0</h3>
+                </div>
             </div>
 
+            <!-- 🌟 KEMASKINI LAYOUT CARTA: Ditambah susunan Flexbox dan div pembungkus relative untuk elak overflow -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px]">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Projek mengikut Jabatan</h2>
-                    <canvas id="jabatanChart"></canvas>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px] flex flex-col justify-between">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 shrink-0">Projek mengikut Jabatan</h2>
+                    <div class="relative flex-1 w-full min-h-0">
+                        <canvas id="jabatanChart"></canvas>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px]">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Pecahan Pingat</h2>
-                    <canvas id="pingatChart"></canvas>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px] flex flex-col justify-between">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 shrink-0">Pecahan Pingat</h2>
+                    <div class="relative flex-1 w-full min-h-0 flex items-center justify-center">
+                        <canvas id="pingatChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -549,11 +559,18 @@
             return "bg-yellow-100 text-yellow-800 border border-yellow-300"; 
         }
 
+        // 🌟 KEMASKINI: Ditambah pengiraan untuk statistik Sijil/Lain
         function kemaskiniStatistik(data) {
             document.getElementById('statJumlah').innerText = data.length;
             document.getElementById('statEmas').innerText = data.filter(r => String(r[7]).toUpperCase().includes("EMAS")).length;
             document.getElementById('statPerak').innerText = data.filter(r => String(r[7]).toUpperCase().includes("PERAK")).length;
             document.getElementById('statGangsa').innerText = data.filter(r => String(r[7]).toUpperCase().includes("GANGSA")).length;
+            
+            // Pengiraan bilangan Sijil / Lain (yang tidak mengandungi perkataan Emas, Perak, atau Gangsa)
+            document.getElementById('statLain').innerText = data.filter(r => {
+                const p = String(r[7]).toUpperCase();
+                return !p.includes("EMAS") && !p.includes("PERAK") && !p.includes("GANGSA");
+            }).length;
         }
 
         function kemaskiniCarta(data) {
@@ -585,6 +602,7 @@
                     }]
                 },
                 options: { 
+                    responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } } 
                 }
@@ -599,14 +617,41 @@
                 else pCounts.Lain++;
             });
 
+            // 🌟 KEMASKINI CARTA DOUGHNUT: Ditambah responsive, maintainAspectRatio, & kedudukan lagenda yang optimum
             if (pingatChartInstance) pingatChartInstance.destroy();
             pingatChartInstance = new Chart(document.getElementById('pingatChart'), {
                 type: 'doughnut',
                 data: {
                     labels: ['Emas', 'Perak', 'Gangsa', 'Sijil/Lain'],
-                    datasets: [{ data: [pCounts.Emas, pCounts.Perak, pCounts.Gangsa, pCounts.Lain], backgroundColor: ['#fbbf24', '#9ca3af', '#fb923c', '#cbd5e1'] }]
+                    datasets: [{ 
+                        data: [pCounts.Emas, pCounts.Perak, pCounts.Gangsa, pCounts.Lain], 
+                        backgroundColor: ['#fbbf24', '#9ca3af', '#fb923c', '#cbd5e1'] 
+                    }]
                 },
-                options: { maintainAspectRatio: false, cutout: '65%' }
+                options: { 
+                    responsive: true,
+                    maintainAspectRatio: false, 
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'center',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 15,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            bottom: 10
+                        }
+                    }
+                }
             });
         }
 
@@ -714,6 +759,11 @@
             const emas = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("EMAS")).length;
             const perak = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("PERAK")).length;
             const gangsa = dataUntukEksport.filter(r => String(r[7]).toUpperCase().includes("GANGSA")).length;
+            // 🌟 KEMASKINI: Ditambah penapisan untuk jumlah Sijil / Lain di dalam laporan PDF
+            const lain = dataUntukEksport.filter(r => {
+                const p = String(r[7]).toUpperCase();
+                return !p.includes("EMAS") && !p.includes("PERAK") && !p.includes("GANGSA");
+            }).length;
 
             doc.setDrawColor(226, 232, 240);
             doc.setFillColor(248, 250, 252);
@@ -725,7 +775,8 @@
             doc.text("Rumusan Pingat Keseluruhan:", 18, yPos + 6);
             
             doc.setFont("helvetica", "normal");
-            doc.text(`Jumlah Projek: ${total}   |   Emas: ${emas}   |   Perak: ${perak}   |   Gangsa: ${gangsa}`, 18, yPos + 11);
+            // 🌟 KEMASKINI: Ditambah paparan Sijil/Lain di dalam kotak rumusan PDF
+            doc.text(`Jumlah Projek: ${total}   |   Emas: ${emas}   |   Perak: ${perak}   |   Gangsa: ${gangsa}   |   Sijil/Lain: ${lain}`, 18, yPos + 11);
 
             yPos += 18; 
 
