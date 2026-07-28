@@ -333,7 +333,10 @@ const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
 
 // Pihak yang boleh Approve, Upload, Edit, Delete
 const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
-const isStaf = userPeranan === "STAF"; // Tambahan pembolehubah untuk kenal pasti STAF
+const isStaf = userPeranan === "STAF"; 
+
+// 🌟 TAMBAHAN BARU: Pihak berkuasa peringkat jabatan yang boleh mengemaskini (Edit) projek jabatan sendiri
+const isEditorJabatan = ["PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN"].includes(userPeranan);
 
 let dataAsal = [];
 let dataTapis = [];
@@ -341,9 +344,8 @@ let halamanSemasa = 1;
 const rekodPerHalaman = 10;
 
 window.onload = () => {
-    // 💡 KEMASKINI: Paparkan header tindakan jika pengguna ialah Approver ATAU Staf
-    if (isApprover || isStaf) {
-        // Nota: Pastikan ID ini sama dengan ID dalam HTML anda (cth: id="headerTindakan" atau id="thTindakan")
+    // 💡 DIKEMASKINI: Paparkan header tindakan jika pengguna ialah Approver, Staf ATAU Editor Jabatan
+    if (isApprover || isStaf || isEditorJabatan) {
         const thTindakan = document.getElementById('thTindakan') || document.getElementById('headerTindakan');
         if (thTindakan) thTindakan.classList.remove('hidden');
     }
@@ -450,18 +452,31 @@ window.onload = () => {
                 
                 if(data.status === "BERJAYA" && data.JABATAN) {
                     data.JABATAN.forEach(jab => { 
-                        // 🌟 Panggil fungsi singkatan di sini
                         let namaSingkatan = dapatkanSingkatanJabatan(jab);
-                        
-                        // value="${jab}" kekal nama penuh untuk filter, tapi paparan guna ${namaSingkatan}
                         fJabatan.innerHTML += `<option value="${jab}">${namaSingkatan}</option>`; 
                     });
                 }
 
-                if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
-                    fJabatan.value = userJabatan;
-                    fJabatan.disabled = true;
-                    fJabatan.classList.add("bg-gray-200");
+                // 🌟 PENAMBAHBAIKAN BARU:
+                // Tetapkan fokus jabatan lalai bagi PENYELIA PROJEK PELAJAR dan PENYELARAS JABATAN
+                if (userJabatan) {
+                    // Cari padanan tepat dalam dropdown tanpa mengira huruf besar/kecil atau jarak kosong
+                    const matchedOption = Array.from(fJabatan.options).find(opt => opt.value.toUpperCase().trim() === userJabatan.toUpperCase().trim());
+                    if (matchedOption) {
+                        fJabatan.value = matchedOption.value;
+                    } else {
+                        fJabatan.value = userJabatan;
+                    }
+
+                    if (userPeranan === "PENYELARAS JABATAN") {
+                        // PENYELARAS JABATAN: Fokus jabatan sendiri tetapi TIDAK DIKUNCI (boleh pilih jabatan lain)
+                        fJabatan.disabled = false;
+                        fJabatan.classList.remove("bg-gray-200");
+                    } else if (!isApprover) {
+                        // STAF & PENYELIA PROJEK PELAJAR: Terus kunci kepada jabatan yang log masuk
+                        fJabatan.disabled = true;
+                        fJabatan.classList.add("bg-gray-200");
+                    }
                 }
             });
         }
@@ -539,10 +554,15 @@ function terapkanTapisan() {
 
         let checkTahun = (valTahun === "" || tahunMulaStr.includes(valTahun) || tahunDaftarStr.includes(valTahun));
         
-        // 2. Semakan Jabatan
-        const dbJabatan = dapatkanData(row, ["jabatan", "JABATAN"]);
-        let checkJabatan = (valJab === "" || dbJabatan === valJab);
-        if (!isApprover && userPeranan !== "PENYELARAS JABATAN") checkJabatan = (dbJabatan === userJabatan);
+        // 2. Semakan Jabatan (🌟 DIKEMASKINI: Padanan kebal ralat huruf besar/kecil & kebebasan PENYELARAS JABATAN)
+        const dbJabatan = (dapatkanData(row, ["jabatan", "JABATAN"]) || "").toUpperCase().trim();
+        const cleanValJab = valJab.toUpperCase().trim();
+        const cleanUserJab = (userJabatan || "").toUpperCase().trim();
+
+        let checkJabatan = (cleanValJab === "" || dbJabatan === cleanValJab);
+        if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
+            checkJabatan = (dbJabatan === cleanUserJab);
+        }
 
         // 3. Semakan Status (🌟 DIKEMASKINI: Sokongan untuk teks ulasan pada status BAIKI SEMULA)
         const dbStatus = dapatkanData(row, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN";
@@ -598,38 +618,53 @@ function terapkanTapisan() {
     document.getElementById('statMenunggu').innerText = cMenunggu;
     document.getElementById('statDisahkan').innerText = cDisahkan;
     
-    // 🌟 TAMBAHAN: Kemaskini kad statistik Baiki Semula (jika elemen wujud dalam HTML anda)
+    // 🌟 TAMBAHAN: Kemaskini kad statistik Baiki Semula
     const elBaiki = document.getElementById('statBaiki') || document.getElementById('statBaikiSemula');
     if (elBaiki) elBaiki.innerText = cBaiki;
 
-    // Logik Isihan (Sorting) Tersuai
+    // =========================================================================
+    // 🌟 PENAMBAHBAIKAN BARU: Logik Isihan (Sorting) Dioptimumkan dengan Cache
+    // Mengelakkan browser freeze & mendahulukan rekod jabatan sendiri
+    // =========================================================================
+    const userJabatanClean = (userJabatan || "").toUpperCase().trim();
+    const cacheIsihan = new Map();
+
+    dataTapis.forEach(item => {
+        const jab = (dapatkanData(item, ["jabatan", "JABATAN"]) || "").toUpperCase().trim();
+        const status = (dapatkanData(item, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN").toUpperCase().trim();
+        const tSurat = dapatkanData(item, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
+        const yr = (tSurat && !isNaN(new Date(tSurat).getFullYear())) ? new Date(tSurat).getFullYear() : 0;
+        const bil = parseInt(dapatkanData(item, ["bil", "BIL"])) || 0;
+
+        cacheIsihan.set(item, {
+            isMyJab: Boolean(isEditorJabatan && userJabatanClean) && (jab === userJabatanClean),
+            isTindakan: status !== "DISAHKAN",
+            yr: yr,
+            bil: bil
+        });
+    });
+
     dataTapis.sort((a, b) => {
-        const statusA = (dapatkanData(a, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN").toUpperCase();
-        const statusB = (dapatkanData(b, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN").toUpperCase();
-        
-        // 🌟 DIKEMASKINI: Kedua-dua status MENUNGGU dan BAIKI SEMULA dikategorikan sebagai "Memerlukan Tindakan"
-        const isTindakanA = statusA !== "DISAHKAN";
-        const isTindakanB = statusB !== "DISAHKAN";
+        const infoA = cacheIsihan.get(a);
+        const infoB = cacheIsihan.get(b);
 
-        // Peraturan 1: Letakkan status yang memerlukan tindakan di atas sekali
-        if (isTindakanA && !isTindakanB) return -1;
-        if (!isTindakanA && isTindakanB) return 1;
-
-        // Peraturan 2: Jika status sama, susun mengikut tahun pada tarikh surat secara menurun (Desc)
-        const tSuratA = dapatkanData(a, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
-        const tSuratB = dapatkanData(b, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
-        
-        const yrA = (tSuratA && !isNaN(new Date(tSuratA).getFullYear())) ? new Date(tSuratA).getFullYear() : 0;
-        const yrB = (tSuratB && !isNaN(new Date(tSuratB).getFullYear())) ? new Date(tSuratB).getFullYear() : 0;
-
-        if (yrB !== yrA) {
-            return yrB - yrA;
+        // Keutamaan 1: Susun rekod dari JABATAN yang login dahulu ( PENYELIA PROJEK PELAJAR / PENYELARAS JABATAN )
+        if (infoA.isMyJab !== infoB.isMyJab) {
+            return infoA.isMyJab ? -1 : 1;
         }
 
-        // Peraturan 3: Kekalkan susunan asal mengikut ID/Bil baris secara menurun
-        const bilA = parseInt(dapatkanData(a, ["bil", "BIL"])) || 0;
-        const bilB = parseInt(dapatkanData(b, ["bil", "BIL"])) || 0;
-        return bilB - bilA;
+        // Keutamaan 2: Letakkan status yang memerlukan tindakan di atas sekali
+        if (infoA.isTindakan !== infoB.isTindakan) {
+            return infoA.isTindakan ? -1 : 1;
+        }
+
+        // Keutamaan 3: Susun mengikut tahun pada tarikh surat secara menurun (Desc)
+        if (infoB.yr !== infoA.yr) {
+            return infoB.yr - infoA.yr;
+        }
+
+        // Keutamaan 4: Kekalkan susunan asal mengikut ID/Bil baris secara menurun
+        return infoB.bil - infoA.bil;
     });
 
     halamanSemasa = 1;
@@ -756,6 +791,17 @@ function paparJadual() {
                     <button onclick="semakKataLuanDanEdit('${dbBil}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">✏️ Edit</button>
                 </div>
             `;
+        } else if (isEditorJabatan) {
+            // 🌟 DIKEMASKINI: Membolehkan PENYELIA PROJEK PELAJAR dan PENYELARAS JABATAN edit tetapi MEMERLUKAN KATA LALUAN IC KETUA (Sama seperti STAF)
+            if (dbJabatan && userJabatan && dbJabatan.toUpperCase().trim() === userJabatan.toUpperCase().trim()) {
+                actionBtn = `
+                    <div class="flex flex-col gap-1 w-full min-w-[80px]">
+                        <button onclick="semakKataLuanDanEdit('${dbBil}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-[10px] w-full flex justify-center items-center gap-1">✏️ Edit</button>
+                    </div>
+                `;
+            } else {
+                actionBtn = `<span class="text-gray-400 text-[11px] italic">Tiada Akses</span>`;
+            }
         }
 
         const tr = document.createElement('tr');
@@ -789,7 +835,8 @@ function paparJadual() {
             <td class="p-3 text-center border-l border-teal-50 align-top">${paparanStatus}</td>
         `;
 
-        if (isApprover || userPeranan === "STAF") {
+        // 💡 DIKEMASKINI: Pastikan lajur tindakan dipaparkan apabila peranan memenuhi syarat
+        if (isApprover || userPeranan === "STAF" || isEditorJabatan) {
             tdContent += `<td class="p-3 text-center border-l border-teal-50 align-top">${actionBtn}</td>`;
         }
         
@@ -837,7 +884,8 @@ function paparJadual() {
         inputStatus.value = statusBersih;
     }
     
-    if (userPeranan === "STAF") {
+    // 🌟 DIKEMASKINI: Lumpuhkan (disable) pilihan status untuk STAF, PENYELIA PROJEK PELAJAR dan PENYELARAS JABATAN
+    if (userPeranan === "STAF" || isEditorJabatan) {
         inputStatus.disabled = true; 
         inputStatus.classList.add("bg-gray-100", "cursor-not-allowed");
     } else {
@@ -984,9 +1032,9 @@ async function hantarKemaskini(e) {
         fileProposalData = await bacaFailAsBase64(fileProposalInput);
     }
 
-    // 🌟 PERUBAHAN BARU: Semakan dan pertukaran automatik status BAIKI SEMULA -> MENUNGGU PENGESAHAN
+    // 🌟 PERUBAHAN BARU: Semakan dan pertukaran automatik status BAIKI SEMULA -> MENUNGGU PENGESAHAN (Ditambah untuk peranan baru)
     let statusUntukDisimpan = document.getElementById('edit_status').value;
-    if ((userPeranan === "STAF" || userPeranan === "PENYELARAS JABATAN") && statusUntukDisimpan.toUpperCase().startsWith("BAIKI SEMULA")) {
+    if ((userPeranan === "STAF" || userPeranan === "PENYELARAS JABATAN" || userPeranan === "PENYELIA PROJEK PELAJAR") && statusUntukDisimpan.toUpperCase().startsWith("BAIKI SEMULA")) {
         statusUntukDisimpan = "MENUNGGU PENGESAHAN";
     }
 
@@ -1127,7 +1175,7 @@ function baikiSemulaTindakan(bilId, tajuk) {
     }
 }
 		
-	// 🔒 FUNGSI KESELAMATAN KHAS UNTUK STAF
+// 🔒 FUNGSI KESELAMATAN KHAS UNTUK STAF, PENYELIA PROJEK PELAJAR & PENYELARAS JABATAN
 function semakKataLuanDanEdit(bil) {
     const row = dataAsal.find(r => dapatkanData(r, ["bil", "BIL"]) == bil);
     if (!row) {
