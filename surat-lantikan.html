@@ -332,10 +332,17 @@
                     data.JABATAN.forEach(jab => { fJabatan.innerHTML += `<option value="${jab}">${jab}</option>`; });
                 }
 
-                if (!isApprover && userPeranan !== "PENYELARAS JABATAN") {
-                    fJabatan.value = userJabatan;
-                    fJabatan.disabled = true;
-                    fJabatan.classList.add("bg-gray-200");
+                // 🌟 KEMASKINI: Apabila PENYELARAS JABATAN, STAF, PENYELIA PROJEK log masuk,
+                // set nilai default kepada jabatan pengguna DAN biarkan ia boleh dipilih (jangan disabled).
+                if (userJabatan && userJabatan !== "") {
+                    if (!isApprover || ["PENYELARAS JABATAN", "STAF", "PENYELIA PROJEK"].includes(userPeranan)) {
+                        fJabatan.value = userJabatan;
+                    }
+                }
+
+                // Pastikan tapisan dikemas kini jika data projek selesai dimuat turun
+                if (typeof dataDisahkan !== "undefined" && dataDisahkan.length > 0) {
+                    terapkanTapisan();
                 }
             });
         }
@@ -385,10 +392,8 @@ function janaStatistik(data) {
     
     if (!wadahStat) return;
 
-    // Dapatkan elemen dropdown jabatan untuk senarai penuh
     const elemenDropdownJab = document.getElementById('filterJabatan');
 
-    // Sentiasa papar SEMUA JABATAN tanpa mengira filter yang dipilih.
     let senaraiJabatan = [];
     if (elemenDropdownJab && elemenDropdownJab.options.length > 1) {
         senaraiJabatan = Array.from(elemenDropdownJab.options)
@@ -403,7 +408,6 @@ function janaStatistik(data) {
     let suratSelesai = 0;
     let suratMenunggu = 0;
 
-    // Kira Status Surat Lantikan 
     if (data && data.length > 0) {
         data.forEach(p => {
             const linkSurat = dapatkanData(p, ["suratLantikan", "SURAT_LANTIKAN"]) || "";
@@ -415,7 +419,6 @@ function janaStatistik(data) {
         });
     }
 
-    // Kad Statistik Keseluruhan
     htmlStat += `
         <div class="bg-teal-700 p-3 rounded-xl shadow-sm border border-teal-800 text-center flex flex-col justify-center transform transition hover:scale-105">
             <span class="text-xs font-bold text-teal-200 uppercase">Keseluruhan</span>
@@ -423,7 +426,6 @@ function janaStatistik(data) {
         </div>
     `;
 
-    // Kad Statistik: Surat Dijana
     htmlStat += `
         <div class="bg-green-50 p-3 rounded-xl shadow-sm border border-green-200 text-center flex flex-col justify-center transform transition hover:scale-105">
             <span class="text-[10px] font-bold text-green-700 uppercase tracking-wide">Surat Dijana</span>
@@ -431,7 +433,6 @@ function janaStatistik(data) {
         </div>
     `;
 
-    // Kad Statistik: Menunggu Surat
     htmlStat += `
         <div class="bg-orange-50 p-3 rounded-xl shadow-sm border border-orange-200 text-center flex flex-col justify-center transform transition hover:scale-105">
             <span class="text-[10px] font-bold text-orange-700 uppercase tracking-wide">Menunggu</span>
@@ -439,7 +440,6 @@ function janaStatistik(data) {
         </div>
     `;
 
-    // 🌟 KEMASKINI: Senarai Palet Warna untuk Jabatan
     const senaraiWarna = [
         { bg: 'bg-blue-50', border: 'border-blue-200', textTitle: 'text-blue-700', textVal: 'text-blue-800' },
         { bg: 'bg-purple-50', border: 'border-purple-200', textTitle: 'text-purple-700', textVal: 'text-purple-800' },
@@ -451,11 +451,9 @@ function janaStatistik(data) {
         { bg: 'bg-sky-50', border: 'border-sky-200', textTitle: 'text-sky-700', textVal: 'text-sky-800' }
     ];
 
-    // Kad Statistik mengikut Jabatan
     senaraiJabatan.sort().forEach((jab, index) => {
         const jumlah = (data && data.length > 0) ? data.filter(p => dapatkanData(p, ["jabatan", "JABATAN"]).toUpperCase() === jab).length : 0;
         
-        // Pilih warna berdasarkan susunan index (akan berulang jika jabatan > 8)
         const warna = senaraiWarna[index % senaraiWarna.length];
         
         htmlStat += `
@@ -468,112 +466,105 @@ function janaStatistik(data) {
     
     wadahStat.innerHTML = htmlStat;
 }
+
 // ==========================================
-// 1. FUNGSI TAPISAN (JABATAN, TAHUN & STATUS SURAT)
+// 1. FUNGSI TAPISAN (JABATAN, TAHUN, STATUS & CARIAN KATA KUNCI)
 // ==========================================
 function terapkanTapisan() {
     const valJab = document.getElementById('filterJabatan').value;
     const valTahun = document.getElementById('filterTahun') ? document.getElementById('filterTahun').value : "";
     const valStatus = document.getElementById('filterStatusSurat') ? document.getElementById('filterStatusSurat').value : "";
+    const valCarian = document.getElementById('inputCarian') ? document.getElementById('inputCarian').value.toLowerCase().trim() : "";
 
     dataTapis = dataDisahkan.filter(row => {
-        // Semakan Jabatan
         const dbJabatan = dapatkanData(row, ["jabatan", "JABATAN"]);
         let checkJabatan = (valJab === "" || dbJabatan === valJab);
-        if (!isApprover && userPeranan !== "PENYELARAS JABATAN") checkJabatan = (dbJabatan === userJabatan);
 
-        // Semakan Tahun (Berdasarkan tarikh surat dikeluarkan)
         const tarikhSurat = dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT", "tarikhSuratDikeluarkan", "TARIKH"]);
         let checkTahun = true;
-        
         if (valTahun !== "") {
             if (tarikhSurat) {
-                // Gunakan Regex /\d{4}/ untuk mencari sebarang 4 digit berturut-turut (Tahun)
                 const cariTahun = String(tarikhSurat).match(/\d{4}/);
-                
-                if (cariTahun && cariTahun[0]) {
-                    checkTahun = (cariTahun[0] === valTahun);
-                } else {
-                    checkTahun = false; // Format tarikh tidak sah / tiada tahun
-                }
+                checkTahun = (cariTahun && cariTahun[0]) ? (cariTahun[0] === valTahun) : false;
             } else {
-                checkTahun = false; // Jika tiada tarikh surat, ia tidak melepasi tapisan tahun
+                checkTahun = false; 
             }
         }
         
-        // Semakan Status Surat
         let checkStatus = true;
         if (valStatus !== "") {
             const linkSurat = dapatkanData(row, ["suratLantikan", "SURAT_LANTIKAN"]) || "";
-            if (valStatus === "MENUNGGU") {
-                checkStatus = (linkSurat.trim() === "");
-            } else if (valStatus === "SELESAI") {
-                checkStatus = (linkSurat.trim() !== "");
-            }
+            if (valStatus === "MENUNGGU") checkStatus = (linkSurat.trim() === "");
+            else if (valStatus === "SELESAI") checkStatus = (linkSurat.trim() !== "");
         }
         
-        return checkJabatan && checkTahun && checkStatus;
+        let checkCarian = true;
+        if (valCarian !== "") {
+            const semuaTeksRekod = Object.values(row).join(" ").toLowerCase();
+            checkCarian = semuaTeksRekod.includes(valCarian);
+        }
+        
+        return checkJabatan && checkTahun && checkStatus && checkCarian;
     });
 
-    // 🌟 KEMASKINI PENAMBAHBAIKAN: Logik Susunan Tersuai (Custom Sorting)
+    // 🌟 KEMASKINI: Logik Susunan - Keutamaan diberikan kepada Jabatan Pengguna yang Log Masuk
     dataTapis.sort((a, b) => {
-        // Ekstrak No Rujukan & Tarikh Surat untuk Rekod A dan B
+        const jabA = dapatkanData(a, ["jabatan", "JABATAN"]);
+        const jabB = dapatkanData(b, ["jabatan", "JABATAN"]);
+        const isMyJabA = (userJabatan !== "" && jabA === userJabatan);
+        const isMyJabB = (userJabatan !== "" && jabB === userJabatan);
+
+        // Letakkan rekod dari Jabatan yang log masuk di atas sekali
+        if (isMyJabA && !isMyJabB) return -1;
+        if (!isMyJabA && isMyJabB) return 1;
+
+        // Susunan sedia ada (Status Surat / No Rujukan / Tarikh / Bil)
         const noRujA = dapatkanData(a, ["noRujukan", "NO_RUJUKAN", "rujukan", "rujukanSurat"]);
         const tSuratA = dapatkanData(a, ["tarikhSurat", "TARIKH_SURAT", "tarikhSuratDikeluarkan", "TARIKH"]);
-        
         const noRujB = dapatkanData(b, ["noRujukan", "NO_RUJUKAN", "rujukan", "rujukanSurat"]);
         const tSuratB = dapatkanData(b, ["tarikhSurat", "TARIKH_SURAT", "tarikhSuratDikeluarkan", "TARIKH"]);
 
-        // Tentukan jika rekod ini BELUM ADA No. Rujukan ATAU Tarikh Surat
         const isBelumAdaA = !noRujA || String(noRujA).trim() === "" || !tSuratA || String(tSuratA).trim() === "";
         const isBelumAdaB = !noRujB || String(noRujB).trim() === "" || !tSuratB || String(tSuratB).trim() === "";
 
-        // PERATURAN 1: Rekod yang tiada No. Rujukan / Tarikh Surat duduk di atas sekali
         if (isBelumAdaA && !isBelumAdaB) return -1;
         if (!isBelumAdaA && isBelumAdaB) return 1;
 
-        // PERATURAN 2: Jika status sama (sama-sama ada atau sama-sama tiada), susun ikut Tahun Tarikh Surat (Menurun)
         const matchTahunA = String(tSuratA).match(/\d{4}/);
         const matchTahunB = String(tSuratB).match(/\d{4}/);
-        
         const yrA = (tSuratA && matchTahunA) ? parseInt(matchTahunA[0]) : 0;
         const yrB = (tSuratB && matchTahunB) ? parseInt(matchTahunB[0]) : 0;
 
-        // Jika tahun berbeza, letakkan tahun yang lebih besar (contoh 2026) di atas
-        if (yrB !== yrA) {
-            return yrB - yrA;
-        }
+        if (yrB !== yrA) return yrB - yrA;
 
-        // PERATURAN 3: Jika tahun juga sama, kekalkan susunan asal mengikut No. BIL (Menurun / Rekod Terbaharu di atas)
         const bilA = parseInt(dapatkanData(a, ["bil", "BIL"])) || 0;
         const bilB = parseInt(dapatkanData(b, ["bil", "BIL"])) || 0;
         return bilB - bilA;
     });
 
-    halamanSemasa = 1;   // Reset kembali ke muka surat 1
+    halamanSemasa = 1; 
     paparJadual();
-    
-    // Panggil fungsi statistik setiap kali filter berjalan!
     janaStatistik(dataTapis);
 }
-// ==========================================
+
+        // ==========================================
         // FUNGSI TRANSLATE TARIKH KE FORMAT (Cth: 15 Oktober 2025)
         // ==========================================
         function formatTarikhMelayuPenuh(tarikhString) {
             if (!tarikhString || tarikhString === "" || tarikhString === "-") return "";
             
             const t = new Date(tarikhString);
-            if (isNaN(t)) return tarikhString; // Jika bukan format tarikh, pulangkan teks asal
+            if (isNaN(t)) return tarikhString; 
             
             const bulanArr = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
-            const hari = t.getDate(); // Tanpa '0' di depan (cth: 2, bukan 02)
+            const hari = t.getDate(); 
             const bulan = bulanArr[t.getMonth()];
             const tahun = t.getFullYear();
             
             return `${hari} ${bulan} ${tahun}`; 
         }
 
-// ==========================================
+        // ==========================================
         // 2. FUNGSI CETAK JADUAL DENGAN PAGINASI (10 REKOD)
         // ==========================================
         function paparJadual() {
@@ -600,7 +591,6 @@ function terapkanTapisan() {
                 const dbMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
                 const dbAkhir = dapatkanData(row, ["tarikhAkhir", "TARIKH_AKHIR", "tarikhAkhirProjek", "tarikhTamat"]);
                 
-                // Ambil No Rujukan & Format Tarikh Surat
                 const dbNoRuj = row.noRujukan || dapatkanData(row, ["noRujukan", "NO_RUJUKAN"]) || "";
                 const tarikhSuratRaw = row.tarikhSurat || dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT"]) || "";
                 const dbTarikhSurat = tarikhSuratRaw !== "" ? formatTarikhMelayuPenuh(tarikhSuratRaw) : "";
@@ -624,7 +614,6 @@ function terapkanTapisan() {
                     htmlAhli = `<div class="text-[10px] text-gray-400 italic mt-1">Tiada ahli tambahan</div>`;
                 }
 
-                // STATUS SURAT LANTIKAN
                 let tindakanSurat = "";
                 let linkSurat = dapatkanData(row, ["suratLantikan", "SURAT_LANTIKAN"]); 
 
@@ -639,10 +628,8 @@ function terapkanTapisan() {
                     tindakanSurat += `<div class="flex flex-col gap-1 w-32 mx-auto mt-2 pt-2 border-t border-gray-100">`;
                     
 					if (linkSurat === "") {
-					// Butang Generate untuk projek yang belum ada surat
 					tindakanSurat += `<button onclick="bukaModalGenerate('${dbBil}')" class="w-full bg-purple-100 hover:bg-purple-200 border border-purple-300 text-purple-700 px-2 py-1 rounded font-bold text-[10px] transition shadow-sm flex justify-center items-center gap-1">⚙️ Generate Surat</button>`;
 					} else {
-					// 🌟 BUTANG BARU: Jana Semula untuk projek yang sudah ada surat
 					tindakanSurat += `<button onclick="bukaModalGenerate('${dbBil}')" class="w-full bg-orange-100 hover:bg-orange-200 border border-orange-300 text-orange-700 px-2 py-1 rounded font-bold text-[10px] transition shadow-sm flex justify-center items-center gap-1">🔄 Jana Semula</button>`;
 				}
                     
@@ -683,26 +670,21 @@ function terapkanTapisan() {
             document.getElementById('btnNext').disabled = Akhir >= dataTapis.length;
         }
 
-// ==========================================
+        // ==========================================
         // KAWALAN MODAL JANA SURAT & JANA PDF
         // ==========================================
         function bukaModalGenerate(bil, tajuk = "", sediaAdaNoRuj = "", sediaAdaTarikh = "") {
             document.getElementById('gen_bil_surat').value = bil;
             
-            // 🌟 1. CARI DATA PENUH PROJEK BERDASARKAN 'BIL'
             let senaraiData = typeof dataTapis !== 'undefined' ? dataTapis : (typeof dataDisahkan !== 'undefined' ? dataDisahkan : []);
             const row = senaraiData.find(r => (r.bil || r.BIL) == bil);
 
             if (row) {
-                // Ekstrak maklumat dari rekod
                 const dbTajuk = dapatkanData(row, ["tajuk", "TAJUK", "tajukProjek"]) || tajuk;
                 const dbKetua = dapatkanData(row, ["ketua", "KETUA", "namaKetua"]) || "";
-                
-                // Tambah lebih banyak variasi ejaan Lajur untuk Tarikh
                 const dbMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek", "TARIKH MULA"]);
                 const dbAkhir = dapatkanData(row, ["tarikhAkhir", "TARIKH_AKHIR", "tarikhAkhirProjek", "tarikhTamat", "TARIKH_TAMAT", "TARIKH AKHIR", "TARIKH TAMAT"]);
                 
-                // Masukkan ke dalam input Modal supaya boleh diedit
                 if(document.getElementById('paparanTajukGen')) document.getElementById('paparanTajukGen').innerText = dbTajuk;
                 if(document.getElementById('gen_tajuk')) document.getElementById('gen_tajuk').value = dbTajuk;
                 if(document.getElementById('gen_ketua')) document.getElementById('gen_ketua').value = dbKetua;
@@ -712,11 +694,9 @@ function terapkanTapisan() {
                 if(document.getElementById('gen_ahli4')) document.getElementById('gen_ahli4').value = dapatkanData(row, ["ahli4", "AHLI_4", "namaAhli4"]) || "";
                 if(document.getElementById('gen_ahli5')) document.getElementById('gen_ahli5').value = dapatkanData(row, ["ahli5", "AHLI_5", "namaAhli5"]) || "";
                 
-                // Format tarikh untuk paparan input jenis 'date' (YYYY-MM-DD)
                 if(document.getElementById('gen_mula')) document.getElementById('gen_mula').value = formatUntukInputTarikh(dbMula);
                 if(document.getElementById('gen_akhir')) document.getElementById('gen_akhir').value = formatUntukInputTarikh(dbAkhir);
                 
-                // Kemas kini jika parameter kosong tetapi data row ada
                 if (sediaAdaNoRuj === "") sediaAdaNoRuj = row.noRujukan || dapatkanData(row, ["noRujukan", "NO_RUJUKAN"]) || "";
                 if (sediaAdaTarikh === "") sediaAdaTarikh = row.tarikhSurat || dapatkanData(row, ["tarikhSurat", "TARIKH_SURAT"]) || "";
             } else {
@@ -724,17 +704,13 @@ function terapkanTapisan() {
                 if(document.getElementById('gen_tajuk')) document.getElementById('gen_tajuk').value = tajuk;
             }
 
-            // 🌟 2. TETAPKAN TARIKH SURAT (Waktu Tempatan Komputer - Dibaiki)
             if (sediaAdaTarikh !== "") {
                 const tarikhLama = formatUntukInputTarikh(sediaAdaTarikh);
-                // Jika tarikh lama sah, guna tarikh lama. Jika tidak, guna tarikh hari ini.
                 document.getElementById('gen_tarikh').value = tarikhLama !== "" ? tarikhLama : formatUntukInputTarikh(new Date());
             } else {
-                // Untuk surat baharu, wajib guna tarikh hari ini
                 document.getElementById('gen_tarikh').value = formatUntukInputTarikh(new Date());
             }
             
-            // 🌟 3. TETAPKAN NO RUJUKAN (Atau Auto-Kira)
             if (sediaAdaNoRuj !== "") {
                 const match = sediaAdaNoRuj.match(/^(.*?)\((\d+)\)$/);
                 if (match) {
@@ -767,29 +743,23 @@ function terapkanTapisan() {
             document.getElementById('modalGenerateSurat').classList.remove('hidden');
         }
 
-        // --- Fungsi Bantuan Penukar Tarikh (DIKEMAS KINI AGAR LEBIH TEPAT) ---
         function formatUntukInputTarikh(tarikhRaw) {
             if (!tarikhRaw || tarikhRaw === "" || tarikhRaw === "-") return "";
             try {
-                // Cuba tukar menjadi Objek Tarikh (Date Object)
                 let d = new Date(tarikhRaw);
-                
-                // Jika Google hantar format pelik (cth DD/MM/YYYY) yang tidak difahami JavaScript
                 if (isNaN(d)) {
                     const stringTarikh = String(tarikhRaw).trim();
-                    // Semak jika format DD/MM/YYYY
                     if (stringTarikh.includes('/')) {
                         const parts = stringTarikh.split('/');
                         if (parts.length === 3) {
                             return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
                         }
                     }
-                    return ""; // Jika masih gagal, biarkan kosong
+                    return ""; 
                 }
 
-                // Dapatkan Tahun, Bulan, Hari mengikut Waktu Tempatan (Local Time)
                 const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0'); // Bulan bermula dari 0
+                const month = String(d.getMonth() + 1).padStart(2, '0'); 
                 const day = String(d.getDate()).padStart(2, '0');
                 
                 return `${year}-${month}-${day}`;
@@ -826,7 +796,6 @@ function terapkanTapisan() {
         // FUNGSI HANTAR DATA YANG TELAH DIEDIT KE SERVER
         // ==========================================
         function prosesJanaSurat(btnElement) {
-            // Jika butang dipanggil tanpa submit form event, kita halang event default
             const bil = document.getElementById('gen_bil_surat').value;
             const prefix = document.getElementById('gen_ref_prefix').value.trim();
             const nombor = document.getElementById('gen_ref_nombor').value.trim();
@@ -845,13 +814,11 @@ function terapkanTapisan() {
             tutupModalGenerate();
             paparUI('⚙️ Sedang mengemas kini rekod dan menjana Surat Lantikan PDF...', 'bg-purple-100 text-purple-800 border-purple-200');
             
-            // Kumpul semua data yang mungkin diedit oleh pengguna
             const payload = {
                 action: "janaSuratLantikan", 
                 BIL: bil,
                 NO_RUJUKAN: noRujukanGabungan,
                 TARIKH_SURAT: tarikhSurat,
-                // --- Data Kemas Kini Maklumat Projek ---
                 TAJUK: document.getElementById('gen_tajuk') ? document.getElementById('gen_tajuk').value.trim() : "",
                 KETUA: document.getElementById('gen_ketua') ? document.getElementById('gen_ketua').value.trim() : "",
                 AHLI1: document.getElementById('gen_ahli1') ? document.getElementById('gen_ahli1').value.trim() : "",
@@ -872,7 +839,7 @@ function terapkanTapisan() {
             .then(data => {
                 if(data.status === "BERJAYA") { 
                     paparUI("✅ " + data.mesej, 'bg-green-100 text-green-800 border-green-200'); 
-                    muatData(); // Refresh jadual
+                    muatData(); 
                 } else {
                     paparUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
                 }
@@ -892,7 +859,7 @@ function terapkanTapisan() {
         function ubahHalaman(arah) { 
             halamanSemasa += arah; 
             paparJadual(); 
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll naik atas perlahan-lahan
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
         // ==========================================
@@ -1026,38 +993,20 @@ function terapkanTapisan() {
 		
 		
 		// ==========================================
-        // FUNGSI: CARIAN UMUM PADA JADUAL
-        // ==========================================
-        function laksanakanCarian() {
-            const kataKunci = document.getElementById('inputCarian').value.toLowerCase();
-            // Pastikan ID 'isiJadual' sepadan dengan ID pada <tbody> jadual anda
-            const barisJadual = document.querySelectorAll('#isiJadual tr'); 
+		// FUNGSI: CARIAN UMUM PADA KESELURUHAN DATA (ALL RECORDS)
+		// ==========================================
+		function laksanakanCarian() {
+		terapkanTapisan();
+		}
 
-            barisJadual.forEach(baris => {
-                // Abaikan baris loading atau baris mesej kosong (yang biasanya di-colspan penuh)
-                if (baris.cells.length <= 1) return; 
+		function resetCarian() {
+		document.getElementById('inputCarian').value = ''; 
+		terapkanTapisan(); 
+		}
 
-                const teksBaris = baris.textContent.toLowerCase();
-                
-                // Jika teks baris mengandungi kata kunci carian, paparkan. Jika tidak, sembunyikan.
-                if (teksBaris.includes(kataKunci)) {
-                    baris.style.display = ''; // Tunjuk
-                } else {
-                    baris.style.display = 'none'; // Sembunyi
-                }
-            });
-        }
-
-        function resetCarian() {
-            document.getElementById('inputCarian').value = ''; // Kosongkan input
-            laksanakanCarian(); // Panggil semula fungsi untuk tunjuk semua data asal
-        }
-
-        // Tambahan: Bolehkan carian dengan menekan butang 'Enter' pada keyboard
-        document.getElementById('inputCarian').addEventListener('keyup', function(event) {
-            // Laksanakan carian secara live setiap kali menaip (pilihan)
-            laksanakanCarian(); 
-        });
+		document.getElementById('inputCarian').addEventListener('keyup', function(event) {
+		laksanakanCarian(); 
+		});
     </script>
 </body>
 </html>

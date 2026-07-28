@@ -457,10 +457,17 @@ window.onload = () => {
                     });
                 }
 
-                // 🌟 PENAMBAHBAIKAN BARU:
-                // Tetapkan fokus jabatan lalai bagi PENYELIA PROJEK PELAJAR dan PENYELARAS JABATAN
-                if (userJabatan) {
-                    // Cari padanan tepat dalam dropdown tanpa mengira huruf besar/kecil atau jarak kosong
+                // 🌟 PENAMBAHBAIKAN: Tetapkan kawalan filter mengikut peranan pengguna
+                if (isApprover) {
+                    // 1. Pihak Pengurusan (ADMIN, KUPIK, PENYELARAS INOVASI, PENYELARAS PENYELIDIKAN):
+                    // Filter Jabatan automatik ditetapkan kepada "SEMUA JABATAN" ("") dan tidak dikunci.
+                    fJabatan.value = "";
+                    fJabatan.disabled = false;
+                    fJabatan.classList.remove("bg-gray-200", "cursor-not-allowed");
+                    // Pastikan filter status juga ditetapkan kepada "Semua Status" ("")
+                    document.getElementById('filterStatus').value = "";
+                } else if (userJabatan) {
+                    // 2. Pengguna Jabatan (PENYELARAS JABATAN, STAF, PENYELIA PROJEK PELAJAR):
                     const matchedOption = Array.from(fJabatan.options).find(opt => opt.value.toUpperCase().trim() === userJabatan.toUpperCase().trim());
                     if (matchedOption) {
                         fJabatan.value = matchedOption.value;
@@ -469,13 +476,11 @@ window.onload = () => {
                     }
 
                     if (userPeranan === "PENYELARAS JABATAN") {
-                        // PENYELARAS JABATAN: Fokus jabatan sendiri tetapi TIDAK DIKUNCI (boleh pilih jabatan lain)
                         fJabatan.disabled = false;
-                        fJabatan.classList.remove("bg-gray-200");
-                    } else if (!isApprover) {
-                        // STAF & PENYELIA PROJEK PELAJAR: Terus kunci kepada jabatan yang log masuk
+                        fJabatan.classList.remove("bg-gray-200", "cursor-not-allowed");
+                    } else {
                         fJabatan.disabled = true;
-                        fJabatan.classList.add("bg-gray-200");
+                        fJabatan.classList.add("bg-gray-200", "cursor-not-allowed");
                     }
                 }
             });
@@ -857,7 +862,15 @@ function paparJadual() {
                 method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "sahkanProjek", BIL: bil })
             }).then(res => res.json()).then(data => {
-                if(data.status === "BERJAYA") { paparUI("✅ " + data.mesej, 'bg-green-100 text-green-800 border-green-200'); muatDataStatus(); } 
+                if(data.status === "BERJAYA") { 
+                    paparUI("✅ " + data.mesej, 'bg-green-100 text-green-800 border-green-200'); 
+                    // 🌟 TAMBAHAN: Setelah dokumen DISAHKAN, pastikan pihak pengurusan terus melihat semua jabatan & semua status
+                    if (isApprover) {
+                        document.getElementById('filterJabatan').value = "";
+                        document.getElementById('filterStatus').value = "";
+                    }
+                    muatDataStatus(); 
+                } 
                 else paparUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
             }).catch(err => paparUI("⚠️ Gagal menghubungi server.", 'bg-red-100 text-red-800 border-red-200'));
         }
@@ -1081,6 +1094,11 @@ async function hantarKemaskini(e) {
         if(data.status === "BERJAYA") { 
             paparUI("✅ " + data.mesej, 'bg-green-100 text-green-800 border-green-200'); 
             tutupModalKemaskini();
+            // 🌟 TAMBAHAN: Pastikan pihak pengurusan melihat semua rekod & status setelah mengemaskini
+            if (isApprover) {
+                document.getElementById('filterJabatan').value = "";
+                document.getElementById('filterStatus').value = "";
+            }
             muatDataStatus(); 
         } else {
             paparUI("❌ Ralat: " + data.mesej, 'bg-red-100 text-red-800 border-red-200');
@@ -1153,6 +1171,12 @@ function baikiSemulaTindakan(bilId, tajuk) {
             if (data.status === "BERJAYA" || data.status === "berjaya") {
                 paparUI("✅ Status berjaya dikemaskini kepada Baiki Semula!", 'bg-green-100 text-green-800 border-green-200');
                 alert("✅ Status berjaya dikemaskini kepada Baiki Semula!");
+                
+                // 🌟 TAMBAHAN: Pastikan pihak pengurusan melihat semua rekod & status setelah tindakan
+                if (isApprover) {
+                    document.getElementById('filterJabatan').value = "";
+                    document.getElementById('filterStatus').value = "";
+                }
                 
                 // 3. Panggil fungsi rasmi sistem anda untuk memuat turun / refresh jadual
                 if (typeof muatDataStatus === 'function') {
