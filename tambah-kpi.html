@@ -60,12 +60,19 @@
                     <input type="text" id="nama_produk" required placeholder="Contoh: Sistem e-Pelajar" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
                 </div>
 
-                <div class="grid grid-cols-1 gap-6">
+                <!-- 🌟 KEMASKINI: GRID KETUA PROJEK & NO IC KETUA -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Ketua Projek <span class="text-red-500">*</span></label>
                         <input type="text" id="ketua" required placeholder="Nama Ketua Projek" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
                     </div>
-                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">No. IC Ketua <span class="text-red-500">*</span></label>
+                        <input type="text" id="no_ic_ketua" required placeholder="Contoh: 850101081234 (Tanpa Sempang)" maxlength="12" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6">
                     <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Bilangan Ahli Kumpulan (Tidak Termasuk Ketua)</label>
                         <select id="bilangan_ahli" class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none mb-4" onchange="kemaskiniBorangAhli()">
@@ -102,7 +109,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
                         <select id="jabatan" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
@@ -110,13 +117,20 @@
                         </select>
                     </div>
                     <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Aplikasi Di <span class="text-red-500">*</span></label>
+                        <input type="text" id="aplikasi" required placeholder="Contoh: Pengajaran & Pembelajaran / Pentadbiran" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
+                    </div>
+                    <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Aplikasi Di Peringkat <span class="text-red-500">*</span></label>
-                        <select id="aplikasi" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                            <option value="">-- Pilih Peringkat --</option>
+                        <select id="peringkat" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="">-- PILIH PERINGKAT --</option>
                             <option value="JABATAN">JABATAN</option>
                             <option value="POLITEKNIK">POLITEKNIK</option>
-                            <option value="KEBANGSAAN">KEBANGSAAN</option>
-                            <option value="ANTARABANGSA">ANTARABANGSA</option>
+                            <option value="KOLEJ KOMUNITI">KOLEJ KOMUNITI</option>
+							<option value="SEKOLAH">SEKOLAH</option>
+							<option value="KOMUNITI">KOMUNITI</option>
+                            <option value="KEMENTERIAN">KEMENTERIAN</option>
+                            <option value="AGENSI LUAR (INDUSTRI)">AGENSI LUAR (INDUSTRI)</option>
                         </select>
                     </div>
                 </div>
@@ -195,13 +209,18 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-6">
                 <div><span class="font-bold text-gray-500">Nama Produk:</span> <p id="pre_produk" class="font-semibold text-lg uppercase text-blue-700"></p></div>
                 <div><span class="font-bold text-gray-500">Jabatan:</span> <p id="pre_jabatan" class="font-semibold text-gray-800"></p></div>
-                <div><span class="font-bold text-gray-500">Ketua Projek:</span> <p id="pre_ketua" class="font-semibold text-gray-800"></p></div>
-                <div><span class="font-bold text-gray-500">Ahli Kumpulan:</span> <p id="pre_ahli" class="text-gray-800 italic"></p></div>
                 
+                <!-- 🌟 KEMASKINI: PRATONTON KETUA & NO IC KETUA -->
+                <div><span class="font-bold text-gray-500">Ketua Projek:</span> <p id="pre_ketua" class="font-semibold text-gray-800"></p></div>
+                <div><span class="font-bold text-gray-500">No. IC Ketua:</span> <p id="pre_ic_ketua" class="font-semibold text-gray-800"></p></div>
+                
+                <div><span class="font-bold text-gray-500">Ahli Kumpulan:</span> <p id="pre_ahli" class="text-gray-800 italic"></p></div>
                 <div><span class="font-bold text-gray-500">No Telefon:</span> <p id="pre_telefon" class="text-gray-800"></p></div>
                 <div><span class="font-bold text-gray-500">Emel:</span> <p id="pre_email" class="text-gray-800"></p></div>
 
-                <div><span class="font-bold text-gray-500">Aplikasi Peringkat:</span> <p id="pre_aplikasi" class="text-gray-800"></p></div>
+                <div><span class="font-bold text-gray-500">Aplikasi Di:</span> <p id="pre_aplikasi" class="text-gray-800 font-semibold uppercase"></p></div>
+                <div><span class="font-bold text-gray-500">Aplikasi Di Peringkat:</span> <p id="pre_peringkat" class="text-gray-800 font-semibold"></p></div>
+                
                 <div><span class="font-bold text-gray-500">Jenis Harta Intelek:</span> <p id="pre_jenis" class="text-gray-800"></p></div>
                 <div><span class="font-bold text-gray-500">No Pendaftaran:</span> <p id="pre_pendaftaran" class="text-gray-800"></p></div>
                 <div><span class="font-bold text-gray-500">Tahun:</span> <p id="pre_tahun" class="font-semibold text-gray-800"></p></div>
@@ -276,9 +295,6 @@
         }
 
         window.onload = () => {
-            // ==============================================================
-            // 🌟 LOGIK BARU: AMBIL TETAPAN SUKUAN DAN AUTO SELECT BERDASARKAN TARIKH
-            // ==============================================================
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -286,8 +302,6 @@
             })
             .then(res => res.json())
             .then(data => {
-                // Periksa sama ada properti SENARAI_SUKUAN wujud (dari kemaskini Code.gs terbaru)
-                // Jika tiada, fallback kepada 'data' lama
                 const sumberDataSukuan = data.SENARAI_SUKUAN || data.data;
 
                 if (data.status === "BERJAYA" && sumberDataSukuan && sumberDataSukuan.length > 0) {
@@ -299,7 +313,6 @@
                     sumberDataSukuan.forEach(s => {
                         let option = document.createElement("option");
                         
-                        // Periksa format data: jika objek (ada tarikh tutup) atau string biasa
                         if (typeof s === 'object' && s !== null) {
                             option.value = s.sukuan;
                             option.text = s.sukuan;
@@ -312,7 +325,6 @@
                                 sukuanTelahDipilih = true;
                             }
                         } else {
-                            // Format lama (array string)
                             option.value = s;
                             option.text = s;
                         }
@@ -320,7 +332,6 @@
                         elSukuan.appendChild(option);
                     });
 
-                    // Fail-safe: Jika menggunakan objek tarikh tetapi semua tarikh telah luput
                     if (typeof sumberDataSukuan[0] === 'object' && !sukuanTelahDipilih && elSukuan.options.length > 1) {
                         elSukuan.options[elSukuan.options.length - 1].selected = true;
                     }
@@ -334,9 +345,6 @@
                 elSukuan.innerHTML = '<option value="">Ralat Memuat Turun</option>'; 
             });
 
-            // ==============================================================
-            // AMBIL JENIS HARTA INTELEK
-            // ==============================================================
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -357,9 +365,6 @@
         const bahagianBerjaya = document.getElementById('bahagianBerjaya');
         const statusMesej = document.getElementById('statusMesej');
 
-        // ==========================================
-        // 🌟 KOD BARU: PENGURUSAN AHLI KUMPULAN
-        // ==========================================
         function kemaskiniBorangAhli() {
             const bil = parseInt(document.getElementById('bilangan_ahli').value);
             const container = document.getElementById('container_ahli');
@@ -380,7 +385,7 @@
                 } else {
                     wrapper.classList.add('hidden');
                     input.required = false;
-                    input.value = ''; // Kosongkan input yang tidak digunakan
+                    input.value = ''; 
                 }
             }
         }
@@ -392,12 +397,9 @@
                 let nama = document.getElementById('ahli_'+i).value.trim();
                 if(nama) senaraiAhli.push(nama.toUpperCase());
             }
-            return senaraiAhli.join(', '); // Pisahkan setiap nama ahli dengan koma
+            return senaraiAhli.join(', '); 
         }
 
-        // ==========================================
-        // 🌟 KOD BARU: PENGURUSAN 3 FAIL BUKTI SPESIFIK
-        // ==========================================
         let failSimpanan = { 1: null, 2: null, 3: null };
 
         function urusFailSpesifik(input, index, namaCadanganAsal) {
@@ -419,7 +421,6 @@
                 return;
             }
 
-            // 🌟 KEMASKINI: Tukar had saiz fail kepada 10 MB
             if (file.size > 10 * 1024 * 1024) {
                 alert("⚠️ Fail terlalu besar! (Maksimum 10MB setiap fail). Sila kecilkan saiz PDF anda.");
                 input.value = "";
@@ -430,16 +431,13 @@
 
             failSimpanan[index] = file;
             divNama.classList.remove('hidden');
-            
-            // Cadangan nama automatik
             inputNama.value = namaCadanganAsal + ".pdf";
         }
 
         function resetBorangTersuai() {
             document.getElementById('borangKPI').reset();
-            kemaskiniBorangAhli(); // Reset paparan dropdown ahli
+            kemaskiniBorangAhli(); 
             
-            // Reset fail dan kotak nama fail
             failSimpanan = { 1: null, 2: null, 3: null };
             for(let i=1; i<=3; i++) {
                 document.getElementById('fail_'+i).value = "";
@@ -461,7 +459,6 @@
                 return;
             }
 
-            // Semak jika semua 3 fail wajib telah di-upload
             if (!failSimpanan[1] || !failSimpanan[2] || !failSimpanan[3]) {
                 alert("⚠️ Sila muat naik KETIGA-TIGA (3) item dokumen bukti PDF yang telah ditetapkan di ruangan muat naik.");
                 return;
@@ -469,12 +466,16 @@
 
             document.getElementById('pre_produk').innerText = document.getElementById('nama_produk').value.toUpperCase();
             document.getElementById('pre_ketua').innerText = document.getElementById('ketua').value.toUpperCase();
-            document.getElementById('pre_ahli').innerText = dapatkanNamaAhliGabungan() || 'TIADA AHLI TAMBAHAN';
             
+            // 🌟 KEMASKINI: PAPAR PRATONTON NO IC KETUA
+            document.getElementById('pre_ic_ketua').innerText = document.getElementById('no_ic_ketua').value.trim();
+            
+            document.getElementById('pre_ahli').innerText = dapatkanNamaAhliGabungan() || 'TIADA AHLI TAMBAHAN';
             document.getElementById('pre_telefon').innerText = document.getElementById('no_telefon').value;
             document.getElementById('pre_email').innerText = document.getElementById('email').value;
             document.getElementById('pre_jabatan').innerText = document.getElementById('jabatan').value;
-            document.getElementById('pre_aplikasi').innerText = document.getElementById('aplikasi').value;
+            document.getElementById('pre_aplikasi').innerText = document.getElementById('aplikasi').value.toUpperCase();
+            document.getElementById('pre_peringkat').innerText = document.getElementById('peringkat').value;
             document.getElementById('pre_jenis').innerText = document.getElementById('jenis').value;
             document.getElementById('pre_pendaftaran').innerText = document.getElementById('no_pendaftaran').value || 'TIADA';
             document.getElementById('pre_tahun').innerText = document.getElementById('tahun').value;
@@ -509,7 +510,6 @@
                 let jabatanDipilih = document.getElementById('jabatan').value || "TIADA_JABATAN";
                 let sukuanDipilih = document.getElementById('sukuan').value || "TIADA_SUKUAN";
 
-                // Loop 3 kali untuk muat naik 3 fail satu persatu ke Google Drive
                 for (let i = 1; i <= 3; i++) {
                     let file = failSimpanan[i];
                     if (file) {
@@ -517,9 +517,8 @@
                         let base64 = await toBase64(file);
                         
                         let namaKastam = document.getElementById('nama_fail_' + i).value.trim();
-                        if (!namaKastam) namaKastam = file.name; // Fallback jika pengguna padam nama
+                        if (!namaKastam) namaKastam = file.name; 
                         
-                        // Menambah .pdf jika pengguna terpadam extension
                         if(!namaKastam.toLowerCase().endsWith('.pdf')) namaKastam += ".pdf";
 
                         const payloadFile = {
@@ -552,15 +551,18 @@
 
                 btn.innerHTML = '💾 Merekod ke pangkalan data... ⏳';
 
+                // 🌟 KEMASKINI: TAMBAH NO_IC_KETUA KE DALAM PAYLOAD
                 const payloadData = {
                     action: "tambahKPI",
                     NAMA_PRODUK: document.getElementById('nama_produk').value.toUpperCase(),
                     KETUA: document.getElementById('ketua').value.toUpperCase(),
+                    NO_IC_KETUA: document.getElementById('no_ic_ketua').value.trim(),
                     NO_TELEFON: document.getElementById('no_telefon').value,
                     EMAIL: document.getElementById('email').value,
-                    AHLI: dapatkanNamaAhliGabungan(), // Menggunakan data ahli gabungan koma
+                    AHLI: dapatkanNamaAhliGabungan(), 
                     JABATAN: document.getElementById('jabatan').value,
-                    APLIKASI: document.getElementById('aplikasi').value,
+                    APLIKASI: document.getElementById('aplikasi').value, 
+                    PERINGKAT: document.getElementById('peringkat').value, 
                     JENIS: document.getElementById('jenis').value,
                     NO_PENDAFTARAN: document.getElementById('no_pendaftaran').value,
                     TAHUN: document.getElementById('tahun').value,
@@ -609,16 +611,11 @@
             window.scrollTo(0, 0);
         }
 
-        // 🌟 KEMASKINI: Fungsi Untuk Menambah Rekod KPI Seterusnya Tanpa Perlu Refresh
         function tambahLagiKPI() {
-            // Sembunyikan mesej berjaya dan paparkan semula borang
             bahagianBerjaya.classList.add('hidden');
             bahagianBorang.classList.remove('hidden');
-            
-            // Kosongkan semula borang dan fail
             resetBorangTersuai();
 
-            // Aktifkan dan tetapkan semula teks butang hantar
             const btn = document.getElementById('btnHantar');
             if(btn) {
                 btn.disabled = false;
@@ -627,11 +624,9 @@
             window.scrollTo(0, 0);
         }
 
-        // ==========================================================
-        // FUNGSI MUAT NAIK PUKAL (CSV) KEKAL SEPERTI ASAL
-        // ==========================================================
+        // 🌟 KEMASKINI: TEMPLAT CSV BAHARU DENGAN LAJUR NO IC KETUA & PERINGKAT
         function muatTurunTemplateCSV() {
-            const header = "NAMA PRODUK,KETUA,NO TELEFON,EMAIL,AHLI,JABATAN,APLIKASI,JENIS,NO PENDAFTARAN,TAHUN,URL,SUKUAN\n";
+            const header = "NAMA PRODUK,KETUA,NO IC KETUA,NO TELEFON,EMAIL,AHLI,JABATAN,APLIKASI,PERINGKAT,JENIS,NO PENDAFTARAN,TAHUN,URL,SUKUAN\n";
             const blob = new Blob([header], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -643,6 +638,7 @@
             document.body.removeChild(a);
         }
 
+        // 🌟 KEMASKINI: SELARASKAN INDEKS LAJUR BAGI PROSES MUAT NAIK CSV
         function prosesMuatNaikCSV() {
             const fail = document.getElementById('failCSV').files[0];
             const statusCSV = document.getElementById('statusCSV');
@@ -709,17 +705,18 @@
                 for(let i = 1; i < rows.length; i++) {
                     let arr = rows[i];
                     
-                    if(arr.length >= 11) { 
+                    // Semak sekurang-kurangnya 13 lajur asas ada dalam baris tersebut
+                    if(arr.length >= 13) { 
                         
                         let urlSediaAda = "";
                         let sukuanSediaAda = "";
                         
-                        if (arr.length > 12) {
+                        if (arr.length > 14) {
                             sukuanSediaAda = arr[arr.length - 1]; 
-                            urlSediaAda = arr.slice(10, arr.length - 1).join(", "); 
+                            urlSediaAda = arr.slice(12, arr.length - 1).join(", "); 
                         } else {
-                            urlSediaAda = arr[10] || "";
-                            sukuanSediaAda = arr[11] || "";
+                            urlSediaAda = arr[12] || "";
+                            sukuanSediaAda = arr[13] || "";
                         }
                         
                         let urlClean = urlSediaAda.replace(/\r?\n/g, ", ");
@@ -727,14 +724,16 @@
                         dataPukal.push({
                             NAMA_PRODUK: arr[0] || "", 
                             KETUA: arr[1] || "", 
-                            NO_TELEFON: arr[2] || "", 
-                            EMAIL: arr[3] || "",
-                            AHLI: arr[4] || "", 
-                            JABATAN: arr[5] || "", 
-                            APLIKASI: arr[6] || "", 
-                            JENIS: arr[7] || "",
-                            NO_PENDAFTARAN: arr[8] || "", 
-                            TAHUN: arr[9] || "", 
+                            NO_IC_KETUA: arr[2] || "", 
+                            NO_TELEFON: arr[3] || "", 
+                            EMAIL: arr[4] || "",
+                            AHLI: arr[5] || "", 
+                            JABATAN: arr[6] || "", 
+                            APLIKASI: arr[7] || "", 
+                            PERINGKAT: arr[8] || "",
+                            JENIS: arr[9] || "",
+                            NO_PENDAFTARAN: arr[10] || "", 
+                            TAHUN: arr[11] || "", 
                             URL: urlClean, 
                             SUKUAN: sukuanSediaAda
                         });
