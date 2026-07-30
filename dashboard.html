@@ -46,7 +46,6 @@
         </div>
 
         <div id="bahagianAtas" class="hidden">
-            <!-- 🌟 KEMASKINI: Ditukar kepada grid 5 kolum (lg:grid-cols-5) & ditambah kad Sijil/Lain -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
                     <p class="text-gray-500 text-sm font-medium uppercase">Jumlah Projek</p>
@@ -70,15 +69,27 @@
                 </div>
             </div>
 
-            <!-- 🌟 KEMASKINI LAYOUT CARTA: Ditambah susunan Flexbox dan div pembungkus relative untuk elak overflow -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px] flex flex-col justify-between">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 shrink-0">Projek mengikut Jabatan</h2>
+            <!-- KEMUDAHAN ON/OFF CARTA -->
+            <div class="flex gap-4 mb-4 items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100 w-fit">
+                <span class="font-bold text-sm text-gray-700">Kawalan Paparan Carta:</span>
+                <label class="flex items-center cursor-pointer gap-2">
+                    <input type="checkbox" id="toggleBar" checked onchange="toggleCarta('bar')" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    <span class="text-sm font-semibold text-gray-600">Carta Bar</span>
+                </label>
+                <label class="flex items-center cursor-pointer gap-2">
+                    <input type="checkbox" id="togglePai" checked onchange="toggleCarta('pai')" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    <span class="text-sm font-semibold text-gray-600">Carta Pai</span>
+                </label>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" id="gridCarta">
+                <div id="containerCartaBar" class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px] flex flex-col justify-between">
+                    <h2 id="tajukCartaBar" class="text-xl font-bold text-gray-800 mb-4 shrink-0">Projek mengikut Jabatan</h2>
                     <div class="relative flex-1 w-full min-h-0">
                         <canvas id="jabatanChart"></canvas>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px] flex flex-col justify-between">
+                <div id="containerCartaPai" class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px] flex flex-col justify-between">
                     <h2 class="text-xl font-bold text-gray-800 mb-4 shrink-0">Pecahan Pingat</h2>
                     <div class="relative flex-1 w-full min-h-0 flex items-center justify-center">
                         <canvas id="pingatChart"></canvas>
@@ -101,7 +112,6 @@
                         </select>
                     </div>
 
-                    <!-- 🌟 KEMASKINI: Ditambah Filter Status (DISAHKAN, MENUNGGU PENGESAHAN, BAIKI SEMULA) -->
                     <div id="divFilterStatus" class="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-1.5 shadow-sm shrink-0 max-w-[230px]">
                         <span class="text-xs font-bold text-gray-500 mr-2 uppercase">Status:</span>
                         <select id="filterStatus" onchange="tapisData()" class="bg-transparent focus:outline-none font-semibold text-blue-700 text-sm w-full truncate cursor-pointer">
@@ -207,6 +217,16 @@
             document.getElementById('divFilterJabatan').classList.add('flex');
         }
 
+        function toggleCarta(jenis) {
+            if (jenis === 'bar') {
+                const isChecked = document.getElementById('toggleBar').checked;
+                document.getElementById('containerCartaBar').style.display = isChecked ? 'flex' : 'none';
+            } else if (jenis === 'pai') {
+                const isChecked = document.getElementById('togglePai').checked;
+                document.getElementById('containerCartaPai').style.display = isChecked ? 'flex' : 'none';
+            }
+        }
+
         function dapatkanSingkatanJabatan(teksJabatan) {
             if (!teksJabatan || teksJabatan === "-") return "-";
             const padananKurungan = teksJabatan.match(/\(([^)]+)\)/);
@@ -216,7 +236,6 @@
             return teksJabatan.trim().toUpperCase();
         }
 
-        // 🌟 KEMASKINI BAHARU: Fungsi untuk memisahkan Status dan Ulasan dari Lajur J (Index 9) sahaja
         function pisahkanStatusDanUlasan(teksLajurJ) {
             let statusRaw = String(teksLajurJ || 'MENUNGGU PENGESAHAN').trim();
             let status = statusRaw;
@@ -224,10 +243,8 @@
 
             if (statusRaw.toUpperCase().includes("BAIKI")) {
                 status = "BAIKI SEMULA";
-                // Buang kata kunci BAIKI SEMULA dari teks untuk mengambil baki ulasan di lajur J
                 let bakiTeks = statusRaw.replace(/i?BAIKI\s*(SEMULA)?/i, "").trim();
                 
-                // Bersihkan simbol pemisah di hadapan ulasan (cth: "-", ":", "(Sebab:", dll.)
                 bakiTeks = bakiTeks.replace(/^[-:–—\s()]+/, "")
                                    .replace(/^(Sebab|Ulasan|Catatan|Komen)\s*[:=-]\s*/i, "")
                                    .replace(/\)+$/, "")
@@ -270,7 +287,6 @@
                 let dataDariSheet = [];
 
                 if (Array.isArray(result) && result.length > 0 && typeof result[0] === 'object' && !Array.isArray(result[0])) {
-                    // 🌟 KEMASKINI: Lajur J (Index 9) menyimpan Status & Ulasan sekaligus.
                     dataDariSheet = result.map((r, i) => [
                         r.BIL || (i+1), r.INNOVATOR || "-", r.AHLI || "-", r.JABATAN || "-", 
                         r.PRODUK || "-", r.NAMAPERTANDINGAN || "-", r.TARIKHTEMPATPERTANDINGAN || "-", 
@@ -301,7 +317,6 @@
                 }
 
                 if (dataDariSheet.length > 0) {
-                    // Tapis data sekiranya peranan pengguna terhad kepada jabatan masing-masing
                     if (ialahPerananJabatan && userJabatan !== "") {
                         dataDariSheet = dataDariSheet.filter(row => {
                             const rekodJabatan = String(row[3] || "").trim().toUpperCase();
@@ -416,8 +431,6 @@
                 let tindakanHTML = "";
                 if (adaAksesTindakan) {
                     const ialahAdminAtauPusat = senaraiPerananDibenarkan.includes(userPeranan.toUpperCase());
-                    
-                    // Semak sama ada jabatan rekod sepadan dengan jabatan pengguna yang log masuk
                     const rekodJabatan = String(row[3] || "").trim().toUpperCase();
                     const userJabatanUpper = String(userJabatan || "").trim().toUpperCase();
                     
@@ -430,7 +443,7 @@
                                         (userJabatanUpper.includes(rekodJabatan) && rekodJabatan !== "");
 
                     const bolehEdit = ialahAdminAtauPusat || samaJabatan;
-                    const bolehPadam = ialahAdminAtauPusat; // Padam terhad untuk Admin/Pusat sahaja
+                    const bolehPadam = ialahAdminAtauPusat;
 
                     if (bolehEdit) {
                         tindakanHTML = `
@@ -453,8 +466,6 @@
                 }
 
                 const singkatanJabatanPapar = dapatkanSingkatanJabatan(row[3]);
-
-                // Pengambilan status dan ulasan daripada Lajur J (row[9])
                 const { status: statusTeks, ulasan: ulasanTeks } = pisahkanStatusDanUlasan(row[9]);
 
                 let paparanStatusHTML = "";
@@ -598,29 +609,64 @@
         }
 
         function kemaskiniCarta(data) {
-            const rekodJabatan = {};
-            
-            data.forEach(r => { 
-                let jAsal = String(r[3] || "N/A").trim(); 
-                let match = jAsal.match(/\(([^)]+)\)/); 
-                let j = match ? match[1].trim() : jAsal;
-                
-                rekodJabatan[j] = (rekodJabatan[j] || 0) + 1; 
-            });
-
             const warnaBar = [
                 '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', 
                 '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'
             ];
+            
+            let labelBarX = [];
+            let dataBarY = [];
+
+            // Jika role terhad (bukan admin/penyelaras/kupik), paparkan 3 Tahun Terkini
+            if (!adaAksesPengesahan) {
+                const tahunTerkini = new Date().getFullYear();
+                const tahun1 = tahunTerkini;
+                const tahun2 = tahunTerkini - 1;
+                const tahun3 = tahunTerkini - 2;
+                
+                document.getElementById('tajukCartaBar').innerText = `Projek 3 Tahun Terkini (${tahun3} - ${tahun1})`;
+
+                const kiraanTahun = {
+                    [tahun3]: 0,
+                    [tahun2]: 0,
+                    [tahun1]: 0
+                };
+
+                data.forEach(r => {
+                    const t = parseInt(String(r[8]).trim());
+                    if (kiraanTahun[t] !== undefined) {
+                        kiraanTahun[t]++;
+                    }
+                });
+
+                labelBarX = [tahun3.toString(), tahun2.toString(), tahun1.toString()];
+                dataBarY = [kiraanTahun[tahun3], kiraanTahun[tahun2], kiraanTahun[tahun1]];
+                
+            } else {
+                // Jika role DIBENARKAN, kekalkan paparan Projek mengikut Jabatan
+                document.getElementById('tajukCartaBar').innerText = "Projek mengikut Jabatan";
+                
+                const rekodJabatan = {};
+                data.forEach(r => { 
+                    let jAsal = String(r[3] || "N/A").trim(); 
+                    let match = jAsal.match(/\(([^)]+)\)/); 
+                    let j = match ? match[1].trim() : jAsal;
+                    
+                    rekodJabatan[j] = (rekodJabatan[j] || 0) + 1; 
+                });
+
+                labelBarX = Object.keys(rekodJabatan);
+                dataBarY = Object.values(rekodJabatan);
+            }
 
             if (jabatanChartInstance) jabatanChartInstance.destroy();
             jabatanChartInstance = new Chart(document.getElementById('jabatanChart'), {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(rekodJabatan),
+                    labels: labelBarX,
                     datasets: [{ 
                         label: 'Bilangan Projek', 
-                        data: Object.values(rekodJabatan), 
+                        data: dataBarY, 
                         backgroundColor: warnaBar,
                         borderRadius: 4 
                     }]
@@ -628,7 +674,15 @@
                 options: { 
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } } 
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
                 }
             });
 
