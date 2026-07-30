@@ -36,10 +36,24 @@
         </div>
         
         <div id="kawasan-cetakan" class="w-full">
+            <!-- PENAMBAHBAIKAN: UI CARTA DENGAN BUTANG ON/OFF & 2 CARTA -->
             <div id="bahagianCarta" class="hidden mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-[450px] w-full mx-auto">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Rekod KPI mengikut Jabatan</h2>
-                    <canvas id="jabatanChart"></canvas>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 w-full mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="w-32 hidden md:block"></div> 
+                        <h2 id="tajukCarta" class="text-xl font-bold text-gray-800 text-center flex-grow">Rekod KPI</h2>
+                        <button onclick="toggleCartaView()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-md text-sm font-semibold transition shadow-sm border border-slate-300 whitespace-nowrap">👁️ On/Off Carta</button>
+                    </div>
+                    
+                    <!-- KANDUNGAN CARTA -->
+                    <div id="kandunganCarta" class="flex flex-col lg:flex-row gap-6 h-[450px] transition-all duration-300">
+                        <div id="bekasJabatanChart" class="w-full h-full transition-all duration-300">
+                            <canvas id="jabatanChart"></canvas>
+                        </div>
+                        <div id="bekasTahunChart" class="w-full lg:w-1/2 h-full hidden transition-all duration-300">
+                            <canvas id="tahunChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -109,7 +123,9 @@
         </div>
     </div>
 
-    <!-- MODAL EDIT DATA -->
+    <!-- MODAL EDIT DATA & UPLOAD SIJIL & LIHAT BUKTI ... KEKAL SAMA SEPERTI ASAL -->
+    <!-- (Untuk menjimatkan baris kod tanpa membuang fungsi, saya kekalkan struktur modanya sepenuhnya) -->
+    
     <div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
         <div class="bg-white p-6 rounded-lg w-full max-w-4xl shadow-2xl max-h-[95vh] overflow-y-auto">
             <h2 class="text-xl font-bold mb-4 text-blue-700 border-b pb-2">✏️ Kemaskini Rekod & Dokumen Bukti</h2>
@@ -141,15 +157,12 @@
                         <label class="block text-sm font-semibold text-gray-700">Ahli (Pisahkan koma)</label>
                         <input type="text" id="editAhli" class="w-full border p-2.5 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400">
                     </div>
-
-                    <!-- PENAMBAHBAIKAN: COMBO BOX JABATAN -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700">Jabatan</label>
                         <select id="editJabatan" class="w-full border p-2.5 rounded-lg mt-1 bg-gray-50 focus:ring-2 focus:ring-blue-400 uppercase">
                             <option value="">-- PILIH JABATAN --</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold text-gray-700">APLIKASI DI (Lajur H)</label>
                         <input type="text" id="editAplikasi" placeholder="Nyatakan aplikasi di..." class="w-full border p-2.5 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400">
@@ -167,15 +180,12 @@
                             <option value="AGENSI LUAR (INDUSTRI)">AGENSI LUAR (INDUSTRI)</option>
                         </select>
                     </div>
-
-                    <!-- PENAMBAHBAIKAN: COMBO BOX JENIS HARTA INTELEK -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700">Jenis Harta Intelek</label>
                         <select id="editJenis" class="w-full border p-2.5 rounded-lg mt-1 bg-gray-50 focus:ring-2 focus:ring-blue-400 uppercase">
                             <option value="">-- PILIH HARTA INTELEK --</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold text-gray-700">No Daftar CR1 / Resit</label>
                         <input type="text" id="editNoDaftar" class="w-full border p-2.5 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400">
@@ -195,7 +205,6 @@
                             <option value="DISAHKAN">DISAHKAN</option>
                         </select>
                     </div>
-                    <!-- ULASAN (LAJUR P) - KHAS UNTUK PERANAN DIBENARKAN -->
                     <div id="containerEditUlasan" class="md:col-span-2 hidden mt-2">
                         <label class="block text-sm font-semibold text-purple-800">Ulasan Penilaian (Lajur P - Khas Penyelaras/Admin)</label>
                         <textarea id="editUlasan" rows="2" placeholder="Ulasan penilaian atau catatan semakan..." class="w-full border border-purple-300 bg-purple-50 p-2.5 rounded-lg mt-1 focus:ring-2 focus:ring-purple-400"></textarea>
@@ -247,7 +256,6 @@
         </div> 
     </div> 
         
-    <!-- MODAL MUAT NAIK SIJIL -->
     <div id="modalUpload" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
         <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-2xl">
             <h2 class="text-xl font-bold mb-4 text-amber-600 border-b pb-2">📄 Muat Naik Sijil Penghargaan</h2>
@@ -264,7 +272,6 @@
         </div>
     </div>
 
-    <!-- MODAL PAPAR DOKUMEN BUKTI (UNTUK STAF SELEPAS PENGESAHAN NO IC KETUA) -->
     <div id="modalLihatDokumen" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
         <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl border border-gray-200">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -284,33 +291,82 @@
         // ⚠️ MASUKKAN URL WEB APP ANDA DI SINI
         const scriptURL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
         
-        // Pemboleh ubah global untuk menyimpan senarai sistem dropdown
         let senaraiJabatanSistem = [];
         let senaraiHISistem = [];
+        let semuaData = []; 
+        let currentFilteredData = []; 
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        
+        let jabatanChartInstance = null;
+        let tahunChartInstance = null; // Tambahan bagi menampung graf baru
+
+        let paparSemuaUntukCetak = false;
+        let failSimpananEdit = { 1: null, 2: null, 3: null };
+
+        const userNama = sessionStorage.getItem("namaPengguna") || "Pengguna";
+        const userPeranan = sessionStorage.getItem("peranan") || "STAF";
+        const userJabatan = sessionStorage.getItem("jabatan") || "";
+
+        const perananLayakTindakan = ["PENYELARAS INOVASI", "KUPIK", "ADMIN", "PENYELARAS PENYELIDIKAN"];
+        const perananLayakUlasan = [
+            "KUPIK", 
+            "ADMIN", 
+            "PENYELARAS INOVASI", 
+            "PENYELARAS PENYELIDIKAN", 
+            "PENYELARAS JABATAN"
+        ];
+        
+        const isPrivileged = perananLayakTindakan.includes(userPeranan.toUpperCase());
+        const canViewUlasan = perananLayakUlasan.includes(userPeranan.toUpperCase());
+        const totalLajur = canViewUlasan ? 15 : 14; 
+
+        document.getElementById('namaPengguna').innerText = userNama;
+        document.getElementById('perananPengguna').innerText = userPeranan;
+        document.getElementById('jabatanPengguna').innerText = dapatkanSingkatanJabatan(userJabatan);
+        
+        document.getElementById('thTindakan').classList.remove('hidden');
+        if (canViewUlasan) {
+            const thUlasan = document.getElementById('thUlasan');
+            if (thUlasan) thUlasan.classList.remove('hidden');
+        }
+
+        if (userPeranan.toUpperCase().includes("INOVASI") || userPeranan.toUpperCase() === "ADMIN") {
+            const btnPengesahanKPI = document.getElementById('btnPengesahanKPI');
+            if (btnPengesahanKPI) {
+                btnPengesahanKPI.classList.remove('hidden');
+                btnPengesahanKPI.classList.add('flex');
+            }
+        }
+
+        if(userPeranan.toUpperCase() === "STAF" && userJabatan) {
+            document.getElementById('tajukJadual').innerText = `(${dapatkanSingkatanJabatan(userJabatan)})`;
+        } else {
+            document.getElementById('tajukJadual').innerText = `(Semua Jabatan)`;
+            document.getElementById('filterJabatan').classList.remove('hidden');
+        }
 
         async function muatSenaraiSistem() {
-    try {
-        const fetchUrl = scriptURL.includes('?') ? `${scriptURL}&action=ambilTetapanSenarai` : `${scriptURL}?action=ambilTetapanSenarai`;
-        const response = await fetch(fetchUrl);
-        const res = await response.json();
-        
-        if (res.status === "BERJAYA") {
-            // 🌟 PEMBETULAN: Baca kekunci "JABATAN" dan "HARTA_INTELEK" (huruf besar) mengikut JSON dari Apps Script
-            const dataJabatan = res.JABATAN || res.jabatan || [];
-            const dataHI = res.HARTA_INTELEK || res.hi || [];
+            try {
+                const fetchUrl = scriptURL.includes('?') ? `${scriptURL}&action=ambilTetapanSenarai` : `${scriptURL}?action=ambilTetapanSenarai`;
+                const response = await fetch(fetchUrl);
+                const res = await response.json();
+                
+                if (res.status === "BERJAYA") {
+                    const dataJabatan = res.JABATAN || res.jabatan || [];
+                    const dataHI = res.HARTA_INTELEK || res.hi || [];
 
-            senaraiJabatanSistem = dataJabatan.map(j => String(j).trim()).filter(j => j !== "");
-            senaraiHISistem = dataHI.map(h => String(h).trim()).filter(h => h !== "");
-            
-            binaPilihanDropdownSistem();
+                    senaraiJabatanSistem = dataJabatan.map(j => String(j).trim()).filter(j => j !== "");
+                    senaraiHISistem = dataHI.map(h => String(h).trim()).filter(h => h !== "");
+                    
+                    binaPilihanDropdownSistem();
+                }
+            } catch (error) {
+                console.error("Gagal menarik tetapan dari tab SISTEM. Menggunakan fallback data jadual:", error);
+                binaPilihanDropdownSistem();
+            }
         }
-    } catch (error) {
-        console.error("Gagal menarik tetapan dari tab SISTEM. Menggunakan fallback data jadual:", error);
-        binaPilihanDropdownSistem();
-    }
-}
 
-        // Fungsi membantu membina <option> combo box Jabatan dan Jenis Harta Intelek
         function binaPilihanDropdownSistem() {
             const selJabatan = document.getElementById('editJabatan');
             const selJenis = document.getElementById('editJenis');
@@ -326,7 +382,6 @@
             });
         }
 
-        // 🌟 KOD BARU: FUNGSI MUAT TURUN FAIL ZIP BERSTRUKTUR FOLDER (HANYA DISAHKAN)
         function muatTurunZipDokumen() {
             if (currentFilteredData.length === 0) return alert("Tiada data untuk dimuat turun.");
 
@@ -404,60 +459,6 @@
             return namaPenuh.length > 15 ? namaPenuh.substring(0, 15) + "..." : namaPenuh; 
         }
         
-        let semuaData = []; 
-        let currentFilteredData = []; 
-        let currentPage = 1;
-        const rowsPerPage = 10;
-        let jabatanChartInstance = null;
-        let paparSemuaUntukCetak = false;
-        let failSimpananEdit = { 1: null, 2: null, 3: null };
-
-        const userNama = sessionStorage.getItem("namaPengguna") || "Pengguna";
-        const userPeranan = sessionStorage.getItem("peranan") || "STAF";
-        const userJabatan = sessionStorage.getItem("jabatan") || "";
-
-        // 🌟 PENAMBAHBAIKAN KAWALAN PERANAN & LAJUR ULASAN
-        const perananLayakTindakan = ["PENYELARAS INOVASI", "KUPIK", "ADMIN", "PENYELARAS PENYELIDIKAN"];
-        const perananLayakUlasan = [
-            "KUPIK", 
-            "ADMIN", 
-            "PENYELARAS INOVASI", 
-            "PENYELARAS PENYELIDIKAN", 
-            "PENYELARAS JABATAN"
-        ];
-        
-        const isPrivileged = perananLayakTindakan.includes(userPeranan.toUpperCase());
-        const canViewUlasan = perananLayakUlasan.includes(userPeranan.toUpperCase());
-        const totalLajur = canViewUlasan ? 15 : 14; 
-
-        document.getElementById('namaPengguna').innerText = userNama;
-        document.getElementById('perananPengguna').innerText = userPeranan;
-        document.getElementById('jabatanPengguna').innerText = dapatkanSingkatanJabatan(userJabatan);
-        
-        // Pastikan lajur Tindakan sentiasa kelihatan untuk memberi ruang butang EDIT (baik kepada ADMIN mahupun STAF)
-        document.getElementById('thTindakan').classList.remove('hidden');
-
-        // Paparkan lajur Ulasan (Lajur P) pada header jika peranan layak
-        if (canViewUlasan) {
-            const thUlasan = document.getElementById('thUlasan');
-            if (thUlasan) thUlasan.classList.remove('hidden');
-        }
-
-        if (userPeranan.toUpperCase().includes("INOVASI") || userPeranan.toUpperCase() === "ADMIN") {
-            const btnPengesahanKPI = document.getElementById('btnPengesahanKPI');
-            if (btnPengesahanKPI) {
-                btnPengesahanKPI.classList.remove('hidden');
-                btnPengesahanKPI.classList.add('flex');
-            }
-        }
-
-        if(userPeranan.toUpperCase() === "STAF" && userJabatan) {
-            document.getElementById('tajukJadual').innerText = `(${dapatkanSingkatanJabatan(userJabatan)})`;
-        } else {
-            document.getElementById('tajukJadual').innerText = `(Semua Jabatan)`;
-            document.getElementById('filterJabatan').classList.remove('hidden');
-        }
-
         async function ambilData() {
             const tbody = document.getElementById('isiJadual');
             const paginationControls = document.getElementById('paginationControls');
@@ -569,7 +570,6 @@
             kemaskiniCarta(dataDitapis);
         }
 
-        // 🌟 FUNGSI PENGESAHAN KESELAMATAN: MEMERIKSA NO IC KETUA (LAJUR R / INDEX 17)
         function semakICKetua(idBil, arahanTeks = "🔒 KESELAMATAN:\nSila masukkan NO IC KETUA sebagai kata laluan:") {
             const rowData = semuaData.find(r => String(r[0]) === String(idBil));
             if (!rowData) {
@@ -593,7 +593,6 @@
             }
         }
 
-        // 🌟 FUNGSI KHAS STAF: LIHAT DOKUMEN BUKTI DENGAN NO IC KETUA
         function verifikasiICDanLihatDokumen(idBil) {
             if (semakICKetua(idBil, "🔒 KESELAMATAN STAF:\nSila masukkan NO IC KETUA sebagai kata laluan untuk melihat dokumen bukti:")) {
                 const rowData = semuaData.find(r => String(r[0]) === String(idBil));
@@ -625,7 +624,6 @@
             }
         }
 
-        // 🌟 FUNGSI KHAS STAF: EDIT REKOD & LIHAT DOKUMEN DENGAN NO IC KETUA
         function verifikasiICDanEdit(idBil) {
             if (semakICKetua(idBil, "🔒 KESELAMATAN STAF:\nSila masukkan kata laluan NO IC KETUA untuk mengemaskini rekod dan melihat dokumen bukti:")) {
                 editRekod(idBil);
@@ -687,7 +685,6 @@
                 }
 
                 const urlSijil = row[14] ? String(row[14]).trim() : "";
-                
                 let btnUploadHTML = "";
                 let btnSijilHTML = ""; 
 
@@ -788,7 +785,6 @@
             document.getElementById('editEmailKetua').value = rowData[4] || ""; 
             document.getElementById('editAhli').value = rowData[5] || "";
             
-            // 🌟 COMBO BOX JABATAN - Pilih atau letak nilai lama sekiranya tiada dalam senarai
             const selJabatan = document.getElementById('editJabatan');
             const nilaiJabatan = String(rowData[6] || "").trim();
             if (nilaiJabatan && !senaraiJabatanSistem.includes(nilaiJabatan)) {
@@ -798,7 +794,6 @@
 
             document.getElementById('editAplikasi').value = rowData[7] || ""; 
             
-            // 🌟 COMBO BOX JENIS HARTA INTELEK - Pilih atau letak nilai lama sekiranya tiada dalam senarai
             const selJenis = document.getElementById('editJenis');
             const nilaiJenis = String(rowData[8] || "").trim();
             if (nilaiJenis && !senaraiHISistem.includes(nilaiJenis)) {
@@ -1069,14 +1064,94 @@
             reader.readAsDataURL(failInput);
         }
 
+        function toggleCartaView() {
+            const chartDiv = document.getElementById('kandunganCarta');
+            if (chartDiv.classList.contains('hidden')) {
+                chartDiv.classList.remove('hidden');
+            } else {
+                chartDiv.classList.add('hidden');
+            }
+        }
+
         function kemaskiniCarta(data) {
-            const rekodJabatan = {};
-            data.forEach(r => { 
-                let jAsal = String(r[6] || "N/A").trim(); 
-                let match = jAsal.match(/\(([^)]+)\)/); 
-                let j = match ? match[1].trim() : jAsal;
-                rekodJabatan[j] = (rekodJabatan[j] || 0) + 1; 
-            }); 
+            const currentYear = new Date().getFullYear();
+            const labelCarta = [];
+            const dataCarta = [];
+            let tajuk = "";
+
+            if (!isPrivileged) {
+                // PAPARAN KHAS STAF/PENGGUNA BIASA (3 Tahun Terkini)
+                const year3 = currentYear - 2;
+                const year2 = currentYear - 1;
+                const year1 = currentYear;
+                
+                const countYear3 = data.filter(r => parseInt(r[10]) === year3).length;
+                const countYear2 = data.filter(r => parseInt(r[10]) === year2).length;
+                const countYear1 = data.filter(r => parseInt(r[10]) === year1).length;
+
+                labelCarta.push(year3.toString(), year2.toString(), year1.toString());
+                dataCarta.push(countYear3, countYear2, countYear1);
+                tajuk = `Rekod KPI 3 Tahun Terkini (${year3} - ${year1})`;
+                
+                // Sembunyikan carta kedua bagi pengguna biasa
+                document.getElementById('bekasTahunChart').classList.add('hidden');
+                document.getElementById('bekasJabatanChart').classList.replace('lg:w-1/2', 'lg:w-full');
+            } else {
+                // PAPARAN KHAS ADMIN/PENYELARAS
+                // 1. CARTA PERTAMA: (Ikut Jabatan Keseluruhan)
+                const rekodJabatan = {};
+                data.forEach(r => { 
+                    let jAsal = String(r[6] || "N/A").trim(); 
+                    let match = jAsal.match(/\(([^)]+)\)/); 
+                    let j = match ? match[1].trim() : jAsal;
+                    rekodJabatan[j] = (rekodJabatan[j] || 0) + 1; 
+                }); 
+                labelCarta.push(...Object.keys(rekodJabatan));
+                dataCarta.push(...Object.values(rekodJabatan));
+                tajuk = "Rekod KPI mengikut Jabatan";
+
+                // Paparkan carta kedua
+                document.getElementById('bekasTahunChart').classList.remove('hidden');
+                document.getElementById('bekasJabatanChart').classList.replace('lg:w-full', 'lg:w-1/2');
+
+                // 2. CARTA KEDUA (Graf Bertindan 3 Tahun Terkini)
+                const tahunTerkini = [currentYear - 2, currentYear - 1, currentYear];
+                const unikJabatan = Object.keys(rekodJabatan);
+                const warnaSet = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16', '#06b6d4', '#d946ef'];
+                
+                const datasetTahun = unikJabatan.map((jab, i) => {
+                    return {
+                        label: jab,
+                        data: tahunTerkini.map(thn => data.filter(r => {
+                            let jAsal = String(r[6] || "N/A").trim();
+                            let match = jAsal.match(/\(([^)]+)\)/);
+                            let finalJ = match ? match[1].trim() : jAsal;
+                            return finalJ === jab && parseInt(r[10]) === thn;
+                        }).length),
+                        backgroundColor: warnaSet[i % warnaSet.length],
+                        stack: 'Stack 0'
+                    };
+                });
+
+                if (tahunChartInstance) tahunChartInstance.destroy();
+                tahunChartInstance = new Chart(document.getElementById('tahunChart'), {
+                    type: 'bar',
+                    data: { labels: tahunTerkini.map(String), datasets: datasetTahun },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                            title: { display: true, text: 'Prestasi 3 Tahun Terkini Mengikut Jabatan' }
+                        },
+                        scales: {
+                            x: { stacked: true },
+                            y: { stacked: true }
+                        }
+                    }
+                });
+            }
+
+            document.getElementById('tajukCarta').innerText = tajuk;
 
             const warnaBar = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
 
@@ -1084,13 +1159,19 @@
             jabatanChartInstance = new Chart(document.getElementById('jabatanChart'), {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(rekodJabatan),
+                    labels: labelCarta,
                     datasets: [{ 
-                        label: 'Bilangan KPI', data: Object.values(rekodJabatan), 
+                        label: 'Bilangan KPI', data: dataCarta, 
                         backgroundColor: warnaBar, borderRadius: 4 
                     }]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options: { 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false },
+                        title: { display: isPrivileged, text: 'Keseluruhan Rekod Pencapaian' }
+                    } 
+                }
             });
         }
 
@@ -1327,7 +1408,7 @@
 
         window.onload = function() {
             ambilData();
-            muatSenaraiSistem(); // Memuat turun tetapan combo box secara latar
+            muatSenaraiSistem();
         };
     </script>
 </body>
