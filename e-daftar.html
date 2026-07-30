@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>e-DAFTAR R&D</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 🌟 TAMBAHAN BARU: Memuatkan pustaka Chart.js untuk paparan graf -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         if (sessionStorage.getItem("userLulus") !== "YA") {
             alert("Sila log masuk terlebih dahulu.");
@@ -105,6 +107,22 @@
                 <p class="text-4xl md:text-5xl font-extrabold text-green-600 mt-2" id="statDisahkan">0</p>
             </div>
         </div>
+
+        <!-- 🌟 TAMBAHAN BARU: Carta Bar 3 Tahun Terkini (Dinamik) -->
+        <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-teal-800 text-sm md:text-base uppercase tracking-wide flex items-center gap-2">
+                    📊 Statistik Pendaftaran Projek (3 Tahun Terkini)
+                </h3>
+                <button onclick="toggleCarta()" id="btnToggleCarta" class="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-1.5 rounded-lg text-sm font-bold transition shadow-sm border border-teal-300">
+                    Sembunyi Carta
+                </button>
+            </div>
+            <div id="cartaContainer" class="w-full h-64 md:h-80 transition-all duration-300">
+                <canvas id="cartaPendaftaran"></canvas>
+            </div>
+        </div>
+        <!-- TAMAT TAMBAHAN CARTA -->
 
 		<div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
             
@@ -342,6 +360,7 @@ let dataAsal = [];
 let dataTapis = [];
 let halamanSemasa = 1;
 const rekodPerHalaman = 10;
+let cartaObj = null; // 🌟 Pembolehubah untuk menyimpan instrumen carta
 
 window.onload = () => {
     // 💡 DIKEMASKINI: Paparkan header tindakan jika pengguna ialah Approver, Staf ATAU Editor Jabatan
@@ -352,6 +371,97 @@ window.onload = () => {
     muatDropdownJabatan();
     muatDataStatus();
 };
+
+        // ==========================================
+        // 🌟 FUNGSI KAWALAN ON/OFF CARTA
+        // ==========================================
+        function toggleCarta() {
+            const container = document.getElementById('cartaContainer');
+            const btn = document.getElementById('btnToggleCarta');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                btn.innerText = "Sembunyi Carta";
+                btn.classList.replace("bg-gray-200", "bg-teal-100");
+                btn.classList.replace("text-gray-800", "text-teal-800");
+            } else {
+                container.classList.add('hidden');
+                btn.innerText = "Papar Carta";
+                btn.classList.replace("bg-teal-100", "bg-gray-200");
+                btn.classList.replace("text-teal-800", "text-gray-800");
+            }
+        }
+
+        // ==========================================
+        // 🌟 FUNGSI CARTA DINAMIK (3 TAHUN TERKINI)
+        // ==========================================
+        function janaCartaDinamik(data) {
+            const tahunSemasa = new Date().getFullYear(); // Ambil tahun daripada jam komputer
+            const labelTahun = [tahunSemasa - 2, tahunSemasa - 1, tahunSemasa]; // Cth: jika 2026 -> [2024, 2025, 2026]
+            
+            let dataCarta = {
+                [labelTahun[0]]: 0,
+                [labelTahun[1]]: 0,
+                [labelTahun[2]]: 0
+            };
+
+            data.forEach(row => {
+                // Ambil tahun daftar dahulu, jika tiada ambil dari tarikh mula
+                let tahunRekod = parseInt(dapatkanData(row, ["tahunDaftar", "TAHUN_DAFTAR"]));
+                
+                if (isNaN(tahunRekod)) {
+                    let tarikhMula = dapatkanData(row, ["tarikhMula", "TARIKH_MULA", "tarikhMulaProjek"]);
+                    if (tarikhMula) tahunRekod = new Date(tarikhMula).getFullYear();
+                }
+
+                if (dataCarta[tahunRekod] !== undefined) {
+                    dataCarta[tahunRekod]++;
+                }
+            });
+
+            const ctx = document.getElementById('cartaPendaftaran').getContext('2d');
+            
+            // Hapus carta lama jika ada sebelum melukis carta baru
+            if (cartaObj) {
+                cartaObj.destroy();
+            }
+
+            cartaObj = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labelTahun.map(String), // Jadikan label sebagai String
+                    datasets: [{
+                        label: 'Jumlah Pendaftaran',
+                        data: [dataCarta[labelTahun[0]], dataCarta[labelTahun[1]], dataCarta[labelTahun[2]]],
+                        backgroundColor: [
+                            'rgba(94, 234, 212, 0.8)', // Teal-300
+                            'rgba(45, 212, 191, 0.8)', // Teal-400
+                            'rgba(20, 184, 166, 0.8)'  // Teal-500
+                        ],
+                        borderColor: [
+                            'rgba(13, 148, 136, 1)',
+                            'rgba(13, 148, 136, 1)',
+                            'rgba(13, 148, 136, 1)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
         // ==========================================
         // 🌟 FUNGSI PENCARIAN DATA PINTAR
         // ==========================================
@@ -391,7 +501,7 @@ window.onload = () => {
 
         // ==========================================
         // 🌟 FUNGSI BARU: FORMAT TARIKH KHAS UNTUK <input type="date">
-        // Menyelesaikan masalah tarikh tidak muncul di Modal Kemaskini
+        // Menyelesaikan masalah pelbagai format tarikh & singkatan bulan Melayu/Inggeris
         // ==========================================
         function formatTarikhInput(tarikhString) {
             if (!tarikhString || tarikhString === "-") return "";
@@ -399,38 +509,45 @@ window.onload = () => {
             // 1. Jika sudah dalam format YYYY-MM-DD
             if (/^\d{4}-\d{2}-\d{2}$/.test(tarikhString)) return tarikhString;
 
-            // 2. Jika dalam format DD-MMM-YYYY (cth: 30-Jan-2025)
-            if (tarikhString.includes('-')) {
-                const parts = tarikhString.split('-');
-                if (parts.length === 3) {
-                    const hari = parts[0].padStart(2, '0');
-                    const bulanStr = parts[1].toLowerCase();
-                    const tahun = parts[2];
+            // 2. Seragamkan semua pemisah (jarak, palang, koma) kepada tanda sempang '-'
+            let tarikhSeragam = String(tarikhString).trim().replace(/[\/\s,]+/g, '-');
+            
+            // 3. Pecahkan kepada bahagian (Hari, Bulan, Tahun)
+            const parts = tarikhSeragam.split('-');
+            
+            if (parts.length === 3) {
+                const part1 = parts[0].padStart(2, '0');
+                const part2 = parts[1];
+                const part3 = parts[2];
+                
+                // Semak jika bahagian tengah (Bulan) adalah NOMBOR (Cth: 13-05-2026 atau 13/5/2026)
+                if (!isNaN(part2)) {
+                    if (part3.length === 4) { // DD-MM-YYYY
+                        return `${part3}-${part2.padStart(2, '0')}-${part1}`;
+                    } else if (part1.length === 4) { // YYYY-MM-DD (Kes terbalik)
+                        return `${part1}-${part2.padStart(2, '0')}-${part3.padStart(2, '0')}`;
+                    }
+                } 
+                // Semak jika bahagian tengah (Bulan) adalah HURUF (Cth: 13 Mei 2026, 15 Disember 2025)
+                else {
+                    const hari = part1;
+                    // Ambil 3 huruf pertama sahaja (cth: "Disember" jadi "dis", "January" jadi "jan")
+                    const bulanStr = part2.toLowerCase().substring(0, 3);
+                    const tahun = part3;
                     
                     const mapBulan = {
-                        "jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05", "jun": "06",
-                        "jul": "07", "aug": "08", "sep": "09", "oct": "10", "nov": "11", "dec": "12",
-                        "mei": "05", "ogo": "08", "okt": "10", "dis": "12" // B.Melayu
+                        "jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05", "mei": "05", "jun": "06",
+                        "jul": "07", "aug": "08", "ogo": "08", "sep": "09", "oct": "10", "okt": "10", "nov": "11",
+                        "dec": "12", "dis": "12" // Menyokong "Disember" (dis)
                     };
                     
-                    if (mapBulan[bulanStr]) {
+                    if (mapBulan[bulanStr] && tahun.length === 4) {
                         return `${tahun}-${mapBulan[bulanStr]}-${hari}`;
                     }
                 }
             }
 
-            // 3. Jika format DD/MM/YYYY
-            if (tarikhString.includes('/')) {
-                const parts = tarikhString.split('/');
-                if (parts.length === 3) {
-                    const hari = parts[0].padStart(2, '0');
-                    const bulan = parts[1].padStart(2, '0');
-                    const tahun = parts[2];
-                    if (tahun.length === 4) return `${tahun}-${bulan}-${hari}`;
-                }
-            }
-
-            // 4. Fallback kepada sistem tarikh JavaScript biasa
+            // 4. Fallback kepada sistem tarikh JavaScript biasa jika format tidak dikenali
             const t = new Date(tarikhString);
             if(isNaN(t)) return "";
             
@@ -513,6 +630,7 @@ window.onload = () => {
                 if (result.status === "BERJAYA") {
                     dataAsal = result.data || [];
                     janaPilihanTahun(dataAsal);
+                    janaCartaDinamik(dataAsal); // 🌟 Panggil fungsi carta sebaik sahaja data dimuat turun
                     terapkanTapisan();
                 } else {
                     tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`;
@@ -629,7 +747,7 @@ function terapkanTapisan() {
 
     // =========================================================================
     // 🌟 PENAMBAHBAIKAN BARU: Logik Isihan (Sorting) Dioptimumkan dengan Cache
-    // Mengelakkan browser freeze & mendahulukan rekod jabatan sendiri
+    // Mengelakkan browser freeze & mendahulukan rekod jabatan sendiri & tahun daftar
     // =========================================================================
     const userJabatanClean = (userJabatan || "").toUpperCase().trim();
     const cacheIsihan = new Map();
@@ -637,13 +755,22 @@ function terapkanTapisan() {
     dataTapis.forEach(item => {
         const jab = (dapatkanData(item, ["jabatan", "JABATAN"]) || "").toUpperCase().trim();
         const status = (dapatkanData(item, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN").toUpperCase().trim();
+        const tDaftar = dapatkanData(item, ["tahunDaftar", "TAHUN_DAFTAR"]);
         const tSurat = dapatkanData(item, ["tarikhSurat", "TARIKH_SURAT", "tarikhLantikan"]);
-        const yr = (tSurat && !isNaN(new Date(tSurat).getFullYear())) ? new Date(tSurat).getFullYear() : 0;
+        
+        let yr = 0;
+        // Utamakan Tahun Daftar, jika tiada atau tidak sah, guna tahun dari Tarikh Surat
+        if (tDaftar && !isNaN(parseInt(tDaftar))) {
+            yr = parseInt(tDaftar);
+        } else if (tSurat && !isNaN(new Date(tSurat).getFullYear())) {
+            yr = new Date(tSurat).getFullYear();
+        }
+
         const bil = parseInt(dapatkanData(item, ["bil", "BIL"])) || 0;
 
         cacheIsihan.set(item, {
             isMyJab: Boolean(isEditorJabatan && userJabatanClean) && (jab === userJabatanClean),
-            isTindakan: status !== "DISAHKAN",
+            isTindakan: status !== "DISAHKAN", // Ini meliputi MENUNGGU PENGESAHAN dan BAIKI SEMULA
             yr: yr,
             bil: bil
         });
@@ -653,17 +780,17 @@ function terapkanTapisan() {
         const infoA = cacheIsihan.get(a);
         const infoB = cacheIsihan.get(b);
 
-        // Keutamaan 1: Susun rekod dari JABATAN yang login dahulu ( PENYELIA PROJEK PELAJAR / PENYELARAS JABATAN )
-        if (infoA.isMyJab !== infoB.isMyJab) {
-            return infoA.isMyJab ? -1 : 1;
-        }
-
-        // Keutamaan 2: Letakkan status yang memerlukan tindakan di atas sekali
+        // Keutamaan 1: Letakkan status yang memerlukan tindakan (MENUNGGU / BAIKI SEMULA) di atas sekali
         if (infoA.isTindakan !== infoB.isTindakan) {
             return infoA.isTindakan ? -1 : 1;
         }
 
-        // Keutamaan 3: Susun mengikut tahun pada tarikh surat secara menurun (Desc)
+        // Keutamaan 2: Susun rekod dari JABATAN yang login dahulu ( PENYELIA PROJEK PELAJAR / PENYELARAS JABATAN )
+        if (infoA.isMyJab !== infoB.isMyJab) {
+            return infoA.isMyJab ? -1 : 1;
+        }
+
+        // Keutamaan 3: Susun mengikut Tahun Daftar secara menurun (Desc) (Cth: 2026, 2025, 2024)
         if (infoB.yr !== infoA.yr) {
             return infoB.yr - infoA.yr;
         }
