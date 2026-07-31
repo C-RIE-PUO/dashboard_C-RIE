@@ -343,6 +343,9 @@
             let el = document.getElementById(elementId);
             let val = String(value || '').trim();
             let found = Array.from(el.options).some((opt, i) => {
+                // PENYELESAIAN MASALAH DI SINI: Abaikan jika value adalah kosong ""
+                if (opt.value === "") return false; 
+                
                 if (opt.value.toLowerCase() === val.toLowerCase() || val.toUpperCase().includes(opt.value.toUpperCase())) { 
                     el.selectedIndex = i; 
                     return true; 
