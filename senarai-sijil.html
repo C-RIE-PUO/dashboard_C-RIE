@@ -161,13 +161,14 @@
         const isUploader = ["ADMIN", "KUPIK", "PENYELARAS INOVASI"].includes(userPeranan.toUpperCase());
         const isPenyelarasJabatan = userPeranan.toUpperCase() === "PENYELARAS JABATAN";
         const isStaf = userPeranan.toUpperCase() === "STAF" || userPeranan.toUpperCase() === "STAFF";
+        const isPenyelia = userPeranan.toUpperCase() === "PENYELIA PROJEK PELAJAR";
 
-        if (isUploader || isPenyelarasJabatan || isStaf) {
+        if (isUploader || isPenyelarasJabatan || isStaf || isPenyelia) {
             document.getElementById("bahagianPenyelaras").classList.remove("hidden");
             
-            if (isPenyelarasJabatan || isStaf) {
-                // Sembunyikan kotak IC sepenuhnya jika yang login adalah STAF
-                if (isStaf) {
+            if (isPenyelarasJabatan || isStaf || isPenyelia) {
+                // Sembunyikan kotak IC sepenuhnya jika yang login adalah STAF atau PENYELIA PROJEK PELAJAR
+                if (isStaf || isPenyelia) {
                     document.getElementById("kotakICPenyelaras").classList.add("hidden");
                 } else {
                     document.getElementById("paparICPenyelaras").innerText = userIC;
@@ -187,7 +188,7 @@
         }
 
         async function muatAwal() {
-            if(isUploader || isPenyelarasJabatan || isStaf) {
+            if(isUploader || isPenyelarasJabatan || isStaf || isPenyelia) {
                await muatSenaraiPenyelaras();
                await muatSijilPenyelaras();
             }
@@ -218,10 +219,18 @@
                 if (result.status === "BERJAYA") {
                     let senaraiSemuaDisahkan = (result.data || []).filter(r => String(r[13] || "").trim().toUpperCase() === "DISAHKAN");
                     
-                    if (!isUploader) {
-                        rekodDisahkan = senaraiSemuaDisahkan.filter(r => String(r[6]).trim().toUpperCase() === userJabatan.toUpperCase());
-                    } else {
+                    // Susun rekod mengikut tahun terkini (2026, 2025, dst)
+                    senaraiSemuaDisahkan.sort((a, b) => {
+                        let tahunA = parseInt(String(a[10]).trim()) || 0;
+                        let tahunB = parseInt(String(b[10]).trim()) || 0;
+                        return tahunB - tahunA;
+                    });
+
+                    // Benarkan peranan ini melihat semua data dan menapis jabatan yang berbeza
+                    if (isUploader || isPenyelarasJabatan || isStaf || isPenyelia) {
                         rekodDisahkan = senaraiSemuaDisahkan;
+                    } else {
+                        rekodDisahkan = senaraiSemuaDisahkan.filter(r => String(r[6]).trim().toUpperCase() === userJabatan.toUpperCase());
                     }
 
                     binaFilterTahunDanJabatan(rekodDisahkan);
@@ -255,20 +264,25 @@
 
             const jabatanUnik = [...new Set(data.map(r => String(r[6]).trim()).filter(j => j !== "" && j !== "null"))].sort();
 
-            if (!isUploader) {
+            // Beri kelonggaran memilih jabatan bagi peranan ini
+            if (isUploader || isPenyelarasJabatan || isStaf || isPenyelia) {
+                dropJabatan.innerHTML = '<option value="Semua">Semua Jabatan</option>';
+                jabatanUnik.forEach(j => {
+                    dropJabatan.innerHTML += `<option value="${j}">${j}</option>`;
+                });
+                dropJabatan.disabled = false;
+                dropJabatan.classList.remove('bg-gray-200', 'cursor-not-allowed', 'text-gray-500');
+                
+                // Fokus pada jabatan semasa pengguna jika bukan isUploader, tetapi pada masa sama membolehkan pertukaran
+                if (!isUploader && (pilJabatanSemasa === "Semua" || pilJabatanSemasa === "")) {
+                    dropJabatan.value = userJabatan;
+                } else if (jabatanUnik.includes(pilJabatanSemasa) || pilJabatanSemasa === "Semua") {
+                    dropJabatan.value = pilJabatanSemasa;
+                }
+            } else {
                 dropJabatan.innerHTML = `<option value="${userJabatan}">${userJabatan}</option>`;
                 dropJabatan.disabled = true; 
                 dropJabatan.classList.add('bg-gray-200', 'cursor-not-allowed', 'text-gray-500');
-            } else {
-                dropJabatan.innerHTML = '<option value="Semua">Semua Jabatan</option>';
-                jabatanUnik.forEach(j => {
-                    const selected = (j === pilJabatanSemasa) ? 'selected' : '';
-                    dropJabatan.innerHTML += `<option value="${j}" ${selected}>${j}</option>`;
-                });
-                
-                if(jabatanUnik.includes(pilJabatanSemasa) || pilJabatanSemasa === "Semua") {
-                    dropJabatan.value = pilJabatanSemasa;
-                }
             }
         }
 
@@ -288,7 +302,7 @@
             const pilTahun = document.getElementById('filterTahun').value.trim();
             const pilJabatan = document.getElementById('filterJabatan').value;
             
-            if (isPenyelarasJabatan || isStaf) {
+            if (isPenyelarasJabatan || isStaf || isPenyelia) {
                 const btnPenyelaras = document.getElementById("btnDownloadPenyelaras");
                 const txtMesej = document.getElementById("mesejSijilPenyelaras");
                 
@@ -297,7 +311,7 @@
                     stafPenyelarasSemasa = senaraiPenyelaras.filter(u => {
                         let jabLama = u.JABATAN || u.jabatan || u.Jabatan || u[3] || ""; 
                         let thnLama = u.TAHUN || u.tahun || u.Tahun || u[8] || ""; 
-                        return String(jabLama).trim().toUpperCase() === userJabatan.trim().toUpperCase() && String(thnLama).trim() === pilTahun;
+                        return String(jabLama).trim().toUpperCase() === pilJabatan.trim().toUpperCase() && String(thnLama).trim() === pilTahun;
                     });
 
                     indexPenyelaras = 0; 
@@ -306,14 +320,14 @@
                         kemaskiniPaparanPenyelarasUmum(); // Panggil fungsi pamer data
                     } else {
                         // Jika carian Tahun tiada rekod Penyelaras
-                        document.getElementById("paparNamaPenyelaras").innerText = isStaf ? "-" : userNama;
-                        document.getElementById("paparJabatanPenyelaras").innerText = userJabatan;
-                        if (!isStaf) document.getElementById("paparICPenyelaras").innerText = userIC;
+                        document.getElementById("paparNamaPenyelaras").innerText = (isStaf || isPenyelia) ? "-" : userNama;
+                        document.getElementById("paparJabatanPenyelaras").innerText = pilJabatan === "Semua" ? userJabatan : pilJabatan;
+                        if (!(isStaf || isPenyelia)) document.getElementById("paparICPenyelaras").innerText = userIC;
                         document.getElementById("paparPerananPenyelaras").innerText = "Tiada Penyelaras Direkodkan";
                         
                         document.getElementById("butangNextPenyelaras").classList.add("hidden");
                         if(btnPenyelaras) btnPenyelaras.classList.add("hidden");
-                        if(txtMesej) txtMesej.innerHTML = `⚠️ Tiada rekod Penyelaras bagi Tahun <b>${pilTahun}</b>.`;
+                        if(txtMesej) txtMesej.innerHTML = `⚠️ Tiada rekod Penyelaras bagi Tahun <b>${pilTahun}</b> di jabatan ini.`;
                     }
                 } else {
                     if(btnPenyelaras) btnPenyelaras.classList.add("hidden");
@@ -322,7 +336,7 @@
                     document.getElementById("paparNamaPenyelaras").innerText = userNama;
                     document.getElementById("paparJabatanPenyelaras").innerText = userJabatan;
                     document.getElementById("paparPerananPenyelaras").innerText = userPeranan;
-                    if (!isStaf) document.getElementById("paparICPenyelaras").innerText = userIC;
+                    if (!(isStaf || isPenyelia)) document.getElementById("paparICPenyelaras").innerText = userIC;
                     document.getElementById("butangNextPenyelaras").classList.add("hidden");
                 }
             }
@@ -361,6 +375,16 @@
             dataTapisSemasa = dataDitapis;
             halamanSemasa = 1; 
             if (typeof paparJadualPaginasi === "function") paparJadualPaginasi(); // Langkah selamat jika fungsi tiada
+            
+            // --- LOGIK BAHARU (TAMBAH BAIK): Sembunyikan Bahagian Penyelaras Jika Tiada Tahun ATAU Tiada Rekod Projek ---
+            if (isPenyelarasJabatan || isStaf || isPenyelia) {
+                const bahagianPenyelaras = document.getElementById("bahagianPenyelaras");
+                if (pilTahun === "" || dataTapisSemasa.length === 0) {
+                    bahagianPenyelaras.classList.add("hidden");
+                } else {
+                    bahagianPenyelaras.classList.remove("hidden");
+                }
+            }
         }
 
         // ⚠️ FUNGSI BARU: Kemaskini paparan Penyelaras secara dinamik bila ada lebih dari 1
@@ -381,7 +405,7 @@ function kemaskiniPaparanPenyelarasUmum() {
     document.getElementById("paparPerananPenyelaras").innerText = paparStat ? `${paparPer} (${paparStat})` : paparPer;
     
     // IC update khusus untuk Penyelaras
-    if (!isStaf && document.getElementById("paparICPenyelaras")) {
+    if (!(isStaf || isPenyelia) && document.getElementById("paparICPenyelaras")) {
         document.getElementById("paparICPenyelaras").innerText = icLama;
     }
 
