@@ -135,7 +135,7 @@
                         📥 CSV
                     </button>
 
-                    <button onclick="muatTurunPDFLaporan()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-1 shrink-0" title="Muat Turun Laporan PDF">
+                    <button id="btnLaporanPDF" onclick="muatTurunPDFLaporan()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-1 shrink-0" title="Muat Turun Laporan PDF">
                         📄 Laporan PDF
                     </button>
                 </div>
@@ -207,6 +207,15 @@
             const btnPengesahan = document.getElementById('btnPengesahan');
             btnPengesahan.classList.remove('hidden');
             btnPengesahan.classList.add('flex');
+        }
+
+        // SEMBUNYIKAN BUTANG PDF JIKA PERANAN IALAH STAF
+        if (userPeranan.toUpperCase() === "STAF") {
+            const btnPDFLaporan = document.getElementById('btnLaporanPDF');
+            if (btnPDFLaporan) {
+                btnPDFLaporan.classList.add('hidden');
+                btnPDFLaporan.classList.remove('flex'); // Membuang kelas flex bagi membolehkan paparan disembunyikan
+            }
         }
 
         if(ialahPerananJabatan && userJabatan) {
@@ -395,7 +404,29 @@
                 });
             }
             
+            // TAMBAH BAIK: Susunan rekod mengikut Keutamaan Status, kemudian Tahun
             dataDitapis.sort((a, b) => {
+                const { status: statusA } = pisahkanStatusDanUlasan(a[9]);
+                const { status: statusB } = pisahkanStatusDanUlasan(b[9]);
+                
+                // Fungsi untuk menetapkan berat/keutamaan status
+                function getBeratStatus(s) {
+                    const teks = String(s).toUpperCase();
+                    if (teks.includes("MENUNGGU")) return 1; // Paling Atas
+                    if (teks.includes("BAIKI")) return 2;    // Tengah
+                    if (teks.includes("DISAHKAN") || teks.includes("LULUS")) return 3; // Bawah
+                    return 4; // Status lain jika ada
+                }
+
+                const beratA = getBeratStatus(statusA);
+                const beratB = getBeratStatus(statusB);
+
+                // 1. Susun mengikut Keutamaan Status
+                if (beratA !== beratB) {
+                    return beratA - beratB; 
+                }
+
+                // 2. Jika status sama, susun mengikut tahun (descending / paling baru di atas)
                 let tahunA = parseInt(a[8]) || 0; 
                 let tahunB = parseInt(b[8]) || 0;
                 return tahunB - tahunA;
@@ -891,7 +922,7 @@
                 styles: { fontSize: 8, cellPadding: 3, font: 'helvetica' },
                 headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' }, 
                 columnStyles: {
-                    0: { cellWidth: 10, halign: 'center' },
+                    0: { cellWidth: 13, halign: 'center' }, // Ditambah ke 15 untuk mengelakkan nombor 100 terpotong
                     1: { cellWidth: 30 },
                     2: { cellWidth: 35 },
                     3: { cellWidth: 20, halign: 'center' },
@@ -900,7 +931,7 @@
                     6: { cellWidth: 30 },
                     7: { cellWidth: 20, halign: 'center' },
                     8: { cellWidth: 15, halign: 'center' },
-                    9: { cellWidth: 30, halign: 'center' }
+                    9: { cellWidth: 27, halign: 'center' }  // Dikurangkan dari 30 ke 25 untuk memberi ruang kepada lajur BIL
                 },
                 didDrawPage: function (data) {
                     let str = 'Muka Surat ' + doc.internal.getNumberOfPages();
