@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard KPI Penyelidikan</title>
+    <!-- Tailwind CSS & Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-	<script src="https://cdn.tailwindcss.com"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script>
+        // Semakan sesi log masuk
         if (sessionStorage.getItem("userLulus") !== "YA") {
             alert("Akses ditolak! Sila log masuk terlebih dahulu.");
             window.location.href = "login.html"; 
@@ -20,6 +21,7 @@
 
     <div class="w-[98%] max-w-[1800px] mx-auto space-y-6">
         
+        <!-- HEADER MAKLUMAT PENGGUNA -->
         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 gap-6 transition-all duration-300">
             <div class="space-y-1">
                 <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
@@ -55,11 +57,13 @@
             </div>
         </div>
 
+        <!-- BAHAGIAN CARTA (BOLEH ON/OFF OLEH SEMUA) -->
         <div id="bekasCartaUtama" class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 mb-6 hidden"> 
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <h2 id="tajukCarta" class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     📊 Carta KPI Penyelidikan Disahkan Mengikut Jabatan
                 </h2>
+                <!-- Butang On/Off Paparan Carta -->
                 <button onclick="toggleCarta()" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95 px-3 py-1.5 rounded-lg font-bold transition-all shadow-3xs border border-slate-300 cursor-pointer">
                     👁️ Sembunyi / Papar
                 </button>
@@ -70,6 +74,7 @@
             </div>
         </div>
 
+        <!-- JADUAL DAN KAWALAN TAPISAN -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200/70 overflow-hidden transition-all duration-300">
             
            <div class="p-5 border-b border-slate-100 flex flex-col xl:flex-row justify-between items-start xl:items-center bg-slate-50/70 gap-4">
@@ -204,7 +209,6 @@
         <input type="text" id="editNamaJurnal" class="w-full border px-3 py-2 rounded-lg focus:ring focus:ring-blue-300 uppercase" placeholder="Contoh: JURNAL TEKNOLOGI / PROCEEDING IEEE">
     </div>
 
-    <!-- 🌟 TAMBAHAN MEDAN LAJUR S, T, U (MAKLUMAT KETUA PENULIS) -->
     <div class="col-span-1 md:col-span-2 bg-blue-50/70 p-3 rounded-xl border border-blue-100 grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
             <label class="block text-xs font-bold text-blue-900 mb-1">🪪 NO IC KETUA (PENULIS 1)</label>
@@ -289,7 +293,6 @@
         <input type="text" id="editIndex" class="w-full border px-3 py-2 rounded-lg focus:ring focus:ring-blue-300 uppercase">
     </div>
     
-    <!-- 🔒 BEKAS STATUS PENGESAHAN: HANYA BOLEH DILIHAT OLEH ADMIN, KUPIK, PENYELARAS INOVASI & PENYELARAS PENYELIDIKAN -->
     <div id="bekasStatusPengesahan">
         <label class="block text-sm font-bold text-gray-700">Status Pengesahan <span class="text-xs text-red-500">(Lajur O)</span></label>
         <select id="editStatusPengesahan" class="w-full border px-3 py-2 rounded-lg focus:ring focus:ring-blue-300 uppercase font-bold">
@@ -368,14 +371,12 @@ if (isAuthorized) {
     }
 }
 
-// Set tajuk mengikut jabatan pengguna
 if (perananUpper === "STAF" && userJabatan) {
     document.getElementById('tajukJadual').innerText = `(${userJabatan})`;
 } else {
     document.getElementById('tajukJadual').innerText = `(Semua Jabatan)`;
 }
 
-// Event listener untuk menutup menu pilihan lajur apabila klik di luar kawasan menu
 document.addEventListener('click', function(event) {
     const menu = document.getElementById('menuPilihanLajur');
     const button = document.getElementById('btnPilihanLajur');
@@ -465,6 +466,42 @@ function dapatkanNamaFail(url, index) {
     } catch (e) {
         const labelDokumen = ["Muka_Depan_Jurnal", "Kertas_Penyelidikan_Penuh"];
         return `${index + 1}. ${labelDokumen[index] || 'Fail_Bukti'}`;
+    }
+}
+
+// =========================================================
+// 🔒 FUNGSI KESELAMATAN BUKA DOKUMEN (PERLU IC)
+// =========================================================
+function bukaDokumenSecure(rekodID) {
+    const rekod = rekodPenuh.find(r => (r.bil == rekodID || r.BIL == rekodID || r.id == rekodID));
+    if (!rekod) {
+        alert("Rekod tidak dijumpai.");
+        return;
+    }
+
+    let icSebenar = rekod.noIcKetua || rekod["NO IC KETUA (PENULIS 1)"] || rekod["no ic ketua"];
+    if (!icSebenar || icSebenar.toString().trim() === "") {
+        alert("🔒 Tiada rekod No IC Ketua didaftarkan untuk penyelidikan ini di pangkalan data. Anda tidak dibenarkan melihat dokumen ini. Sila hubungi Admin.");
+        return;
+    }
+
+    let inputIC = prompt("🔒 Langkah Keselamatan (FAIL BUKTI):\n\nSila masukkan NO IC KETUA (PENULIS 1) untuk mengesahkan identiti anda dan melihat fail bukti ini:");
+    
+    if (inputIC === null) return; 
+
+    if (inputIC.trim() === icSebenar.toString().trim()) {
+        let dokumenVal = rekod.urlBukti || rekod.urlDokumenBukti || rekod.url_dokumen_bukti || rekod.URL || rekod.finalUrlBukti || rekod["URL DOKUMEN BUKTI"] || rekod["Dokumen Bukti"] || rekod.urldokumenbukti || "";
+        let senaraiLink = dokumenVal.toString().split(/\r?\n|\s+/).filter(link => link.trim().startsWith("http"));
+        
+        if (senaraiLink.length > 0) {
+            senaraiLink.forEach(link => {
+                window.open(link.trim(), "_blank");
+            });
+        } else {
+            alert("Fail bukti telah didaftarkan tetapi tiada pautan yang sah ditemui.");
+        }
+    } else {
+        alert("❌ Akses Ditolak: NO IC yang anda masukkan tidak sepadan dengan rekod NO IC Ketua (Penulis 1).");
     }
 }
 
@@ -603,18 +640,27 @@ function paparkanJadualPenyelidikan(senarai) {
         let dokumenVal = row.urlBukti || row.urlDokumenBukti || row.url_dokumen_bukti || row.URL || row.finalUrlBukti || row["URL DOKUMEN BUKTI"] || row["Dokumen Bukti"] || row.urldokumenbukti || "";
         let htmlDokumen = '<span class="text-gray-400 italic">Tiada Pautan</span>';
         
+        // 🚨 LOGIK KESELAMATAN BUKA DOKUMEN: Jika bukan authorized role, wajib periksa IC
         if (dokumenVal && dokumenVal.toString().trim() !== "" && dokumenVal !== "-") {
             let senaraiLink = dokumenVal.toString().split(/\r?\n|\s+/).filter(link => link.trim().startsWith("http"));
             
             if (senaraiLink.length > 0) {
                 htmlDokumen = `<div class="flex flex-col gap-1.5 items-center w-full">`;
-                senaraiLink.forEach((link, i) => {
-                    let teksPautan = dapatkanNamaFail(link, i);
+                
+                if (!isAuthorized) {
                     htmlDokumen += `
-                        <a href="${link.trim()}" target="_blank" title="${teksPautan}" class="w-full inline-flex items-center justify-center gap-1 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-slate-200 px-2 py-1.5 rounded-md font-medium transition shadow-3xs">
-                            <span class="truncate max-w-[120px]">📄 ${teksPautan}</span>
-                        </a>`;
-                });
+                        <button onclick="bukaDokumenSecure('${rekodID}')" class="w-full inline-flex items-center justify-center gap-1 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800 border border-rose-200 px-2 py-1.5 rounded-md font-medium transition shadow-3xs">
+                            <span class="truncate max-w-[120px]">🔒 Buka Fail (Perlu IC)</span>
+                        </button>`;
+                } else {
+                    senaraiLink.forEach((link, i) => {
+                        let teksPautan = dapatkanNamaFail(link, i);
+                        htmlDokumen += `
+                            <a href="${link.trim()}" target="_blank" title="${teksPautan}" class="w-full inline-flex items-center justify-center gap-1 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-slate-200 px-2 py-1.5 rounded-md font-medium transition shadow-3xs">
+                                <span class="truncate max-w-[120px]">📄 ${teksPautan}</span>
+                            </a>`;
+                    });
+                }
                 htmlDokumen += `</div>`;
             }
         }
@@ -931,7 +977,7 @@ function editRekod(idRekod) {
         elEditStatusPengesahan.value = rekod.statusPengesahan || rekod.STATUS_PENGESAHAN || rekod["STATUS PENGESAHAN"] || rekod.status || 'MENUNGGU';
     }
 
-    // 🔒 KAWALAN PERANAN: STATUS PENGESAHAN HANYA BISA DILIHAT OLEH ADMIN, KUPIK, PENYELARAS INOVASI, PENYELARAS PENYELIDIKAN
+    // 🔒 KAWALAN PERANAN: STATUS PENGESAHAN HANYA BISA DILIHAT OLEH ADMIN, KUPIK, DLL
     const bekasStatus = document.getElementById('bekasStatusPengesahan');
     if (bekasStatus) {
         if (isAuthorized) {
@@ -1373,6 +1419,9 @@ function logKeluar() {
 
 let cartaJabatanObj = null;
 
+// =========================================================
+// 📊 FUNGSI LUKIS CARTA (DITAMBAH BAIK 3 TAHUN TERKINI)
+// =========================================================
 function lukisCartaJabatan(senarai) {
     const kotakCartaUtama = document.getElementById('bekasCartaUtama'); 
 
@@ -1382,28 +1431,11 @@ function lukisCartaJabatan(senarai) {
     });
 
     if (senaraiSah.length === 0) {
-        if (kotakCartaUtama) {
-            kotakCartaUtama.classList.add('hidden');
-        }
+        if (kotakCartaUtama) kotakCartaUtama.classList.add('hidden');
         return; 
     } else {
-        if (kotakCartaUtama) {
-            kotakCartaUtama.classList.remove('hidden');
-        }
+        if (kotakCartaUtama) kotakCartaUtama.classList.remove('hidden');
     }
-
-    const statJabatan = {};
-    senaraiSah.forEach(row => {
-        let jabPenuh = row.jabatan || row.JABATAN || "TIADA MAKLUMAT JABATAN";
-        
-        let matchSingkatan = jabPenuh.match(/\(([^)]+)\)/);
-        let jab = matchSingkatan ? matchSingkatan[1].trim() : jabPenuh; 
-
-        statJabatan[jab] = (statJabatan[jab] || 0) + 1;
-    });
-
-    const labelJabatan = Object.keys(statJabatan).sort();
-    const dataKiraan = labelJabatan.map(jab => statJabatan[jab]);
 
     const canvas = document.getElementById('cartaJabatan');
     if (!canvas) return;
@@ -1414,44 +1446,106 @@ function lukisCartaJabatan(senarai) {
         cartaJabatanObj.destroy();
     }
 
-    cartaJabatanObj = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labelJabatan,
-            datasets: [{
-                label: 'Jumlah Penyelidikan Disahkan',
-                data: dataKiraan,
-                backgroundColor: 'rgba(16, 185, 129, 0.8)', 
-                borderColor: 'rgba(5, 150, 105, 1)',      
-                borderWidth: 1,
-                borderRadius: 6,
-                barPercentage: 0.6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.parsed.y + ' Rekod';
+    // Paparan Carta Dinamik Untuk Pengguna Biasa vs Pentadbir
+    if (!isAuthorized) {
+        // Carta Dinamik 3 Tahun Terkini
+        const currentYear = new Date().getFullYear();
+        const year1 = currentYear.toString();
+        const year2 = (currentYear - 1).toString();
+        const year3 = (currentYear - 2).toString();
+
+        let countY1 = 0, countY2 = 0, countY3 = 0;
+        
+        senaraiSah.forEach(row => {
+            let thn = String(row.tahun || row.TAHUN || "");
+            if (thn === year1) countY1++;
+            else if (thn === year2) countY2++;
+            else if (thn === year3) countY3++;
+        });
+
+        document.getElementById('tajukCarta').innerHTML = "📊 Carta KPI Penyelidikan Disahkan (3 Tahun Terkini)";
+
+        cartaJabatanObj = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [year1, year2, year3], // Label Dinamik
+                datasets: [{
+                    label: 'Jumlah Penyelidikan',
+                    data: [countY1, countY2, countY3],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)', // Merah
+                        'rgba(59, 130, 246, 0.8)', // Biru
+                        'rgba(16, 185, 129, 0.8)'  // Hijau
+                    ], 
+                    borderColor: [
+                        'rgba(220, 38, 38, 1)', 
+                        'rgba(37, 99, 235, 1)',
+                        'rgba(5, 150, 105, 1)'
+                    ],      
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) { return context.parsed.y + ' Rekod'; }
                         }
                     }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { 
-                        stepSize: 1, 
-                        precision: 0
-                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } }
                 }
             }
-        }
-    });
+        });
+
+    } else {
+        // Carta Jabatan bagi Authorized Personnel (Admin dll)
+        document.getElementById('tajukCarta').innerHTML = "📊 Carta KPI Penyelidikan Disahkan Mengikut Jabatan";
+        
+        const statJabatan = {};
+        senaraiSah.forEach(row => {
+            let jabPenuh = row.jabatan || row.JABATAN || "TIADA MAKLUMAT JABATAN";
+            let matchSingkatan = jabPenuh.match(/\(([^)]+)\)/);
+            let jab = matchSingkatan ? matchSingkatan[1].trim() : jabPenuh; 
+            statJabatan[jab] = (statJabatan[jab] || 0) + 1;
+        });
+
+        const labelJabatan = Object.keys(statJabatan).sort();
+        const dataKiraan = labelJabatan.map(jab => statJabatan[jab]);
+
+        cartaJabatanObj = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelJabatan,
+                datasets: [{
+                    label: 'Jumlah Penyelidikan Disahkan',
+                    data: dataKiraan,
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)', 
+                    borderColor: 'rgba(5, 150, 105, 1)',      
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: { label: function(context) { return context.parsed.y + ' Rekod'; } }
+                    }
+                },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
+            }
+        });
+    }
 }
 
 function kemaskiniStatistik(senarai) {
@@ -1477,6 +1571,7 @@ function kemaskiniStatistik(senarai) {
     }
 }
 
+// Butang toggle on/off paparan carta
 function toggleCarta() {
     const bekas = document.getElementById('bekasCarta');
     if (bekas) {

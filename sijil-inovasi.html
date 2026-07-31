@@ -139,11 +139,8 @@
         if (response.status === "BERJAYA") {
           let senaraiAsal = response.data.filter(rekod => rekod[9] === "DISAHKAN");
           
-          if (!isPengurusSijil && perananUpper === "STAF") {
-              dataInovasiLulus = senaraiAsal.filter(rekod => rekod[3] === jabatanPengguna);
-          } else {
-              dataInovasiLulus = senaraiAsal; 
-          }
+          // KEMASKINI: Buang tapisan keras supaya semua peranan dapat akses keseluruhan data asal
+          dataInovasiLulus = senaraiAsal; 
           
           binaFilterJabatan(dataInovasiLulus);
           tapisData();
@@ -160,12 +157,21 @@
   function binaFilterJabatan(data) {
     let setJabatan = new Set();
     data.forEach(r => { if(r[3]) setJabatan.add(r[3]); });
+    
     let selectJabatan = document.getElementById("filterJabatan");
     selectJabatan.innerHTML = '<option value="SEMUA">Semua Jabatan</option>';
     setJabatan.forEach(jab => selectJabatan.innerHTML += `<option value="${jab}">${jab}</option>`);
-    if (!isPengurusSijil && perananUpper === "STAF") {
-        selectJabatan.value = jabatanPengguna;
-        selectJabatan.disabled = true;
+    
+    // KEMASKINI: Senarai peranan yang akan difokuskan kepada jabatan sendiri secara lalai (default)
+    const perananFokusJabatan = ["PENYELARAS JABATAN", "STAF", "PENYELARAS PROJEK PELAJAR"];
+    
+    if (!isPengurusSijil && perananFokusJabatan.includes(perananUpper)) {
+        // Semak sama ada jabatan pengguna wujud di dalam set jabatan
+        if (setJabatan.has(jabatanPengguna)) {
+            selectJabatan.value = jabatanPengguna;
+        }
+        // Disabled dibuang supaya peranan ini masih boleh memilih jabatan lain dari dropdown
+        selectJabatan.disabled = false;
     }
   }
 
