@@ -42,23 +42,32 @@
                 </div>
             </div>
 
+            <!-- BAHAGIAN FILTER YANG TELAH DITAMBAH BAIK -->
             <div class="md:col-span-3 bg-white p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-300 flex flex-col justify-center">
                 <h3 class="text-sm font-bold text-gray-600 uppercase mb-3 flex items-center gap-2">🔍 Tapis Senarai Jadual</h3>
                 <div class="flex flex-wrap gap-3">
-                    <div class="flex-1 min-w-[200px]">
+                    <div class="flex-1 min-w-[150px]">
                         <label class="block text-xs font-bold text-blue-800 mb-1.5">Jabatan</label>
                         <select id="filterJabatan" onchange="tapisJadual()" class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900 cursor-pointer transition-all">
                             <option value="Semua">-- Semua Jabatan --</option>
                         </select>
                     </div>
-                    <div class="w-36">
+                    <div class="w-32">
                         <label class="block text-xs font-bold text-blue-800 mb-1.5">Cari Tahun</label>
                         <input type="text" id="filterTahun" oninput="tapisJadual()" placeholder="202X..." class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900 transition-all placeholder:text-blue-300">
                     </div>
-                    <div class="w-40">
+                    <div class="w-32">
                         <label class="block text-xs font-bold text-blue-800 mb-1.5">Sukuan</label>
                         <select id="filterSukuan" onchange="tapisJadual()" class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900 uppercase cursor-pointer transition-all">
                             <option value="Semua">-- Semua --</option>
+                        </select>
+                    </div>
+                    <div class="w-48">
+                        <label class="block text-xs font-bold text-blue-800 mb-1.5">Status Pengesahan</label>
+                        <select id="filterStatus" onchange="tapisJadual()" class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-900 uppercase cursor-pointer transition-all">
+                            <option value="MENUNGGU PENGESAHAN">MENUNGGU PENGESAHAN</option>
+                            <option value="BAIKI SEMULA">BAIKI SEMULA</option>
+                            <option value="Semua">-- SEMUA --</option>
                         </select>
                     </div>
                     <div class="flex items-end">
@@ -80,15 +89,17 @@
                     <thead>
                         <tr class="bg-purple-600 text-white text-[11px] uppercase tracking-wider">
                             <th class="p-3 border-b text-center w-[3%]">BIL</th>
-                            <th class="p-3 border-b w-[22%]">PRODUK</th>
-                            <th class="p-3 border-b w-[15%]">KETUA & AHLI</th>
+                            <!-- DIGABUNGKAN: PRODUK & KETUA & AHLI -->
+                            <th class="p-3 border-b w-[25%]">PRODUK, KETUA & AHLI</th>
                             <th class="p-3 border-b w-[12%]">HUBUNGI</th>
                             <th class="p-3 border-b w-[8%] text-center">JABATAN</th>
                             <th class="p-3 border-b w-[8%] text-center">APLIKASI</th>
                             <th class="p-3 border-b w-[10%]">JENIS & DAFTAR</th>
                             <th class="p-3 border-b text-center w-[6%]">TAHUN / SUKUAN</th>
+                            <!-- DITAMBAH: STATUS -->
+                            <th class="p-3 border-b text-center w-[8%]">STATUS</th>
                             <th class="p-3 border-b text-center w-[8%]">URL BUKTI</th>
-                            <th class="p-3 border-b text-center w-[8%]">TINDAKAN</th>
+                            <th class="p-3 border-b text-center w-[12%]">TINDAKAN</th>
                         </tr>
                     </thead>
                     <tbody id="isiJadual" class="text-gray-700 text-xs bg-white divide-y divide-gray-100">
@@ -106,6 +117,7 @@
         </div>
     </div>
 
+    <!-- MODAL EDIT KEKAL SAMA SEPERTI ASAL -->
     <div id="modalEdit" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-y-auto">
         <div class="bg-white p-6 md:p-8 rounded-2xl w-full max-w-6xl shadow-2xl relative my-8 transition-all">
             <button onclick="tutupModal()" class="absolute top-4 right-5 text-gray-400 hover:text-red-500 font-bold text-3xl transition-colors cursor-pointer">&times;</button>
@@ -229,16 +241,15 @@
             document.getElementById('filterJabatan').value = "Semua";
             document.getElementById('filterTahun').value = "";
             document.getElementById('filterSukuan').value = "Semua";
+            document.getElementById('filterStatus').value = "MENUNGGU PENGESAHAN"; // Default kepada MENUNGGU PENGESAHAN
 
             const tbody = document.getElementById('isiJadual');
             tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center font-semibold text-purple-500 animate-pulse">⏳ Menyemak pangkalan data...</td></tr>`;
 
-            // KEMASKINI: Tukar Endpoint API ke ambilKPI (Tarik semua rekod untuk tujuan statistik)
             const fetchUrl = SCRIPT_URL.includes('?') ? `${SCRIPT_URL}&action=ambilKPI` : `${SCRIPT_URL}?action=ambilKPI`;
 
             fetch(fetchUrl).then(res => res.json()).then(result => {
                 if(result.status === "BERJAYA") {
-                    // Mapping Array ke Objek untuk mudahkan penggunaan dalam fail ini
                     senaraiDataTerkini = result.data.map(r => {
                         return {
                             bil: r[0], namaProduk: r[1], ketua: r[2], telefon: r[3], email: r[4], 
@@ -247,13 +258,8 @@
                         };
                     });
 
-                    // 1. Bina Menu Lungsur Turun (Filter) Dinamik
                     binaFilterDropdown();
-
-                    // 2. Bina Statistik Jabatan
                     binaStatistikDisahkan();
-                    
-                    // 3. Paparkan Jadual
                     tapisJadual(); 
                 }
                 else tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">Ralat: ${result.mesej}</td></tr>`;
@@ -296,7 +302,6 @@
                 return;
             }
 
-            // Susun dari nilai paling tinggi ke rendah
             let htmlStats = `<div class="flex justify-between font-bold text-green-700 bg-green-50 p-2 rounded border border-green-200 mb-2"><span>JUMLAH KESELURUHAN:</span> <span>${totalSah}</span></div>`;
             
             const susunanJab = Object.entries(statDict).sort((a, b) => b[1] - a[1]);
@@ -316,15 +321,15 @@
             const pilJabatan = document.getElementById('filterJabatan').value;
             const pilTahun = document.getElementById('filterTahun').value.trim();
             const pilSukuan = document.getElementById('filterSukuan').value;
+            const pilStatus = document.getElementById('filterStatus').value; // Mengambil nilai dropdown Status
 
-            // Proses Filter
             let dataDitapis = senaraiDataTerkini.filter(row => {
                 let matchJab = (pilJabatan === "Semua" || String(row.jabatan).trim().toUpperCase() === pilJabatan.toUpperCase());
                 let matchThn = (pilTahun === "" || String(row.tahun).includes(pilTahun));
                 let matchSuk = (pilSukuan === "Semua" || String(row.sukuan).trim().toUpperCase() === pilSukuan.toUpperCase());
                 
-                // Hanya papar rekod yang MENUNGGU PENGESAHAN di jadual ini!
-                let matchStatus = (String(row.status).trim().toUpperCase() === "MENUNGGU PENGESAHAN");
+                // Carian fleksibel berdasarkan Status
+                let matchStatus = (pilStatus === "Semua" || String(row.status).trim().toUpperCase() === pilStatus.toUpperCase());
 
                 return matchJab && matchThn && matchSuk && matchStatus;
             });
@@ -343,7 +348,7 @@
             const tbody = document.getElementById('isiJadual');
             tbody.innerHTML = "";
             if (senarai.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-gray-500 font-medium text-lg">✨ Lengkap! Tiada KPI yang sedang menunggu pengesahan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-gray-500 font-medium text-lg">✨ Lengkap! Tiada KPI dijumpai berdasarkan carian.</td></tr>`;
                 return;
             }
             
@@ -370,14 +375,18 @@
                 }
 
                 let ahliKumpulan = row.ahli ? row.ahli : "<span class='text-gray-400 italic'>Tiada</span>";
+                let badgeStatusWarna = row.status.toUpperCase() === 'BAIKI SEMULA' ? 'bg-orange-100 text-orange-700' : 'bg-yellow-100 text-yellow-700';
 
                 tr.innerHTML = `
                     <td class="p-3 font-mono font-bold text-gray-700 text-center">${row.bil}</td>
-                    <td class="p-3 font-bold text-gray-800 leading-relaxed">${row.namaProduk}</td>
+                    
+                    <!-- DIGABUNGKAN PRODUK DAN AHLI -->
                     <td class="p-3 text-gray-700">
+                        <div class="font-bold text-gray-800 leading-relaxed mb-1.5">${row.namaProduk}</div>
                         <div class="font-bold text-blue-700 uppercase leading-snug">👑 ${row.ketua}</div>
-                        <div class="text-[10px] text-gray-600 mt-1.5 uppercase leading-snug">👥 ${ahliKumpulan}</div>
+                        <div class="text-[10px] text-gray-600 mt-1 uppercase leading-snug">👥 ${ahliKumpulan}</div>
                     </td>
+                    
                     <td class="p-3 text-gray-700">
                         <div class="text-blue-600 mb-1">📞 ${row.telefon || '-'}</div>
                         <div class="text-orange-600 break-all">✉️ ${row.email || '-'}</div>
@@ -392,6 +401,12 @@
                         <div class="font-bold text-lg text-gray-800">${row.tahun || '-'}</div>
                         <div class="text-[11px] font-semibold text-gray-500 uppercase">${row.sukuan || '-'}</div>
                     </td>
+                    
+                    <!-- PAPARAN STATUS -->
+                    <td class="p-3 text-center">
+                        <span class="font-bold text-[10px] px-2 py-1 rounded-md border ${badgeStatusWarna}">${row.status}</span>
+                    </td>
+
                     <td class="p-3 text-center align-top pt-4">
                         <div class="flex flex-col items-center justify-center w-full">
                             ${pautanHtml}
@@ -401,6 +416,8 @@
                         <div class="flex flex-col gap-1.5 w-full">
                             <button onclick="prosesPengesahan('${row.bil}', 'sahkanKPI')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg font-bold shadow-sm transition w-full">✔ Sahkan</button>
                             <button onclick="bukaModalEdit('${row.bil}')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg font-bold shadow-sm transition w-full">✏ Kemaskini</button>
+                            <!-- BUTANG BARU: BAIKI SEMULA -->
+                            <button onclick="prosesPengesahan('${row.bil}', 'baikiSemulaKPI')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-bold shadow-sm transition w-full">🛠 Baiki Semula</button>
                             <button onclick="prosesPengesahan('${row.bil}', 'tolakKPI')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg font-bold shadow-sm transition w-full">✖ Tolak</button>
                         </div>
                     </td>
@@ -588,15 +605,25 @@
         }
 
         // ==========================================
-        // FUNGSI PENGESAHAN (SAH / TOLAK)
+        // FUNGSI PENGESAHAN (SAH / TOLAK / BAIKI SEMULA)
         // ==========================================
         function prosesPengesahan(bil, actionType) {
-            let alasanPenolakan = "";
+            let ulasanKomen = "";
+            let perananSemasa = sessionStorage.getItem("peranan") || "";
+            
+            // Logik Ambil Ulasan (Tolak / Baiki Semula)
             if (actionType === 'tolakKPI') {
-                alasanPenolakan = prompt("⚠️ PERHATIAN: Sila masukkan alasan penolakan untuk dihantar kepada staf:");
-                if (alasanPenolakan === null) return; 
-                if (alasanPenolakan.trim() === "") {
+                ulasanKomen = prompt("⚠️ PERHATIAN: Sila masukkan ALASAN PENOLAKAN untuk dihantar kepada staf:");
+                if (ulasanKomen === null) return; 
+                if (ulasanKomen.trim() === "") {
                     alert("Gagal: Anda WAJIB memasukkan alasan mengapa rekod ini ditolak!");
+                    return;
+                }
+            } else if (actionType === 'baikiSemulaKPI') {
+                ulasanKomen = prompt("🛠 PERHATIAN: Sila masukkan ULASAN PENAMBAHBAIKAN yang perlu dilakukan oleh staf:");
+                if (ulasanKomen === null) return;
+                if (ulasanKomen.trim() === "") {
+                    alert("Gagal: Anda WAJIB memasukkan ulasan penambahbaikan!");
                     return;
                 }
             } else {
@@ -608,8 +635,17 @@
             statusMesej.innerText = "⏳ Memproses permohonan...";
             statusMesej.classList.remove('hidden');
 
-            const payload = { action: actionType, BIL: bil };
-            if (actionType === 'tolakKPI') payload.ALASAN = alasanPenolakan;
+            const payload = { 
+                action: actionType, 
+                BIL: bil,
+                peranan: perananSemasa
+            };
+            
+            // Hantar ulasan ke server
+            if (actionType === 'tolakKPI' || actionType === 'baikiSemulaKPI') {
+                payload.ALASAN = ulasanKomen; // Parameter biasa digunakan
+                payload.ULASAN = ulasanKomen; // Parameter ke sheet 'kemaskiniRekod' (Lajur P)
+            }
 
             fetch(SCRIPT_URL, {
                 method: 'POST',

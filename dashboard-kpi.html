@@ -78,11 +78,12 @@
                                 <option value="Semua">Semua Status</option>
                                 <option value="DISAHKAN">DISAHKAN</option>
                                 <option value="MENUNGGU PENGESAHAN">MENUNGGU PENGESAHAN</option>
+                                <option value="BAIKI SEMULA">BAIKI SEMULA</option>
                             </select>
                         </div>
                         
                         <div class="flex flex-wrap gap-2 items-center w-full lg:w-auto justify-start lg:justify-end">
-                            <button onclick="muatTurunPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-1">📄 Laporan PDF</button>
+                            <button id="btnLaporanPDF" onclick="muatTurunPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-1">📄 Laporan PDF</button>
                             <button id="btnDownloadZip" onclick="muatTurunZipDokumen()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-1" title="Ekstrak & Muat Turun Dokumen Bukti Berdasarkan Filter">🗜️ Download Dokumen (ZIP)</button>
                             <button onclick="muatTurunCSV()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-1">📥 Download CSV</button>
                             <button onclick="ambilData()" class="bg-white border border-gray-300 hover:bg-gray-100 text-blue-600 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1 shadow-sm">🔄 Refresh Data</button>
@@ -124,7 +125,6 @@
     </div>
 
     <!-- MODAL EDIT DATA & UPLOAD SIJIL & LIHAT BUKTI ... KEKAL SAMA SEPERTI ASAL -->
-    <!-- (Untuk menjimatkan baris kod tanpa membuang fungsi, saya kekalkan struktur modanya sepenuhnya) -->
     
     <div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
         <div class="bg-white p-6 rounded-lg w-full max-w-4xl shadow-2xl max-h-[95vh] overflow-y-auto">
@@ -198,10 +198,12 @@
                         <label class="block text-sm font-semibold text-gray-700">Sukuan</label>
                         <input type="text" id="editSukuan" placeholder="Contoh: S1, S2..." class="w-full border p-2.5 rounded-lg mt-1 focus:ring-2 focus:ring-blue-400 uppercase">
                     </div>
-                    <div class="md:col-span-2 mt-2">
+                    <!-- TAMBAHAN KOD: Menambah ID containerEditStatus untuk disembunyikan berdasarkan peranan -->
+                    <div id="containerEditStatus" class="md:col-span-2 mt-2">
                         <label class="block text-sm font-semibold text-gray-700">Status Pengesahan</label>
                         <select id="editStatus" class="w-full border p-2.5 rounded-lg mt-1 bg-gray-50 focus:ring-2 focus:ring-blue-400">
                             <option value="MENUNGGU PENGESAHAN">MENUNGGU PENGESAHAN</option>
+                            <option value="BAIKI SEMULA">BAIKI SEMULA</option>
                             <option value="DISAHKAN">DISAHKAN</option>
                         </select>
                     </div>
@@ -309,13 +311,26 @@
         const userJabatan = sessionStorage.getItem("jabatan") || "";
 
         const perananLayakTindakan = ["PENYELARAS INOVASI", "KUPIK", "ADMIN", "PENYELARAS PENYELIDIKAN"];
+        
+        // --- MULA PENAMBAHBAIKAN KOD --- //
+        // Tambah STAF dan PENYELIA PROJEK PELAJAR supaya rekod dapat dibaca
         const perananLayakUlasan = [
             "KUPIK", 
             "ADMIN", 
             "PENYELARAS INOVASI", 
             "PENYELARAS PENYELIDIKAN", 
-            "PENYELARAS JABATAN"
+            "PENYELARAS JABATAN",
+            "STAF",
+            "PENYELIA PROJEK PELAJAR"
         ];
+        
+        // Kumpulan peranan yang jadualnya difilter dan dikunci mengikut jabatan login sahaja
+        const perananBiasa = ["STAF", "PENYELARAS JABATAN", "PENYELIA PROJEK PELAJAR"];
+        
+        // Kawalan peranan bagi muat turun Laporan PDF dan Dokumen ZIP
+        const perananLayakPDF = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS JABATAN"];
+        const perananLayakZip = ["ADMIN", "KUPIK", "PENYELARAS INOVASI"];
+        // --- TAMAT PENAMBAHBAIKAN KOD --- //
         
         const isPrivileged = perananLayakTindakan.includes(userPeranan.toUpperCase());
         const canViewUlasan = perananLayakUlasan.includes(userPeranan.toUpperCase());
@@ -339,12 +354,35 @@
             }
         }
 
-        if(userPeranan.toUpperCase() === "STAF" && userJabatan) {
+        // --- MULA PENAMBAHBAIKAN KOD: Menetapkan tajuk & sembunyi filter bagi pengguna jabatan --- //
+        if(perananBiasa.includes(userPeranan.toUpperCase()) && userJabatan) {
             document.getElementById('tajukJadual').innerText = `(${dapatkanSingkatanJabatan(userJabatan)})`;
         } else {
             document.getElementById('tajukJadual').innerText = `(Semua Jabatan)`;
             document.getElementById('filterJabatan').classList.remove('hidden');
         }
+        // --- TAMAT PENAMBAHBAIKAN KOD --- //
+
+        // --- MULA PENAMBAHBAIKAN KOD: Semak dan kawal ketersediaan butang Laporan PDF dan Download ZIP --- //
+        const btnPDF = document.getElementById('btnLaporanPDF');
+        const btnZip = document.getElementById('btnDownloadZip');
+
+        if (btnPDF) {
+            if (!perananLayakPDF.includes(userPeranan.toUpperCase())) {
+                btnPDF.classList.add('hidden');
+            } else {
+                btnPDF.classList.remove('hidden');
+            }
+        }
+
+        if (btnZip) {
+            if (!perananLayakZip.includes(userPeranan.toUpperCase())) {
+                btnZip.classList.add('hidden');
+            } else {
+                btnZip.classList.remove('hidden');
+            }
+        }
+        // --- TAMAT PENAMBAHBAIKAN KOD --- //
 
         async function muatSenaraiSistem() {
             try {
@@ -383,6 +421,9 @@
         }
 
         function muatTurunZipDokumen() {
+            if (!perananLayakZip.includes(userPeranan.toUpperCase())) {
+                return alert("Akses ditolak! Peranan anda tidak mempunyai kebenaran untuk memuat turun dokumen ZIP.");
+            }
             if (currentFilteredData.length === 0) return alert("Tiada data untuk dimuat turun.");
 
             let senaraiDokumen = [];
@@ -477,9 +518,12 @@
                 let dataDariSheet = result.status === "BERJAYA" ? result.data || [] : [];
 
                 if (dataDariSheet.length > 0) {
-                    if (userPeranan.toUpperCase() === "STAF" && userJabatan !== "") {
+                    
+                    // --- MULA PENAMBAHBAIKAN KOD: Filter data terus berdasarkan jabatan bagi pengguna peranan jabatan --- //
+                    if (perananBiasa.includes(userPeranan.toUpperCase()) && userJabatan !== "") {
                         dataDariSheet = dataDariSheet.filter(row => String(row[6] || "").trim().toUpperCase() === userJabatan.toUpperCase());
                     }
+                    // --- TAMAT PENAMBAHBAIKAN KOD --- //
 
                     if (dataDariSheet.length > 0) {
                         semuaData = dataDariSheet;
@@ -502,7 +546,8 @@
         }
 
         function binaFilter(data) {
-            if (userPeranan.toUpperCase() !== "STAF") {
+            // --- MULA PENAMBAHBAIKAN KOD: Dropdown dibina hanya untuk non-perananBiasa --- //
+            if (!perananBiasa.includes(userPeranan.toUpperCase())) {
                 const dropJabatan = document.getElementById('filterJabatan');
                 const jabatanUnik = [...new Set(data.map(r => String(r[6]).trim()).filter(j => j !== "" && j !== "-"))].sort(); 
                 const pilJabatanAsal = dropJabatan.value;
@@ -512,6 +557,7 @@
                 });
                 if (jabatanUnik.includes(pilJabatanAsal) || pilJabatanAsal === "Semua") dropJabatan.value = pilJabatanAsal;
             }
+            // --- TAMAT PENAMBAHBAIKAN KOD --- //
 
             const dropSukuan = document.getElementById('filterSukuan');
             const sukuanUnik = [...new Set(data.map(r => String(r[12]).trim().toUpperCase()).filter(s => s !== "" && s !== "-"))].sort();
@@ -531,9 +577,13 @@
             if (tahunDipilih !== "") {
                 dataDitapis = dataDitapis.filter(r => String(r[10]).includes(tahunDipilih)); 
             }
-            if (jabatanDipilih !== "Semua" && userPeranan.toUpperCase() !== "STAF") {
+            
+            // --- MULA PENAMBAHBAIKAN KOD: Filter logik untuk non-perananBiasa --- //
+            if (jabatanDipilih !== "Semua" && !perananBiasa.includes(userPeranan.toUpperCase())) {
                 dataDitapis = dataDitapis.filter(r => String(r[6]).trim().toUpperCase() === jabatanDipilih.toUpperCase()); 
             }
+            // --- TAMAT PENAMBAHBAIKAN KOD --- //
+
             if (sukuanDipilih !== "Semua") {
                 dataDitapis = dataDitapis.filter(r => String(r[12]).trim().toUpperCase() === sukuanDipilih.toUpperCase());
             }
@@ -659,9 +709,16 @@
                 const idRekodDB = row[0];
                 
                 const statusVal = String(row[13] || 'DISAHKAN').trim().toUpperCase();
-                const statusBadge = (statusVal === 'MENUNGGU PENGESAHAN') 
-                    ? `<span class="bg-yellow-100 text-yellow-800 border border-yellow-300 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap">MENUNGGU PENGESAHAN</span>` 
-                    : `<span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap">DISAHKAN</span>`;
+                
+                // PENAMBAHBAIKAN LOGIK STATUS
+                let statusBadge = "";
+                if (statusVal === 'MENUNGGU PENGESAHAN') {
+                    statusBadge = `<span class="bg-yellow-100 text-yellow-800 border border-yellow-300 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap">MENUNGGU PENGESAHAN</span>`;
+                } else if (statusVal === 'BAIKI SEMULA') {
+                    statusBadge = `<span class="bg-red-100 text-red-800 border border-red-300 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap">BAIKI SEMULA</span>`;
+                } else {
+                    statusBadge = `<span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap">DISAHKAN</span>`;
+                }
 
                 let pautanHtml = "<span class='text-gray-400 italic text-xs'>Tiada Fail</span>";
                 let urlBukti = row[11] ? String(row[11]).trim() : "";
@@ -737,8 +794,14 @@
                     `;
                 }
 
+                // PENAMBAHBAIKAN WARNA ULASAN
+                let ulasanTeks = row[15] ? String(row[15]).trim() : '-';
+                let ulasanContent = ulasanTeks !== '-' 
+                    ? `<span class="bg-purple-100 text-purple-800 border border-purple-300 px-2.5 py-1.5 rounded-md text-[11px] font-bold block max-w-[150px] break-words shadow-sm cursor-pointer hover:bg-purple-200 transition" title="${ulasanTeks}">💬 ${ulasanTeks}</span>` 
+                    : `<span class="text-gray-400 italic text-xs block text-center">-</span>`;
+                    
                 const ulasanHTML = canViewUlasan 
-                    ? `<td class="p-4 text-xs text-purple-800 font-medium italic">${row[15] || '-'}</td>` 
+                    ? `<td class="p-4 align-middle">${ulasanContent}</td>` 
                     : '';
 
                 const tr = document.createElement('tr');
@@ -758,7 +821,7 @@
                     <td class="p-4 font-bold text-teal-700 text-center whitespace-nowrap uppercase">${row[12] || '-'}</td> 
                     ${ulasanHTML}
                     <td class="p-4 text-center align-top pt-4"><div class="flex flex-col items-center justify-center">${pautanHtml}</div></td>
-                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4 text-center align-middle">${statusBadge}</td>
                     ${tindakanHTML}
                 `;
                 tbody.appendChild(tr);
@@ -807,9 +870,29 @@
             document.getElementById('editStatus').value = rowData[13] || "DISAHKAN";
             document.getElementById('editPeringkat').value = rowData[16] || ""; 
             
+            // --- MULA PENAMBAHBAIKAN KOD --- //
+            // Menyembunyikan status pengesahan untuk kumpulan perananBiasa
+            if (perananBiasa.includes(userPeranan.toUpperCase())) {
+                document.getElementById('containerEditStatus').classList.add('hidden');
+            } else {
+                document.getElementById('containerEditStatus').classList.remove('hidden');
+            }
+            // --- TAMAT PENAMBAHBAIKAN KOD --- //
+
             if (canViewUlasan) {
                 document.getElementById('containerEditUlasan').classList.remove('hidden');
                 document.getElementById('editUlasan').value = rowData[15] || "";
+                
+                // --- MULA PENAMBAHBAIKAN KOD --- //
+                // Jika pengguna boleh view ulasan tetapi adalah 'perananBiasa', ulasan disetkan 'read-only' di dalam modal edit
+                if (perananBiasa.includes(userPeranan.toUpperCase())) {
+                    document.getElementById('editUlasan').setAttribute('readonly', 'readonly');
+                    document.getElementById('editUlasan').classList.add('bg-gray-200', 'cursor-not-allowed');
+                } else {
+                    document.getElementById('editUlasan').removeAttribute('readonly');
+                    document.getElementById('editUlasan').classList.remove('bg-gray-200', 'cursor-not-allowed');
+                }
+                // --- TAMAT PENAMBAHBAIKAN KOD --- //
             } else {
                 document.getElementById('containerEditUlasan').classList.add('hidden');
             }
@@ -887,12 +970,25 @@
             const noDaftar = document.getElementById('editNoDaftar').value;
             const tahun = document.getElementById('editTahun').value;
             const sukuan = document.getElementById('editSukuan').value;
-            const status = document.getElementById('editStatus').value;
             const peringkat = document.getElementById('editPeringkat').value; 
             const noIcKetua = document.getElementById('editNoIcKetua').value; 
             const noTelKetua = document.getElementById('editNoTelKetua').value; 
             const emailKetua = document.getElementById('editEmailKetua').value; 
-            const ulasan = canViewUlasan ? document.getElementById('editUlasan').value : undefined; 
+            
+            let status = document.getElementById('editStatus').value;
+            let ulasan = canViewUlasan ? document.getElementById('editUlasan').value : undefined; 
+
+            // --- MULA PENAMBAHBAIKAN KOD --- //
+            // Apabila peranan PENYELARAS JABATAN, PENYELIA PROJEK PELAJAR dan STAF (perananBiasa)
+            // menekan butang edit bagi rekod (terutamanya yang mempunyai Status BAIKI SEMULA)
+            // dan membuat pengemaskini rekod, STATUS bertukar kepada MENUNGGU PENGESAHAN 
+            // dan lajur ULASAN akan menjadi tiada rekod (kosong) kerana pembetulan telah dilakukan 
+            // untuk disemak dan disahkan semula oleh ADMIN, PENYELARAS INOVASI, atau KUPIK.
+            if (perananBiasa.includes(userPeranan.toUpperCase())) {
+                status = "MENUNGGU PENGESAHAN";
+                ulasan = ""; 
+            }
+            // --- TAMAT PENAMBAHBAIKAN KOD --- //
 
             if (nama.trim() === "" || ketua.trim() === "") {
                 alert("Sila isi Nama Produk dan Ketua Projek sebelum menyimpan.");
@@ -1235,6 +1331,10 @@
         }
         
         function muatTurunPDF() {
+            if (!perananLayakPDF.includes(userPeranan.toUpperCase())) {
+                return alert("Akses ditolak! Peranan anda tidak mempunyai kebenaran untuk memuat turun Laporan PDF.");
+            }
+
             let dataUntukEksport = [];
             
             if (typeof currentFilteredData !== 'undefined' && currentFilteredData.length > 0) {
@@ -1279,6 +1379,12 @@
             let fJabatan = (selJabatan && selJabatan.selectedIndex > 0 && selJabatan.value !== "Semua") 
                             ? selJabatan.options[selJabatan.selectedIndex].text.replace(/🏢 |-- /g, '').replace(' --', '') 
                             : "SEMUA JABATAN";
+
+            // --- MULA PENAMBAHBAIKAN KOD: Tajuk bagi PDF peranan PENYELARAS JABATAN adalah Jabatan semasa yang login --- //
+            if (userPeranan.toUpperCase() === "PENYELARAS JABATAN" && userJabatan) {
+                fJabatan = userJabatan;
+            }
+            // --- TAMAT PENAMBAHBAIKAN KOD --- //
 
             fJabatan = fJabatan.toUpperCase();
 
