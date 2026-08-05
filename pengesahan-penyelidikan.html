@@ -72,12 +72,22 @@
                     <option value="">-- Semua Sukuan --</option>
                 </select>
 
-                <select id="filterStatus" class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50 font-semibold" onchange="applyFilters()">
-                    <option value="MENUNGGU PENGESAHAN">Menunggu Pengesahan</option>
-                    <option value="DISAHKAN">Telah Disahkan</option>
-                    <option value="DITOLAK">Ditolak</option>
-                    <option value="">Papar Semua Status</option>
-                </select>
+				<!-- Carian Filter HTML (Di atas Jadual) -->
+				<select id="filterStatus" class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50 font-semibold" onchange="applyFilters()">
+				<option value="MENUNGGU PENGESAHAN">Menunggu Pengesahan</option>
+				<option value="DISAHKAN">Telah Disahkan</option>
+				<option value="DITOLAK">Ditolak</option>
+				<option value="BAIKI SEMULA">Baiki Semula</option> <!-- Ditukar dari PERLU DIBAIKI -->
+				<option value="">Papar Semua Status</option>
+				</select>
+
+				<!-- Modal Edit (Dalam formEditKPI) -->
+				<select id="editStatusPengesahanHeader" class="w-full p-2.5 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold uppercase shadow-sm bg-white text-gray-800 hidden">
+				<option value="MENUNGGU PENGESAHAN">🟡 MENUNGGU PENGESAHAN</option>
+				<option value="DISAHKAN">✅ DISAHKAN</option>
+				<option value="BAIKI SEMULA">🔄 BAIKI SEMULA</option> <!-- Ditukar dari PERLU DIBAIKI -->
+				<option value="DITOLAK">❌ DITOLAK</option>
+				</select>
             </div>
 
             <div class="relative w-full lg:w-auto">
@@ -114,7 +124,7 @@
                             <th class="py-4 px-3 font-bold col-index text-center w-[5%]">Index</th>
                             <th class="py-4 px-3 font-bold col-dokumen text-center w-[8%]">Fail Bukti</th>
                             <th class="py-4 px-3 font-bold col-status text-center w-[8%]">Status</th>
-                            <th class="py-4 px-3 font-bold col-ulasan text-left min-w-[120px] w-[10%]">Ulasan Ditolak</th>
+                            <th class="py-4 px-3 font-bold col-ulasan text-left min-w-[120px] w-[10%]">Ulasan Ditolak / Baiki</th>
                             <th class="py-4 px-3 font-bold col-tindakan text-center w-[8%]">Tindakan</th>
                         </tr>
                     </thead>
@@ -286,16 +296,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block font-bold text-amber-900 mb-1">Status Pengesahan (Lajur O):</label>
+                        <!-- Status Ditukar -->
                         <select id="editStatusPengesahan" onchange="semakStatusUlasan()" class="w-full p-2.5 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold uppercase shadow-sm bg-white text-gray-800">
                             <option value="MENUNGGU PENGESAHAN">🟡 MENUNGGU PENGESAHAN</option>
                             <option value="DISAHKAN">✅ DISAHKAN</option>
+                            <option value="BAIKI SEMULA">🔄 BAIKI SEMULA</option> <!-- Ditukar dari PERLU DIBAIKI -->
                             <option value="DITOLAK">❌ DITOLAK</option>
                         </select>
                     </div>
                     
                     <div id="ruangUlasanTolak" class="hidden transition-all duration-300">
-                        <label class="block font-bold text-rose-800 mb-1">Ulasan Ditolak (Lajur R): <span class="text-rose-500">*</span></label>
-                        <textarea id="editUlasanDitolak" rows="2" class="w-full p-2.5 border border-rose-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none font-medium shadow-sm bg-rose-50/50" placeholder="Nyatakan sebab rekod ini ditolak..."></textarea>
+                        <label class="block font-bold text-rose-800 mb-1">Ulasan Ditolak / Baiki Semula (Lajur R): <span class="text-rose-500">*</span></label>
+                        <textarea id="editUlasan" rows="2" class="w-full p-2.5 border border-rose-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:outline-none font-medium shadow-sm bg-rose-50/50" placeholder="Nyatakan ulasan penambahbaikan / sebab ditolak..."></textarea>
                     </div>
                 </div>
             </div>
@@ -398,6 +410,31 @@
                 return matchTahun && matchSukuan && matchJabatan && matchStatus;
             });
 
+            // 🌟 TAMBAHAN BARU: Susunan data Client-Side tanpa usik Sheet (Tahun Desc, Status Custom)
+            window.rekodDitapis.sort((a, b) => {
+                // 1. Susunan Tahun (Menurun: 2026, 2025, 2024...)
+                let tahunA = parseInt(a.tahun || a.TAHUN || 0);
+                let tahunB = parseInt(b.tahun || b.TAHUN || 0);
+                
+                if (tahunB !== tahunA) {
+                    return tahunB - tahunA;
+                }
+                
+                // 2. Susunan Status: MENUNGGU PENGESAHAN (1), BAIKI SEMULA (2), DISAHKAN/TELAH DISAHKAN (3), Lain-lain (4)
+                const getStatusPriority = (status) => {
+                    let s = (status || "MENUNGGU").toUpperCase();
+                    if (s.includes("MENUNGGU")) return 1;
+                    if (s.includes("BAIKI SEMULA")) return 2;
+                    if (s.includes("DISAHKAN")) return 3;
+                    return 4; 
+                };
+                
+                let statusA = getStatusPriority(a.statusPengesahan || a.STATUSPENGESAHAN || a.status);
+                let statusB = getStatusPriority(b.statusPengesahan || b.STATUSPENGESAHAN || b.status);
+                
+                return statusA - statusB;
+            });
+
             // ⚠️ SETIAP KALI FILTER DITUKAR, COMPONENT AKAN KEMBALI KE MUKA SURAT 1 AUTOMATIK
             window.mukaSuratSemasa = 1;
             renderJadual(window.rekodDitapis);
@@ -442,6 +479,9 @@ function renderJadual(senarai) {
             statusBadge = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wide shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>DISAHKAN</span>`;
         } else if (statusSemasa === "DITOLAK") {
             statusBadge = `<span class="inline-flex items-center gap-1 bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wide shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>DITOLAK</span>`;
+        } else if (statusSemasa === "BAIKI SEMULA") {
+            // 🌟 KEMASKINI BARU: Lencana status BAIKI SEMULA
+            statusBadge = `<span class="inline-flex items-center gap-1 bg-violet-50 text-violet-700 border border-violet-200 px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wide shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>BAIKI SEMULA</span>`;
         } else {
             statusBadge = `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wide shadow-2xs"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>MENUNGGU</span>`;
         }
@@ -451,7 +491,6 @@ function renderJadual(senarai) {
         // Urusan turutan nombor Bil mengikut halaman semasa
         let noPaparanBermula = indeksMula + index + 1;
 
-        // Memperkemas pautan DOI menjadi micro-badge button
         let htmlDoi = (row.doiUrl || row.doi_url) 
             ? `<a href="${row.doiUrl || row.doi_url}" target="_blank" class="inline-flex items-center gap-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-800 px-2 py-1 rounded-md font-semibold text-[11px] transition border border-indigo-100 shadow-2xs">🔗 Pautan</a>` 
             : `<span class="text-gray-300 italic">-</span>`;
@@ -464,7 +503,6 @@ function renderJadual(senarai) {
             if (senaraiLink.length > 0) {
                 htmlDokumen = `<div class="flex flex-col gap-1 items-center w-full">`;
                 senaraiLink.forEach((link, idx) => {
-                    // Dapatkan nama fail sebenar yang sudah dibersihkan
                     const labelFail = typeof dapatkanNamaFail === 'function' ? dapatkanNamaFail(link, idx) : `Fail Bukti ${idx+1}`;
                     
                     htmlDokumen += `
@@ -475,22 +513,24 @@ function renderJadual(senarai) {
                 htmlDokumen += `</div>`;
             }
         }
-
-        // 🌟 KEMASKINI BARU: Ulasan Ditolak (Lajur R)
+        // 🌟 KEMASKINI BARU: Paparkan Ulasan (Lajur R) bagi status DITOLAK atau BAIKI SEMULA
         let ulasanTeks = row.ulasanDitolak || row.ulasan_ditolak || row.ulasan || "";
         let htmlUlasan = "";
         
-        if (statusSemasa === "DITOLAK" && ulasanTeks !== "") {
-            htmlUlasan = `<span class="inline-block bg-rose-50 text-rose-700 font-medium p-1.5 rounded text-[11px] line-clamp-3 leading-snug w-full" title="${ulasanTeks}">${ulasanTeks}</span>`;
+        if ((statusSemasa === "DITOLAK" || statusSemasa === "BAIKI SEMULA") && ulasanTeks !== "") {
+            // Gunakan warna mengikut status untuk ulasan
+            let colorClass = statusSemasa === "BAIKI SEMULA" ? "bg-violet-50 text-violet-700" : "bg-rose-50 text-rose-700";
+            htmlUlasan = `<span class="inline-block ${colorClass} font-medium p-1.5 rounded text-[11px] line-clamp-3 leading-snug w-full" title="${ulasanTeks}">${ulasanTeks}</span>`;
         } else {
             htmlUlasan = `<span class="text-gray-300 italic text-[11px]">-</span>`;
         }
 
-        // Butang Tindakan yang lebih moden dan ada animasi hover mikro
+        // 🌟 KEMASKINI BARU: Ditambah Butang Baiki Semula yang menghantar parameter baru
         let butangTindakan = `
-            <div class="flex items-center justify-center gap-1.5 flex-wrap min-w-[180px]">
+            <div class="flex items-center justify-center gap-1.5 flex-wrap min-w-[200px]">
                 <button onclick="bukaModalEdit('${rekodID}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg font-bold transition text-xs shadow-2xs flex items-center gap-1 transform hover:-translate-y-0.5" title="Edit Rekod">📝 Edit</button>
                 <button onclick="kemaskiniStatus('${rekodID}', 'DISAHKAN')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg font-bold transition text-xs shadow-2xs flex items-center gap-1 transform hover:-translate-y-0.5" title="Sahkan">✔️ Sahkan</button>
+                <button onclick="kemaskiniStatus('${rekodID}', 'BAIKI SEMULA')" class="bg-violet-600 hover:bg-violet-700 text-white px-2.5 py-1.5 rounded-lg font-bold transition text-xs shadow-2xs flex items-center gap-1 transform hover:-translate-y-0.5" title="Baiki Semula">🔄 Baiki Semula</button>
                 <button onclick="kemaskiniStatus('${rekodID}', 'DITOLAK')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1.5 rounded-lg font-bold transition text-xs shadow-2xs flex items-center gap-1 transform hover:-translate-y-0.5" title="Tolak">❌ Tolak</button>
                 <button onclick="padamRekod('${rekodID}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1.5 rounded-lg font-bold transition text-xs shadow-2xs flex items-center gap-1 transform hover:-translate-y-0.5" title="Padam Rekod">🗑️ Padam</button>
             </div>
@@ -500,65 +540,34 @@ function renderJadual(senarai) {
         tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100";
         tr.id = `baris-${rekodID}`;
         
-        // 🌟 KEMASKINI: Ditambah `<td class="py-4 px-3 col-ulasan">` sebelum `<td ... col-tindakan>`
         tr.innerHTML = `
             <td class="py-4 px-3 font-bold text-gray-500 text-center select-none bg-slate-50/50">${noPaparanBermula}</td>
-            
             <td class="py-4 px-4 whitespace-normal min-w-[320px] max-w-[500px]">
                 <div class="flex flex-col gap-2.5 text-left">
                     <div class="font-bold text-gray-900 text-[14px] leading-snug tracking-tight">
                         ${formatDataKosong(row.tajuk || row.TAJUK)}
                     </div>
-                    
                     ${(row.namaJurnal || row.NAMA_JURNAL) ? `
                     <div class="text-[11px] font-medium text-purple-700 flex items-center gap-1.5 mt-0.5">
                         📚 <span class="italic bg-purple-50 px-2 py-0.5 rounded border border-purple-100 shadow-3xs uppercase">${row.namaJurnal || row.NAMA_JURNAL}</span>
                     </div>
                     ` : ''}
-
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px]">
-                        <span class="text-slate-600" title="Publisher">
-                            <span class="font-semibold text-slate-800">Penerbit:</span> ${formatDataKosong(row.publisher || row.PUBLISHER)}
-                        </span>
-                        <span class="text-slate-600" title="Volume / Issue">
-                            <span class="font-semibold text-slate-800">Vol/Issue:</span> ${formatDataKosong(row.volIssue || row.volumeIssue || row.volume_issue || row.VOLUME)}
-                        </span>
-                        <span class="text-slate-600" title="Tarikh Terbit">
-                            <span class="font-semibold text-slate-800">Tarikh Terbit:</span> ${formatDataKosong(row.tarikhTerbit || row.tarikhPenerbitan || row.tarikh_penerbitan || row.TARIKH)}
-                        </span>
-                         <span class="text-slate-600" title="Bahasa">
-                            <span class="font-semibold text-slate-800">Bahasa:</span> ${formatDataKosong(row.bahasa || row.BAHASA)}
-                        </span>
+                        <span class="text-slate-600" title="Publisher"><span class="font-semibold text-slate-800">Penerbit:</span> ${formatDataKosong(row.publisher || row.PUBLISHER)}</span>
+                        <span class="text-slate-600" title="Volume / Issue"><span class="font-semibold text-slate-800">Vol/Issue:</span> ${formatDataKosong(row.volIssue || row.volumeIssue || row.volume_issue || row.VOLUME)}</span>
+                        <span class="text-slate-600" title="Tarikh Terbit"><span class="font-semibold text-slate-800">Tarikh Terbit:</span> ${formatDataKosong(row.tarikhTerbit || row.tarikhPenerbitan || row.tarikh_penerbitan || row.TARIKH)}</span>
+                        <span class="text-slate-600" title="Bahasa"><span class="font-semibold text-slate-800">Bahasa:</span> ${formatDataKosong(row.bahasa || row.BAHASA)}</span>
                     </div>
                 </div>
             </td>
-
-            <td class="py-4 px-3 text-gray-700 text-sm whitespace-normal min-w-[150px] col-penulis">
-                <div class="flex items-start gap-1.5 font-medium">
-                    <span class="mt-0.5">👤</span> 
-                    <span class="leading-tight">${formatDataKosong(row.penulis || row.PENULIS)}</span>
-                </div>
-            </td>
+            <td class="py-4 px-3 text-gray-700 text-sm whitespace-normal min-w-[150px] col-penulis"><div class="flex items-start gap-1.5 font-medium"><span class="mt-0.5">👤</span> <span class="leading-tight">${formatDataKosong(row.penulis || row.PENULIS)}</span></div></td>
             <td class="py-4 px-3 text-center col-doi">${htmlDoi}</td>
             <td class="py-4 px-3 text-center font-bold text-slate-700 text-sm col-jabatan">${formatDataKosong(row.jabatan || row.JABATAN)}</td>
-            <td class="py-4 px-3 text-center text-gray-600 text-xs col-tahap">
-                <span class="bg-gray-100 text-gray-800 px-2 py-0.5 rounded-md font-medium border border-gray-200 shadow-3xs">
-                    ${formatDataKosong(row.tahapSebaran || row.tahap_sebaran || row.TAHAP)}
-                </span>
-            </td>
-            <td class="py-4 px-3 text-center font-semibold text-gray-600 text-xs col-kpi">
-                <span class="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-md font-medium border border-purple-100 shadow-3xs">
-                    ${formatDataKosong(row.laporanKpi || row.laporan_kpi || row.SUKUAN)}
-                </span>
-            </td>
+            <td class="py-4 px-3 text-center text-gray-600 text-xs col-tahap"><span class="bg-gray-100 text-gray-800 px-2 py-0.5 rounded-md font-medium border border-gray-200 shadow-3xs">${formatDataKosong(row.tahapSebaran || row.tahap_sebaran || row.TAHAP)}</span></td>
+            <td class="py-4 px-3 text-center font-semibold text-gray-600 text-xs col-kpi"><span class="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-md font-medium border border-purple-100 shadow-3xs">${formatDataKosong(row.laporanKpi || row.laporan_kpi || row.SUKUAN)}</span></td>
             <td class="py-4 px-3 text-center font-bold text-purple-800 text-sm col-tahun">${formatDataKosong(row.tahun || row.TAHUN)}</td>
-            <td class="py-4 px-3 text-center text-gray-600 text-xs col-index">
-                <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-medium border border-blue-100 shadow-3xs">
-                    ${formatDataKosong(row.indexStatus || row.index_status || row.INDEX)}
-                </span>
-            </td>
+            <td class="py-4 px-3 text-center text-gray-600 text-xs col-index"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-medium border border-blue-100 shadow-3xs">${formatDataKosong(row.indexStatus || row.index_status || row.INDEX)}</span></td>
             <td class="py-4 px-3 col-dokumen text-center">${htmlDokumen}</td>
-            
             <td class="py-4 px-3 text-center col-status">${statusBadge}</td>
             <td class="py-4 px-3 text-left col-ulasan">${htmlUlasan}</td>
             <td class="py-4 px-3 text-center bg-slate-50/30 col-tindakan">${butangTindakan}</td>
@@ -694,7 +703,7 @@ function dapatkanNamaFail(url, index) {
             // 🌟 TAMBAHAN BARU: SETUP DATA STATUS PENGESAHAN & ULASAN KETIKA MODAL DIBUKA
             // =======================================================================
             const elStatusPengesahan = document.getElementById('editStatusPengesahan');
-            const elUlasanDitolak = document.getElementById('editUlasanDitolak');
+            const elUlasanDitolak = document.getElementById('editUlasan');
             const ruangUlasanTolak = document.getElementById('ruangUlasanTolak');
             
             if (elStatusPengesahan) {
@@ -705,8 +714,8 @@ function dapatkanNamaFail(url, index) {
                     let ulasanSemasa = rekod.ulasanDitolak || rekod.ulasan_ditolak || rekod.ulasan || "";
                     elUlasanDitolak.value = ulasanSemasa;
                     
-                    // Automatik buka ruangan ulasan jika status semasa memang DITOLAK
-                    if (statusSemasa === "DITOLAK") {
+                    // Automatik buka ruangan ulasan jika status semasa DITOLAK atau BAIKI SEMULA
+                    if (statusSemasa === "DITOLAK" || statusSemasa === "BAIKI SEMULA") {
                         ruangUlasanTolak.classList.remove("hidden");
                         elUlasanDitolak.setAttribute("required", "true");
                     } else {
@@ -915,7 +924,7 @@ function dapatkanNamaFail(url, index) {
 
             // Dapatkan nilai tambahan dari UI (Lajur O & R)
             const statusPengesahanVal = document.getElementById('editStatusPengesahan') ? document.getElementById('editStatusPengesahan').value : "";
-            const ulasanDitolakVal = document.getElementById('editUlasanDitolak') ? document.getElementById('editUlasanDitolak').value : "";
+            const ulasanDitolakVal = document.getElementById('editUlasan') ? document.getElementById('editUlasan').value : "";
 
             const payload = {
                 action: "kemaskiniMaklumatPenyelidikan",
@@ -939,8 +948,8 @@ function dapatkanNamaFail(url, index) {
                 senaraiFailBaru: senaraiFailDihantar,
                 
                 // 🌟 TAMBAHAN BARU: Sertakan data status & ulasan ke dalam payload hantaran
-                statusPengesahan: statusPengesahanVal,
-                ulasanDitolak: (statusPengesahanVal === "DITOLAK") ? ulasanDitolakVal : "" 
+				statusPengesahan: statusPengesahanVal,
+				ulasanDitolak: (statusPengesahanVal === "DITOLAK" || statusPengesahanVal === "BAIKI SEMULA") ? ulasanDitolakVal : ""
             };
 
             fetch(SCRIPT_URL, {
@@ -971,7 +980,7 @@ function dapatkanNamaFail(url, index) {
                             window.rekodPenuh[indexLokal].STATUSPENGESAHAN = payload.statusPengesahan;
                             window.rekodPenuh[indexLokal].status = payload.statusPengesahan;
                         }
-                        if (payload.statusPengesahan === "DITOLAK") {
+                        if (payload.statusPengesahan === "DITOLAK" || payload.statusPengesahan === "BAIKI SEMULA") {
                             window.rekodPenuh[indexLokal].ulasanDitolak = payload.ulasanDitolak;
                             window.rekodPenuh[indexLokal].ulasan = payload.ulasanDitolak;
                         } else {
@@ -1002,28 +1011,28 @@ function dapatkanNamaFail(url, index) {
             });
         }
         // =================================================================
-        // KAWALAN TINDAKAN PENGESAH (SAHKAN / TOLAK / PADAM)
-        // =================================================================
-        function kemaskiniStatus(bil, statusBaru) {
-            let ulasanMesej = "";
+// KAWALAN TINDAKAN PENGESAH (SAHKAN / TOLAK / BAIKI SEMULA / PADAM)
+// =================================================================
+function kemaskiniStatus(bil, statusBaru) {
+    let ulasanMesej = "";
 
-            // Jika status DITOLAK, wajibkan pengguna memasukkan ulasan
-            if (statusBaru === "DITOLAK") {
-                ulasanMesej = prompt("Sila nyatakan ulasan / sebab rekod ini DITOLAK (Lajur R):", "");
-                
-                if (ulasanMesej === null) return; // Pengguna klik Batal (Cancel)
-                if (ulasanMesej.trim() === "") {
-                    alert("⚠️ Ulasan / sebab WAJIB diisi sekiranya anda menolak permohonan ini.");
-                    return;
-                }
-            } else {
-                const mesejPengesahan = "Adakah anda pasti untuk SAHKAN rekod penyelidikan ini?";
-                if (!confirm(mesejPengesahan)) return;
-            }
-            
-            // Hantar tindakan bersama ulasanMesej
-            laksanakanArahanAPI("kemaskiniStatusPenyelidikan", bil, statusBaru, ulasanMesej.trim());
+    // 🌟 KEMASKINI BARU: Jika status DITOLAK atau BAIKI SEMULA, wajibkan pengguna memasukkan ulasan
+    if (statusBaru === "DITOLAK" || statusBaru === "BAIKI SEMULA") {
+        ulasanMesej = prompt(`Sila nyatakan ulasan penambahbaikan / sebab rekod ini ${statusBaru} (Lajur R):`, "");
+        
+        if (ulasanMesej === null) return; // Pengguna klik Batal (Cancel)
+        if (ulasanMesej.trim() === "") {
+            alert(`⚠️ Ulasan penambahbaikan / sebab WAJIB diisi sekiranya anda memilih status ${statusBaru}.`);
+            return;
         }
+    } else {
+        const mesejPengesahan = "Adakah anda pasti untuk SAHKAN rekod penyelidikan ini?";
+        if (!confirm(mesejPengesahan)) return;
+    }
+    
+    // Hantar tindakan bersama ulasanMesej
+    laksanakanArahanAPI("kemaskiniStatusPenyelidikan", bil, statusBaru, ulasanMesej.trim());
+}
 
         function padamRekod(bil) {
             const mesejPengesahan = "⚠️ AMARAN: Adakah anda pasti mahu MEMADAM rekod ini sepenuhnya dari pangkalan data? Tindakan ini memadam fail Drive juga dan tidak boleh dipulihkan.";
@@ -1077,7 +1086,7 @@ function dapatkanNamaFail(url, index) {
                             window.rekodPenuh[idxLokal].status = statusBaru;
                             
                             // Kemaskini rekod ulasan ke memori paparan secara langsung
-                            if (statusBaru === "DITOLAK") {
+                            if (statusBaru === "DITOLAK" || statusBaru === "BAIKI SEMULA") {
                                 window.rekodPenuh[idxLokal].ulasanDitolak = ulasanDitolak;
                                 window.rekodPenuh[idxLokal].ulasan = ulasanDitolak;
                             } else {
@@ -1184,13 +1193,14 @@ function dapatkanNamaFail(url, index) {
         }
 		
 		
-		// Fungsi ini dipanggil apabila pengguna menukar dropdown Status
+	// Fungsi ini dipanggil apabila pengguna menukar dropdown Status
+    // 🌟 KEMASKINI BARU: Memastikan Modal Edit membuka ruang ulasan jika rekod = BAIKI SEMULA
     function semakStatusUlasan() {
         const ddlStatus = document.getElementById("editStatusPengesahan");
         const ruangUlasan = document.getElementById("ruangUlasanTolak");
-        const ulasanTeks = document.getElementById("editUlasanDitolak");
+        const ulasanTeks = document.getElementById("editUlasan");
         
-        if (ddlStatus.value === "DITOLAK") {
+        if (ddlStatus.value === "DITOLAK" || ddlStatus.value === "BAIKI SEMULA") {
             ruangUlasan.classList.remove("hidden");
             ulasanTeks.setAttribute("required", "true"); // Wajib diisi
         } else {
