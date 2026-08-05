@@ -9,6 +9,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+	<!-- Pustaka untuk cantum PDF di Pelayar Web -->
+	<script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+	<!-- Pustaka untuk hasilkan ZIP di Pelayar Web -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+	<!-- Pustaka untuk mencetuskan arahan Muat Turun -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script>
         if (sessionStorage.getItem("userLulus") !== "YA") {
             alert("Akses ditolak! Sila log masuk terlebih dahulu.");
@@ -84,7 +90,7 @@
                         
                         <div class="flex flex-wrap gap-2 items-center w-full lg:w-auto justify-start lg:justify-end">
                             <button id="btnLaporanPDF" onclick="muatTurunPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-1">📄 Laporan PDF</button>
-                            <button id="btnDownloadZip" onclick="muatTurunZipDokumen()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-1" title="Ekstrak & Muat Turun Dokumen Bukti Berdasarkan Filter">🗜️ Download Dokumen (ZIP)</button>
+                            <button id="btnDownloadZip" onclick="muatTurunZipDokumen()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-1" title="Ekstrak & Muat Turun Dokumen Bukti Berdasarkan Filter">🗜️ MUAT TURUN FAIL BUKTI</button>
                             <button onclick="muatTurunCSV()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-1">📥 Download CSV</button>
                             <button onclick="ambilData()" class="bg-white border border-gray-300 hover:bg-gray-100 text-blue-600 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1 shadow-sm">🔄 Refresh Data</button>
                         </div>
@@ -124,6 +130,46 @@
         </div>
     </div>
 
+     <!-- 🌟 MODAL PILIHAN FORMAT MUAT TURUN ZIP 🌟 -->
+<div id="modalPilihanDownload" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl border border-gray-100 transition-all">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                <span class="text-2xl">📥</span>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Pilihan Format Muat Turun</h2>
+        </div>
+        
+        <p class="text-sm text-gray-500 mb-5">Sila pilih format susunan fail di dalam fail ZIP:</p>
+        
+        <div class="space-y-3 mb-6">
+            <!-- Pilihan 1: Tanpa Gabung (Asal) -->
+            <label class="flex items-start p-4 border-2 border-blue-500 bg-blue-50/40 rounded-xl cursor-pointer transition hover:bg-blue-50 group">
+                <input type="radio" name="pilihanZipFormat" value="1" checked class="mt-1 w-4 h-4 text-blue-600 focus:ring-blue-500">
+                <div class="ml-3">
+                    <span class="block font-bold text-gray-800 group-hover:text-blue-700">1. Tanpa Gabung (Asal)</span>
+                    <span class="block text-xs text-gray-500 mt-1">Fail bukti akan dimuat turun dalam keadaan asal berasingan tanpa dicantumkan.</span>
+                </div>
+            </label>
+
+            <!-- Pilihan 2: Merge PDF (Gabung) -->
+            <label class="flex items-start p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition hover:bg-gray-50 group">
+                <input type="radio" name="pilihanZipFormat" value="2" class="mt-1 w-4 h-4 text-blue-600 focus:ring-blue-500">
+                <div class="ml-3">
+                    <span class="block font-bold text-gray-800 group-hover:text-blue-700">2. Merge PDF (Gabung)</span>
+                    <span class="block text-xs text-gray-500 mt-1">Kesemua fail bukti bagi setiap ID akan dicantumkan menjadi satu (1) fail PDF tunggal.</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
+            <button type="button" onclick="tutupModal('modalPilihanDownload')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2.5 rounded-xl transition">Batal</button>
+            <button type="button" onclick="mulaMuatTurunSistem()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition flex items-center gap-1.5">Muat Turun ⬇</button>
+        </div>
+    </div>
+</div>
+
+ 
     <!-- MODAL EDIT DATA & UPLOAD SIJIL & LIHAT BUKTI ... KEKAL SAMA SEPERTI ASAL -->
     
     <div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
@@ -420,75 +466,230 @@
             });
         }
 
+        // 🌟 --- FUNGSI BUKA MODAL PILIHAN MUAT TURUN --- 🌟
         function muatTurunZipDokumen() {
             if (!perananLayakZip.includes(userPeranan.toUpperCase())) {
                 return alert("Akses ditolak! Peranan anda tidak mempunyai kebenaran untuk memuat turun dokumen ZIP.");
             }
             if (currentFilteredData.length === 0) return alert("Tiada data untuk dimuat turun.");
 
-            let senaraiDokumen = [];
-            const labelDokumen = ["Laporan", "Surat_Aplikasi", "Harta_Intelek"];
-
-            currentFilteredData.forEach(row => {
+            // Semak kewujudan rekod berstatus DISAHKAN
+            let adaDisahkan = currentFilteredData.some(row => {
                 let statusRekod = row[13] ? String(row[13]).trim().toUpperCase() : "";
-
-                if (statusRekod === "DISAHKAN") {
-                    let urlBukti = row[11] ? String(row[11]).trim() : "";
-                    
-                    if (urlBukti.length > 5) {
-                        let urlArray = urlBukti.split(/,|\n/).map(u => u.trim()).filter(u => u.length > 5);
-                        
-                        let tahun = String(row[10]).trim() || "TIADA_TAHUN";
-                        let sukuan = String(row[12]).trim() || "TIADA_SUKUAN";
-                        let jabatanPenuh = String(row[6]).trim() || "TIADA_JABATAN";
-                        
-                        let matchJab = jabatanPenuh.match(/\(([^)]+)\)/);
-                        let jabatan = matchJab ? matchJab[1].trim() : jabatanPenuh.substring(0, 15);
-                        let namaProduk = String(row[1] || `Produk_${row[0]}`).replace(/[^a-zA-Z0-9_-]/g, "_");
-
-                        urlArray.forEach((url, idx) => {
-                            let namaItem = labelDokumen[idx] ? labelDokumen[idx] : `Lampiran_${idx + 1}`;
-                            let pathFolder = `${tahun}/${sukuan}/${jabatan}/${namaProduk}_${namaItem}.pdf`;
-                            
-                            senaraiDokumen.push({ url: url, path: pathFolder });
-                        });
-                    }
-                }
+                let urlBukti = row[11] ? String(row[11]).trim() : "";
+                return statusRekod === "DISAHKAN" && urlBukti.length > 5;
             });
 
-            if (senaraiDokumen.length === 0) return alert("Tiada dokumen bukti yang berstatus DISAHKAN dijumpai dalam senarai pada waktu ini.");
+            if (!adaDisahkan) {
+                return alert("Tiada dokumen bukti yang berstatus DISAHKAN dijumpai dalam senarai pada waktu ini.");
+            }
 
+            // Paparkan Modal Pilihan
+            document.getElementById('modalPilihanDownload').classList.remove('hidden');
+            document.getElementById('modalPilihanDownload').classList.add('flex');
+        }
+
+        // 🌟 --- FUNGSI MULA PROSES SETELAH BUTANG 'MUAT TURUN' DITEKAN --- 🌟
+        function mulaMuatTurunSistem() {
+            tutupModal('modalPilihanDownload');
+            const formatPilihan = document.querySelector('input[name="pilihanZipFormat"]:checked').value;
+            prosesMuatTurunZip(formatPilihan);
+        }
+
+        // 🌟 --- FUNGSI PELAKSANAAN MUAT TURUN (PILIHAN 1 / PILIHAN 2) --- 🌟
+        async function prosesMuatTurunZip(pilihanFormat) {
             const btn = document.getElementById('btnDownloadZip');
             const teksAsal = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = "⏳ Sedang memampat fail (Sila tunggu)...";
 
             let namaFolderZip = `Dokumen_Bukti_KPI_${document.getElementById('filterTahun').value || 'Semua_Tahun'}.zip`;
 
-            fetch(scriptURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: "zipDokumen",
-                    dokumen: senaraiDokumen,
-                    namaZip: namaFolderZip
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "BERJAYA") {
-                    window.open(data.url, '_blank');
-                } else {
-                    alert("Ralat Server: " + data.mesej);
+            // ==========================================
+            // PILIHAN 1: TANPA GABUNG (ASAL)
+            // ==========================================
+            if (pilihanFormat === "1") {
+                btn.innerHTML = "⏳ Sedang memampat fail (Sila tunggu)...";
+
+                let senaraiDokumen = [];
+                const labelDokumen = ["Laporan", "Surat_Aplikasi", "Harta_Intelek"];
+
+                currentFilteredData.forEach(row => {
+                    let statusRekod = row[13] ? String(row[13]).trim().toUpperCase() : "";
+
+                    if (statusRekod === "DISAHKAN") {
+                        let urlBukti = row[11] ? String(row[11]).trim() : "";
+                        
+                        if (urlBukti.length > 5) {
+                            let urlArray = urlBukti.split(/,|\n/).map(u => u.trim()).filter(u => u.length > 5);
+                            
+                            let tahun = String(row[10]).trim() || "TIADA_TAHUN";
+                            let sukuan = String(row[12]).trim() || "TIADA_SUKUAN";
+                            let jabatanPenuh = String(row[6]).trim() || "TIADA_JABATAN";
+                            
+                            let matchJab = jabatanPenuh.match(/\(([^)]+)\)/);
+                            let jabatan = matchJab ? matchJab[1].trim() : jabatanPenuh.substring(0, 15);
+                            let namaProduk = String(row[1] || `Produk_${row[0]}`).replace(/[^a-zA-Z0-9_-]/g, "_");
+
+                            urlArray.forEach((url, idx) => {
+                                let namaItem = labelDokumen[idx] ? labelDokumen[idx] : `Lampiran_${idx + 1}`;
+                                let pathFolder = `${tahun}/${sukuan}/${jabatan}/${namaProduk}_${namaItem}.pdf`;
+                                
+                                senaraiDokumen.push({ url: url, path: pathFolder });
+                            });
+                        }
+                    }
+                });
+
+                if (senaraiDokumen.length === 0) {
+                    btn.disabled = false;
+                    btn.innerHTML = teksAsal;
+                    return alert("Tiada dokumen bukti yang berstatus DISAHKAN dijumpai dalam senarai pada waktu ini.");
                 }
-            })
-            .catch(err => {
-                alert("Ralat pelayan semasa cuba membuat fail ZIP. Gagal berhubung dengan Google Script.");
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = teksAsal;
-            });
+
+                fetch(scriptURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: "zipDokumen",
+                        dokumen: senaraiDokumen,
+                        namaZip: namaFolderZip
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "BERJAYA") {
+                        window.open(data.url, '_blank');
+                    } else {
+                        alert("Ralat Server: " + data.mesej);
+                    }
+                })
+                .catch(err => {
+                    alert("Ralat pelayan semasa cuba membuat fail ZIP. Gagal berhubung dengan Google Script.");
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = teksAsal;
+                });
+
+            // ==========================================
+            // PILIHAN 2: MERGE PDF (GABUNG)
+            // ==========================================
+            } else if (pilihanFormat === "2") {
+                btn.innerHTML = "⏳ Sedang mencantumkan PDF & memampat fail...";
+
+                let senaraiItemProses = [];
+
+                currentFilteredData.forEach(row => {
+                    let statusRekod = row[13] ? String(row[13]).trim().toUpperCase() : ""; // Lajur N (STATUS)
+
+                    if (statusRekod === "DISAHKAN") {
+                        let urlBukti = row[11] ? String(row[11]).trim() : ""; // Lajur L (DOKUMEN BUKTI)
+                        
+                        if (urlBukti.length > 5) {
+                            let urlArray = urlBukti.split(/,|\n/).map(u => u.trim()).filter(u => u.length > 5);
+                            
+                            let bil = String(row[0]).trim(); // Lajur A (BIL)
+                            let namaProdukRaw = String(row[1] || `Produk_${row[0]}`).trim(); // Lajur B (NAMA PRODUK)
+                            let namaProduk = namaProdukRaw.replace(/[^a-zA-Z0-9_-]/g, "_");
+                            
+                            let tahun = String(row[10]).trim() || "TIADA_TAHUN";
+                            let sukuan = String(row[12]).trim() || "TIADA_SUKUAN";
+                            let jabatanPenuh = String(row[6]).trim() || "TIADA_JABATAN";
+                            
+                            let matchJab = jabatanPenuh.match(/\(([^)]+)\)/);
+                            let jabatan = matchJab ? matchJab[1].trim() : jabatanPenuh.substring(0, 15);
+
+                            // Format nama fail gabungan: BIL_NAMA PRODUK_GABUNG.pdf
+                            let namaFailGabung = `${bil}_${namaProduk}_GABUNG.pdf`;
+                            let pathFolder = `${tahun}/${sukuan}/${jabatan}/`;
+
+                            senaraiItemProses.push({
+                                bil: bil,
+                                namaProduk: namaProduk,
+                                pathFolder: pathFolder,
+                                namaFailGabung: namaFailGabung,
+                                urls: urlArray
+                            });
+                        }
+                    }
+                });
+
+                if (senaraiItemProses.length === 0) {
+                    btn.disabled = false;
+                    btn.innerHTML = teksAsal;
+                    return alert("Tiada dokumen bukti yang berstatus DISAHKAN dijumpai dalam senarai pada waktu ini.");
+                }
+
+                try {
+                    // Tarik fail dari Google Drive melalui backend Apps Script
+                    const response = await fetch(scriptURL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: "dapatkanBase64Dokumen",
+                            senarai: senaraiItemProses
+                        })
+                    });
+
+                    const resData = await response.json();
+
+                    if (resData.status !== "BERJAYA") {
+                        throw new Error(resData.mesej || "Gagal mendapatkan fail dari Google Drive.");
+                    }
+
+                    // Gunakan JSZip untuk membina ZIP di Browser
+                    const zip = new JSZip();
+
+                    for (let item of resData.data) {
+                        if (!item.files || item.files.length === 0) continue;
+
+                        // Jika mengandungi lebih daripada 2 fail (atau > 1 fail), merge PDF
+                        if (item.files.length > 1) {
+                            try {
+                                const mergedPdf = await PDFLib.PDFDocument.create();
+
+                                for (let f of item.files) {
+                                    try {
+                                        const pdfBytes = Uint8Array.from(atob(f.base64), c => c.charCodeAt(0));
+                                        const pdf = await PDFLib.PDFDocument.load(pdfBytes);
+                                        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                                        copiedPages.forEach(page => mergedPdf.addPage(page));
+                                    } catch (ePdf) {
+                                        console.warn("Ralat semasa membaca helaian PDF:", ePdf);
+                                    }
+                                }
+
+                                const mergedPdfBytes = await mergedPdf.save();
+                                let fullPath = `${item.pathFolder}${item.namaFailGabung}`;
+                                zip.file(fullPath, mergedPdfBytes);
+
+                            } catch (eMerge) {
+                                console.error("Ralat gabung PDF:", eMerge);
+                                // Fallback jika gabung gagal
+                                item.files.forEach((f, idx) => {
+                                    const pdfBytes = Uint8Array.from(atob(f.base64), c => c.charCodeAt(0));
+                                    zip.file(`${item.pathFolder}${item.namaFailGabung.replace('.pdf','')}_Fail_${idx+1}.pdf`, pdfBytes);
+                                });
+                            }
+                        } else if (item.files.length === 1) {
+                            // Jika hanya 1 fail PDF
+                            const singlePdfBytes = Uint8Array.from(atob(item.files[0].base64), c => c.charCodeAt(0));
+                            let fullPath = `${item.pathFolder}${item.namaFailGabung}`;
+                            zip.file(fullPath, singlePdfBytes);
+                        }
+                    }
+
+                    // Hasilkan & Muat turun fail ZIP terus dalam pelayar web
+                    const zipBlob = await zip.generateAsync({ type: "blob" });
+                    saveAs(zipBlob, namaFolderZip);
+
+                } catch (err) {
+                    alert("Ralat semasa proses Merge PDF: " + err.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = teksAsal;
+                }
+            }
         }
 
         function dapatkanSingkatanJabatan(namaPenuh) {
