@@ -41,6 +41,11 @@
                         <label class="block text-sm font-bold text-gray-700 mb-1">No. Kad Pengenalan</label>
                         <input type="text" id="noIC" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: 801231081234">
                     </div>
+                    <!-- TAMBAH: Ruangan No. HP -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">No. Telefon (HP)</label>
+                        <input type="text" id="noHP" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: 0123456789">
+                    </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Kata Laluan</label>
                         <input type="password" id="katalaluan" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
@@ -101,13 +106,20 @@
                         <option value="">Semua Jabatan</option>
                     </select>
 
+                    <!-- TAMBAH: Filter Bahagian -->
+                    <select id="filterBahagian" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-indigo-300 rounded-lg text-sm font-bold focus:ring-indigo-500 outline-none text-gray-700 w-full md:w-auto">
+                        <option value="">Semua Bahagian</option>
+                    </select>
+
                     <select id="filterPeranan" onchange="terapkanTapisan()" class="px-3 py-1.5 border border-indigo-300 rounded-lg text-sm font-bold focus:ring-indigo-500 outline-none text-gray-700 w-full md:w-auto">
                         <option value="">Semua Peranan</option>
                     </select>
 
-                    <button onclick="muatTurunCSV()" class="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-emerald-700 transition shadow-sm flex-1 md:flex-none">
+                    <!-- KEMAS KINI: ID ditambah dan disetkan kepada hidden secara lalai -->
+                    <button id="btnMuatTurunCSV" onclick="muatTurunCSV()" class="hidden bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-emerald-700 transition shadow-sm flex-1 md:flex-none">
                         📥 CSV
                     </button>
+                    
                     <button onclick="muatSenaraiPenyelaras()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm flex-1 md:flex-none">
                         🔄 Refresh
                     </button>
@@ -120,6 +132,8 @@
                         <tr class="bg-indigo-600 text-white uppercase tracking-wide text-xs">
                             <th class="p-3 border-b text-center w-12">BIL</th>
                             <th class="p-3 border-b w-1/4">NAMA</th>
+                            <!-- TAMBAH: Header No HP (Sembunyi secara lalai) -->
+                            <th id="thNoHP" class="p-3 border-b text-center hidden">NO. HP</th>
                             <th class="p-3 border-b text-center">JABATAN</th>
                             <th class="p-3 border-b text-center">PERANAN</th>
                             <th class="p-3 border-b text-center">BAHAGIAN</th>
@@ -130,7 +144,7 @@
                         </tr>
                     </thead>
                     <tbody id="isiJadual" class="text-gray-700 bg-white">
-                        <tr><td colspan="9" class="p-10 text-center font-bold text-indigo-500 animate-pulse">⏳ Memuat turun senarai...</td></tr>
+                        <tr><td colspan="10" class="p-10 text-center font-bold text-indigo-500 animate-pulse">⏳ Memuat turun senarai...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -154,7 +168,6 @@
             <form id="formKemaskini" onsubmit="simpanKemaskini(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                 <input type="hidden" id="editIC_Lama"> 
                
-
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Nama Pengguna <span class="text-red-500">*</span></label>
                     <input type="text" id="editNama" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none uppercase">
@@ -163,6 +176,12 @@
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">No. Kad Pengenalan (IC) <span class="text-red-500">*</span></label>
                     <input type="text" id="editIC_Baru" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                
+                <!-- TAMBAH: Edit No HP dalam modal -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">No. Telefon (HP) <span class="text-red-500">*</span></label>
+                    <input type="text" id="editNoHP" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
 
                 <div>
@@ -215,14 +234,31 @@
     </div>
 
     <script>
-// ⚠️ MASUKKAN URL WEB APP ANDA DI SINI
+        // ⚠️ MASUKKAN URL WEB APP ANDA DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
         const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
+        const userJabatan = (sessionStorage.getItem("jabatan") || "").toUpperCase(); // TAMBAH: Dapatkan jabatan pengguna login
         const rawIC = sessionStorage.getItem("ic") || sessionStorage.getItem("noIC") || sessionStorage.getItem("NO_IC") || sessionStorage.getItem("no_ic") || ""; 
         const userICSemasa = String(rawIC).trim();
+        
+        // 1. Kumpulkan semua peranan Penyelaras yang setara ke dalam satu tatasusunan (array)
+        const senaraiPenyelaras = [
+            "PENYELARAS INOVASI", 
+            "PENYELARAS PENYELIDIKAN",
+            "PENYELARAS INOVASI (C-RIE)",
+            "PENYELARAS PENYELIDIKAN (C-RIE)"
+        ];
+        // 2. Tentukan jika pengguna log masuk adalah Approver
+        // (Gabungkan ADMIN, KUPIK, dan senaraiPenyelaras menggunakan sintaks penyebaran '...')
+        const isApprover = ["ADMIN", "KUPIK", ...senaraiPenyelaras].includes(userPeranan);
 
-        const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
+        // 3. KAWALAN: Senarai peranan yang dibenarkan muat turun CSV
+        const allowedCSVRoles = [
+            "ADMIN", 
+            "KUPIK", 
+            ...senaraiPenyelaras
+        ];
 
         let dataPenggunaGlobal = []; 
         let dataDitapis = []; 
@@ -233,8 +269,33 @@
         let sesiSistem = ""; 
         let tahunSistem = "";
 
+        // ==========================================
+        // DIPERBAIKI: SATUKAN window.onload & KAWALAN AKSES
+        // ==========================================
         window.onload = () => {
-            if (isApprover) { document.getElementById('thTindakan').classList.remove('hidden'); }
+            const thTindakan = document.getElementById('thTindakan');
+            const thNoHP = document.getElementById('thNoHP');
+
+            // KAWALAN: Jika tiada pengguna login, sembunyikan TINDAKAN
+            if (!userPeranan) {
+                if(thTindakan) thTindakan.classList.add('hidden');
+                if(thNoHP) thNoHP.classList.add('hidden');
+            } 
+            // KAWALAN: Jika pengguna login adalah Approver
+            else if (isApprover) { 
+                if(thTindakan) thTindakan.classList.remove('hidden'); 
+                if(thNoHP) thNoHP.classList.remove('hidden'); // Papar NO HP untuk Approver
+            } 
+            // KAWALAN: Pengguna biasa (STAF, PENYELARAS JABATAN, PENYELIA PROJEK PELAJAR)
+            else {
+                if(thTindakan) thTindakan.classList.remove('hidden'); 
+            }
+            
+            // Semak adakah peranan dibenarkan melihat butang CSV
+            if (allowedCSVRoles.includes(userPeranan)) {
+                const btnCSV = document.getElementById('btnMuatTurunCSV');
+                if (btnCSV) btnCSV.classList.remove('hidden');
+            }
             
             // Panggil fungsi untuk muat sesi dan tahun dari pangkalan data
             muatSesiDanTahunGlobal();
@@ -263,7 +324,12 @@
                     document.getElementById('bahagian').innerHTML = htmlBahagian;
                     document.getElementById('editBahagian').innerHTML = htmlBahagian;
 
-					// --- SETUP PERANAN ---
+                    // TAMBAH: SETUP FILTER BAHAGIAN
+                    let htmlFilterBahagian = '<option value="">Semua Bahagian</option>';
+                    data.BAHAGIAN.forEach(b => htmlFilterBahagian += `<option value="${b}">${b}</option>`);
+                    document.getElementById('filterBahagian').innerHTML = htmlFilterBahagian;
+
+                    // --- SETUP PERANAN ---
                     let htmlPeranan = '<option value="">-- Pilih Peranan --</option>';
                     data.PERANAN.forEach(p => {
                         // Semak dan abaikan jika peranan adalah STAF
@@ -274,16 +340,14 @@
                     document.getElementById('peranan').innerHTML = htmlPeranan; // Untuk Daftar
                     document.getElementById('editPeranan').innerHTML = htmlPeranan; // Untuk Edit
 
-                    // ⬇️ TAMBAH KOD INI UNTUK FILTER PERANAN ⬇️
+                    // FILTER PERANAN 
                     let htmlFilterPeranan = '<option value="">Semua Peranan</option>';
                     data.PERANAN.forEach(p => {
-                        // Semak dan abaikan jika peranan adalah STAF
                         if (p.toString().trim().toUpperCase() !== "STAF") {
                             htmlFilterPeranan += `<option value="${p}">${p}</option>`;
                         }
                     });
                     document.getElementById('filterPeranan').innerHTML = htmlFilterPeranan;
-                    // ⬆️ TAMAT KOD FILTER PERANAN ⬆️
                 }
             })
             .catch(err => console.log("Gagal memuat turun tetapan dropdown."));
@@ -335,6 +399,7 @@
                 action: "tambahPengguna",
                 NAMA: document.getElementById('nama').value.toUpperCase(),
                 NO_IC: document.getElementById('noIC').value, 
+                NO_HP: document.getElementById('noHP').value, // TAMBAH: No HP ke payload
                 KATA_LALUAN: pass1,
                 JABATAN: document.getElementById('jabatan').value.toUpperCase(),
                 BAHAGIAN: document.getElementById('bahagian').value.toUpperCase(), 
@@ -382,7 +447,7 @@
 
         function muatSenaraiPenyelaras() {
             const tbody = document.getElementById('isiJadual');
-            tbody.innerHTML = `<tr><td colspan="9" class="p-10 text-center font-bold text-indigo-500 animate-pulse">⏳ Memuat turun...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center font-bold text-indigo-500 animate-pulse">⏳ Memuat turun...</td></tr>`;
 
             fetch(`${SCRIPT_URL}?action=ambilPengguna`)
             .then(res => res.json()).then(result => {
@@ -391,8 +456,8 @@
                     dataPenggunaGlobal = (result.data || []).reverse(); 
                     terapkanTapisan(); 
                 } 
-                else { tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`; }
-            }).catch(err => { tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke pangkalan data.</td></tr>`; });
+                else { tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`; }
+            }).catch(err => { tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke pangkalan data.</td></tr>`; });
         }
 
         // ==========================================
@@ -400,16 +465,18 @@
         // ==========================================
         function terapkanTapisan() {
             const valJab = document.getElementById('filterJabatan').value;
+            const valBahagian = document.getElementById('filterBahagian').value; // TAMBAH: Ambil nilai Bahagian
             const valPeranan = document.getElementById('filterPeranan').value;
             const valTahun = document.getElementById('carianTahun').value.trim();
 
-            // Tapis dataGlobal berdasarkan 3 kriteria
+            // Tapis dataGlobal berdasarkan 4 kriteria
             dataDitapis = dataPenggunaGlobal.filter(row => {
                 let padanJabatan = (valJab === "") || (row.jabatan === valJab);
+                let padanBahagian = (valBahagian === "") || (row.bahagian === valBahagian); // TAMBAH: Tapisan Bahagian
                 let padanPeranan = (valPeranan === "") || (String(row.peranan).toUpperCase() === String(valPeranan).toUpperCase());
                 let padanTahun = (valTahun === "") || (String(row.tahun).includes(valTahun));
 
-                return padanJabatan && padanPeranan && padanTahun;
+                return padanJabatan && padanBahagian && padanPeranan && padanTahun;
             });
             
             // Reset kembali ke muka surat 1 setiap kali tapisan ditukar
@@ -424,120 +491,128 @@
         }
 
         function paparJadualPaginasi() {
-    const tbody = document.getElementById('isiJadual');
-    const navBar = document.getElementById('kawalanNavigasi');
-    tbody.innerHTML = "";
+            const tbody = document.getElementById('isiJadual');
+            const navBar = document.getElementById('kawalanNavigasi');
+            tbody.innerHTML = "";
 
-    if (dataDitapis.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="p-10 text-center text-gray-500 font-medium">Tiada pengguna dijumpai.</td></tr>`;
-        navBar.classList.add('hidden');
-        return;
-    }
-
-    // 🌟 PENAMBAHBAIKAN BARU: Susun (Sort) dataDitapis mengikut TAHUN (Terkini) dan SESI (Terkini)
-    dataDitapis.sort((a, b) => {
-        // Tukar nilai kepada integer untuk perbandingan yang tepat. Nilai fallback adalah 0 jika tiada rekod.
-        const tahunA = parseInt(a.tahun) || 0;
-        const tahunB = parseInt(b.tahun) || 0;
-        const sesiA = parseInt(a.sesi) || 0;
-        const sesiB = parseInt(b.sesi) || 0;
-
-        if (tahunB !== tahunA) {
-            return tahunB - tahunA; // Susun Tahun menurun (Contoh: 2026, 2025)
-        } else {
-            return sesiB - sesiA;   // Jika Tahun sama, susun Sesi menurun (Contoh: Sesi 2, Sesi 1)
-        }
-    });
-
-    // KIRA LOGIK PAGINATION
-    const jumlahMukaSurat = Math.ceil(dataDitapis.length / rekodPerMukaSurat);
-    const indexMula = (mukaSuratSemasa - 1) * rekodPerMukaSurat;
-    const indexTamat = indexMula + rekodPerMukaSurat;
-    const rekodSemasa = dataDitapis.slice(indexMula, indexTamat);
-
-    // PENAMBAHBAIKAN: Gunakan Document Fragment untuk muat data lebih laju tanpa 'reflow' berulang
-    const fragment = document.createDocumentFragment();
-
-    // BINA BARIS JADUAL
-    rekodSemasa.forEach((row, index) => {
-        const statusCaps = (row.status || "MENUNGGU").toUpperCase();
-        let badgeStatus = `<span class="bg-orange-100 text-orange-800 border border-orange-300 px-2 py-1 rounded text-[11px] font-bold whitespace-nowrap">⏳ ${statusCaps}</span>`;
-        
-        // PENAMBAHBAIKAN: Cara penulisan logik yang lebih ringkas dan mudah dibaca
-        if (["SAH", "DISAHKAN", "AKTIF"].includes(statusCaps)) {
-            badgeStatus = `<span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded text-[11px] font-bold whitespace-nowrap">✅ AKTIF</span>`;
-        }
-
-        let strBahagian = row.bahagian || "-";
-        let strSesi = row.sesi || "-";
-        let strTahun = row.tahun || "-";
-
-        let safeBahagian = strBahagian.replace(/'/g, "\\'");
-        let safeNama = (row.nama || "").replace(/'/g, "\\'");
-        let safeSesi = String(strSesi).replace(/'/g, "\\'");
-        let safeTahun = String(strTahun).replace(/'/g, "\\'");
-        let barisIC = String(row.ic).trim(); 
-        
-        let roleBaris = String(row.peranan || "").toUpperCase().trim();
-
-        let btnTindakan = `<span class="text-gray-300">-</span>`;
-        if (isApprover) {
-            let btnSahkan = "";
-            if (!["SAH", "AKTIF", "DISAHKAN"].includes(statusCaps)) {
-                btnSahkan = `<button onclick="sahkanPengguna('${barisIC}', '${safeNama}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded font-bold shadow-sm transition text-xs w-full mb-1">Sahkan</button>`;
+            if (dataDitapis.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-gray-500 font-medium">Tiada pengguna dijumpai.</td></tr>`;
+                navBar.classList.add('hidden');
+                return;
             }
-            
-            // PENAMBAHBAIKAN: Telah ditambah hantaran nilai safeSesi dan safeTahun
-            let btnEdit = `<button onclick="bukaModalKemaskini('${barisIC}', '${safeNama}', '${row.jabatan}', '${safeBahagian}', '${row.peranan}', '${statusCaps}', '${safeSesi}', '${safeTahun}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-xs w-full flex items-center justify-center gap-1 mb-1">✏️ Edit</button>`;
-      
-            let isSelf = (userICSemasa !== "" && barisIC === userICSemasa);
-            let isAdminRole = (roleBaris === "ADMIN");
-            let perananLogin = sessionStorage.getItem("peranan") ? sessionStorage.getItem("peranan").toUpperCase() : "";
-            
-            let isSekatKupik = (perananLogin === "KUPIK") && 
-                               (roleBaris === "PENYELARAS PENYELIDIKAN" || roleBaris === "PENYELARAS INOVASI");
 
-            let btnPadam = "";
-            if (isSelf || isAdminRole || isSekatKupik) {
-                let tajukKunci = "Tindakan disekat";
-                if (isSelf) tajukKunci = "Anda tidak boleh memadam akaun sendiri";
-                else if (isAdminRole) tajukKunci = "Akaun ADMIN tidak boleh dipadam";
-                else if (isSekatKupik) tajukKunci = "KUPIK tidak mempunyai kuasa untuk memadam rekod pengurusan ini";
+            // 🌟 PENAMBAHBAIKAN BARU: Susun (Sort) dataDitapis mengikut TAHUN (Terkini) dan SESI (Terkini)
+            dataDitapis.sort((a, b) => {
+                const tahunA = parseInt(a.tahun) || 0;
+                const tahunB = parseInt(b.tahun) || 0;
+                const sesiA = parseInt(a.sesi) || 0;
+                const sesiB = parseInt(b.sesi) || 0;
+
+                if (tahunB !== tahunA) return tahunB - tahunA; 
+                else return sesiB - sesiA;   
+            });
+
+            const jumlahMukaSurat = Math.ceil(dataDitapis.length / rekodPerMukaSurat);
+            const indexMula = (mukaSuratSemasa - 1) * rekodPerMukaSurat;
+            const indexTamat = indexMula + rekodPerMukaSurat;
+            const rekodSemasa = dataDitapis.slice(indexMula, indexTamat);
+
+            const fragment = document.createDocumentFragment();
+
+            rekodSemasa.forEach((row, index) => {
+                const statusCaps = (row.status || "MENUNGGU").toUpperCase();
+                let badgeStatus = `<span class="bg-orange-100 text-orange-800 border border-orange-300 px-2 py-1 rounded text-[11px] font-bold whitespace-nowrap">⏳ ${statusCaps}</span>`;
                 
-                btnPadam = `<button disabled class="bg-gray-200 text-gray-400 px-2 py-1 rounded font-bold shadow-sm text-xs w-full flex items-center justify-center gap-1 cursor-not-allowed" title="${tajukKunci}">🗑️ Padam</button>`;
-            } else {
-                btnPadam = `<button onclick="padamPengguna('${barisIC}', '${safeNama}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-xs w-full flex items-center justify-center gap-1">🗑️ Padam</button>`;
-            }
-            
-            btnTindakan = `<div class="flex flex-col gap-1 w-full">${btnSahkan}${btnEdit}${btnPadam}</div>`;
-        }
+                if (["SAH", "DISAHKAN", "AKTIF"].includes(statusCaps)) {
+                    badgeStatus = `<span class="bg-green-100 text-green-800 border border-green-300 px-2 py-1 rounded text-[11px] font-bold whitespace-nowrap">✅ AKTIF</span>`;
+                }
 
-        const tr = document.createElement('tr');
-        tr.className = "border-b hover:bg-indigo-50 transition";
-        
-        let tdContent = `
-            <td class="p-3 text-center font-bold text-gray-600">${indexMula + index + 1}</td>
-            <td class="p-3 font-bold text-gray-800 text-xs uppercase">${row.nama || "-"}</td>
-            <td class="p-3 text-center font-bold text-indigo-700 text-xs uppercase">${row.jabatan || "-"}</td>
-            <td class="p-3 text-center font-semibold text-gray-600 text-[11px] uppercase">${row.peranan || "-"}</td>
-            <td class="p-3 text-center font-semibold text-gray-500 text-[11px] uppercase">${strBahagian}</td>
-            <td class="p-3 text-center font-semibold text-gray-600 text-xs">${strSesi}</td>
-            <td class="p-3 text-center font-semibold text-gray-600 text-xs">${strTahun}</td>
-            <td class="p-3 text-center">${badgeStatus}</td>
-        `;
-        if (isApprover) tdContent += `<td class="p-3 text-center">${btnTindakan}</td>`;
+                let strBahagian = row.bahagian || "-";
+                let strSesi = row.sesi || "-";
+                let strTahun = row.tahun || "-";
+                let strNoHp = row.no_hp || "-"; 
 
-        tr.innerHTML = tdContent; 
-        fragment.appendChild(tr);
-    });
-            // Masukkan DOM fragment sekaligus untuk kurangkan lag pada jadual yang panjang
+                let safeBahagian = strBahagian.replace(/'/g, "\\'");
+                let safeNama = (row.nama || "").replace(/'/g, "\\'");
+                let safeSesi = String(strSesi).replace(/'/g, "\\'");
+                let safeTahun = String(strTahun).replace(/'/g, "\\'");
+                let safeNoHp = String(strNoHp).replace(/'/g, "\\'"); 
+                let barisIC = String(row.ic).trim(); 
+                
+                let roleBaris = String(row.peranan || "").toUpperCase().trim();
+                let isSelf = (userICSemasa !== "" && barisIC === userICSemasa);
+                
+                // TAMBAHAN: Semak jika dalam jabatan yang sama (untuk Penyelaras Jabatan/Penyelia)
+                let rowJabatan = String(row.jabatan || "").toUpperCase();
+                let isSameJabatan = (userJabatan !== "" && rowJabatan === userJabatan);
+
+                let btnTindakan = `<span class="text-gray-300">-</span>`;
+                
+                // FUNGSI EDIT DENGAN PENGESAHAN NO IC
+                let btnEdit = `<button onclick="sahkanDanBukaModal('${barisIC}', '${safeNama}', '${row.jabatan}', '${safeBahagian}', '${row.peranan}', '${statusCaps}', '${safeSesi}', '${safeTahun}', '${safeNoHp}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-xs w-full flex items-center justify-center gap-1 mb-1">✏️ Edit</button>`;
+
+                // KAWALAN PAPARAN BUTANG TINDAKAN
+                if (!userPeranan) {
+                    // Jika tiada peranan (belum log masuk / role kosong), tiada butang akan dipapar
+                    btnTindakan = `<span class="text-gray-300">-</span>`;
+                } else if (isApprover) {
+                    // Role Approver (Admin, Kupik, Inovasi, Penyelidikan)
+                    let btnSahkan = "";
+                    if (!["SAH", "AKTIF", "DISAHKAN"].includes(statusCaps)) {
+                        btnSahkan = `<button onclick="sahkanPengguna('${barisIC}', '${safeNama}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded font-bold shadow-sm transition text-xs w-full mb-1">Sahkan</button>`;
+                    }
+                    
+                    let isAdminRole = (roleBaris === "ADMIN");
+                    let perananLogin = userPeranan;
+                    let isSekatKupik = (perananLogin === "KUPIK") && senaraiPenyelaras.includes(roleBaris);
+
+                    let btnPadam = "";
+                    if (isSelf || isAdminRole || isSekatKupik) {
+                        let tajukKunci = "Tindakan disekat";
+                        if (isSelf) tajukKunci = "Anda tidak boleh memadam akaun sendiri";
+                        else if (isAdminRole) tajukKunci = "Akaun ADMIN tidak boleh dipadam";
+                        else if (isSekatKupik) tajukKunci = "KUPIK tidak mempunyai kuasa memadam rekod ini";
+                        
+                        btnPadam = `<button disabled class="bg-gray-200 text-gray-400 px-2 py-1 rounded font-bold shadow-sm text-xs w-full flex items-center justify-center gap-1 cursor-not-allowed" title="${tajukKunci}">🗑️ Padam</button>`;
+                    } else {
+                        btnPadam = `<button onclick="padamPengguna('${barisIC}', '${safeNama}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded font-bold shadow-sm transition text-xs w-full flex items-center justify-center gap-1">🗑️ Padam</button>`;
+                    }
+                    
+                    btnTindakan = `<div class="flex flex-col gap-1 w-full">${btnSahkan}${btnEdit}${btnPadam}</div>`;
+                } else if (isSameJabatan || isSelf) {
+                    // Role seperti PENYELARAS JABATAN / PENYELIA PROJEK PELAJAR
+                    // Hanya memaparkan butang Edit jika mereka dalam JABATAN yang sama ATAU diri sendiri
+                    btnTindakan = `<div class="flex flex-col gap-1 w-full">${btnEdit}</div>`;
+                }
+
+                // Kawalan Paparan No. HP 
+                let tdNoHP = isApprover ? `<td class="p-3 text-center font-bold text-gray-600 text-xs">${strNoHp}</td>` : ``;
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-indigo-50 transition";
+                
+                let tdContent = `
+                    <td class="p-3 text-center font-bold text-gray-600">${indexMula + index + 1}</td>
+                    <td class="p-3 font-bold text-gray-800 text-xs uppercase">${row.nama || "-"}</td>
+                    ${tdNoHP}
+                    <td class="p-3 text-center font-bold text-indigo-700 text-xs uppercase">${row.jabatan || "-"}</td>
+                    <td class="p-3 text-center font-semibold text-gray-600 text-[11px] uppercase">${row.peranan || "-"}</td>
+                    <td class="p-3 text-center font-semibold text-gray-500 text-[11px] uppercase">${strBahagian}</td>
+                    <td class="p-3 text-center font-semibold text-gray-600 text-xs">${strSesi}</td>
+                    <td class="p-3 text-center font-semibold text-gray-600 text-xs">${strTahun}</td>
+                    <td class="p-3 text-center">${badgeStatus}</td>
+                    <td class="p-3 text-center">${btnTindakan}</td>
+                `;
+
+                tr.innerHTML = tdContent; 
+                fragment.appendChild(tr);
+            });
+
             tbody.appendChild(fragment);
 
-            // KAWALAN PAPARAN BUTANG NEXT/PREV
             if (jumlahMukaSurat > 1) {
                 navBar.classList.remove('hidden');
                 document.getElementById('teksMukaSurat').innerText = `Muka ${mukaSuratSemasa} / ${jumlahMukaSurat}`;
-                
                 document.getElementById('btnPrev').disabled = (mukaSuratSemasa === 1);
                 document.getElementById('btnNext').disabled = (mukaSuratSemasa === jumlahMukaSurat);
             } else {
@@ -545,13 +620,128 @@
             }
         }
 
-        // MUAT TURUN CSV (Diubah suai untuk include SESI & TAHUN dan Format Anti-Pecah)
+        // ==========================================
+        // FUNGSI KESELAMATAN SEBELUM BUKA MODAL
+        // ==========================================
+        function sahkanDanBukaModal(ic, nama, jabatan, bahagian, peranan, status, sesi, tahun, noHp) {
+            // Jika bukan approver, perlukan No IC sebagai pengesahan
+            if (!isApprover) {
+                const kataLaluan = prompt("🔒 Keselamatan: Sila masukkan NO. IC anda sebagai pengesahan identiti:", "");
+                if (kataLaluan !== ic) {
+                    alert("❌ Pengesahan gagal! NO IC tidak tepat.");
+                    return;
+                }
+            }
+            bukaModalKemaskini(ic, nama, jabatan, bahagian, peranan, status, sesi, tahun, noHp);
+        }
+
+
+        // ==========================================
+        // DIPERBAIKI: BUKA MODAL (Dengan Kawalan Akses Disable Input)
+        // ==========================================
+        function bukaModalKemaskini(ic, nama, jabatan, bahagian, peranan, status, sesi, tahun, noHp) {
+            document.getElementById('editIC_Lama').value = ic;
+            document.getElementById('editIC_Baru').value = ic;
+            document.getElementById('editNama').value = nama;
+            
+            // Edit no hp dipaparkan ke dalam modal kemas kini
+            document.getElementById('editNoHP').value = (noHp === "-" || !noHp) ? "" : noHp; 
+
+            document.getElementById('editJabatan').value = jabatan;
+            document.getElementById('editBahagian').value = (bahagian === "-" || !bahagian) ? "" : bahagian; 
+            document.getElementById('editPeranan').value = peranan;
+            
+            // SET DATA STATUS, SESI & TAHUN KE DALAM MODAL
+            document.getElementById('editStatus').value = status ? status.toUpperCase() : "MENUNGGU PENGESAHAN";
+            document.getElementById('editSesi').value = (sesi === "-" || !sesi) ? "" : sesi;
+            document.getElementById('editTahun').value = (tahun === "-" || !tahun) ? "" : tahun;
+            
+            // 🌟 KAWALAN AKSES: Lumpuhkan Status, Sesi, dan Tahun untuk pengguna selain Approver
+            if (!isApprover) {
+                document.getElementById('editStatus').disabled = true;
+                document.getElementById('editStatus').classList.add('bg-gray-200', 'cursor-not-allowed');
+                
+                document.getElementById('editSesi').disabled = true;
+                document.getElementById('editSesi').classList.add('bg-gray-200', 'cursor-not-allowed');
+                
+                document.getElementById('editTahun').disabled = true;
+                document.getElementById('editTahun').classList.add('bg-gray-200', 'cursor-not-allowed');
+            } else {
+                document.getElementById('editStatus').disabled = false;
+                document.getElementById('editStatus').classList.remove('bg-gray-200', 'cursor-not-allowed');
+                
+                document.getElementById('editSesi').disabled = false;
+                document.getElementById('editSesi').classList.remove('bg-gray-200', 'cursor-not-allowed');
+                
+                document.getElementById('editTahun').disabled = false;
+                document.getElementById('editTahun').classList.remove('bg-gray-200', 'cursor-not-allowed');
+            }
+
+            document.getElementById('modalKemaskini').classList.remove('hidden');
+        }
+
+        function tutupModal() { 
+            document.getElementById('modalKemaskini').classList.add('hidden'); 
+        }
+
+        // ==========================================
+        // DIPERBAIKI: SIMPAN MODAL
+        // ==========================================
+        function simpanKemaskini(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btnSimpanKemaskini');
+            btn.disabled = true; 
+            btn.innerText = "⏳ Menyimpan...";
+
+            const payload = {
+                action: "kemaskiniPenggunaAdmin",
+                NO_IC: document.getElementById('editIC_Lama').value,
+                NO_IC_BARU: document.getElementById('editIC_Baru').value.trim(), 
+                NAMA: document.getElementById('editNama').value.trim().toUpperCase(), 
+                NO_HP: document.getElementById('editNoHP').value.trim(),      
+                JABATAN: document.getElementById('editJabatan').value, 
+                PERANAN: document.getElementById('editPeranan').value, 
+                BAHAGIAN: document.getElementById('editBahagian').value, 
+                
+                // 🌟 Pastikan jika input disabled (pengguna biasa), ia menghantar rentetan kosong ("")
+                STATUS: document.getElementById('editStatus').disabled ? "" : document.getElementById('editStatus').value,          
+                SESI: document.getElementById('editSesi').disabled ? "" : document.getElementById('editSesi').value.trim(),       
+                TAHUN: document.getElementById('editTahun').disabled ? "" : document.getElementById('editTahun').value.trim()      
+            };
+
+            fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify(payload) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "BERJAYA") {
+                    alert("✅ Maklumat Profil berjaya dikemaskini!");
+                    tutupModal(); 
+                    muatSenaraiPenyelaras(); 
+                } else { 
+                    alert("❌ Ralat: " + data.mesej); 
+                }
+            })
+            .catch(err => { 
+                console.error("Ralat Fetch:", err);
+                alert("⚠️ Gagal menghubungi server. Sila semak sambungan internet anda."); 
+            })
+            .finally(() => { 
+                btn.disabled = false; 
+                btn.innerText = "Simpan"; 
+            });
+        }
+
+        // MUAT TURUN CSV (Diubah suai untuk include SESI, TAHUN, NO_HP dan Format Anti-Pecah)
         function muatTurunCSV() {
             if (dataDitapis.length === 0) return alert("Tiada data untuk dimuat turun.");
 
             // PENAMBAHBAIKAN: \uFEFF ialah BOM UTF-8 supaya Excel dapat baca aksara khas dengan betul
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
-            csvContent += "BIL,NAMA,NO_IC,JABATAN,PERANAN,BAHAGIAN,SESI,TAHUN,STATUS\r\n";
+            csvContent += "BIL,NAMA,NO_HP,NO_IC,JABATAN,PERANAN,BAHAGIAN,SESI,TAHUN,STATUS\r\n";
             
             // PENAMBAHBAIKAN: Fungsi format teks untuk memastikan struktur koma dalam CSV tidak rosak
             const formatCSV = (text) => {
@@ -563,6 +753,7 @@
             dataDitapis.forEach((row, index) => {
                 let bil = index + 1;
                 let nama = formatCSV(row.nama);
+                let noHp = formatCSV(row.no_hp); // TAMBAH: No HP diproses
                 let ic = `="${row.ic || ""}"`; 
                 let jab = formatCSV(row.jabatan);
                 let per = formatCSV(row.peranan);
@@ -571,7 +762,7 @@
                 let tahun = formatCSV(row.tahun);
                 let stat = formatCSV(row.status);
                 
-                csvContent += `${bil},${nama},${ic},${jab},${per},${bah},${sesi},${tahun},${stat}\r\n`;
+                csvContent += `${bil},${nama},${noHp},${ic},${jab},${per},${bah},${sesi},${tahun},${stat}\r\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
@@ -649,79 +840,6 @@
                 msgBox.innerText = "⚠️ Gagal menghubungi server."; msgBox.classList.remove('hidden');
             });
         }
-
-		// ==========================================
-        // 2. KEMASKINI: BUKA MODAL
-        // ==========================================
-        function bukaModalKemaskini(ic, nama, jabatan, bahagian, peranan, status, sesi, tahun) {
-            document.getElementById('editIC_Lama').value = ic;
-            document.getElementById('editIC_Baru').value = ic;
-            document.getElementById('editNama').value = nama;
-            
-            document.getElementById('editJabatan').value = jabatan;
-            document.getElementById('editBahagian').value = (bahagian === "-" || !bahagian) ? "" : bahagian; 
-            document.getElementById('editPeranan').value = peranan;
-            
-            // 🌟 SET DATA STATUS, SESI & TAHUN KE DALAM MODAL
-            document.getElementById('editStatus').value = status ? status.toUpperCase() : "MENUNGGU PENGESAHAN";
-            document.getElementById('editSesi').value = (sesi === "-" || !sesi) ? "" : sesi;
-            document.getElementById('editTahun').value = (tahun === "-" || !tahun) ? "" : tahun;
-            
-            document.getElementById('modalKemaskini').classList.remove('hidden');
-        }
-
-        function tutupModal() { 
-            document.getElementById('modalKemaskini').classList.add('hidden'); 
-        }
-
-        // ==========================================
-        // 3. KEMASKINI: SIMPAN MODAL
-        // ==========================================
-        function simpanKemaskini(e) {
-            e.preventDefault();
-            
-            const btn = document.getElementById('btnSimpanKemaskini');
-            btn.disabled = true; 
-            btn.innerText = "⏳ Menyimpan...";
-
-            // 🌟 UBAH: Ambil data SESI dan TAHUN terus dari input form, BUKAN localStorage
-            const payload = {
-                action: "kemaskiniPenggunaAdmin",
-                NO_IC: document.getElementById('editIC_Lama').value,
-                NO_IC_BARU: document.getElementById('editIC_Baru').value.trim(), 
-                NAMA: document.getElementById('editNama').value.trim().toUpperCase(), 
-                JABATAN: document.getElementById('editJabatan').value, 
-                PERANAN: document.getElementById('editPeranan').value, 
-                BAHAGIAN: document.getElementById('editBahagian').value, 
-                STATUS: document.getElementById('editStatus').value,          // Lajur G
-                SESI: document.getElementById('editSesi').value.trim(),       // Lajur H
-                TAHUN: document.getElementById('editTahun').value.trim()      // Lajur I
-            };
-
-            fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify(payload) 
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "BERJAYA") {
-                    alert("✅ Maklumat Profil berjaya dikemaskini!");
-                    tutupModal(); 
-                    muatSenaraiPenyelaras(); 
-                } else { 
-                    alert("❌ Ralat: " + data.mesej); 
-                }
-            })
-            .catch(err => { 
-                console.error("Ralat Fetch:", err);
-                alert("⚠️ Gagal menghubungi server. Sila semak sambungan internet anda."); 
-            })
-            .finally(() => { 
-                btn.disabled = false; 
-                btn.innerText = "Simpan"; 
-            });
-        }
-</script>
+    </script>
 </body>
 </html>
