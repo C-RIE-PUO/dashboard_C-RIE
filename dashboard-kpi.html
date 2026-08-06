@@ -356,15 +356,17 @@
         const userPeranan = sessionStorage.getItem("peranan") || "STAF";
         const userJabatan = sessionStorage.getItem("jabatan") || "";
 
-        const perananLayakTindakan = ["PENYELARAS INOVASI", "KUPIK", "ADMIN", "PENYELARAS PENYELIDIKAN"];
+        const perananLayakTindakan = ["PENYELARAS INOVASI", "PENYELARAS INOVASI (C-RIE)", "KUPIK", "ADMIN", "PENYELARAS PENYELIDIKAN" , "PENYELARAS PENYELIDIKAN (C-RIE)"];
         
         // --- MULA PENAMBAHBAIKAN KOD --- //
         // Tambah STAF dan PENYELIA PROJEK PELAJAR supaya rekod dapat dibaca
         const perananLayakUlasan = [
             "KUPIK", 
             "ADMIN", 
-            "PENYELARAS INOVASI", 
+            "PENYELARAS INOVASI (C-RIE))",
+            "PENYELARAS INOVASI", 			
             "PENYELARAS PENYELIDIKAN", 
+			"PENYELARAS PENYELIDIKAN (C-RIE)",
             "PENYELARAS JABATAN",
             "STAF",
             "PENYELIA PROJEK PELAJAR"
@@ -374,8 +376,8 @@
         const perananBiasa = ["STAF", "PENYELARAS JABATAN", "PENYELIA PROJEK PELAJAR"];
         
         // Kawalan peranan bagi muat turun Laporan PDF dan Dokumen ZIP
-        const perananLayakPDF = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS JABATAN"];
-        const perananLayakZip = ["ADMIN", "KUPIK", "PENYELARAS INOVASI"];
+        const perananLayakPDF = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS JABATAN"];
+        const perananLayakZip = ["ADMIN", "KUPIK", "PENYELARAS INOVASI" , "PENYELARAS INOVASI (C-RIE)"];
         // --- TAMAT PENAMBAHBAIKAN KOD --- //
         
         const isPrivileged = perananLayakTindakan.includes(userPeranan.toUpperCase());

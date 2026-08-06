@@ -158,7 +158,7 @@
         const userPeranan = sessionStorage.getItem("peranan") || "";
         const userIC = sessionStorage.getItem("no_ic") || "-";
         
-        const isUploader = ["ADMIN", "KUPIK", "PENYELARAS INOVASI"].includes(userPeranan.toUpperCase());
+        const isUploader = ["ADMIN", "KUPIK","PENYELARAS INOVASI (C-RIE)", "PENYELARAS INOVASI"].includes(userPeranan.toUpperCase());
         const isPenyelarasJabatan = userPeranan.toUpperCase() === "PENYELARAS JABATAN";
         const isStaf = userPeranan.toUpperCase() === "STAF" || userPeranan.toUpperCase() === "STAFF";
         const isPenyelia = userPeranan.toUpperCase() === "PENYELIA PROJEK PELAJAR";

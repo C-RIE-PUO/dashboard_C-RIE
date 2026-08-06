@@ -350,7 +350,7 @@ const userJabatan = sessionStorage.getItem("jabatan") || "";
 const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
 
 // Pihak yang boleh Approve, Upload, Edit, Delete
-const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
+const isApprover = ["PENYELARAS INOVASI", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS PENYELIDIKAN (C-RIE)", "PENYELARAS PENYELIDIKAN", "KUPIK", "ADMIN"].includes(userPeranan);
 const isStaf = userPeranan === "STAF"; 
 
 // 🌟 TAMBAHAN BARU: Pihak berkuasa peringkat jabatan yang boleh mengemaskini (Edit) projek jabatan sendiri
