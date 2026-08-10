@@ -199,7 +199,7 @@
                 <i class="fa-solid fa-shield-halved w-5 text-cyan-400"></i> Harta Intelek
             </button>
             <button onclick="tukarTab('KPI_PENYELIDIKAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="KPI_PENYELIDIKAN">
-                <i class="fa-solid fa-microscope w-5 text-cyan-400"></i> KPI Penyelidikan
+                <i class="fa-solid fa-microscope w-5 text-cyan-400"></i> KPI Penerbitan
             </button>
             <button onclick="tukarTab('GERAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="GERAN">
                 <i class="fa-solid fa-hand-holding-dollar w-5 text-cyan-400"></i> Geran Penyelidikan
@@ -662,12 +662,12 @@ function prosesDanRender(tab, data, page = 1) {
     }
 
     if (tab === 'KPI_PENYELIDIKAN') {
-        document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-microscope mr-2 text-blue-600"></i> Bilangan Kertas Penyelidikan Mengikut Jabatan`;
-        document.getElementById('tajukCartaPie').innerText = `Status Indeks Penyelidikan`;
+        document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-microscope mr-2 text-blue-600"></i> Bilangan Kertas Penerbitan Mengikut Jabatan`;
+        document.getElementById('tajukCartaPie').innerText = `Status Indeks Penerbitan`;
 
         let headerHtml = `<tr class="bg-blue-900 text-white">
             <th class="p-4 border-b">BIL</th>
-            <th class="p-4 border-b w-1/3">TAJUK KERTAS PENYELIDIKAN</th>
+            <th class="p-4 border-b w-1/3">TAJUK PENERBITAN</th>
             <th class="p-4 border-b">PENULIS</th>
             <th class="p-4 border-b text-center">JABATAN</th>
             <th class="p-4 border-b text-center">TAHUN</th>
@@ -1084,7 +1084,7 @@ function renderKadPenyelidikan(stats) {
     const kpiContainer = document.getElementById('kpiCards');
     kpiContainer.innerHTML = `
         <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-900 flex items-center justify-between">
-            <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Penyelidikan</p><h4 class="text-3xl font-black text-slate-800">${stats.total}</h4></div>
+            <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Penerbitan</p><h4 class="text-3xl font-black text-slate-800">${stats.total}</h4></div>
             <div class="bg-blue-50 p-3 rounded-xl"><i class="fa-solid fa-book-open text-blue-900 text-2xl"></i></div>
         </div>
         <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between">
@@ -1135,7 +1135,7 @@ function renderChartsPenyelidikan(stats) {
         data: {
             labels: labelJabatan,
             datasets: [{ 
-                label: 'Bilangan Kertas Penyelidikan', 
+                label: 'Bilangan Kertas Penerbitan', 
                 data: Object.values(stats.jabatan), 
                 backgroundColor: warnaBar, // <-- Array warna dimasukkan di sini
                 borderRadius: 8 

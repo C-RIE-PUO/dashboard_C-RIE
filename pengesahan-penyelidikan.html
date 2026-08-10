@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengesahan KPI Penyelidikan</title>
+    <title>Pengesahan KPI Penerbitan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Kawalan Akses Peringkat Awal
@@ -29,8 +29,8 @@
         
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-200 gap-4">
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">🛡️ Pengesahan KPI Penyelidikan</h1>
-                <p class="text-sm text-gray-500 mt-1">Senarai penyelidikan yang menunggu semakan dan kelulusan.</p>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">🛡️ Pengesahan KPI Penerbitan</h1>
+                <p class="text-sm text-gray-500 mt-1">Senarai Penerbitan yang menunggu semakan dan kelulusan.</p>
             </div>
             <div class="flex items-center gap-3">
                 <div class="text-right hidden md:block mr-2">
@@ -114,7 +114,7 @@
                     <thead>
                         <tr class="bg-slate-800 text-slate-100 border-b border-slate-900 uppercase tracking-wider text-[11px]">
                             <th class="py-4 px-3 font-bold text-center w-[3%]">Bil</th>
-                            <th class="py-4 px-4 font-bold text-left min-w-[200px] w-[18%]">Maklumat Penyelidikan & Penerbitan</th>
+                            <th class="py-4 px-4 font-bold text-left min-w-[200px] w-[18%]">Maklumat Penerbitan</th>
                             <th class="py-4 px-3 font-bold col-penulis text-left w-[10%]">Penulis</th>
                             <th class="py-4 px-3 font-bold col-doi text-center w-[7%]">DOI/URL</th>
                             <th class="py-4 px-3 font-bold col-jabatan text-center w-[6%]">Jabatan</th>
@@ -164,7 +164,7 @@
 <div id="modalEdit" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
     <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
         <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-slate-50 rounded-t-xl sticky top-0 z-10">
-            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-1.5">📝 Kemaskini & Betulkan Rekod Penyelidikan</h3>
+            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-1.5">📝 Kemaskini & Betulkan Rekod Penerbitan</h3>
             <button onclick="tutupModalEdit()" class="text-gray-400 hover:text-red-600 font-bold text-2xl focus:outline-none transition-colors">&times;</button>
         </div>
         
@@ -173,7 +173,7 @@
             <input type="hidden" id="editDokumenSediaAda" />
 
             <div>
-                <label class="block font-bold text-gray-700 mb-1">Tajuk Penyelidikan / Artikel: <span class="text-red-500">*</span></label>
+                <label class="block font-bold text-gray-700 mb-1">Tajuk Penerbitan / Artikel: <span class="text-red-500">*</span></label>
                 <textarea id="editTajuk" required rows="2" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-medium shadow-sm" placeholder="Masukkan tajuk penuh penyelidikan..."></textarea>
             </div>
 
@@ -281,7 +281,7 @@
                     </div>
 
                     <div class="p-4 border border-blue-200 bg-blue-50/40 rounded-xl hover:shadow-md hover:bg-blue-50 transition-all">
-                        <label class="block text-sm font-extrabold text-blue-900 mb-2">2. Kertas Penyelidikan Penuh</label>
+                        <label class="block text-sm font-extrabold text-blue-900 mb-2">2. Kertas Penerbitan Penuh</label>
                         <div id="pautanLama2" class="text-xs mb-3 bg-white p-2.5 rounded-lg border border-blue-100 min-h-[40px] flex items-center break-all text-blue-700 font-semibold shadow-sm"></div>
                         <input type="hidden" id="urlLama2">
                         <div class="flex flex-col gap-2">
