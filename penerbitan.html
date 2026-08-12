@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekod Maklumat Penerbitan</title>
     <script src="https://cdn.tailwindcss.com"></script>
-	    <script>
+    <script>
         if (sessionStorage.getItem("userLulus") !== "YA") {
             alert("Sila log masuk terlebih dahulu.");
             window.location.href = "login.html"; 
@@ -95,7 +95,7 @@
                 <!-- TABS NAVIGATION -->
                 <div class="flex flex-col md:flex-row border-b border-gray-200">
                     <button type="button" id="btn-buku" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-bold text-sm transition-colors border-blue-600 text-blue-700" onclick="tukarTab('buku')">Buku Dan Bab Dalam Buku</button>
-                    <button type="button" id="btn-prosiding" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-semibold text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" onclick="tukarTab('prosiding')">Pembentangan/Prosiding</button>
+                    <button type="button" id="btn-prosiding" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-semibold text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" onclick="tukarTab('prosiding')">Artikel Akhbar/Majalah/Penulisan Kreatif</button>
                     <button type="button" id="btn-umum" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-semibold text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" onclick="tukarTab('umum')">Penerbitan Umum</button>
                 </div>
 
@@ -125,75 +125,37 @@
                                     <option>DIGITAL</option>
                                 </select>
                             </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Bab</label>
-                                <input type="text" id="tab1_namaBab" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
-                            </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Mukasurat</label>
                                 <input type="text" id="tab1_mukasurat" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
                             </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Bab</label>
+                                <input type="text" id="tab1_namaBab" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                            <!-- MUAT NAIK FAIL PDF TAB BUKU -->
+                            <div class="md:col-span-2 bg-white p-4 rounded-lg border border-blue-200">
+                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF Buku / Bab (Maks 2 Fail, Maks 7 MB/fail)</label>
+                                <input type="file" id="tab1_fail" accept=".pdf" multiple onchange="kendalikanPilihanFail(this, 'buku')" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                <!-- WIDGET INTERAKTIF FAIL DIPILIH -->
+                                <div id="tab1_senarai_fail" class="mt-3 space-y-2"></div>
+                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive Sub Folder BUKU ID: 1jsMcoRr-XH-HfOH4RKEKBvmpaxbeFoV_</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- TAB 2: PROSIDING -->
+                    <!-- TAB 2: Artikel Akhbar/Majalah/Penulisan Kreatif -->
                     <div id="sek-prosiding" class="tab-content hidden fade-in space-y-4">
-                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Pembentangan/Penerbitan Dalam Prosiding (Seminar/Persidangan/Bengkel)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Seminar/Persidangan/Bengkel</label>
-                                <input type="text" id="tab2_namaSeminar" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Jenis Kertas Kerja</label>
-                                <select id="tab2_jenisKertas" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
-                                    <option>ABSTRAK</option>
-                                    <option>PENUH</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Taraf Seminar/Persidangan/Bengkel</label>
-                                <select id="tab2_tarafSeminar" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
-                                    <option>ANTARABANGSA</option>
-                                    <option>KEBANGSAAN</option>
-                                    <option>NEGERI</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Taraf Prosiding</label>
-                                <select id="tab2_tarafProsiding" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
-                                    <option>BERWASIT</option>
-                                    <option>TIDAK BERWASIT</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Mula Seminar/Persidangan/Bengkel</label>
-                                <input type="date" id="tab2_tarikhMula" value="2026-08-11" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-gray-50">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Tamat Seminar/Persidangan/Bengkel</label>
-                                <input type="date" id="tab2_tarikhTamat" value="2026-08-11" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-gray-50">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Tempat Seminar/Persidangan/Bengkel</label>
-                                <input type="text" id="tab2_tempat" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Penganjur</label>
-                                <input type="text" id="tab2_penganjur" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Anugerah</label>
-                                <input type="text" id="tab2_anugerah" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Bilangan Pembentang</label>
-                                <select id="tab2_bilPembentang" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
-                                    <option>1 ORANG</option>
-                                    <option>2 ORANG</option>
-                                    <option>3 ORANG</option>
-                                    <option>LEBIH DARI 3 ORANG</option>
-                                </select>
+                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Artikel Akhbar/Majalah/Penulisan Kreatif</h3>
+                        <p class="text-xs text-gray-600 text-center mb-4">Sila isi maklumat penerbitan di bahagian Maklumat Asas dan muat naik dokumen berkaitan di bawah.</p>
+                        <div class="grid grid-cols-1 gap-6">
+                            <!-- Muat naik PDF Artikel Akhbar/Majalah/Penulisan Kreatif -->
+                            <div class="bg-white p-4 rounded-lg border border-blue-200">
+                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF (Maks 2 Fail, Maks 7 MB/fail)</label>
+                                <input type="file" id="tab2_fail" accept=".pdf" multiple onchange="kendalikanPilihanFail(this, 'prosiding')" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                <!-- WIDGET INTERAKTIF FAIL DIPILIH -->
+                                <div id="tab2_senarai_fail" class="mt-3 space-y-2"></div>
+                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive Sub Folder ID: 1JuJktmbuggNKrZMziCxCAGsKQVouKp6H</span>
                             </div>
                         </div>
                     </div>
@@ -226,6 +188,14 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Penerbit</label>
                                 <input type="text" id="tab3_penerbit" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
                             </div>
+                            <!-- MUAT NAIK FAIL PDF TAB PENERBITAN UMUM -->
+                            <div class="md:col-span-2 bg-white p-4 rounded-lg border border-blue-200">
+                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF Penerbitan Umum (Maks 2 Fail, Maks 7 MB/fail)</label>
+                                <input type="file" id="tab3_fail" accept=".pdf" multiple onchange="kendalikanPilihanFail(this, 'umum')" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                <!-- WIDGET INTERAKTIF FAIL DIPILIH -->
+                                <div id="tab3_senarai_fail" class="mt-3 space-y-2"></div>
+                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive Sub Folder UMUM ID: 1c7jjoYO9Ko-7GPPiF8g8u0TZvR4XSt4d</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -236,7 +206,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Pemilik <span class="text-red-500">*</span></label>
-                        <select id="jabatanUtama" name="jabatanUtama" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-gray-50">
+                        <select id="jabatanUtama" name="jabatanUtama" required onclick="if(senaraiJabatan.length===0) muatJabatanSistem()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-gray-50">
                             <option value="">Memuatkan senarai jabatan... ⏳</option>
                         </select>
                     </div>
@@ -334,7 +304,7 @@
                             <th class="p-4">Jabatan</th>
                             <th class="p-4">Tajuk Penerbitan</th>
                             <th class="p-4">Maklumat Ketua</th>
-                            <th class="p-4">Butiran Spesifik</th>
+                            <th class="p-4">Butiran Spesifik / Fail Dokumen</th>
                             <th class="p-4">Status & Pengesahan</th>
                             <th class="p-4 text-center">Tindakan</th>
                         </tr>
@@ -347,7 +317,7 @@
                 </table>
             </div>
 
-            <!-- BAHAGIAN KAWALAN PAGINASI (NEXT / PREVIOUS) -->
+            <!-- BAHAGIAN KAWALAN PAGINASI -->
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <span id="infoPaginasi" class="text-xs sm:text-sm text-gray-600 font-medium">
                     Menunjukkan 0 hingga 0 daripada 0 rekod
@@ -367,6 +337,21 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec";
+        
+        // FOLDER MAP GOOGLE DRIVE
+        const FOLDER_MAP = {
+            'buku': '1jsMcoRr-XH-HfOH4RKEKBvmpaxbeFoV_',
+            'prosiding': '1JuJktmbuggNKrZMziCxCAGsKQVouKp6H',
+            'umum': '1c7jjoYO9Ko-7GPPiF8g8u0TZvR4XSt4d'
+        };
+
+        // STRUKTUR DATA INTERAKTIF SIMPAN FAIL
+        let failDipilih = {
+            buku: [],
+            prosiding: [],
+            umum: []
+        };
+
         let semuaData = []; 
         let dataBercetak = [];
         let senaraiJabatan = [];
@@ -420,7 +405,7 @@
 
             const petaNamaJadual = {
                 'buku': 'PENERBITAN-BUKU',
-                'prosiding': 'PENERBITAN-PROSIDING',
+                'prosiding': 'ARTIKEL/MAJALAH/PENULISAN KREATIF',
                 'umum': 'PENERBITAN-UMUM'
             };
             document.getElementById('labelJadualKategori').innerText = petaNamaJadual[tabId] || 'PENERBITAN-BUKU';
@@ -434,40 +419,130 @@
             document.getElementById('paparanLogMasuk').innerHTML = `<b>${peranan}</b> | ${jabatan}`;
         }
 
+        // ==============================================================================
+        // PENAMBAHBAIKAN FUNGSI MUAT JABATAN SISTEM (PENGENDALIAN RALAT & RETRY)
+        // ==============================================================================
         async function muatJabatanSistem() {
             const selectUtama = document.getElementById('jabatanUtama');
-            const selectJabatanPengguna = document.getElementById('jabatanPengguna');
-            
+            if (!selectUtama) return;
+
+            // Jika data jabatan sudah sedia ada dalam memori, terus isi semula
+            if (senaraiJabatan.length > 0) {
+                isiPilihanJabatan();
+                return;
+            }
+
+            selectUtama.innerHTML = '<option value="">Memuatkan senarai jabatan... ⏳</option>';
+
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`);
                 const result = await response.json(); 
                 
                 if (result.status === "BERJAYA" && Array.isArray(result.JABATAN)) {
                     senaraiJabatan = result.JABATAN.map(item => ({ nilai: item, teks: item }));
-                    
-                    selectUtama.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
-                    senaraiJabatan.forEach(jab => {
-                        selectUtama.appendChild(new Option(jab.teks, jab.nilai));
-                        
-                        if(sessionStorage.getItem("userLulus") !== "YA") {
-                            selectJabatanPengguna.appendChild(new Option(jab.teks, jab.nilai));
-                        }
-                    });
-                    selectUtama.disabled = false;
+                    isiPilihanJabatan();
+                } else {
+                    selectUtama.innerHTML = '<option value="">⚠️ Gagal memuatkan senarai jabatan</option>';
                 }
             } catch (error) {
                 console.error("Ralat muat senarai jabatan:", error);
+                selectUtama.innerHTML = '<option value="">⚠️ Ralat sambungan (Klik untuk cuba lagi)</option>';
             }
         }
 
+        // FUNGSI KHAS UNTUK MENGISI DROPDOWN DENGAN SELAMAT
+        function isiPilihanJabatan() {
+            const selectUtama = document.getElementById('jabatanUtama');
+            const selectJabatanPengguna = document.getElementById('jabatanPengguna');
+
+            if (!selectUtama) return;
+
+            selectUtama.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            
+            if (selectJabatanPengguna && sessionStorage.getItem("userLulus") !== "YA") {
+                selectJabatanPengguna.innerHTML = '<option value="Semua Jabatan">- Semua Jabatan -</option>';
+            }
+
+            senaraiJabatan.forEach(jab => {
+                selectUtama.appendChild(new Option(jab.teks, jab.nilai));
+                
+                if (selectJabatanPengguna && sessionStorage.getItem("userLulus") !== "YA") {
+                    selectJabatanPengguna.appendChild(new Option(jab.teks, jab.nilai));
+                }
+            });
+            selectUtama.disabled = false;
+        }
+
         // ==============================================================================
-        // TAMBAH BAIK: PENGEKALAN REKOD SEDIA ADA APABILA MENGEDIT BILANGAN AHLI
+        // PENGENDALI FAIL INTERAKTIF (TAMBAH, PAPAR & REMOVE INDIVIDU)
         // ==============================================================================
+        function kendalikanPilihanFail(inputElem, kat) {
+            const files = Array.from(inputElem.files);
+            const saizMaksimumBytes = 7 * 1024 * 1024; // 7 MB
+
+            for (let file of files) {
+                if (failDipilih[kat].length >= 2) {
+                    alert("Ralat: Anda hanya dibenarkan memuat naik maksimum 2 fail PDF sahaja.");
+                    break;
+                }
+                if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+                    alert(`Ralat: Fail "${file.name}" bukan berformat PDF.`);
+                    continue;
+                }
+                if (file.size > saizMaksimumBytes) {
+                    alert(`Ralat: Fail "${file.name}" melebihi saiz maksimum yang dibenarkan (7 MB).`);
+                    continue;
+                }
+                // Semak jika fail sudah ada dalam senarai
+                if (!failDipilih[kat].some(f => f.name === file.name && f.size === file.size)) {
+                    failDipilih[kat].push(file);
+                }
+            }
+            
+            inputElem.value = ""; // Reset input
+            paparSenaraiFail(kat);
+        }
+
+        function padamFailDipilih(kat, index) {
+            failDipilih[kat].splice(index, 1);
+            paparSenaraiFail(kat);
+        }
+
+        function paparSenaraiFail(kat) {
+            let containerId = "";
+            if (kat === 'buku') containerId = 'tab1_senarai_fail';
+            else if (kat === 'prosiding') containerId = 'tab2_senarai_fail';
+            else if (kat === 'umum') containerId = 'tab3_senarai_fail';
+
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = "";
+
+            failDipilih[kat].forEach((file, idx) => {
+                const saizMB = (file.size / (1024 * 1024)).toFixed(2);
+                const itemHTML = `
+                    <div class="flex items-center justify-between p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs fade-in">
+                        <div class="flex items-center gap-2 overflow-hidden pr-2">
+                            <span class="text-base">📄</span>
+                            <div class="truncate">
+                                <p class="font-semibold text-gray-800 truncate">${file.name}</p>
+                                <p class="text-gray-500 text-[11px]">${saizMB} MB</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="padamFailDipilih('${kat}', ${idx})" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-xs transition flex-shrink-0 font-semibold shadow-sm">
+                            🗑️ Padam
+                        </button>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', itemHTML);
+            });
+        }
+
         function janaBorangAhli() {
             const bilAhli = parseInt(document.getElementById('bilAhli').value) || 0;
             const bekasAhli = document.getElementById('bekasAhli');
 
-            // 1. Simpan data ahli sedia ada daripada input borang sebelum diselaraskan
             const dataAhliSemasa = [];
             let idxAhli = 1;
             while (document.getElementById(`namaAhli${idxAhli}`)) {
@@ -479,10 +554,8 @@
                 idxAhli++;
             }
 
-            // 2. Kosongkan elemen bekasAhli
             bekasAhli.innerHTML = '';
 
-            // 3. Jana semula petak input mengikut bilangan baharu
             if (bilAhli > 0) {
                 for (let i = 1; i <= bilAhli; i++) {
                     let pilihanJabatanHTML = `<option value="">-- Pilih Jabatan --</option>`;
@@ -513,7 +586,6 @@
                         </div>
                     `);
 
-                    // 4. Masukkan semula data yang tersimpan untuk ahli sedia ada
                     if (dataAhliSemasa[i - 1]) {
                         document.getElementById(`namaAhli${i}`).value = dataAhliSemasa[i - 1].nama;
                         document.getElementById(`perananAhli${i}`).value = dataAhliSemasa[i - 1].peranan;
@@ -548,7 +620,6 @@
             const perananSemasa = document.getElementById('perananPengguna').value;
             const katSemasa = document.getElementById('kategoriPenerbitan').value;
             
-            // Senarai peranan yang dibenarkan untuk pengesahan & pemadaman
             const perananSah = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS PENYELIDIKAN (C-RIE)"];
             const bolehUrus = perananSah.includes(perananSemasa);
 
@@ -587,13 +658,26 @@
                     butangPadam = `<button onclick="padamRekod(${row.Row_Index}, this)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded shadow w-full md:w-auto">Padam</button>`;
                 }
 
+                // JANAKAN PAUTAN DOKUMEN JIKA ADA
+                let pautanDokumenHTML = '';
+                const url1 = row.Url_Fail1 || row.Fail_1 || '';
+                const url2 = row.Url_Fail2 || row.Fail_2 || '';
+                
+                if (url1 || url2) {
+                    pautanDokumenHTML += `<div class="mt-2 space-y-1">`;
+                    if (url1) pautanDokumenHTML += `<a href="${url1}" target="_blank" class="inline-flex items-center gap-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-2 py-0.5 rounded">📄 Fail Dokumen 1 ↗</a>`;
+                    if (url2) pautanDokumenHTML += `<a href="${url2}" target="_blank" class="inline-flex items-center gap-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-2 py-0.5 rounded ml-1">📄 Fail Dokumen 2 ↗</a>`;
+                    pautanDokumenHTML += `</div>`;
+                }
+
+                // BUTIRAN SPESIFIK LAJUR
                 let butiranSpesifik = '-';
                 if (katSemasa === 'buku') {
-                    butiranSpesifik = `<b>Penerbit:</b> ${row.Penerbit || '-'}<br><span class="text-xs text-gray-500"><b>Bab:</b> ${row.Nama_Bab || '-'} (${row.Mukasurat || '-'} ms)</span>`;
+                    butiranSpesifik = `<b>Penerbit:</b> ${row.Penerbit || '-'}<br><span class="text-xs text-gray-500"><b>Bab:</b> ${row.Nama_Bab || '-'} (${row.Mukasurat || '-'} ms)</span>${pautanDokumenHTML}`;
                 } else if (katSemasa === 'prosiding') {
-                    butiranSpesifik = `<b>Seminar:</b> ${row.Nama_Seminar || '-'}<br><span class="text-xs text-gray-500"><b>Tempat:</b> ${row.Tempat || '-'} | <b>Tarikh:</b> ${row.Tarikh_Mula || '-'}</span>`;
+                    butiranSpesifik = `<span class="font-semibold text-blue-700">📑 Dokumen Artikel Akhbar/Majalah/Penulisan Kreatif</span><br><span class="text-xs text-gray-500">Status Fail: ${url1 ? 'Telah Dimuat Naik' : 'Tiada Fail'}</span>${pautanDokumenHTML}`;
                 } else if (katSemasa === 'umum') {
-                    butiranSpesifik = `<b>Jenis:</b> ${row.Jenis_Penerbitan || '-'}<br><span class="text-xs text-gray-500"><b>Penerbit:</b> ${row.Penerbit || '-'} | <b>Peringkat:</b> ${row.Peringkat_Penerbitan || '-'}</span>`;
+                    butiranSpesifik = `<b>Jenis:</b> ${row.Jenis_Penerbitan || '-'}<br><span class="text-xs text-gray-500"><b>Penerbit:</b> ${row.Penerbit || '-'} | <b>Peringkat:</b> ${row.Peringkat_Penerbitan || '-'}</span>${pautanDokumenHTML}`;
                 }
 
                 tbody.insertAdjacentHTML('beforeend', `
@@ -652,9 +736,6 @@
             }
         }
 
-        // ==============================================================================
-        // TAMBAH BAIK: PENGESANAN FORMAT SENARAI AHLI (JSON / TEKS LAMA)
-        // ==============================================================================
         function semakICDanEdit(rowIndex) {
             const rekod = semuaData.find(r => r.Row_Index === rowIndex);
             if (!rekod) return alert("Rekod tidak dijumpai dalam ingatan sistem.");
@@ -668,7 +749,6 @@
                 isSahBypass = true;
             } else {
                 const icDimasukkan = prompt(`Sila masukkan No. IC Ketua Penyelidik untuk kemaskini rekod:\n"${rekod.Tajuk}"`);
-                
                 if (icDimasukkan === null) return; 
 
                 if (icDimasukkan.trim() === rekod.IC_Ketua.toString().trim()) {
@@ -707,17 +787,6 @@
                     if (document.getElementById('tab1_bentuk')) document.getElementById('tab1_bentuk').value = rekod.Bentuk_Penerbitan || "CETAK";
                     if (document.getElementById('tab1_namaBab')) document.getElementById('tab1_namaBab').value = rekod.Nama_Bab || "";
                     if (document.getElementById('tab1_mukasurat')) document.getElementById('tab1_mukasurat').value = rekod.Mukasurat || "";
-                } else if (kat === 'prosiding') {
-                    if (document.getElementById('tab2_namaSeminar')) document.getElementById('tab2_namaSeminar').value = rekod.Nama_Seminar || "";
-                    if (document.getElementById('tab2_jenisKertas')) document.getElementById('tab2_jenisKertas').value = rekod.Jenis_Kertas || "ABSTRAK";
-                    if (document.getElementById('tab2_tarafSeminar')) document.getElementById('tab2_tarafSeminar').value = rekod.Taraf_Seminar || "ANTARABANGSA";
-                    if (document.getElementById('tab2_tarafProsiding')) document.getElementById('tab2_tarafProsiding').value = rekod.Taraf_Prosiding || "BERWASIT";
-                    if (document.getElementById('tab2_tarikhMula')) document.getElementById('tab2_tarikhMula').value = rekod.Tarikh_Mula || "";
-                    if (document.getElementById('tab2_tarikhTamat')) document.getElementById('tab2_tarikhTamat').value = rekod.Tarikh_Tamat || "";
-                    if (document.getElementById('tab2_tempat')) document.getElementById('tab2_tempat').value = rekod.Tempat || "";
-                    if (document.getElementById('tab2_penganjur')) document.getElementById('tab2_penganjur').value = rekod.Penganjur || "";
-                    if (document.getElementById('tab2_anugerah')) document.getElementById('tab2_anugerah').value = rekod.Anugerah || "";
-                    if (document.getElementById('tab2_bilPembentang')) document.getElementById('tab2_bilPembentang').value = rekod.Bil_Pembentang || "1 ORANG";
                 } else if (kat === 'umum') {
                     if (document.getElementById('tab3_peringkat')) document.getElementById('tab3_peringkat').value = rekod.Peringkat_Penerbitan || "ANTARABANGSA";
                     if (document.getElementById('tab3_jenis')) document.getElementById('tab3_jenis').value = rekod.Jenis_Penerbitan || "MONOGRAF";
@@ -731,7 +800,6 @@
 
                 if (bilAhli > 0 && rekod.Senarai_Ahli) {
                     try {
-                        // 1. Cuba parse data sebagai format rentetan JSON (Format Baharu)
                         const ahliArrayJSON = JSON.parse(rekod.Senarai_Ahli);
                         for (let i = 0; i < bilAhli; i++) {
                             if (ahliArrayJSON[i]) {
@@ -741,12 +809,10 @@
                             }
                         }
                     } catch (e) {
-                        // 2. Jika gagal dibaca sebagai JSON, guna kaedah fallback format pemisah teks (Format Lama)
                         const ahliArray = rekod.Senarai_Ahli.split(" | ");
                         for (let i = 0; i < bilAhli; i++) {
                             if (ahliArray[i]) {
                                 const matchBaru = ahliArray[i].match(/^(.*?)\s*-\s*(.*?)\s*\((.*)\)$/);
-                                
                                 if (matchBaru) {
                                     document.getElementById(`namaAhli${i+1}`).value = matchBaru[1].trim();
                                     document.getElementById(`perananAhli${i+1}`).value = matchBaru[2].trim();
@@ -769,12 +835,33 @@
             }
         }
 
+        // ==============================================================================
+        // PENAMBAHBAIKAN FUNGSI BATAL EDIT (PENETAPAN SEMULA JABATAN TANPA RELOAD)
+        // ==============================================================================
         function batalEdit() {
+            // Tangkap kategori (tab) semasa sebelum reset
+            const katSemasa = document.getElementById('kategoriPenerbitan').value; 
+
             document.getElementById('borangPenerbitan').reset();
             document.getElementById('bekasAhli').innerHTML = '';
             document.getElementById('tindakanBorang').value = "simpan";
             document.getElementById('rowIndexSemasa').value = "";
-            tukarTab('buku'); 
+            
+            // RESET SENARAI FAIL
+            failDipilih = { buku: [], prosiding: [], umum: [] };
+            paparSenaraiFail('buku');
+            paparSenaraiFail('prosiding');
+            paparSenaraiFail('umum');
+
+            // MEKANISME RE-FILL / AUTO-RETRY DROPDOWN JABATAN
+            if (senaraiJabatan.length > 0) {
+                isiPilihanJabatan();
+            } else {
+                muatJabatanSistem();
+            }
+
+            // Set semula paparan tanpa menukar tab ke 'buku'
+            tukarTab(katSemasa); 
             
             document.getElementById('btnHantar').innerHTML = "Hantar Rekod 🚀";
             document.getElementById('btnHantar').classList.replace("bg-yellow-500", "bg-blue-600");
@@ -850,10 +937,20 @@
             paparJadual(dataBercetak);
         }
 
+        // TUKAR FAIL KEPADA BASE64
+        function tukarFailKeBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         // ==============================================================================
-        // TAMBAH BAIK: PENGHANTARAN BORANG MENGGUNAKAN FORMAT JSON.STRINGIFY
+        // PENGHANTARAN BORANG PERINTAH DENGAN MUAT NAIK FAIL INTERAKTIF
         // ==============================================================================
-        document.getElementById('borangPenerbitan').addEventListener('submit', function(e) {
+        document.getElementById('borangPenerbitan').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const btnHantar = document.getElementById('btnHantar');
@@ -867,7 +964,6 @@
             mesejStatus.className = "text-sm font-medium text-blue-600 block";
             mesejStatus.innerText = (tindakan === "edit") ? "Menyimpan kemaskini..." : "Menyimpan rekod baharu...";
 
-            // Tukar struktur penghantaran kepada array of objects JSON
             let senaraiAhliJSON = [];
             for(let i = 1; i <= bilAhli; i++) {
                 senaraiAhliJSON.push({
@@ -885,6 +981,7 @@
             }
             
             formData.append("Kategori_Penerbitan", katSemasa);
+            formData.append("Folder_ID", FOLDER_MAP[katSemasa] || "");
             formData.append("Timestamp", new Date().toLocaleString("ms-MY"));
             formData.append("Jabatan", document.getElementById('jabatanUtama').value);
             formData.append("Tahun", document.getElementById('tahun').value);
@@ -895,9 +992,15 @@
             formData.append("Ketua", document.getElementById('ketua').value);
             formData.append("IC_Ketua", document.getElementById('icKetua').value);
             formData.append("Bilangan_Ahli", bilAhli);
-            
-            // Hantar sebagai rentetan JSON (JSON String) terus ke Google Sheets
             formData.append("Senarai_Ahli", JSON.stringify(senaraiAhliJSON));
+
+            // AMBIL FAIL DARIPADA ARRAY INTERAKTIF `failDipilih[katSemasa]`
+            const listFail = failDipilih[katSemasa] || [];
+            for (let i = 0; i < listFail.length; i++) {
+                const base64Data = await tukarFailKeBase64(listFail[i]);
+                formData.append(`Fail_${i + 1}_Nama`, listFail[i].name);
+                formData.append(`Fail_${i + 1}_Data`, base64Data);
+            }
 
             if (katSemasa === 'buku') {
                 formData.append("Penerbit", document.getElementById('tab1_penerbit').value);
@@ -905,17 +1008,6 @@
                 formData.append("Bentuk_Penerbitan", document.getElementById('tab1_bentuk').value);
                 formData.append("Nama_Bab", document.getElementById('tab1_namaBab').value);
                 formData.append("Mukasurat", document.getElementById('tab1_mukasurat').value);
-            } else if (katSemasa === 'prosiding') {
-                formData.append("Nama_Seminar", document.getElementById('tab2_namaSeminar').value);
-                formData.append("Jenis_Kertas", document.getElementById('tab2_jenisKertas').value);
-                formData.append("Taraf_Seminar", document.getElementById('tab2_tarafSeminar').value);
-                formData.append("Taraf_Prosiding", document.getElementById('tab2_tarafProsiding').value);
-                formData.append("Tarikh_Mula", document.getElementById('tab2_tarikhMula').value);
-                formData.append("Tarikh_Tamat", document.getElementById('tab2_tarikhTamat').value);
-                formData.append("Tempat", document.getElementById('tab2_tempat').value);
-                formData.append("Penganjur", document.getElementById('tab2_penganjur').value);
-                formData.append("Anugerah", document.getElementById('tab2_anugerah').value);
-                formData.append("Bil_Pembentang", document.getElementById('tab2_bilPembentang').value);
             } else if (katSemasa === 'umum') {
                 formData.append("Peringkat_Penerbitan", document.getElementById('tab3_peringkat').value);
                 formData.append("Jenis_Penerbitan", document.getElementById('tab3_jenis').value);
@@ -933,6 +1025,10 @@
                 
                 batalEdit();
                 setTimeout(muatTurunData, 1500);
+            }).catch(err => {
+                console.error("Ralat simpan:", err);
+                mesejStatus.className = "text-sm font-medium text-red-600 block";
+                mesejStatus.innerText = "❌ Gagal menyimpan rekod.";
             }).finally(() => {
                 btnHantar.disabled = false;
                 setTimeout(() => mesejStatus.classList.add('hidden'), 5000);
