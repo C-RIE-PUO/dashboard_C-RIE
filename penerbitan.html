@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekod Maklumat Penerbitan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+	    <script>
+        if (sessionStorage.getItem("userLulus") !== "YA") {
+            alert("Sila log masuk terlebih dahulu.");
+            window.location.href = "login.html"; 
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+    <!-- ================= MENU UTAMA ================= -->
+    <nav class="bg-white shadow-md mb-6 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-6">
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <span class="text-2xl">🎓</span>
+                        <span class="font-bold text-xl text-blue-700">Sistem Penerbitan</span>
+                    </div>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="paparan.html" class="text-gray-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md text-sm font-semibold transition">Paparan Utama</a>
+                        <a href="#" class="text-blue-700 bg-blue-50 px-3 py-2 rounded-md text-sm font-semibold transition">Rekod Data</a>
+                    </div>
+                </div>
+                <!-- Butang Log Masuk -->
+                <div class="flex items-center">
+                    <button id="btnLogMasuk" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition">Log Masuk</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 md:px-6 mb-8 space-y-8">
+        
+        <!-- ================= INFO PENGGUNA & SESI ================= -->
+        <div id="infoPengguna" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <span>👤 Log Masuk Semasa: </span>
+                <span id="paparanLogMasuk" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs border border-blue-200 uppercase">
+                    Memuatkan...
+                </span>
+            </div>
+            
+            <div id="kawalanSimulasi" class="flex flex-col sm:flex-row gap-3">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-semibold text-gray-600">Peranan:</label>
+                    <select id="perananPengguna" onchange="kemaskiniPaparanLogMasuk(); muatTurunData()" class="px-2 py-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 bg-gray-50">
+                        <option value="PENGGUNA BIASA">Pengguna Biasa (Penyelidik)</option>
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="KUPIK">KUPIK</option>
+                        <option value="PENYELARAS INOVASI (C-RIE)">PENYELARAS INOVASI (C-RIE)</option>
+                        <option value="PENYELARAS PENYELIDIKAN (C-RIE)">PENYELARAS PENYELIDIKAN (C-RIE)</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-semibold text-gray-600">Jabatan:</label>
+                    <select id="jabatanPengguna" onchange="kemaskiniPaparanLogMasuk()" class="px-2 py-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 bg-gray-50">
+                        <option value="Semua Jabatan">- Semua Jabatan -</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= BAHAGIAN BORANG ================= -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-blue-600 px-8 py-6 text-white flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold flex items-center gap-2">
+                        <span>📚</span> <span id="tajukBorang">Rekod Maklumat Penerbitan Bukan Penyelidikan</span>
+                    </h1>
+                    <p class="text-blue-100 text-sm mt-1" id="subTajukBorang">Sila lengkapkan butiran penerbitan di bawah untuk direkodkan ke pangkalan data.</p>
+                </div>
+                <button type="button" id="btnBatalEdit" onclick="batalEdit()" class="hidden bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-2 px-4 rounded shadow transition">Batal Kemaskini ✖</button>
+            </div>
+
+            <form id="borangPenerbitan" class="p-6 md:p-8 space-y-6">
+                <!-- MEDAN TERSEMBUNYI UNTUK KAWALAN TINDAKAN -->
+                <input type="hidden" id="tindakanBorang" value="simpan">
+                <input type="hidden" id="rowIndexSemasa" value="">
+                <input type="hidden" id="kategoriPenerbitan" value="buku">
+
+                <!-- TABS NAVIGATION -->
+                <div class="flex flex-col md:flex-row border-b border-gray-200">
+                    <button type="button" id="btn-buku" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-bold text-sm transition-colors border-blue-600 text-blue-700" onclick="tukarTab('buku')">Buku Dan Bab Dalam Buku</button>
+                    <button type="button" id="btn-prosiding" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-semibold text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" onclick="tukarTab('prosiding')">Pembentangan/Prosiding</button>
+                    <button type="button" id="btn-umum" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-semibold text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" onclick="tukarTab('umum')">Penerbitan Umum</button>
+                </div>
+
+                <!-- KANDUNGAN TABS -->
+                <div class="bg-blue-50/50 p-6 rounded-lg border border-blue-100 mb-6">
+                    
+                    <!-- TAB 1: BUKU DAN BAB DALAM BUKU -->
+                    <div id="sek-buku" class="tab-content fade-in space-y-4">
+                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Buku Dan Bab Dalam Buku</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Penerbit</label>
+                                <input type="text" id="tab1_penerbit" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Peringkat Sebaran</label>
+                                <select id="tab1_peringkat" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option>ANTARABANGSA</option>
+                                    <option>KEBANGSAAN</option>
+                                    <option>NEGERI</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Bentuk Penerbitan</label>
+                                <select id="tab1_bentuk" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option>CETAK</option>
+                                    <option>DIGITAL</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Bab</label>
+                                <input type="text" id="tab1_namaBab" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Mukasurat</label>
+                                <input type="text" id="tab1_mukasurat" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: PROSIDING -->
+                    <div id="sek-prosiding" class="tab-content hidden fade-in space-y-4">
+                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Pembentangan/Penerbitan Dalam Prosiding (Seminar/Persidangan/Bengkel)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Seminar/Persidangan/Bengkel</label>
+                                <input type="text" id="tab2_namaSeminar" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Jenis Kertas Kerja</label>
+                                <select id="tab2_jenisKertas" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option>ABSTRAK</option>
+                                    <option>PENUH</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Taraf Seminar/Persidangan/Bengkel</label>
+                                <select id="tab2_tarafSeminar" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option>ANTARABANGSA</option>
+                                    <option>KEBANGSAAN</option>
+                                    <option>NEGERI</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Taraf Prosiding</label>
+                                <select id="tab2_tarafProsiding" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option>BERWASIT</option>
+                                    <option>TIDAK BERWASIT</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Mula Seminar/Persidangan/Bengkel</label>
+                                <input type="date" id="tab2_tarikhMula" value="2026-08-11" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Tamat Seminar/Persidangan/Bengkel</label>
+                                <input type="date" id="tab2_tarikhTamat" value="2026-08-11" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-gray-50">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Tempat Seminar/Persidangan/Bengkel</label>
+                                <input type="text" id="tab2_tempat" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Penganjur</label>
+                                <input type="text" id="tab2_penganjur" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Anugerah</label>
+                                <input type="text" id="tab2_anugerah" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Bilangan Pembentang</label>
+                                <select id="tab2_bilPembentang" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option>1 ORANG</option>
+                                    <option>2 ORANG</option>
+                                    <option>3 ORANG</option>
+                                    <option>LEBIH DARI 3 ORANG</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: PENERBITAN UMUM -->
+                    <div id="sek-umum" class="tab-content hidden fade-in space-y-4">
+                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Penerbitan Umum</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Peringkat Penerbitan</label>
+                                <select id="tab3_peringkat" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option>ANTARABANGSA</option>
+                                    <option>KEBANGSAAN</option>
+                                    <option>NEGERI</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Jenis Penerbitan</label>
+                                <select id="tab3_jenis" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option>MONOGRAF</option>
+                                    <option>MAJALAH</option>
+                                    <option>ARTIKEL UMUM</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh Penerbitan</label>
+                                <input type="date" id="tab3_tarikhPenerbitan" value="2026-08-11" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Penerbit</label>
+                                <input type="text" id="tab3_penerbit" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-300">
+                
+                <!-- MEDAN ASAS (KEKAL) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Pemilik <span class="text-red-500">*</span></label>
+                        <select id="jabatanUtama" name="jabatanUtama" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-gray-50">
+                            <option value="">Memuatkan senarai jabatan... ⏳</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
+                        <input type="number" id="tahun" name="tahun" placeholder="Contoh: 2026" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Status Penerbitan <span class="text-red-500">*</span></label>
+                        <select id="status" name="status" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                            <option value="">-- Pilih Status --</option>
+                            <option value="Draf">Draf</option>
+                            <option value="Dalam Semakan">Dalam Semakan</option>
+                            <option value="Diterbitkan">Diterbitkan</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Bahasa <span class="text-red-500">*</span></label>
+                        <select id="bahasa" name="bahasa" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                            <option value="">-- Pilih Bahasa --</option>
+                            <option value="Bahasa Melayu">Bahasa Melayu</option>
+                            <option value="English">English</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">ISSN / ISBN (Dari Maklumat Asas)</label>
+                        <input type="text" id="issnIsbn" name="issnIsbn" placeholder="Masukkan nombor ISSN atau ISBN (jika ada)" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Tajuk Penerbitan Utama <span class="text-red-500">*</span></label>
+                        <input type="text" id="tajuk" name="tajuk" placeholder="Masukkan tajuk penuh penerbitan" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Ketua Penyelidik/Penulis <span class="text-red-500">*</span></label>
+                        <input type="text" id="ketua" name="ketua" placeholder="Nama penuh ketua" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">No. IC Ketua Penyelidik <span class="text-red-500">*</span></label>
+                        <input type="text" id="icKetua" name="icKetua" placeholder="Contoh: 880101-10-1234" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
+
+                    <div class="md:col-span-2 border-t pt-4 mt-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Bilangan Ahli Kumpulan (Tidak termasuk ketua)</label>
+                        <select id="bilAhli" name="bilAhli" onchange="janaBorangAhli()" class="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
+                            <option value="0">0 (Tiada ahli kumpulan)</option>
+                            <option value="1">1 Ahli</option>
+                            <option value="2">2 Ahli</option>
+                            <option value="3">3 Ahli</option>
+                            <option value="4">4 Ahli</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="bekasAhli" class="space-y-4 pt-2"></div>
+
+                <div class="flex items-center justify-end gap-4 border-t pt-6 mt-6">
+                    <span id="mesejStatus" class="text-sm font-medium hidden"></span>
+                    <button type="submit" id="btnHantar" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow-md transition flex items-center gap-2">
+                        Hantar Rekod 🚀
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ================= BAHAGIAN JADUAL REKOD ================= -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-6 bg-gray-800 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <span>📊</span> Senarai Rekod Penerbitan (<span id="labelJadualKategori" class="text-blue-300">PENERBITAN-BUKU</span>)
+                    </h2>
+                    <p class="text-gray-400 text-xs mt-1">Paparan 10 rekod terkini mengikut tab. Status pengesahan dan tindakan hanya bagi peranan dibenarkan.</p>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <input type="text" id="inputCarian" onkeyup="tapisJadual()" placeholder="🔍 Cari tajuk, ketua, jabatan..." class="px-4 py-2 text-sm text-gray-800 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 w-full md:w-72">
+                    <button onclick="muatTurunData()" title="Muat semula data" class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-sm transition">
+                        🔄 Kemaskini
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 text-xs uppercase font-semibold border-b border-gray-200">
+                            <th class="p-4">Tarikh</th>
+                            <th class="p-4">Jabatan</th>
+                            <th class="p-4">Tajuk Penerbitan</th>
+                            <th class="p-4">Maklumat Ketua</th>
+                            <th class="p-4">Butiran Spesifik</th>
+                            <th class="p-4">Status & Pengesahan</th>
+                            <th class="p-4 text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jadualBody" class="divide-y divide-gray-200 text-sm text-gray-700">
+                        <tr>
+                            <td colspan="7" class="text-center py-6 text-gray-500">Memuatkan data... ⏳</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BAHAGIAN KAWALAN PAGINASI (NEXT / PREVIOUS) -->
+            <div class="p-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span id="infoPaginasi" class="text-xs sm:text-sm text-gray-600 font-medium">
+                    Menunjukkan 0 hingga 0 daripada 0 rekod
+                </span>
+                <div class="flex items-center space-x-2">
+                    <button id="btnPrev" onclick="halamanSebelumnya()" class="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition">
+                        ◀ Sebelumnya
+                    </button>
+                    <span id="teksHalaman" class="text-xs font-bold text-gray-700 px-2">Halaman 1 / 1</span>
+                    <button id="btnNext" onclick="halamanSeterusnya()" class="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition">
+                        Seterusnya ▶
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec";
+        let semuaData = []; 
+        let dataBercetak = [];
+        let senaraiJabatan = [];
+
+        // PEMBOLEHUBAH PAGINASI
+        let halamanSemasa = 1;
+        const rekodSetiapHalaman = 10;
+
+        document.addEventListener("DOMContentLoaded", async function() {
+            const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
+            const perananPengguna = (sessionStorage.getItem("peranan") || "PENGGUNA BIASA").trim().toUpperCase();
+            const jabatanPengguna = (sessionStorage.getItem("jabatan") || "SEMUA JABATAN").trim().toUpperCase();
+
+            if (sudahLogin) {
+                const btnLogMasuk = document.getElementById('btnLogMasuk');
+                if (btnLogMasuk) {
+                    btnLogMasuk.classList.add('hidden');
+                    btnLogMasuk.style.display = 'none';
+                }
+
+                document.getElementById('kawalanSimulasi').style.display = 'none';
+                document.getElementById('paparanLogMasuk').innerHTML = `<b>${perananPengguna}</b> | ${jabatanPengguna}`;
+                document.getElementById('perananPengguna').innerHTML = `<option value="${perananPengguna}">${perananPengguna}</option>`;
+                document.getElementById('jabatanPengguna').innerHTML = `<option value="${jabatanPengguna}">${jabatanPengguna}</option>`;
+            } else {
+                kemaskiniPaparanLogMasuk();
+            }
+
+            await muatJabatanSistem();
+            muatTurunData();
+        });
+
+        function tukarTab(tabId) {
+            halamanSemasa = 1; 
+            document.getElementById('kategoriPenerbitan').value = tabId;
+
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(el => el.classList.add('hidden'));
+
+            document.getElementById('sek-' + tabId).classList.remove('hidden');
+
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-700', 'font-bold');
+                btn.classList.add('border-transparent', 'text-gray-500', 'font-semibold');
+            });
+
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('border-transparent', 'text-gray-500', 'font-semibold');
+            activeBtn.classList.add('border-blue-600', 'text-blue-700', 'font-bold');
+
+            const petaNamaJadual = {
+                'buku': 'PENERBITAN-BUKU',
+                'prosiding': 'PENERBITAN-PROSIDING',
+                'umum': 'PENERBITAN-UMUM'
+            };
+            document.getElementById('labelJadualKategori').innerText = petaNamaJadual[tabId] || 'PENERBITAN-BUKU';
+            
+            muatTurunData();
+        }
+
+        function kemaskiniPaparanLogMasuk() {
+            const peranan = document.getElementById('perananPengguna').value;
+            const jabatan = document.getElementById('jabatanPengguna').value;
+            document.getElementById('paparanLogMasuk').innerHTML = `<b>${peranan}</b> | ${jabatan}`;
+        }
+
+        async function muatJabatanSistem() {
+            const selectUtama = document.getElementById('jabatanUtama');
+            const selectJabatanPengguna = document.getElementById('jabatanPengguna');
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`);
+                const result = await response.json(); 
+                
+                if (result.status === "BERJAYA" && Array.isArray(result.JABATAN)) {
+                    senaraiJabatan = result.JABATAN.map(item => ({ nilai: item, teks: item }));
+                    
+                    selectUtama.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                    senaraiJabatan.forEach(jab => {
+                        selectUtama.appendChild(new Option(jab.teks, jab.nilai));
+                        
+                        if(sessionStorage.getItem("userLulus") !== "YA") {
+                            selectJabatanPengguna.appendChild(new Option(jab.teks, jab.nilai));
+                        }
+                    });
+                    selectUtama.disabled = false;
+                }
+            } catch (error) {
+                console.error("Ralat muat senarai jabatan:", error);
+            }
+        }
+
+        // ==============================================================================
+        // TAMBAH BAIK: PENGEKALAN REKOD SEDIA ADA APABILA MENGEDIT BILANGAN AHLI
+        // ==============================================================================
+        function janaBorangAhli() {
+            const bilAhli = parseInt(document.getElementById('bilAhli').value) || 0;
+            const bekasAhli = document.getElementById('bekasAhli');
+
+            // 1. Simpan data ahli sedia ada daripada input borang sebelum diselaraskan
+            const dataAhliSemasa = [];
+            let idxAhli = 1;
+            while (document.getElementById(`namaAhli${idxAhli}`)) {
+                dataAhliSemasa.push({
+                    nama: document.getElementById(`namaAhli${idxAhli}`).value || '',
+                    peranan: document.getElementById(`perananAhli${idxAhli}`).value || '',
+                    jabatan: document.getElementById(`jabatanAhli${idxAhli}`).value || ''
+                });
+                idxAhli++;
+            }
+
+            // 2. Kosongkan elemen bekasAhli
+            bekasAhli.innerHTML = '';
+
+            // 3. Jana semula petak input mengikut bilangan baharu
+            if (bilAhli > 0) {
+                for (let i = 1; i <= bilAhli; i++) {
+                    let pilihanJabatanHTML = `<option value="">-- Pilih Jabatan --</option>`;
+                    senaraiJabatan.forEach(jab => {
+                        pilihanJabatanHTML += `<option value="${jab.nilai}">${jab.teks}</option>`;
+                    });
+
+                    bekasAhli.insertAdjacentHTML('beforeend', `
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg fade-in grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Ahli ${i} <span class="text-red-500">*</span></label>
+                                <input type="text" id="namaAhli${i}" required class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Peranan Ahli ${i} <span class="text-red-500">*</span></label>
+                                <select id="perananAhli${i}" required class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
+                                    <option value="">-- Pilih Peranan --</option>
+                                    <option value="PEMBENTANG">PEMBENTANG</option>
+                                    <option value="PENULIS">PENULIS</option>
+                                    <option value="PENYUNTING">PENYUNTING</option>
+                                    <option value="PENULIS DAN PEMBENTANG">PENULIS DAN PEMBENTANG</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Ahli ${i} <span class="text-red-500">*</span></label>
+                                <select id="jabatanAhli${i}" required class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none">${pilihanJabatanHTML}</select>
+                            </div>
+                        </div>
+                    `);
+
+                    // 4. Masukkan semula data yang tersimpan untuk ahli sedia ada
+                    if (dataAhliSemasa[i - 1]) {
+                        document.getElementById(`namaAhli${i}`).value = dataAhliSemasa[i - 1].nama;
+                        document.getElementById(`perananAhli${i}`).value = dataAhliSemasa[i - 1].peranan;
+                        document.getElementById(`jabatanAhli${i}`).value = dataAhliSemasa[i - 1].jabatan;
+                    }
+                }
+            }
+        }
+
+        async function muatTurunData() {
+            const tbody = document.getElementById('jadualBody');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-500">Memuatkan data terkini... ⏳</td></tr>';
+
+            const katSemasa = document.getElementById('kategoriPenerbitan').value;
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?kategori=${katSemasa}`);
+                const result = await response.json(); 
+                let dataDiterima = Array.isArray(result) ? result : (result.data || []);
+                semuaData = [...dataDiterima].reverse(); 
+                dataBercetak = semuaData;
+                paparJadual(dataBercetak);
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-red-500">Gagal memuatkan data pangkalan.</td></tr>';
+                kemaskiniKawalanPaginasi(0, 0, 0, 1);
+            }
+        }
+
+        function paparJadual(data) {
+            dataBercetak = data;
+            const tbody = document.getElementById('jadualBody');
+            const perananSemasa = document.getElementById('perananPengguna').value;
+            const katSemasa = document.getElementById('kategoriPenerbitan').value;
+            
+            // Senarai peranan yang dibenarkan untuk pengesahan & pemadaman
+            const perananSah = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS PENYELIDIKAN (C-RIE)"];
+            const bolehUrus = perananSah.includes(perananSemasa);
+
+            tbody.innerHTML = '';
+            
+            const jumlahRekod = data.length;
+            if (jumlahRekod === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-500">Tiada rekod dijumpai.</td></tr>';
+                kemaskiniKawalanPaginasi(0, 0, 0, 1);
+                return;
+            }
+
+            const jumlahHalaman = Math.ceil(jumlahRekod / rekodSetiapHalaman) || 1;
+            if (halamanSemasa > jumlahHalaman) halamanSemasa = jumlahHalaman;
+            if (halamanSemasa < 1) halamanSemasa = 1;
+
+            const mula = (halamanSemasa - 1) * rekodSetiapHalaman;
+            const tamat = Math.min(mula + rekodSetiapHalaman, jumlahRekod);
+            const dataHalaman = data.slice(mula, tamat);
+
+            dataHalaman.forEach((row) => {
+                const isDisahkan = (row.Status_Pengesahan === 'Disahkan');
+                let badgeSah = isDisahkan ? 'bg-green-100 text-green-800 border-green-300' : 'bg-orange-100 text-orange-800 border-orange-300';
+                
+                let butangSahkan = '';
+                if (!isDisahkan && bolehUrus) {
+                    butangSahkan = `<button onclick="sahkanRekod(${row.Row_Index}, this)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded shadow w-full md:w-auto">Sahkan</button>`;
+                } else if (isDisahkan) {
+                    butangSahkan = `<span class="text-green-600 text-xs font-semibold block text-center mb-1 w-full">Telah Disahkan</span>`;
+                }
+
+                let butangEdit = `<button onclick="semakICDanEdit(${row.Row_Index})" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded shadow w-full md:w-auto">Edit</button>`;
+                
+                let butangPadam = '';
+                if (bolehUrus) {
+                    butangPadam = `<button onclick="padamRekod(${row.Row_Index}, this)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded shadow w-full md:w-auto">Padam</button>`;
+                }
+
+                let butiranSpesifik = '-';
+                if (katSemasa === 'buku') {
+                    butiranSpesifik = `<b>Penerbit:</b> ${row.Penerbit || '-'}<br><span class="text-xs text-gray-500"><b>Bab:</b> ${row.Nama_Bab || '-'} (${row.Mukasurat || '-'} ms)</span>`;
+                } else if (katSemasa === 'prosiding') {
+                    butiranSpesifik = `<b>Seminar:</b> ${row.Nama_Seminar || '-'}<br><span class="text-xs text-gray-500"><b>Tempat:</b> ${row.Tempat || '-'} | <b>Tarikh:</b> ${row.Tarikh_Mula || '-'}</span>`;
+                } else if (katSemasa === 'umum') {
+                    butiranSpesifik = `<b>Jenis:</b> ${row.Jenis_Penerbitan || '-'}<br><span class="text-xs text-gray-500"><b>Penerbit:</b> ${row.Penerbit || '-'} | <b>Peringkat:</b> ${row.Peringkat_Penerbitan || '-'}</span>`;
+                }
+
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr class="hover:bg-blue-50/50 transition border-b border-gray-100">
+                        <td class="p-4 text-xs text-gray-500">${row.Timestamp || '-'}</td>
+                        <td class="p-4 font-semibold text-gray-800">${row.Jabatan || '-'}</td>
+                        <td class="p-4 font-medium text-gray-900">
+                            ${row.Tajuk || '-'}<br>
+                            <span class="text-xs text-gray-500 font-normal">Tahun: ${row.Tahun} | ISSN/ISBN: ${row.ISSN_ISBN || 'Tiada'}</span>
+                        </td>
+                        <td class="p-4 text-sm text-gray-700">
+                            <b>${row.Ketua || '-'}</b>
+                        </td>
+                        <td class="p-4 text-xs text-gray-700">
+                            ${butiranSpesifik}
+                        </td>
+                        <td class="p-4 whitespace-nowrap">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeSah}">
+                                ${row.Status_Pengesahan || 'Menunggu Pengesahan'}
+                            </span>
+                            <div class="text-[10px] text-gray-400 mt-1">${row.Disahkan_Oleh || ''}</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex flex-wrap items-center justify-center gap-1.5">
+                                ${butangSahkan}
+                                ${butangEdit}
+                                ${butangPadam}
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            kemaskiniKawalanPaginasi(mula + 1, tamat, jumlahRekod, jumlahHalaman);
+        }
+
+        function kemaskiniKawalanPaginasi(mula, tamat, total, totalPage) {
+            document.getElementById('infoPaginasi').innerText = `Menunjukkan ${total === 0 ? 0 : mula} hingga ${tamat} daripada ${total} rekod`;
+            document.getElementById('teksHalaman').innerText = `Halaman ${halamanSemasa} / ${totalPage || 1}`;
+            document.getElementById('btnPrev').disabled = (halamanSemasa <= 1);
+            document.getElementById('btnNext').disabled = (halamanSemasa >= totalPage || total === 0);
+        }
+
+        function halamanSebelumnya() {
+            if (halamanSemasa > 1) {
+                halamanSemasa--;
+                paparJadual(dataBercetak);
+            }
+        }
+
+        function halamanSeterusnya() {
+            const totalPage = Math.ceil(dataBercetak.length / rekodSetiapHalaman);
+            if (halamanSemasa < totalPage) {
+                halamanSemasa++;
+                paparJadual(dataBercetak);
+            }
+        }
+
+        // ==============================================================================
+        // TAMBAH BAIK: PENGESANAN FORMAT SENARAI AHLI (JSON / TEKS LAMA)
+        // ==============================================================================
+        function semakICDanEdit(rowIndex) {
+            const rekod = semuaData.find(r => r.Row_Index === rowIndex);
+            if (!rekod) return alert("Rekod tidak dijumpai dalam ingatan sistem.");
+
+            const perananSemasa = document.getElementById('perananPengguna').value.trim().toUpperCase();
+            const perananPengecualian = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS PENYELIDIKAN (C-RIE)"];
+            
+            let isSahBypass = false;
+
+            if (perananPengecualian.includes(perananSemasa)) {
+                isSahBypass = true;
+            } else {
+                const icDimasukkan = prompt(`Sila masukkan No. IC Ketua Penyelidik untuk kemaskini rekod:\n"${rekod.Tajuk}"`);
+                
+                if (icDimasukkan === null) return; 
+
+                if (icDimasukkan.trim() === rekod.IC_Ketua.toString().trim()) {
+                    isSahBypass = true;
+                    alert("Pengesahan IC Berjaya. Anda boleh mula menyunting rekod.");
+                } else {
+                    alert("Ralat! No. IC yang dimasukkan tidak sepadan dengan rekod ini.");
+                    return;
+                }
+            }
+
+            if (isSahBypass) {
+                document.getElementById('tindakanBorang').value = "edit";
+                document.getElementById('rowIndexSemasa').value = rowIndex;
+                document.getElementById('btnHantar').innerHTML = "Kemaskini Rekod 📝";
+                document.getElementById('btnHantar').classList.replace("bg-blue-600", "bg-yellow-500");
+                document.getElementById('btnHantar').classList.replace("hover:bg-blue-700", "hover:bg-yellow-600");
+                
+                document.getElementById('tajukBorang').innerText = "Kemaskini Rekod Penerbitan";
+                document.getElementById('subTajukBorang').innerText = "Sila sunting butiran yang perlu dikemaskini. Status akan direset kepada Menunggu Pengesahan.";
+                document.getElementById('btnBatalEdit').classList.remove("hidden");
+
+                document.getElementById('jabatanUtama').value = rekod.Jabatan || "";
+                document.getElementById('tahun').value = rekod.Tahun || "";
+                document.getElementById('status').value = rekod.Status || "";
+                document.getElementById('bahasa').value = rekod.Bahasa || "";
+                document.getElementById('issnIsbn').value = rekod.ISSN_ISBN || "";
+                document.getElementById('tajuk').value = rekod.Tajuk || "";
+                document.getElementById('ketua').value = rekod.Ketua || "";
+                document.getElementById('icKetua').value = rekod.IC_Ketua || "";
+
+                const kat = document.getElementById('kategoriPenerbitan').value;
+                if (kat === 'buku') {
+                    if (document.getElementById('tab1_penerbit')) document.getElementById('tab1_penerbit').value = rekod.Penerbit || "";
+                    if (document.getElementById('tab1_peringkat')) document.getElementById('tab1_peringkat').value = rekod.Peringkat_Sebaran || "ANTARABANGSA";
+                    if (document.getElementById('tab1_bentuk')) document.getElementById('tab1_bentuk').value = rekod.Bentuk_Penerbitan || "CETAK";
+                    if (document.getElementById('tab1_namaBab')) document.getElementById('tab1_namaBab').value = rekod.Nama_Bab || "";
+                    if (document.getElementById('tab1_mukasurat')) document.getElementById('tab1_mukasurat').value = rekod.Mukasurat || "";
+                } else if (kat === 'prosiding') {
+                    if (document.getElementById('tab2_namaSeminar')) document.getElementById('tab2_namaSeminar').value = rekod.Nama_Seminar || "";
+                    if (document.getElementById('tab2_jenisKertas')) document.getElementById('tab2_jenisKertas').value = rekod.Jenis_Kertas || "ABSTRAK";
+                    if (document.getElementById('tab2_tarafSeminar')) document.getElementById('tab2_tarafSeminar').value = rekod.Taraf_Seminar || "ANTARABANGSA";
+                    if (document.getElementById('tab2_tarafProsiding')) document.getElementById('tab2_tarafProsiding').value = rekod.Taraf_Prosiding || "BERWASIT";
+                    if (document.getElementById('tab2_tarikhMula')) document.getElementById('tab2_tarikhMula').value = rekod.Tarikh_Mula || "";
+                    if (document.getElementById('tab2_tarikhTamat')) document.getElementById('tab2_tarikhTamat').value = rekod.Tarikh_Tamat || "";
+                    if (document.getElementById('tab2_tempat')) document.getElementById('tab2_tempat').value = rekod.Tempat || "";
+                    if (document.getElementById('tab2_penganjur')) document.getElementById('tab2_penganjur').value = rekod.Penganjur || "";
+                    if (document.getElementById('tab2_anugerah')) document.getElementById('tab2_anugerah').value = rekod.Anugerah || "";
+                    if (document.getElementById('tab2_bilPembentang')) document.getElementById('tab2_bilPembentang').value = rekod.Bil_Pembentang || "1 ORANG";
+                } else if (kat === 'umum') {
+                    if (document.getElementById('tab3_peringkat')) document.getElementById('tab3_peringkat').value = rekod.Peringkat_Penerbitan || "ANTARABANGSA";
+                    if (document.getElementById('tab3_jenis')) document.getElementById('tab3_jenis').value = rekod.Jenis_Penerbitan || "MONOGRAF";
+                    if (document.getElementById('tab3_tarikhPenerbitan')) document.getElementById('tab3_tarikhPenerbitan').value = rekod.Tarikh_Penerbitan || "";
+                    if (document.getElementById('tab3_penerbit')) document.getElementById('tab3_penerbit').value = rekod.Penerbit || "";
+                }
+
+                const bilAhli = parseInt(rekod.Bilangan_Ahli) || 0;
+                document.getElementById('bilAhli').value = bilAhli;
+                janaBorangAhli();
+
+                if (bilAhli > 0 && rekod.Senarai_Ahli) {
+                    try {
+                        // 1. Cuba parse data sebagai format rentetan JSON (Format Baharu)
+                        const ahliArrayJSON = JSON.parse(rekod.Senarai_Ahli);
+                        for (let i = 0; i < bilAhli; i++) {
+                            if (ahliArrayJSON[i]) {
+                                document.getElementById(`namaAhli${i+1}`).value = ahliArrayJSON[i].nama || "";
+                                document.getElementById(`perananAhli${i+1}`).value = ahliArrayJSON[i].peranan || "";
+                                document.getElementById(`jabatanAhli${i+1}`).value = ahliArrayJSON[i].jabatan || "";
+                            }
+                        }
+                    } catch (e) {
+                        // 2. Jika gagal dibaca sebagai JSON, guna kaedah fallback format pemisah teks (Format Lama)
+                        const ahliArray = rekod.Senarai_Ahli.split(" | ");
+                        for (let i = 0; i < bilAhli; i++) {
+                            if (ahliArray[i]) {
+                                const matchBaru = ahliArray[i].match(/^(.*?)\s*-\s*(.*?)\s*\((.*)\)$/);
+                                
+                                if (matchBaru) {
+                                    document.getElementById(`namaAhli${i+1}`).value = matchBaru[1].trim();
+                                    document.getElementById(`perananAhli${i+1}`).value = matchBaru[2].trim();
+                                    document.getElementById(`jabatanAhli${i+1}`).value = matchBaru[3].trim();
+                                } else {
+                                    const matchLama = ahliArray[i].match(/^(.*?)\s*\((.*)\)$/);
+                                    if (matchLama) {
+                                        document.getElementById(`namaAhli${i+1}`).value = matchLama[1].trim();
+                                        document.getElementById(`jabatanAhli${i+1}`).value = matchLama[2].trim();
+                                    } else {
+                                        document.getElementById(`namaAhli${i+1}`).value = ahliArray[i].trim();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                document.getElementById('borangPenerbitan').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function batalEdit() {
+            document.getElementById('borangPenerbitan').reset();
+            document.getElementById('bekasAhli').innerHTML = '';
+            document.getElementById('tindakanBorang').value = "simpan";
+            document.getElementById('rowIndexSemasa').value = "";
+            tukarTab('buku'); 
+            
+            document.getElementById('btnHantar').innerHTML = "Hantar Rekod 🚀";
+            document.getElementById('btnHantar').classList.replace("bg-yellow-500", "bg-blue-600");
+            document.getElementById('btnHantar').classList.replace("hover:bg-yellow-600", "hover:bg-blue-700");
+            
+            document.getElementById('tajukBorang').innerText = "Rekod Maklumat Penerbitan Bukan Penyelidikan";
+            document.getElementById('subTajukBorang').innerText = "Sila lengkapkan butiran penerbitan di bawah untuk direkodkan ke pangkalan data.";
+            document.getElementById('btnBatalEdit').classList.add("hidden");
+        }
+
+        function sahkanRekod(rowIndex, btnElem) {
+            const peranan = document.getElementById('perananPengguna').value;
+            const jabatan = document.getElementById('jabatanPengguna').value;
+            const katSemasa = document.getElementById('kategoriPenerbitan').value;
+            const disahkanOleh = `${peranan} (${jabatan})`;
+            
+            if(!confirm(`Adakah anda pasti untuk sahkan dokumen ini sebagai ${peranan}?`)) return;
+
+            btnElem.innerText = "Memproses...";
+            btnElem.disabled = true;
+
+            const formData = new FormData();
+            formData.append("action", "sahkan");
+            formData.append("Row_Index", rowIndex);
+            formData.append("Peranan", disahkanOleh);
+            formData.append("Kategori_Penerbitan", katSemasa);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            }).then(() => {
+                setTimeout(() => muatTurunData(), 1200);
+            });
+        }
+        
+        function padamRekod(rowIndex, btnElem) {
+            if(!confirm("Adakah anda pasti untuk memadam rekod ini? Tindakan ini tidak boleh dibatalkan.")) return;
+            
+            btnElem.innerText = "Memadam...";
+            btnElem.disabled = true;
+
+            const katSemasa = document.getElementById('kategoriPenerbitan').value;
+            const formData = new FormData();
+            formData.append("action", "padam");
+            formData.append("Row_Index", rowIndex);
+            formData.append("Kategori_Penerbitan", katSemasa);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            }).then(() => {
+                setTimeout(() => muatTurunData(), 1200);
+            }).catch(err => {
+                console.error("Ralat memadam data:", err);
+                alert("Berlaku ralat semasa memadam rekod.");
+                btnElem.innerText = "Padam";
+                btnElem.disabled = false;
+            });
+        }
+
+        function tapisJadual() {
+            halamanSemasa = 1; 
+            const kataKunci = document.getElementById('inputCarian').value.toLowerCase();
+            dataBercetak = semuaData.filter(item => {
+                return (
+                    (item.Tajuk && item.Tajuk.toLowerCase().includes(kataKunci)) ||
+                    (item.Ketua && item.Ketua.toLowerCase().includes(kataKunci)) ||
+                    (item.Jabatan && item.Jabatan.toLowerCase().includes(kataKunci))
+                );
+            });
+            paparJadual(dataBercetak);
+        }
+
+        // ==============================================================================
+        // TAMBAH BAIK: PENGHANTARAN BORANG MENGGUNAKAN FORMAT JSON.STRINGIFY
+        // ==============================================================================
+        document.getElementById('borangPenerbitan').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const btnHantar = document.getElementById('btnHantar');
+            const mesejStatus = document.getElementById('mesejStatus');
+            const bilAhli = parseInt(document.getElementById('bilAhli').value);
+            const tindakan = document.getElementById('tindakanBorang').value;
+            const katSemasa = document.getElementById('kategoriPenerbitan').value;
+
+            btnHantar.disabled = true;
+            btnHantar.innerHTML = "Menghantar... ⏳";
+            mesejStatus.className = "text-sm font-medium text-blue-600 block";
+            mesejStatus.innerText = (tindakan === "edit") ? "Menyimpan kemaskini..." : "Menyimpan rekod baharu...";
+
+            // Tukar struktur penghantaran kepada array of objects JSON
+            let senaraiAhliJSON = [];
+            for(let i = 1; i <= bilAhli; i++) {
+                senaraiAhliJSON.push({
+                    nama: document.getElementById(`namaAhli${i}`).value,
+                    peranan: document.getElementById(`perananAhli${i}`).value,
+                    jabatan: document.getElementById(`jabatanAhli${i}`).value
+                });
+            }
+
+            const formData = new FormData();
+            formData.append("action", tindakan);
+            
+            if (tindakan === "edit") {
+                formData.append("Row_Index", document.getElementById('rowIndexSemasa').value);
+            }
+            
+            formData.append("Kategori_Penerbitan", katSemasa);
+            formData.append("Timestamp", new Date().toLocaleString("ms-MY"));
+            formData.append("Jabatan", document.getElementById('jabatanUtama').value);
+            formData.append("Tahun", document.getElementById('tahun').value);
+            formData.append("Status", document.getElementById('status').value);
+            formData.append("Bahasa", document.getElementById('bahasa').value);
+            formData.append("ISSN_ISBN", document.getElementById('issnIsbn').value);
+            formData.append("Tajuk", document.getElementById('tajuk').value);
+            formData.append("Ketua", document.getElementById('ketua').value);
+            formData.append("IC_Ketua", document.getElementById('icKetua').value);
+            formData.append("Bilangan_Ahli", bilAhli);
+            
+            // Hantar sebagai rentetan JSON (JSON String) terus ke Google Sheets
+            formData.append("Senarai_Ahli", JSON.stringify(senaraiAhliJSON));
+
+            if (katSemasa === 'buku') {
+                formData.append("Penerbit", document.getElementById('tab1_penerbit').value);
+                formData.append("Peringkat_Sebaran", document.getElementById('tab1_peringkat').value);
+                formData.append("Bentuk_Penerbitan", document.getElementById('tab1_bentuk').value);
+                formData.append("Nama_Bab", document.getElementById('tab1_namaBab').value);
+                formData.append("Mukasurat", document.getElementById('tab1_mukasurat').value);
+            } else if (katSemasa === 'prosiding') {
+                formData.append("Nama_Seminar", document.getElementById('tab2_namaSeminar').value);
+                formData.append("Jenis_Kertas", document.getElementById('tab2_jenisKertas').value);
+                formData.append("Taraf_Seminar", document.getElementById('tab2_tarafSeminar').value);
+                formData.append("Taraf_Prosiding", document.getElementById('tab2_tarafProsiding').value);
+                formData.append("Tarikh_Mula", document.getElementById('tab2_tarikhMula').value);
+                formData.append("Tarikh_Tamat", document.getElementById('tab2_tarikhTamat').value);
+                formData.append("Tempat", document.getElementById('tab2_tempat').value);
+                formData.append("Penganjur", document.getElementById('tab2_penganjur').value);
+                formData.append("Anugerah", document.getElementById('tab2_anugerah').value);
+                formData.append("Bil_Pembentang", document.getElementById('tab2_bilPembentang').value);
+            } else if (katSemasa === 'umum') {
+                formData.append("Peringkat_Penerbitan", document.getElementById('tab3_peringkat').value);
+                formData.append("Jenis_Penerbitan", document.getElementById('tab3_jenis').value);
+                formData.append("Tarikh_Penerbitan", document.getElementById('tab3_tarikhPenerbitan').value);
+                formData.append("Penerbit", document.getElementById('tab3_penerbit').value);
+            }
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            }).then(() => {
+                mesejStatus.className = "text-sm font-medium text-green-600 block";
+                mesejStatus.innerText = (tindakan === "edit") ? "✅ Kemaskini Berjaya!" : "✅ Rekod disimpan!";
+                
+                batalEdit();
+                setTimeout(muatTurunData, 1500);
+            }).finally(() => {
+                btnHantar.disabled = false;
+                setTimeout(() => mesejStatus.classList.add('hidden'), 5000);
+            });
+        });
+    </script>
+</body>
+</html>
