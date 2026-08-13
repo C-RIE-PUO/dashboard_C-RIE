@@ -43,14 +43,11 @@
         
         /* --- Scrollbar standard untuk jadual --- */
         .scroll-jadual {
-            /* Sokongan untuk Firefox */
             scrollbar-width: auto;
             scrollbar-color: #cbd5e1 #f8fafc;
-            /* Tambahan mobile: Jadikan skrol lebih lancar di iOS/Android */
             -webkit-overflow-scrolling: touch; 
         }
         
-        /* Sokongan untuk Chrome, Edge, Safari */
         .scroll-jadual::-webkit-scrollbar {
             width: 16px; 
             height: 16px;
@@ -68,21 +65,15 @@
             background-color: #94a3b8; 
         }
 
-        /* Paksa tajuk (header) jadual lekat di atas */
         #headerJadual th {
             position: sticky;
             top: 0;
             z-index: 20;
             background-color: #1e3a8a; 
-            /* Letakkan sedikit outline/border-bottom untuk nampak lebih kemas bila skrol */
             box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); 
         }
 
-        /* ==========================================
-           TAMBAH BAIK UNTUK MOBILE WEB (RESPONSIVE)
-           ========================================== */
         @media (max-width: 768px) {
-            /* Nipiskan scrollbar jadual supaya tidak memakan ruang pada skrin kecil */
             .scroll-jadual::-webkit-scrollbar {
                 width: 6px; 
                 height: 6px;
@@ -92,17 +83,15 @@
                 border-radius: 4px;
             }
 
-            /* Besarkan sedikit padding untuk butang supaya mesra sentuhan jari (touch-friendly) */
             .sidebar-btn {
                 padding: 1rem 1.2rem;
                 font-size: 0.95rem;
             }
 
-            /* Kecilkan saiz font pada tajuk jadual untuk mengelakkan sel menjadi terlalu lebar */
             #headerJadual th {
                 font-size: 0.85rem;
                 padding: 0.75rem 0.5rem;
-                white-space: nowrap; /* Elak teks pecah berbaris dalam th */
+                white-space: nowrap;
             }
         }
     </style>
@@ -110,7 +99,6 @@
 <body class="bg-slate-50 flex flex-col min-h-screen">
 
 <header class="w-full bg-blue-950 text-white py-4 px-4 md:px-6 shadow-lg z-50 relative border-b border-blue-800 flex items-center justify-center">
-    
     <div class="absolute left-4 md:left-6 flex items-center gap-3">
         <button onclick="toggleMenu()" class="text-white focus:outline-none hover:text-blue-300 transition md:hidden">
             <i class="fa-solid fa-bars text-2xl"></i>
@@ -126,11 +114,9 @@
         <h1 class="text-2xl md:text-4xl font-black text-white tracking-widest uppercase mb-1">
             DASHBOARD C-RIE
         </h1>
-
         <h2 class="text-sm md:text-base font-extrabold uppercase tracking-tighter leading-tight text-blue-100">
             DASHBOARD PETUNJUK PRESTASI PENYELIDIKAN DAN INOVASI
         </h2>
-
         <p class="text-[9px] md:text-xs font-bold text-blue-300 opacity-80 uppercase mt-1">
             PUSAT KECEMERLANGAN PENYELIDIKAN DAN INOVASI (C-RIE), POLITEKNIK UNGKU OMAR <span id="paparanTahunHeader"></span>
         </p>
@@ -140,292 +126,257 @@
         <i class="fa-solid fa-calendar-days text-sm"></i>
         <span class="hidden md:inline">Sesi Semasa</span>
     </button>
-
 </header>
 
-    <div class="flex flex-1 overflow-hidden">
-        
-<aside class="w-full md:w-64 lg:w-72 bg-blue-900 text-white flex flex-col shadow-2xl z-20 flex-shrink-0 md:h-screen md:sticky top-0">
-        
+<div class="flex flex-1 overflow-hidden">
+    <aside class="w-full md:w-64 lg:w-72 bg-blue-900 text-white flex flex-col shadow-2xl z-20 flex-shrink-0 md:h-screen md:sticky top-0">
+        <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+            <div class="p-5 border-b border-blue-800 flex flex-col gap-3">
+                <a href="login.html" id="btnLogMasuk" class="w-full bg-yellow-400 text-blue-900 px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-yellow-300 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
+                    🔒 Log Masuk Utama
+                </a>
 
+                <a href="tukar-katalaluan.html" id="btnTukarKataLaluan" class="hidden w-full bg-slate-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-slate-800 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
+                    🔑 Tukar Kata Laluan
+                </a>
 
-    <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
-        
-        <div class="p-5 border-b border-blue-800 flex flex-col gap-3">
-            <a href="login.html" id="btnLogMasuk" class="w-full bg-yellow-400 text-blue-900 px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-yellow-300 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
-                🔒 Log Masuk Utama
-            </a>
+                <button onclick="logKeluar()" id="btnLogKeluar" class="hidden w-full bg-red-500 text-white px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-red-600 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
+                    🚪 Log Keluar
+                </button>
 
-            <a href="tukar-katalaluan.html" id="btnTukarKataLaluan" class="hidden w-full bg-slate-700 text-white px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-slate-800 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
-                🔑 Tukar Kata Laluan
-            </a>
-
-            <button onclick="logKeluar()" id="btnLogKeluar" class="hidden w-full bg-red-500 text-white px-4 py-2.5 rounded-lg font-bold shadow-md hover:bg-red-600 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 text-sm">
-                🚪 Log Keluar
-            </button>
-
-            <div id="infoPengguna" class="hidden w-full bg-blue-800 rounded-xl p-4 border border-blue-700 shadow-inner text-center md:text-left relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 text-5xl opacity-10">👤</div>
-                <p class="text-blue-200 text-xs font-bold uppercase tracking-wider mb-1">Selamat Datang,</p>
-                <p id="paparNama" class="font-bold text-yellow-300 text-xs md:text-sm leading-tight truncate"></p>
-                <div class="mt-2 pt-2 border-t border-blue-700">
-                    <p class="text-[10px] text-blue-100 uppercase">Peranan: <span id="paparPeranan" class="font-bold text-white"></span></p>
-                    <p class="text-[10px] text-blue-100 mt-0.5 uppercase">Jabatan: <span id="paparJabatan" class="font-bold text-white"></span></p>
+                <div id="infoPengguna" class="hidden w-full bg-blue-800 rounded-xl p-4 border border-blue-700 shadow-inner text-center md:text-left relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-5xl opacity-10">👤</div>
+                    <p class="text-blue-200 text-xs font-bold uppercase tracking-wider mb-1">Selamat Datang,</p>
+                    <p id="paparNama" class="font-bold text-yellow-300 text-xs md:text-sm leading-tight truncate"></p>
+                    <div class="mt-2 pt-2 border-t border-blue-700">
+                        <p class="text-[10px] text-blue-100 uppercase">Peranan: <span id="paparPeranan" class="font-bold text-white"></span></p>
+                        <p class="text-[10px] text-blue-100 mt-0.5 uppercase">Jabatan: <span id="paparJabatan" class="font-bold text-white"></span></p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <nav id="tabMenuPortal" class="p-4 space-y-2 border-b border-blue-800 bg-blue-900/50">
-            <p class="text-emerald-300 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Modul Utama Portal</p>
-            
-            <button onclick="tukarTab('MODUL_PENYELIDIKAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold border-l-4 border-transparent hover:border-emerald-400 hover:bg-emerald-900/40 text-slate-200 hover:text-white" data-tab="MODUL_PENYELIDIKAN">
-                <i class="fa-solid fa-microscope w-5 text-emerald-400"></i> Penyelidikan
-            </button>
-            <button onclick="tukarTab('MODUL_INOVASI')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold border-l-4 border-transparent hover:border-purple-400 hover:bg-purple-900/40 text-slate-200 hover:text-white" data-tab="MODUL_INOVASI">
-                <i class="fa-solid fa-lightbulb w-5 text-purple-400"></i> Inovasi
-            </button>
-        </nav>
+            <nav id="tabMenuPortal" class="p-4 space-y-2 border-b border-blue-800 bg-blue-900/50">
+                <p class="text-emerald-300 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Modul Utama Portal</p>
+                <button onclick="tukarTab('MODUL_PENYELIDIKAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold border-l-4 border-transparent hover:border-emerald-400 hover:bg-emerald-900/40 text-slate-200 hover:text-white" data-tab="MODUL_PENYELIDIKAN">
+                    <i class="fa-solid fa-microscope w-5 text-emerald-400"></i> Penyelidikan
+                </button>
+                <button onclick="tukarTab('MODUL_INOVASI')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold border-l-4 border-transparent hover:border-purple-400 hover:bg-purple-900/40 text-slate-200 hover:text-white" data-tab="MODUL_INOVASI">
+                    <i class="fa-solid fa-lightbulb w-5 text-purple-400"></i> Inovasi
+                </button>
+            </nav>
 
-        <nav id="tabMenuDashboard" class="p-4 space-y-1 border-b border-blue-800">
-            <p class="text-cyan-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Dashboard Analitik</p>
-            
-            <button onclick="tukarTab('INOVASI')" class="sidebar-btn active-tab w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="INOVASI">
-                <i class="fa-solid fa-trophy w-5 text-yellow-400"></i> Data Inovasi(Pingat)
-            </button>
-            <button onclick="tukarTab('KPI_INOVASI')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="KPI_INOVASI">
-                <i class="fa-solid fa-chart-line w-5 text-cyan-400"></i> KPI Inovasi
-            </button>
-            <button onclick="tukarTab('HARTA_INTELEK')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="HARTA_INTELEK">
-                <i class="fa-solid fa-shield-halved w-5 text-cyan-400"></i> Harta Intelek
-            </button>
-            <button onclick="tukarTab('KPI_PENYELIDIKAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="KPI_PENYELIDIKAN">
-                <i class="fa-solid fa-microscope w-5 text-cyan-400"></i> KPI Penerbitan
-            </button>
-            <button onclick="tukarTab('GERAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="GERAN">
-                <i class="fa-solid fa-hand-holding-dollar w-5 text-cyan-400"></i> Geran Penyelidikan
-            </button>
-        </nav>
+            <nav id="tabMenuDashboard" class="p-4 space-y-1 border-b border-blue-800">
+                <p class="text-cyan-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Dashboard Analitik</p>
+                <button onclick="tukarTab('INOVASI')" class="sidebar-btn active-tab w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="INOVASI">
+                    <i class="fa-solid fa-trophy w-5 text-yellow-400"></i> Data Inovasi(Pingat)
+                </button>
+                <button onclick="tukarTab('KPI_INOVASI')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="KPI_INOVASI">
+                    <i class="fa-solid fa-chart-line w-5 text-cyan-400"></i> KPI Inovasi
+                </button>
+                <button onclick="tukarTab('HARTA_INTELEK')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="HARTA_INTELEK">
+                    <i class="fa-solid fa-shield-halved w-5 text-cyan-400"></i> Harta Intelek
+                </button>
+                <button onclick="tukarTab('KPI_PENYELIDIKAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="KPI_PENYELIDIKAN">
+                    <i class="fa-solid fa-microscope w-5 text-cyan-400"></i> KPI Penerbitan
+                </button>
+                <button onclick="tukarTab('GERAN')" class="sidebar-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-semibold hover:bg-cyan-800/50 hover:text-white text-slate-300" data-tab="GERAN">
+                    <i class="fa-solid fa-hand-holding-dollar w-5 text-cyan-400"></i> Geran Penyelidikan
+                </button>
+            </nav>
 
-        <div class="p-4 space-y-2 border-b border-blue-800 bg-blue-950/30">
-            <p class="text-amber-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Menu Pantas</p>
-            
-            <button onclick="tukarTab('MODUL_ORGANISASI')" data-tab="MODUL_ORGANISASI" class="sidebar-btn w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400 text-left">
-                <span class="text-lg">🏢</span> Carta Organisasi
-            </button>
-            
-            <a href="kemaskini-penyelaras.html" id="btnSidePenyelaras" class="hidden w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400">
-                <span class="text-lg">👥</span> Senarai Penyelaras
-            </a>
-            
-            <a href="pengurusan-data.html" id="btnSidePengurusan" class="hidden w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400">
-                <span class="text-lg">⚙️</span> Pengurusan Data
-            </a>
-        </div>
-
-        <div class="p-4 mb-4">
-            <p class="text-blue-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-70">Akses Terbuka</p>
-            
-            <a href="daftar-penyelaras.html" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-4 py-3 rounded-xl shadow-lg font-bold transition transform hover:-translate-y-1 flex items-center justify-center gap-2 border border-blue-500 text-sm">
-                <span class="text-lg">👨‍🏫</span> Daftar Penyelaras
-            </a>
-        </div>
-
-    </div> 
-    
-    <div class="mt-auto">
-        <div class="p-4 bg-blue-950/80 border-t border-blue-800">
-            <div id="statusUpdate" class="flex items-center space-x-2 text-[9px] font-bold">
-                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span id="lastUpdated" class="text-blue-200 uppercase tracking-tighter">Sistem Aktif</span>
+            <div class="p-4 space-y-2 border-b border-blue-800 bg-blue-950/30">
+                <p class="text-amber-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-80">Menu Pantas</p>
+                <button onclick="tukarTab('MODUL_ORGANISASI')" data-tab="MODUL_ORGANISASI" class="sidebar-btn w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400 text-left">
+                    <span class="text-lg">🏢</span> Carta Organisasi
+                </button>
+                <a href="kemaskini-penyelaras.html" id="btnSidePenyelaras" class="hidden w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400">
+                    <span class="text-lg">👥</span> Senarai Penyelaras
+                </a>
+                <a href="pengurusan-data.html" id="btnSidePengurusan" class="hidden w-full flex items-center gap-3 bg-blue-800/50 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-all text-xs font-semibold shadow-sm border border-transparent hover:border-amber-400">
+                    <span class="text-lg">⚙️</span> Pengurusan Data
+                </a>
             </div>
-        </div>
+
+            <div class="p-4 mb-4">
+                <p class="text-blue-400 text-[10px] font-black uppercase mb-3 px-2 tracking-widest opacity-70">Akses Terbuka</p>
+                <a href="daftar-penyelaras.html" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-4 py-3 rounded-xl shadow-lg font-bold transition transform hover:-translate-y-1 flex items-center justify-center gap-2 border border-blue-500 text-sm">
+                    <span class="text-lg">👨‍🏫</span> Daftar Penyelaras
+                </a>
+            </div>
+        </div> 
         
-        <footer class="p-3 text-center text-blue-500 text-[10px] border-t border-blue-900 bg-blue-950 uppercase font-black tracking-widest">
-            &copy; 2024 Sistem R&I
-        </footer>
-    </div>
-
-</aside>
-
- <main class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-
-    <div id="sectionDashboard">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="relative group">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
-                <input type="text" id="carianInput" onkeyup="laksanaFilter()" placeholder="Carian Ketua, Tajuk atau Jabatan..." 
-                    class="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium text-slate-700">
-            </div>
-            <input type="text" id="filterTahun" placeholder="Cari Tahun (cth: 2023)" oninput="laksanaFilter()" class="p-2 border rounded-md text-sm">
-			<select id="filterJabatan" onchange="laksanaFilter()" class="p-3.5 rounded-2xl border border-slate-200 shadow-sm outline-none bg-white font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10"></select>
-        </div>
-
-        <div id="kpiCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8"></div>
-
-        <div id="chartSection" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-all hover:shadow-md">
-                <h3 id="tajukCartaBar" class="font-black text-slate-700 mb-6 flex items-center text-sm uppercase tracking-wide"></h3>
-                <div class="h-72 relative"><canvas id="barChart"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-all hover:shadow-md">
-                <h3 id="tajukCartaPie" class="font-black text-slate-700 mb-6 flex items-center text-sm uppercase tracking-wide"></h3>
-                <div class="h-72 relative"><canvas id="pieChart"></canvas></div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 mb-10">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse relative">
-                    <thead id="headerJadual" class="bg-slate-50 border-b border-slate-100"></thead>
-                    <tbody id="bodyJadual" class="text-xs"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="paginationNav" class="mt-6 flex justify-center space-x-2 pb-10"></div>
-    </div>
-
-<div id="sectionPenyelidikan" class="hidden">
-    <h2 class="text-2xl font-black text-emerald-800 mb-6 flex items-center gap-3">
-        <span class="bg-emerald-100 p-2 rounded-xl">🔬</span> MODUL PENYELIDIKAN
-    </h2>
-
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:shadow-lg">
-            <div class="bg-emerald-600 text-white p-4 flex items-center gap-3">
-                <div class="bg-white bg-opacity-20 p-2 rounded-lg text-lg">🔬</div>
-                <h2 class="text-lg md:text-xl font-bold uppercase tracking-wider">Akses Pantas Penyelidikan</h2>
-            </div>
-
-            <div class="p-4 flex-grow flex flex-col gap-3">
-                <div class="grid grid-cols-2 gap-2 lg:gap-3">
-                    
-                    <a href="#" onclick="aksesModul(event, 'penerbitan.html')" class="group bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📚</span>
-                        <span class="font-bold text-emerald-800 group-hover:text-white text-xs lg:text-sm">Penerbitan</span>
-                    </a>
-                    <a href="#" onclick="aksesModul(event, 'kik.html')" class="group bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💡</span>
-                        <span class="font-bold text-emerald-800 group-hover:text-white text-xs lg:text-sm">KIK</span>
-                    </a>
-
-                    <a href="#" onclick="aksesModul(event, 'e-daftar.html')" class="group col-span-2 bg-teal-50 hover:bg-teal-600 border border-teal-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📝</span>
-                        <span class="font-bold text-teal-800 group-hover:text-white text-xs lg:text-sm">e-Daftar R&D</span>
-                    </a>
-
-                    <a href="#" onclick="aksesModul(event, 'dashboard.html')" class="group bg-slate-50 hover:bg-emerald-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📊</span>
-                        <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard Pencapaian</span>
-                    </a>
-                    <a href="#" onclick="aksesModul(event, 'dashboard-penyelidikan.html')" class="group bg-slate-50 hover:bg-emerald-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📈</span>
-                        <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard KPI</span>
-                    </a>
-
+        <div class="mt-auto">
+            <div class="p-4 bg-blue-950/80 border-t border-blue-800">
+                <div id="statusUpdate" class="flex items-center space-x-2 text-[9px] font-bold">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span id="lastUpdated" class="text-blue-200 uppercase tracking-tighter">Sistem Aktif</span>
                 </div>
             </div>
-        </section>
-        
+            <footer class="p-3 text-center text-blue-500 text-[10px] border-t border-blue-900 bg-blue-950 uppercase font-black tracking-widest">
+                &copy; 2024 Sistem R&I
+            </footer>
         </div>
-</div>
+    </aside>
 
-<div id="sectionInovasi" class="hidden">
-    <h2 class="text-2xl font-black text-purple-800 mb-6 flex items-center gap-3">
-        <span class="bg-purple-100 p-2 rounded-xl">🚀</span> MODUL INOVASI
-    </h2>
-
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:shadow-lg">
-            <div class="bg-purple-600 text-white p-4 flex items-center gap-3">
-                <div class="bg-white bg-opacity-20 p-2 rounded-lg text-lg">🚀</div>
-                <h2 class="text-lg md:text-xl font-bold uppercase tracking-wider">Akses Pantas Inovasi</h2>
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+        <div id="sectionDashboard">
+            <div id="filterContainer" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="relative group">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+                    <input type="text" id="carianInput" onkeyup="laksanaFilter()" placeholder="Carian Ketua, Tajuk atau Jabatan..." 
+                        class="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium text-slate-700">
+                </div>
+                <input type="text" id="filterTahun" placeholder="Cari Tahun (cth: 2023)" oninput="laksanaFilter()" class="p-2 border rounded-md text-sm">
+                <select id="filterJabatan" onchange="laksanaFilter()" class="p-3.5 rounded-2xl border border-slate-200 shadow-sm outline-none bg-white font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10"></select>
+                <select id="filterPingat" onchange="laksanaFilter()" class="p-3.5 rounded-2xl border border-slate-200 shadow-sm outline-none bg-white font-bold text-slate-600 focus:ring-4 focus:ring-blue-500/10">
+                    <option value="SEMUA">Semua Pencapaian</option>
+                    <option value="EMAS">Emas</option>
+                    <option value="PERAK">Perak</option>
+                    <option value="GANGSA">Gangsa</option>
+                    <option value="SIJIL">Sijil Penghargaan</option>
+                    <option value="LAIN">Lain-lain</option>
+                </select>
             </div>
 
-            <div class="p-4 flex-grow flex flex-col gap-3">
-                <div class="grid grid-cols-2 gap-2 lg:gap-3">
-                    <a href="#" onclick="aksesModul(event, 'pencapaian_pelajar.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">🎓</span>
-                        <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Projek Pelajar</span>
-                    </a>
-                    <a href="#" onclick="aksesModul(event, 'geran.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💰</span>
-                        <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Geran</span>
-                    </a>
+            <div id="kpiCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8"></div>
 
-                    <a href="#" onclick="aksesModul(event, 'komersilan.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💎</span>
-                        <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Komersilan</span>
-                    </a>
-                    <a href="#" onclick="aksesModul(event, 'harta-intelek.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">©️</span>
-                        <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Harta Intelek</span>
-                    </a>
-
-                    <a href="#" onclick="aksesModul(event, 'tambah-inovasi.html')" class="group col-span-2 bg-indigo-50 hover:bg-indigo-600 border border-indigo-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📝</span>
-                        <span class="font-bold text-indigo-800 group-hover:text-white text-xs lg:text-sm">Laporan Pencapaian Inovasi</span>
-                    </a>
-
-                    <a href="#" onclick="aksesModul(event, 'senarai-pertandingan.html')" class="group col-span-2 bg-pink-50 hover:bg-pink-600 border border-pink-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">🏆</span>
-                        <span class="font-bold text-pink-800 group-hover:text-white text-xs lg:text-sm">Senarai Pertandingan</span>
-                    </a>
-
-                    <a href="#" onclick="aksesModul(event, 'dashboard.html')" class="group bg-slate-50 hover:bg-purple-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📊</span>
-                        <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard Pencapaian</span>
-                    </a>
-                    <a href="#" onclick="aksesModul(event, 'dashboard-kpi.html')" class="group bg-slate-50 hover:bg-purple-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
-                        <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📈</span>
-                        <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard KPI</span>
-                    </a>
+            <div id="chartSection" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-all hover:shadow-md">
+                    <h3 id="tajukCartaBar" class="font-black text-slate-700 mb-6 flex items-center text-sm uppercase tracking-wide"></h3>
+                    <div class="h-72 relative"><canvas id="barChart"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 transition-all hover:shadow-md">
+                    <h3 id="tajukCartaPie" class="font-black text-slate-700 mb-6 flex items-center text-sm uppercase tracking-wide"></h3>
+                    <div class="h-72 relative"><canvas id="pieChart"></canvas></div>
                 </div>
             </div>
-        </section>
 
-        </div>
-</div>
-
-
-<div id="sectionOrganisasi" class="hidden">
-    <h2 class="text-2xl font-black text-blue-900 mb-6 flex items-center gap-3">
-        <span class="bg-blue-100 p-2 rounded-xl">🏢</span> CARTA ORGANISASI PUSAT KECEMERLANGAN PENYELIDIKAN DAN INOVASI, POLITEKNIK UNGKU OMAR
-    </h2>
-    
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center min-h-[500px] relative">
-        
-        <div id="loading-carta" class="absolute flex flex-col items-center justify-center z-10">
-            <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-500 mb-3"></i>
-            <span class="text-sm font-bold text-slate-500 animate-pulse">Memuat turun carta terkini...</span>
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 mb-10">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse relative">
+                        <thead id="headerJadual" class="bg-slate-50 border-b border-slate-100"></thead>
+                        <tbody id="bodyJadual" class="text-xs"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="paginationNav" class="mt-6 flex justify-center space-x-2 pb-10"></div>
         </div>
 
-        <img id="img-carta" src="" alt="Carta Organisasi" onclick="bukaGambarPenuh()" 
-             class="opacity-0 transition-opacity duration-700 w-full max-w-lg lg:max-w-2xl max-h-[400px] md:max-h-[500px] object-contain rounded-xl shadow-sm cursor-pointer hover:shadow-lg border border-slate-200 z-20 mx-auto" 
-             title="Klik untuk paparan penuh">
-        
-        <button onclick="bukaGambarPenuh()" id="btn-zoom-carta" class="mt-8 bg-slate-800 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 z-20 hidden">
-            <i class="fa-solid fa-expand"></i> Paparan Penuh
-        </button>
-    </div>
+        <div id="sectionPenyelidikan" class="hidden">
+            <!-- (Kandungan modul Penyelidikan dikekalkan) -->
+            <h2 class="text-2xl font-black text-emerald-800 mb-6 flex items-center gap-3">
+                <span class="bg-emerald-100 p-2 rounded-xl">🔬</span> MODUL PENYELIDIKAN
+            </h2>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:shadow-lg">
+                    <div class="bg-emerald-600 text-white p-4 flex items-center gap-3">
+                        <div class="bg-white bg-opacity-20 p-2 rounded-lg text-lg">🔬</div>
+                        <h2 class="text-lg md:text-xl font-bold uppercase tracking-wider">Akses Pantas Penyelidikan</h2>
+                    </div>
+                    <div class="p-4 flex-grow flex flex-col gap-3">
+                        <div class="grid grid-cols-2 gap-2 lg:gap-3">
+                            <a href="#" onclick="aksesModul(event, 'penerbitan.html')" class="group bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📚</span>
+                                <span class="font-bold text-emerald-800 group-hover:text-white text-xs lg:text-sm">Penerbitan</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'kik.html')" class="group bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💡</span>
+                                <span class="font-bold text-emerald-800 group-hover:text-white text-xs lg:text-sm">KIK</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'e-daftar.html')" class="group col-span-2 bg-teal-50 hover:bg-teal-600 border border-teal-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📝</span>
+                                <span class="font-bold text-teal-800 group-hover:text-white text-xs lg:text-sm">e-Daftar R&D</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'dashboard.html')" class="group bg-slate-50 hover:bg-emerald-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📊</span>
+                                <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard Pencapaian</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'dashboard-penyelidikan.html')" class="group bg-slate-50 hover:bg-emerald-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📈</span>
+                                <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard KPI</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div id="sectionInovasi" class="hidden">
+            <!-- (Kandungan modul Inovasi dikekalkan) -->
+            <h2 class="text-2xl font-black text-purple-800 mb-6 flex items-center gap-3">
+                <span class="bg-purple-100 p-2 rounded-xl">🚀</span> MODUL INOVASI
+            </h2>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <section class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col h-full transform transition hover:shadow-lg">
+                    <div class="bg-purple-600 text-white p-4 flex items-center gap-3">
+                        <div class="bg-white bg-opacity-20 p-2 rounded-lg text-lg">🚀</div>
+                        <h2 class="text-lg md:text-xl font-bold uppercase tracking-wider">Akses Pantas Inovasi</h2>
+                    </div>
+                    <div class="p-4 flex-grow flex flex-col gap-3">
+                        <div class="grid grid-cols-2 gap-2 lg:gap-3">
+                            <a href="#" onclick="aksesModul(event, 'pencapaian_pelajar.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">🎓</span>
+                                <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Projek Pelajar</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'geran.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💰</span>
+                                <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Geran</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'komersilan.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">💎</span>
+                                <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Komersilan</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'harta-intelek.html')" class="group bg-purple-50 hover:bg-purple-600 border border-purple-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">©️</span>
+                                <span class="font-bold text-purple-800 group-hover:text-white text-xs lg:text-sm">Harta Intelek</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'tambah-inovasi.html')" class="group col-span-2 bg-indigo-50 hover:bg-indigo-600 border border-indigo-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📝</span>
+                                <span class="font-bold text-indigo-800 group-hover:text-white text-xs lg:text-sm">Laporan Pencapaian Inovasi</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'senarai-pertandingan.html')" class="group col-span-2 bg-pink-50 hover:bg-pink-600 border border-pink-100 p-3 rounded-xl text-center transition-all duration-300 flex flex-row items-center justify-center gap-2 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">🏆</span>
+                                <span class="font-bold text-pink-800 group-hover:text-white text-xs lg:text-sm">Senarai Pertandingan</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'dashboard.html')" class="group bg-slate-50 hover:bg-purple-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📊</span>
+                                <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard Pencapaian</span>
+                            </a>
+                            <a href="#" onclick="aksesModul(event, 'dashboard-kpi.html')" class="group bg-slate-50 hover:bg-purple-600 border border-slate-200 p-3 rounded-xl text-center transition-all duration-300 flex flex-col items-center justify-center gap-1 hover:shadow-md">
+                                <span class="text-xl md:text-2xl group-hover:scale-110 transition-transform">📈</span>
+                                <span class="font-bold text-slate-700 group-hover:text-white text-xs lg:text-sm">Dashboard KPI</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div id="sectionOrganisasi" class="hidden">
+            <h2 class="text-2xl font-black text-blue-900 mb-6 flex items-center gap-3">
+                <span class="bg-blue-100 p-2 rounded-xl">🏢</span> CARTA ORGANISASI PUSAT KECEMERLANGAN PENYELIDIKAN DAN INOVASI
+            </h2>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center min-h-[500px] relative">
+                <div id="loading-carta" class="absolute flex flex-col items-center justify-center z-10">
+                    <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-500 mb-3"></i>
+                    <span class="text-sm font-bold text-slate-500 animate-pulse">Memuat turun carta terkini...</span>
+                </div>
+                <img id="img-carta" src="" alt="Carta Organisasi" onclick="bukaGambarPenuh()" class="opacity-0 transition-opacity duration-700 w-full max-w-lg lg:max-w-2xl max-h-[400px] md:max-h-[500px] object-contain rounded-xl shadow-sm cursor-pointer hover:shadow-lg border border-slate-200 z-20 mx-auto" title="Klik untuk paparan penuh">
+                <button onclick="bukaGambarPenuh()" id="btn-zoom-carta" class="mt-8 bg-slate-800 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 z-20 hidden">
+                    <i class="fa-solid fa-expand"></i> Paparan Penuh
+                </button>
+            </div>
+        </div>
+    </main>
 </div>
 
-
-
-
-
-
-
-</main>
-    </div>
-
-    <script>
+<script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
 let barChartInstance = null;
 let pieChartInstance = null;
 let rawDataCache = {}; 
 let tabSemasa = 'INOVASI';
 
-// Variable Global Pagination
 let halamanSemasa = 1;
 const hadRekod = 10;
 let dataGlobal = [];
@@ -433,44 +384,49 @@ let tabGlobal = '';
 
 window.onload = () => tukarTab('INOVASI');
 
-// 1. KEMASKINI FUNGSI tukarTab SEDIA ADA
 function tukarTab(tabName) {
     tabSemasa = tabName;
-    halamanSemasa = 1; // Reset halaman
+    halamanSemasa = 1;
 
-    if (typeof closeMobileMenu === 'function') closeMobileMenu(); // Tutup menu mobile jika ada
+    if (typeof closeMobileMenu === 'function') closeMobileMenu();
 
-    // Kemaskini Gaya Butang Aktif
     document.querySelectorAll('.tab-btn, .sidebar-btn').forEach(btn => {
         btn.classList.remove('active-tab');
         if(btn.dataset.tab === tabName) btn.classList.add('active-tab');
     });
 
-    // Kenalpasti Seksyen Paparan
     const secDashboard = document.getElementById('sectionDashboard');
     const secPenyelidikan = document.getElementById('sectionPenyelidikan');
     const secInovasi = document.getElementById('sectionInovasi');
-    const secOrganisasi = document.getElementById('sectionOrganisasi'); // Tambahan Baru
+    const secOrganisasi = document.getElementById('sectionOrganisasi'); 
+    const filterPingat = document.getElementById('filterPingat');
+    const filterContainer = document.getElementById('filterContainer');
 
-    // Sembunyikan semua seksyen
     if (secDashboard) secDashboard.classList.add('hidden');
     if (secPenyelidikan) secPenyelidikan.classList.add('hidden');
     if (secInovasi) secInovasi.classList.add('hidden');
     if (secOrganisasi) secOrganisasi.classList.add('hidden');
 
-    // Logik Tunjuk Seksyen
+    if (filterPingat && filterContainer) {
+        if (tabName === 'INOVASI') {
+            filterPingat.classList.remove('hidden');
+            filterContainer.classList.remove('md:grid-cols-3');
+            filterContainer.classList.add('md:grid-cols-4');
+        } else {
+            filterPingat.classList.add('hidden');
+            filterContainer.classList.remove('md:grid-cols-4');
+            filterContainer.classList.add('md:grid-cols-3');
+            filterPingat.value = 'SEMUA'; 
+        }
+    }
+
     if (tabName === 'MODUL_PENYELIDIKAN') {
         if (secPenyelidikan) secPenyelidikan.classList.remove('hidden');
-    } 
-    else if (tabName === 'MODUL_INOVASI') {
+    } else if (tabName === 'MODUL_INOVASI') {
         if (secInovasi) secInovasi.classList.remove('hidden');
-    } 
-    else if (tabName === 'MODUL_ORGANISASI') {
-        // Tunjuk Seksyen Organisasi
+    } else if (tabName === 'MODUL_ORGANISASI') {
         if (secOrganisasi) secOrganisasi.classList.remove('hidden');
-    } 
-    else {
-        // Jika tab Dashboard/Data
+    } else {
         if (secDashboard) secDashboard.classList.remove('hidden');
         
         const tajukBar = document.getElementById('tajukCartaBar');
@@ -485,7 +441,6 @@ function tukarTab(tabName) {
     }
 }
 
-// 2. MASUKKAN FUNGSI DATA CARTA (Kod Anda)
 async function muatTurunCartaTerkini() {
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
     const img = document.getElementById('img-carta');
@@ -500,20 +455,17 @@ async function muatTurunCartaTerkini() {
             img.src = data.url;
             img.classList.remove('opacity-0');
             if (loading) loading.classList.add('hidden');
-            if (btnZoom) btnZoom.classList.remove('hidden'); // Tunjuk butang paparan penuh
+            if (btnZoom) btnZoom.classList.remove('hidden');
         } else {
-            console.error("Mesej fail:", data.mesej);
             if (loading) loading.innerHTML = `<span class="text-red-500 text-xs font-bold">⚠️ ${data.mesej}</span>`;
         }
     } catch (err) {
-        console.error("Ralat rangkaian:", err);
         if (loading) loading.innerHTML = `<span class="text-red-500 text-xs font-bold">⚠️ Ralat sambungan server. Sila semak internet.</span>`;
     }
 }
 
 function bukaGambarPenuh() {
     const imgSrc = document.getElementById('img-carta').src;
-    
     if (imgSrc && imgSrc.startsWith("data:image")) {
         const tabBaru = window.open();
         tabBaru.document.write(`
@@ -530,7 +482,6 @@ function bukaGambarPenuh() {
     }
 }
 
-// Jalankan fungsi muat turun gambar ketika halaman dibuka
 window.addEventListener('DOMContentLoaded', muatTurunCartaTerkini);
 
 function fetchDataDariServer(tabName) {
@@ -552,7 +503,6 @@ function fetchDataDariServer(tabName) {
 }
 
 function janaPilihanFilter(rawData) {
-    // let setTahun = new Set(); // ❌ Tidak perlu lagi kumpul tahun untuk dropdown
     let setJabatan = new Set();
     
     rawData.forEach(r => {
@@ -560,35 +510,21 @@ function janaPilihanFilter(rawData) {
             if (r.jabatan) setJabatan.add(String(r.jabatan).trim());
         } else {
             let idxJabatan;
-            
-            // Kita hanya perlukan indeks jabatan sekarang
-            if (tabSemasa === 'KPI_INOVASI') {
-                idxJabatan = 6;
-            } else if (tabSemasa === 'GERAN') {
-                idxJabatan = 3; 
-            } else { 
-                idxJabatan = 3;
-            }
+            if (tabSemasa === 'KPI_INOVASI') { idxJabatan = 6; } 
+            else if (tabSemasa === 'GERAN') { idxJabatan = 3; } 
+            else { idxJabatan = 3; }
 
             if (r[idxJabatan]) setJabatan.add(String(r[idxJabatan]).trim());
         }
     });
     
     const fJabatan = document.getElementById('filterJabatan');
-    
-    // Hanya render pilihan untuk Jabatan sahaja
     fJabatan.innerHTML = '<option value="SEMUA">Semua Jabatan</option>';
     
     Array.from(setJabatan).sort().forEach(j => {
-        // 🌟 KEMASKINI: Ekstrak nama singkatan di dalam kurungan jika wujud
         let namaSingkatan = j;
-        const match = j.match(/\(([^)]+)\)/); // Cari teks di dalam ()
-        if (match) {
-            namaSingkatan = match[1].trim(); // Ambil teks singkatan (cth: JKA)
-        }
-        
-        // Value kekal nama penuh (j) supaya fungsi filter asal tidak rosak
-        // Paparan teks menggunakan nama singkatan (namaSingkatan)
+        const match = j.match(/\(([^)]+)\)/);
+        if (match) { namaSingkatan = match[1].trim(); }
         fJabatan.innerHTML += `<option value="${j}">${namaSingkatan}</option>`;
     });
 }
@@ -597,50 +533,56 @@ function laksanaFilter() {
     let rawData = rawDataCache[tabSemasa];
     if (!rawData) return;
     
-    // 🌟 Ambil nilai dari textbox Tahun
     let thn = document.getElementById('filterTahun').value.trim();
     let jbt = document.getElementById('filterJabatan').value.trim().toUpperCase();
     let cari = document.getElementById('carianInput').value.trim().toLowerCase();
+    
+    let pngtEl = document.getElementById('filterPingat');
+    let pngt = pngtEl ? pngtEl.value.trim().toUpperCase() : "SEMUA";
 
     let dataFiltered = rawData.filter(r => {
         let pTahun = false;
         let valJabatan = "";
+        let pPingat = true; 
 
-        // 1. Logik untuk HARTA INTELEK & KPI PENYELIDIKAN (Objek JSON)
         if (tabSemasa === 'HARTA_INTELEK' || tabSemasa === 'KPI_PENYELIDIKAN') {
             let valTahun = String(r.tahun || '').trim();
             pTahun = (thn === "" || valTahun.includes(thn));
             valJabatan = String(r.jabatan || '').trim().toUpperCase();
-        } 
-        // 2. 🌟 KEMASKINI: Logik Khas untuk GERAN (Cari di Lajur J dan K)
-        else if (tabSemasa === 'GERAN') {
-            let tahunMula = String(r[9] || '').trim();  // Lajur J (Indeks 9)
-            let tahunTamat = String(r[10] || '').trim(); // Lajur K (Indeks 10)
-            
-            // Sah jika input teks sepadan dengan Tahun Mula ATAU Tahun Tamat
+        } else if (tabSemasa === 'GERAN') {
+            let tahunMula = String(r[9] || '').trim();
+            let tahunTamat = String(r[10] || '').trim();
             pTahun = (thn === "" || tahunMula.includes(thn) || tahunTamat.includes(thn));
-            valJabatan = String(r[3] || '').trim().toUpperCase(); // Lajur D (Indeks 3)
-        } 
-        // 3. Logik untuk INOVASI & KPI INOVASI (Array Biasa)
-        else {
+            valJabatan = String(r[3] || '').trim().toUpperCase();
+        } else {
             let idxTahun = (tabSemasa === 'KPI_INOVASI') ? 10 : 8;
             let idxJabatan = (tabSemasa === 'KPI_INOVASI') ? 6 : 3;
-            
             let valTahun = String(r[idxTahun] || '').trim();
             pTahun = (thn === "" || valTahun.includes(thn));
             valJabatan = String(r[idxJabatan] || '').trim().toUpperCase();
+
+            if (tabSemasa === 'INOVASI') {
+                let valPingat = String(r[7] || '').trim().toUpperCase();
+                if (pngt === "SIJIL") {
+                    pPingat = valPingat.includes('SIJIL');
+                } else if (pngt === "LAIN") {
+                    pPingat = !valPingat.includes('EMAS') && !valPingat.includes('PERAK') && !valPingat.includes('GANGSA') && !valPingat.includes('SIJIL');
+                } else if (pngt !== "SEMUA") {
+                    pPingat = valPingat.includes(pngt);
+                }
+            }
         }
 
-        // Semakan untuk Jabatan & Carian Teks Umum
         let pJabatan = (jbt === "SEMUA" || jbt === "" || valJabatan === jbt);
         let pCari = JSON.stringify(r).toLowerCase().includes(cari);
         
-        return pTahun && pJabatan && pCari;
+        return pTahun && pJabatan && pCari && pPingat;
     });
 
     halamanSemasa = 1; 
     prosesDanRender(tabSemasa, dataFiltered, 1);
 }
+
 function prosesDanRender(tab, data, page = 1) {
     dataGlobal = data;
     tabGlobal = tab;
@@ -653,17 +595,16 @@ function prosesDanRender(tab, data, page = 1) {
     const totalRekod = data.length;
     document.getElementById('chartSection').classList.remove('hidden');
 
-    // --- FUNGSI BANTUAN EKSTRAK SINGKATAN JABATAN ---
     function formatSingkatanJabatan(namaJabatan) {
         if (!namaJabatan) return '-';
         let nama = String(namaJabatan).trim().toUpperCase();
         let match = nama.match(/\(([^)]+)\)/);
-        return match ? match[1].trim() : nama; // Pulangkan JKA, JKE atau nama asal jika tiada kurungan
+        return match ? match[1].trim() : nama; 
     }
 
     if (tab === 'KPI_PENYELIDIKAN') {
-        document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-microscope mr-2 text-blue-600"></i> Bilangan Kertas Penerbitan Mengikut Jabatan`;
-        document.getElementById('tajukCartaPie').innerText = `Status Indeks Penerbitan`;
+        document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-microscope mr-2 text-blue-600"></i> Bilangan Kertas Penerbitan Mengikut Jabatan (Disahkan)`;
+        document.getElementById('tajukCartaPie').innerText = `Status Indeks Penerbitan (Disahkan)`;
 
         let headerHtml = `<tr class="bg-blue-900 text-white">
             <th class="p-4 border-b">BIL</th>
@@ -677,11 +618,9 @@ function prosesDanRender(tab, data, page = 1) {
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
         let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = indeksMula + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
+            let noBil = indeksMula + index + 1; 
             let statusVal = String(r.statusPengesahan || 'MENUNGGU').toUpperCase();
             let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
-            
-            // 🌟 KEMASKINI: Singkatan Jabatan
             let jabSingkat = formatSingkatanJabatan(r.jabatan);
 
             return `<tr class="hover:bg-slate-50 transition-colors">
@@ -704,6 +643,7 @@ function prosesDanRender(tab, data, page = 1) {
         renderKadPenyelidikan(statsPenyelidikan);
 
     } else if (tab === 'HARTA_INTELEK') {
+        // ... (Kekalkan kod HARTA INTELEK asal yang sedia ada tanpa ubah suai)
         document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-shield-halved mr-2 text-blue-600"></i> Harta Intelek Mengikut Jabatan`;
         document.getElementById('tajukCartaPie').innerText = `Pecahan Jenis Harta Intelek`;
 
@@ -719,11 +659,9 @@ function prosesDanRender(tab, data, page = 1) {
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
         let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = indeksMula + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
+            let noBil = indeksMula + index + 1;
             let statusVal = String(r.statusHI || '').toUpperCase();
             let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
-            
-            // 🌟 KEMASKINI: Singkatan Jabatan
             let jabSingkat = formatSingkatanJabatan(r.jabatan);
 
             return `<tr class="hover:bg-slate-50 transition-colors">
@@ -743,6 +681,7 @@ function prosesDanRender(tab, data, page = 1) {
         renderKadHI(statsHI);
 
     } else if (tab === 'KPI_INOVASI') {
+        // ... (Kekalkan KPI_INOVASI)
         document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-chart-column mr-2 text-blue-600"></i> Produk Diaplikasikan Mengikut Jabatan`;
         document.getElementById('tajukCartaPie').innerText = `Jenis Hakcipta`;
 
@@ -762,11 +701,9 @@ function prosesDanRender(tab, data, page = 1) {
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
         let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = indeksMula + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
+            let noBil = indeksMula + index + 1;
             let statusVal = String(r[13] || '').toUpperCase();
             let statusClass = statusVal.includes('DISAHKAN') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
-            
-            // 🌟 KEMASKINI: Singkatan Jabatan
             let jabSingkat = formatSingkatanJabatan(r[6]);
 
             return `<tr class="hover:bg-slate-50 transition-colors">
@@ -790,6 +727,7 @@ function prosesDanRender(tab, data, page = 1) {
         renderKadKPI(statsKPI);
 
     } else if (tab === 'GERAN') {
+        // ... (Kekalkan fungsi GERAN yang sedia ada sepenuhnya)
         document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-money-bill-trend-up mr-2 text-blue-600"></i> Nilai Geran Mengikut Jabatan (RM)`;
         document.getElementById('tajukCartaPie').innerText = `Pecahan Jenis Geran`;
 
@@ -814,37 +752,26 @@ function prosesDanRender(tab, data, page = 1) {
             let tajukRaw = String(r[6] || '').trim();
             let namaAhli = String(r[4] || '').trim();
             let jabatanAhli = String(r[5] || '').trim();
-
             let isProjekBaru = (bilRaw !== '' && bilRaw !== '-') || (ketuaRaw !== '' && ketuaRaw !== '-') || (tajukRaw !== '' && tajukRaw !== '-');
 
             if (isProjekBaru || !projekSemasa) {
                 let rowBaru = [...r];
                 rowBaru.senaraiAhliGabungan = []; 
-                
                 if (namaAhli && namaAhli !== '-') {
                     let listAhli = namaAhli.split(/\r?\n|,|;/).map(a => a.trim()).filter(a => a !== "");
                     let listJab = jabatanAhli.split(/\r?\n|,|;/).map(j => j.trim()).filter(j => j !== "");
-                    
                     listAhli.forEach((a, i) => {
-                        rowBaru.senaraiAhliGabungan.push({ 
-                            nama: a, 
-                            jabatan: listJab[i] || String(r[3] || '').trim() || '-' 
-                        });
+                        rowBaru.senaraiAhliGabungan.push({ nama: a, jabatan: listJab[i] || String(r[3] || '').trim() || '-' });
                     });
                 }
                 projekSemasa = rowBaru;
                 semuaProjekKumpulan.push(projekSemasa);
-
             } else {
                 if (namaAhli && namaAhli !== '-') {
                     let listAhli = namaAhli.split(/\r?\n|,|;/).map(a => a.trim()).filter(a => a !== "");
                     let listJab = jabatanAhli.split(/\r?\n|,|;/).map(j => j.trim()).filter(j => j !== "");
-                    
                     listAhli.forEach((a, i) => {
-                        projekSemasa.senaraiAhliGabungan.push({ 
-                            nama: a, 
-                            jabatan: listJab[i] || String(projekSemasa[3] || '').trim() || '-' 
-                        });
+                        projekSemasa.senaraiAhliGabungan.push({ nama: a, jabatan: listJab[i] || String(projekSemasa[3] || '').trim() || '-' });
                     });
                 }
             }
@@ -852,20 +779,15 @@ function prosesDanRender(tab, data, page = 1) {
 
         let startIdx = typeof indeksMula !== 'undefined' ? indeksMula : 0;
         let limitRecords = 10; 
-        
-        if (typeof rekodPerHalaman !== 'undefined') {
-            limitRecords = rekodPerHalaman;
-        } else if (typeof indeksTamat !== 'undefined' && typeof indeksMula !== 'undefined') {
-            limitRecords = indeksTamat - indeksMula;
-        }
+        if (typeof rekodPerHalaman !== 'undefined') limitRecords = rekodPerHalaman;
+        else if (typeof indeksTamat !== 'undefined' && typeof indeksMula !== 'undefined') limitRecords = indeksTamat - indeksMula;
         
         let projekKumpulan = semuaProjekKumpulan.slice(startIdx, startIdx + limitRecords);
 
         let bodyHtml = projekKumpulan.map((r, index) => {
-            
-            let noBil = startIdx + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
+            let noBil = startIdx + index + 1;
             let ketuaRaw = String(r[1] || '-');        
-            let jabatanUtama = formatSingkatanJabatan(r[3]); // 🌟 KEMASKINI: Singkatan Jabatan Geran
+            let jabatanUtama = formatSingkatanJabatan(r[3]); 
             let tajuk = String(r[6] || '-').toUpperCase(); 
             let jenisGeran = String(r[7] || '-').toUpperCase(); 
             let noRuj = String(r[8] || '-');            
@@ -877,17 +799,15 @@ function prosesDanRender(tab, data, page = 1) {
 
             let nilai = parseFloat(nilaiRaw || 0).toLocaleString('en-MY', {minimumFractionDigits: 2});
             let peratus = peratusRaw.includes('%') ? peratusRaw : peratusRaw + '%';
-            
             let pctVal = parseFloat(peratusRaw) || 0;
             let warnaPct = pctVal >= 90 ? 'border-green-200 bg-green-50 text-green-600' : (pctVal > 0 ? 'border-yellow-200 bg-yellow-50 text-yellow-600' : 'border-red-200 bg-red-50 text-red-600');
-
             let namaKetua = ketuaRaw.replace(/^\d+[\.\)\-\s]+/g, '').trim(); 
             
             let htmlAhli = '-';
             if (r.senaraiAhliGabungan && r.senaraiAhliGabungan.length > 0) {
                 htmlAhli = r.senaraiAhliGabungan.slice(0, 5).map(a => {
                     let namaAhliBersih = a.nama.replace(/^\d+[\.\)\-\s]+/g, '').trim();
-                    let jabatanAhli = formatSingkatanJabatan(a.jabatan); // 🌟 KEMASKINI: Singkatan Jabatan Ahli
+                    let jabatanAhli = formatSingkatanJabatan(a.jabatan); 
                     return `
                     <div class="flex items-center mt-1.5">
                         <i class="fa-solid fa-user text-slate-300 text-[10px] mr-2"></i>
@@ -899,47 +819,27 @@ function prosesDanRender(tab, data, page = 1) {
             
             return `<tr class="hover:bg-blue-50/50 transition-colors border-b border-slate-100">
                 <td class="p-4 font-bold text-slate-400 text-center align-top text-sm">${noBil}</td>
-                
                 <td class="p-4 align-top uppercase">
                     <div class="mb-4">
-                        <div class="font-bold text-blue-900 text-[11px] flex items-center">
-                            <i class="fa-solid fa-user text-blue-600 mr-2 text-sm"></i>
-                            <span>${namaKetua}</span>
-                        </div>
-                        <div class="mt-1.5 ml-6">
-                            <span class="border border-blue-200 bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[9px] font-bold" title="${r[3] || ''}">${jabatanUtama}</span>
-                        </div>
+                        <div class="font-bold text-blue-900 text-[11px] flex items-center"><i class="fa-solid fa-user text-blue-600 mr-2 text-sm"></i><span>${namaKetua}</span></div>
+                        <div class="mt-1.5 ml-6"><span class="border border-blue-200 bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[9px] font-bold" title="${r[3] || ''}">${jabatanUtama}</span></div>
                     </div>
-                    <div class="ml-1 uppercase">
-                        ${htmlAhli !== '-' ? htmlAhli : '<span class="italic opacity-50 text-[10px] text-slate-500 font-medium">TIADA AHLI</span>'}
-                    </div>
+                    <div class="ml-1 uppercase">${htmlAhli !== '-' ? htmlAhli : '<span class="italic opacity-50 text-[10px] text-slate-500 font-medium">TIADA AHLI</span>'}</div>
                 </td>
-                
                 <td class="p-4 align-top">
                     <div class="font-bold text-slate-800 uppercase text-xs leading-relaxed mb-3">${tajuk}</div>
                     <span class="border border-blue-100 bg-blue-50/80 text-blue-500 px-2.5 py-1 rounded text-[10px] font-mono whitespace-nowrap shadow-sm"><i class="fa-regular fa-file-lines mr-1.5"></i>${noRuj}</span>
                 </td>
-                
                 <td class="p-4 align-top text-center space-y-2">
                     <div><span class="border border-emerald-200 bg-emerald-50 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap shadow-sm">Mula: ${tahunMula}</span></div>
                     <div><span class="border border-rose-200 bg-rose-50 text-rose-700 px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap shadow-sm">Tamat: ${tahunTamat}</span></div>
                 </td>
-                
                 <td class="p-4 align-top text-center">
                     <div class="border border-indigo-100 bg-indigo-50 text-indigo-700 p-2 rounded-lg text-[9px] font-bold uppercase w-full mx-auto leading-relaxed shadow-sm">${jenisGeran}</div>
                 </td>
-                
-                <td class="p-4 align-top text-center">
-                    <span class="border ${warnaPct} px-2.5 py-1 rounded-md text-[11px] font-bold shadow-sm">${peratus}</span>
-                </td>
-                
-                <td class="p-4 text-right font-mono font-bold text-emerald-600 align-top text-sm whitespace-nowrap">
-                    RM ${nilai}
-                </td>
-
-                <td class="p-4 align-top text-center">
-                    <span class="border border-amber-300 bg-amber-50 text-amber-600 px-2.5 py-1 rounded text-[9px] font-extrabold uppercase whitespace-nowrap shadow-sm">${status}</span>
-                </td>
+                <td class="p-4 align-top text-center"><span class="border ${warnaPct} px-2.5 py-1 rounded-md text-[11px] font-bold shadow-sm">${peratus}</span></td>
+                <td class="p-4 text-right font-mono font-bold text-emerald-600 align-top text-sm whitespace-nowrap">RM ${nilai}</td>
+                <td class="p-4 align-top text-center"><span class="border border-amber-300 bg-amber-50 text-amber-600 px-2.5 py-1 rounded text-[9px] font-extrabold uppercase whitespace-nowrap shadow-sm">${status}</span></td>
             </tr>`;
         }).join('');
         
@@ -962,16 +862,15 @@ function prosesDanRender(tab, data, page = 1) {
         document.getElementById('headerJadual').innerHTML = headerHtml;
 
         let bodyHtml = dataTerhad.map((r, index) => {
-            let noBil = indeksMula + index + 1; // 🌟 KEMASKINI: BIL 1,2,3 Secara Turutan
+            let noBil = indeksMula + index + 1; 
             let badgePingat = "";
             let p = String(r[7]).toUpperCase();
             if(p.includes('EMAS')) badgePingat = "bg-yellow-500 text-white";
             else if(p.includes('PERAK')) badgePingat = "bg-slate-400 text-white";
             else if(p.includes('GANGSA')) badgePingat = "bg-orange-600 text-white";
-            else badgePingat = "bg-slate-100 text-slate-600";
+            else if(p.includes('SIJIL')) badgePingat = "bg-blue-500 text-white";
+            else badgePingat = "bg-purple-500 text-white";
             let statusClass = r[9].includes('DISAHKAN') ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50';
-
-            // 🌟 KEMASKINI: Singkatan Jabatan (Inovasi Tab)
             let jabSingkat = formatSingkatanJabatan(r[3]);
 
             return `<tr class="hover:bg-blue-50/30 transition-colors">
@@ -1002,19 +901,12 @@ function prosesDanRender(tab, data, page = 1) {
     binaButangPagination(totalRekod);
 }
 
-// ==========================================
-// FUNGSI PAGINATION
-// ==========================================
 function binaButangPagination(totalRekod) {
     const totalHalaman = Math.ceil(totalRekod / hadRekod);
     const navHalaman = document.getElementById('paginationNav');
     
     if (!navHalaman) return;
-
-    if (totalHalaman <= 1) {
-        navHalaman.innerHTML = '';
-        return;
-    }
+    if (totalHalaman <= 1) { navHalaman.innerHTML = ''; return; }
 
     navHalaman.innerHTML = `
         <div class="flex items-center justify-center space-x-2 py-6 border-t border-slate-100 bg-slate-50/50">
@@ -1022,11 +914,9 @@ function binaButangPagination(totalRekod) {
                 class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
                 <i class="fa-solid fa-chevron-left mr-2"></i> KEMBALI
             </button>
-            
             <span class="px-4 py-2 text-[10px] font-black text-blue-900 bg-blue-100/50 rounded-lg border border-blue-200 uppercase tracking-widest">
                 HALAMAN ${halamanSemasa} / ${totalHalaman}
             </span>
-
             <button onclick="tukarHalaman(1)" ${halamanSemasa === totalHalaman ? 'disabled' : ''} 
                 class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
                 SETERUSNYA <i class="fa-solid fa-chevron-right ml-2"></i>
@@ -1046,37 +936,37 @@ function tukarHalaman(arah) {
     }
 }
 
-// ==========================================
+// ----------------------------------------------------
 // FUNGSI STATISTIK (KPI PENYELIDIKAN)
-// ==========================================
+// ----------------------------------------------------
 function kiraStatsPenyelidikan(data) {
     let statsJabatan = {};
     let statsIndex = {};
     let totalDisahkan = 0;
+    let total = 0;
     
     data.forEach(r => {
-        let jbtAsal = String(r.jabatan || 'TIADA JABATAN').trim();
-        
-        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
-        // Cari perkataan di dalam kurungan cth: (JKA)
-        let match = jbtAsal.match(/\(([^)]+)\)/); 
-        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
-        let jbt = match ? match[1].trim() : jbtAsal;
-
-        let idx = String(r.indexStatus || 'LAIN-LAIN').trim().toUpperCase();
         let status = String(r.statusPengesahan || '').toUpperCase();
         
-        statsJabatan[jbt] = (statsJabatan[jbt] || 0) + 1;
-        statsIndex[idx] = (statsIndex[idx] || 0) + 1;
-        
-        if(status.includes('DISAHKAN')) totalDisahkan++;
+        // HANYA KIRA CARTA JIKA DISAHKAN
+        if(status.includes('DISAHKAN')) {
+            totalDisahkan++;
+            let jbtAsal = String(r.jabatan || 'TIADA JABATAN').trim();
+            let match = jbtAsal.match(/\(([^)]+)\)/); 
+            let jbt = match ? match[1].trim() : jbtAsal;
+            let idx = String(r.indexStatus || 'LAIN-LAIN').trim().toUpperCase();
+            
+            statsJabatan[jbt] = (statsJabatan[jbt] || 0) + 1;
+            statsIndex[idx] = (statsIndex[idx] || 0) + 1;
+        }
+        total++;
     });
     
     return { 
         jabatan: statsJabatan, 
         index: statsIndex, 
         disahkan: totalDisahkan, 
-        total: data.length 
+        total: total 
     };
 }
 
@@ -1105,29 +995,10 @@ function renderChartsPenyelidikan(stats) {
     if (barChartInstance) barChartInstance.destroy();
     if (pieChartInstance) pieChartInstance.destroy();
 
-    // 1. Sediakan senarai warna yang pelbagai untuk jabatan
     const senaraiWarna = [
-        '#3b82f6', // Biru
-        '#10b981', // Zamrud (Emerald)
-        '#8b5cf6', // Ungu
-        '#f59e0b', // Jingga (Amber)
-        '#ef4444', // Merah
-        '#06b6d4', // Sian (Cyan)
-        '#f43f5e', // Merah Jambu (Rose)
-        '#84cc16', // Hijau Limau (Lime)
-        '#6366f1', // Indigo
-        '#14b8a6'  // Teal
+        '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#f43f5e', '#84cc16', '#6366f1', '#14b8a6'
     ];
-
-    // 2. Dapatkan label jabatan
     const labelJabatan = Object.keys(stats.jabatan);
-    
-    // 3. Petakan warna mengikut senaraiWarna di atas
-    /* NOTA: Jika anda ingin warna jabatan sentiasa sama/seragam di semua tab 
-       (menggunakan penyelesaian yang kita buat sebelum ini), 
-       anda boleh gantikan baris di bawah dengan: 
-       const warnaBar = labelJabatan.map(jbt => dapatkanWarna(jbt));
-    */
     const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
 
     barChartInstance = new Chart(document.getElementById('barChart'), {
@@ -1135,19 +1006,13 @@ function renderChartsPenyelidikan(stats) {
         data: {
             labels: labelJabatan,
             datasets: [{ 
-                label: 'Bilangan Kertas Penerbitan', 
+                label: 'Bilangan Kertas Penerbitan (Disahkan)', 
                 data: Object.values(stats.jabatan), 
-                backgroundColor: warnaBar, // <-- Array warna dimasukkan di sini
+                backgroundColor: warnaBar, 
                 borderRadius: 8 
             }]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            plugins: { 
-                legend: { display: false } 
-            } 
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
     pieChartInstance = new Chart(document.getElementById('pieChart'), {
@@ -1159,20 +1024,13 @@ function renderChartsPenyelidikan(stats) {
                 backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'] 
             }]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            cutout: '70%', 
-            plugins: { 
-                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } 
-            } 
-        }
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
     });
 }
 
-// ==========================================
+// ----------------------------------------------------
 // FUNGSI STATISTIK (HARTA INTELEK)
-// ==========================================
+// ----------------------------------------------------
 function kiraStatsHI(data) {
     let statsJabatan = {};
     let statsJenis = {};
@@ -1180,13 +1038,8 @@ function kiraStatsHI(data) {
     
     data.forEach(r => {
         let jbtAsal = String(r.jabatan || 'TIADA JABATAN').trim();
-        
-        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
-        // Cari perkataan di dalam kurungan cth: (JTMK)
         let match = jbtAsal.match(/\(([^)]+)\)/); 
-        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
         let jbt = match ? match[1].trim() : jbtAsal;
-
         let jenis = String(r.jenis || 'HAK CIPTA').trim().toUpperCase();
         let status = String(r.statusHI || '').toUpperCase();
         
@@ -1196,15 +1049,11 @@ function kiraStatsHI(data) {
         if(status.includes('DISAHKAN')) totalDisahkan++;
     });
     
-    return { 
-        jabatan: statsJabatan, 
-        jenis: statsJenis, 
-        disahkan: totalDisahkan, 
-        total: data.length 
-    };
+    return { jabatan: statsJabatan, jenis: statsJenis, disahkan: totalDisahkan, total: data.length };
 }
 
 function renderKadHI(stats) {
+    // ... Kekalkan kad
     const kpiContainer = document.getElementById('kpiCards');
     kpiContainer.innerHTML = `
         <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-900 flex items-center justify-between">
@@ -1229,62 +1078,26 @@ function renderChartsHI(stats) {
     if (barChartInstance) barChartInstance.destroy();
     if (pieChartInstance) pieChartInstance.destroy();
 
-    // 1. Sediakan senarai warna yang pelbagai untuk jabatan
-    const senaraiWarna = [
-        '#3b82f6', // Biru
-        '#10b981', // Zamrud (Emerald)
-        '#8b5cf6', // Ungu
-        '#f59e0b', // Jingga (Amber)
-        '#ef4444', // Merah
-        '#06b6d4', // Sian (Cyan)
-        '#f43f5e', // Merah Jambu (Rose)
-        '#84cc16', // Hijau Limau (Lime)
-        '#6366f1', // Indigo
-        '#14b8a6'  // Teal
-    ];
-
-    // 2. Petakan warna mengikut jumlah jabatan
+    const senaraiWarna = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#f43f5e', '#84cc16', '#6366f1', '#14b8a6'];
     const labelJabatan = Object.keys(stats.jabatan);
     const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
 
     barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
-        data: {
-            labels: labelJabatan,
-            datasets: [{ 
-                label: 'Bilangan Harta Intelek', 
-                data: Object.values(stats.jabatan), 
-                backgroundColor: warnaBar, // <-- Masukkan array warna di sini
-                borderRadius: 8 
-            }]
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false // Sembunyikan petunjuk (legend) supaya lebih kemas bila banyak warna
-                }
-            }
-        }
+        data: { labels: labelJabatan, datasets: [{ label: 'Bilangan Harta Intelek', data: Object.values(stats.jabatan), backgroundColor: warnaBar, borderRadius: 8 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
     pieChartInstance = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
-        data: {
-            labels: Object.keys(stats.jenis),
-            datasets: [{ 
-                data: Object.values(stats.jenis), 
-                backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#0ea5e9'] 
-            }]
-        },
+        data: { labels: Object.keys(stats.jenis), datasets: [{ data: Object.values(stats.jenis), backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#0ea5e9'] }] },
         options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
     });
 }
 
-// ==========================================
+// ----------------------------------------------------
 // FUNGSI STATISTIK (KPI INOVASI)
-// ==========================================
+// ----------------------------------------------------
 function kiraStatsKPI(data) {
     let statsJabatan = {};
     let pecahanHakcipta = {};
@@ -1292,13 +1105,8 @@ function kiraStatsKPI(data) {
     
     data.forEach(r => {
         let jbtAsal = String(r[6] || 'TIADA JABATAN').trim(); 
-        
-        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
-        // Cari perkataan di dalam kurungan cth: (JTMK)
         let match = jbtAsal.match(/\(([^)]+)\)/); 
-        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
         let jbt = match ? match[1].trim() : jbtAsal;
-        
         let jenis = String(r[8] || 'TIADA DATA').trim().toUpperCase(); 
         
         if(jbt !== 'TIADA JABATAN') setJabatanUnik.add(jbt);
@@ -1307,12 +1115,7 @@ function kiraStatsKPI(data) {
         pecahanHakcipta[jenis] = (pecahanHakcipta[jenis] || 0) + 1;
     });
     
-    return { 
-        jabatan: statsJabatan, 
-        hakcipta: pecahanHakcipta, 
-        totalJabatan: setJabatanUnik.size, 
-        totalProduk: data.length 
-    };
+    return { jabatan: statsJabatan, hakcipta: pecahanHakcipta, totalJabatan: setJabatanUnik.size, totalProduk: data.length };
 }
 
 function renderKadKPI(stats) {
@@ -1327,93 +1130,60 @@ function renderChartsKPI(stats) {
     if (barChartInstance) barChartInstance.destroy();
     if (pieChartInstance) pieChartInstance.destroy();
 
-    // 1. Sediakan senarai warna yang pelbagai untuk jabatan
-    const senaraiWarna = [
-        '#3b82f6', // Biru
-        '#10b981', // Zamrud (Emerald)
-        '#8b5cf6', // Ungu
-        '#f59e0b', // Jingga (Amber)
-        '#ef4444', // Merah
-        '#06b6d4', // Sian (Cyan)
-        '#f43f5e', // Merah Jambu (Rose)
-        '#84cc16', // Hijau Limau (Lime)
-        '#6366f1', // Indigo
-        '#14b8a6'  // Teal
-    ];
-
-    // 2. Petakan warna mengikut jumlah jabatan
+    const senaraiWarna = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#f43f5e', '#84cc16', '#6366f1', '#14b8a6'];
     const labelJabatan = Object.keys(stats.jabatan);
     const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
 
     barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
-        data: {
-            labels: labelJabatan,
-            datasets: [{ 
-                label: 'Bilangan Produk Diaplikasikan', 
-                data: Object.values(stats.jabatan), 
-                backgroundColor: warnaBar, // <-- Masukkan array warna di sini
-                borderRadius: 8 
-            }]
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false // Sembunyikan petunjuk (legend) supaya lebih kemas
-                }
-            }
-        }
+        data: { labels: labelJabatan, datasets: [{ label: 'Bilangan Produk Diaplikasikan', data: Object.values(stats.jabatan), backgroundColor: warnaBar, borderRadius: 8 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
     pieChartInstance = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
-        data: {
-            labels: Object.keys(stats.hakcipta),
-            datasets: [{ 
-                data: Object.values(stats.hakcipta), 
-                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] 
-            }]
-        },
+        data: { labels: Object.keys(stats.hakcipta), datasets: [{ data: Object.values(stats.hakcipta), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] }] },
         options: { responsive: true, maintainAspectRatio: false, cutout: '60%' }
     });
 }
 
-// ==========================================
+// ----------------------------------------------------
 // FUNGSI STATISTIK (PRODUK INOVASI)
-// ==========================================
+// ----------------------------------------------------
 function kiraStats(data) {
-    let emas = 0, perak = 0, gangsa = 0;
+    let emas = 0, perak = 0, gangsa = 0, sijil = 0, lain = 0;
     let statsJabatan = {};
     
     data.forEach(r => {
-        let pingat = String(r[7]).toUpperCase();
-        let jAsal = String(r[3]);
+        let status = String(r[9]).toUpperCase();
         
-        // --- LOGIK EKSTRAK SINGKATAN JABATAN ---
-        // Cari perkataan di dalam kurungan cth: (JTMK)
-        let match = jAsal.match(/\(([^)]+)\)/); 
-        // Jika jumpa kurungan, ambil singkatan. Jika tidak, guna nama asal.
-        let j = match ? match[1].trim() : jAsal.trim(); 
+        // HANYA KIRA CARTA JIKA DISAHKAN
+        if(status.includes('DISAHKAN')) {
+            let pingat = String(r[7]).toUpperCase();
+            let jAsal = String(r[3]);
+            
+            let match = jAsal.match(/\(([^)]+)\)/); 
+            let j = match ? match[1].trim() : jAsal.trim(); 
 
-        if (!statsJabatan[j]) statsJabatan[j] = { emas: 0, perak: 0, gangsa: 0 };
-        
-        if (pingat.includes('EMAS')) { emas++; statsJabatan[j].emas++; }
-        else if (pingat.includes('PERAK')) { perak++; statsJabatan[j].perak++; }
-        else if (pingat.includes('GANGSA')) { gangsa++; statsJabatan[j].gangsa++; }
+            if (!statsJabatan[j]) statsJabatan[j] = { emas: 0, perak: 0, gangsa: 0, sijil: 0, lain: 0 };
+            
+            if (pingat.includes('EMAS')) { emas++; statsJabatan[j].emas++; }
+            else if (pingat.includes('PERAK')) { perak++; statsJabatan[j].perak++; }
+            else if (pingat.includes('GANGSA')) { gangsa++; statsJabatan[j].gangsa++; }
+            else if (pingat.includes('SIJIL')) { sijil++; statsJabatan[j].sijil++; }
+            else { lain++; statsJabatan[j].lain++; }
+        }
     });
     
-    return { overall: {emas, perak, gangsa}, jabatan: statsJabatan };
+    return { overall: {emas, perak, gangsa, sijil, lain}, jabatan: statsJabatan };
 }
 
 function renderCharts(statsJabatan, overall) {
     if (barChartInstance) barChartInstance.destroy();
     if (pieChartInstance) pieChartInstance.destroy();
 
-    // TAMBAH DUA BARIS INI:
-    document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-chart-column mr-2 text-blue-600"></i> Analisis Prestasi Mengikut Jabatan`;
-    document.getElementById('tajukCartaPie').innerText = `Pecahan Keseluruhan`;
+    document.getElementById('tajukCartaBar').innerHTML = `<i class="fa-solid fa-chart-column mr-2 text-blue-600"></i> Analisis Prestasi Mengikut Jabatan (Disahkan)`;
+    document.getElementById('tajukCartaPie').innerText = `Pecahan Keseluruhan (Disahkan)`;
 
     const kpiContainer = document.getElementById('kpiCards');
     kpiContainer.innerHTML = `
@@ -1429,20 +1199,22 @@ function renderCharts(statsJabatan, overall) {
             <div><p class="text-xs font-bold text-slate-500 uppercase">Pingat Gangsa</p><h4 class="text-3xl font-black text-slate-800">${overall.gangsa}</h4></div>
             <div class="bg-orange-50 p-3 rounded-xl"><i class="fa-solid fa-medal text-orange-700 text-2xl"></i></div>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-900 flex items-center justify-between">
-            <div><p class="text-xs font-bold text-slate-500 uppercase">Jumlah Pingat</p><h4 class="text-3xl font-black text-slate-800">${overall.emas + overall.perak + overall.gangsa}</h4></div>
-            <div class="bg-blue-50 p-3 rounded-xl"><i class="fa-solid fa-trophy text-blue-900 text-2xl"></i></div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-500 flex items-center justify-between">
+            <div><p class="text-[10px] font-bold text-slate-500 uppercase">Sijil & Lain-lain</p><h4 class="text-3xl font-black text-slate-800">${overall.sijil + overall.lain}</h4></div>
+            <div class="bg-blue-50 p-3 rounded-xl"><i class="fa-solid fa-award text-blue-600 text-2xl"></i></div>
         </div>`;
     
     const labels = Object.keys(statsJabatan);
     barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
-            labels: labels, // Label kini akan memaparkan singkatan seperti JTMK, JKA dll.
+            labels: labels,
             datasets: [
                 { label: 'Emas', data: labels.map(l => statsJabatan[l].emas), backgroundColor: '#EAB308' },
                 { label: 'Perak', data: labels.map(l => statsJabatan[l].perak), backgroundColor: '#94A3B8' },
-                { label: 'Gangsa', data: labels.map(l => statsJabatan[l].gangsa), backgroundColor: '#F97316' }
+                { label: 'Gangsa', data: labels.map(l => statsJabatan[l].gangsa), backgroundColor: '#F97316' },
+                { label: 'Sijil', data: labels.map(l => statsJabatan[l].sijil), backgroundColor: '#3B82F6' },
+                { label: 'Lain-lain', data: labels.map(l => statsJabatan[l].lain), backgroundColor: '#8B5CF6' }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
@@ -1451,15 +1223,16 @@ function renderCharts(statsJabatan, overall) {
     pieChartInstance = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Emas', 'Perak', 'Gangsa'],
-            datasets: [{ data: [overall.emas, overall.perak, overall.gangsa], backgroundColor: ['#EAB308', '#94A3B8', '#F97316'] }]
+            labels: ['Emas', 'Perak', 'Gangsa', 'Sijil', 'Lain-lain'],
+            datasets: [{ data: [overall.emas, overall.perak, overall.gangsa, overall.sijil, overall.lain], backgroundColor: ['#EAB308', '#94A3B8', '#F97316', '#3B82F6', '#8B5CF6'] }]
         },
         options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
     });
 }
-// ==========================================
-// FUNGSI STATISTIK (GERAN) - DITAMBAH BAIK 🚀
-// ==========================================
+
+// ----------------------------------------------------
+// FUNGSI STATISTIK (GERAN)
+// ----------------------------------------------------
 function kiraStatsGeran(data) {
     let statsJabatan = {};
     let statsJenis = {};
@@ -1474,13 +1247,9 @@ function kiraStatsGeran(data) {
 
         if (isProjekBaru) {
             let jbtAsal = String(r[3] || 'TIADA JABATAN').trim();
-            
             let match = jbtAsal.match(/\(([^)]+)\)/); 
             let jbt = match ? match[1].trim() : jbtAsal;
-
             let jenis = String(r[7] || 'LAIN-LAIN').trim().toUpperCase(); 
-            
-            // 🌟 KEMASKINI: Buang semua koma, huruf, ruang kosong atau simbol sebelum diproses
             let nilaiBersih = String(r[11] || '0').replace(/[^0-9.-]+/g, ""); 
             let nilai = parseFloat(nilaiBersih) || 0; 
 
@@ -1490,19 +1259,11 @@ function kiraStatsGeran(data) {
             totalProjek++; 
         }
     });
-
-    return { 
-        jabatan: statsJabatan, 
-        jenis: statsJenis, 
-        totalNilai: totalNilai, 
-        totalProjek: totalProjek 
-    };
+    return { jabatan: statsJabatan, jenis: statsJenis, totalNilai: totalNilai, totalProjek: totalProjek };
 }
 
 function renderKadGeran(stats) {
     const kpiContainer = document.getElementById('kpiCards');
-    
-    // Elakkan ralat "Divide by Zero" jika tiada projek
     let purataNilai = stats.totalProjek > 0 ? (stats.totalNilai / stats.totalProjek) : 0;
     let jumlahJenisUnik = Object.keys(stats.jenis).length;
 
@@ -1514,7 +1275,6 @@ function renderKadGeran(stats) {
             </div>
             <div class="bg-emerald-50 w-12 h-12 flex items-center justify-center rounded-xl"><i class="fa-solid fa-comments-dollar text-emerald-600 text-xl"></i></div>
         </div>
-
         <div class="bg-white p-5 rounded-2xl shadow-sm border-l-[5px] border-indigo-500 flex items-center justify-between hover:shadow-md transition-shadow">
             <div>
                 <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Bilangan Projek</p>
@@ -1522,7 +1282,6 @@ function renderKadGeran(stats) {
             </div>
             <div class="bg-indigo-50 w-12 h-12 flex items-center justify-center rounded-xl"><i class="fa-solid fa-diagram-project text-indigo-600 text-xl"></i></div>
         </div>
-
         <div class="bg-white p-5 rounded-2xl shadow-sm border-l-[5px] border-purple-500 flex items-center justify-between hover:shadow-md transition-shadow">
             <div>
                 <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Purata Nilai Projek</p>
@@ -1530,7 +1289,6 @@ function renderKadGeran(stats) {
             </div>
             <div class="bg-purple-50 w-12 h-12 flex items-center justify-center rounded-xl"><i class="fa-solid fa-calculator text-purple-600 text-xl"></i></div>
         </div>
-
         <div class="bg-white p-5 rounded-2xl shadow-sm border-l-[5px] border-orange-500 flex items-center justify-between hover:shadow-md transition-shadow">
             <div>
                 <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Jenis Geran Unik</p>
@@ -1544,250 +1302,124 @@ function renderChartsGeran(stats) {
     if (typeof barChartInstance !== 'undefined' && barChartInstance) barChartInstance.destroy();
     if (typeof pieChartInstance !== 'undefined' && pieChartInstance) pieChartInstance.destroy();
 
-    // 1. Palet warna ceria & moden untuk Carta Bar
     const senaraiWarna = [
-        'rgba(59, 130, 246, 0.85)', // Biru
-        'rgba(16, 185, 129, 0.85)', // Hijau Emerald
-        'rgba(139, 92, 246, 0.85)', // Ungu
-        'rgba(245, 158, 11, 0.85)', // Jingga
-        'rgba(239, 68, 68, 0.85)',  // Merah
-        'rgba(6, 182, 212, 0.85)',  // Cyan
-        'rgba(244, 63, 94, 0.85)',  // Rose
-        'rgba(132, 204, 22, 0.85)', // Lime
+        'rgba(59, 130, 246, 0.85)', 'rgba(16, 185, 129, 0.85)', 'rgba(139, 92, 246, 0.85)', 'rgba(245, 158, 11, 0.85)', 'rgba(239, 68, 68, 0.85)', 'rgba(6, 182, 212, 0.85)', 'rgba(244, 63, 94, 0.85)', 'rgba(132, 204, 22, 0.85)'
     ];
 
     const labelJabatan = Object.keys(stats.jabatan);
     const dataJabatan = Object.values(stats.jabatan);
     const warnaBar = labelJabatan.map((_, index) => senaraiWarna[index % senaraiWarna.length]);
 
-    // Render Carta Bar (Nilai Ikut Jabatan)
     barChartInstance = new Chart(document.getElementById('barChart'), {
         type: 'bar',
-        data: {
-            labels: labelJabatan,
-            datasets: [{ 
-                label: 'Jumlah Nilai (RM)', 
-                data: dataJabatan, 
-                backgroundColor: warnaBar,
-                borderRadius: 6,
-                borderSkipped: false,
-                maxBarThickness: 50 // 🌟 KEMASKINI: Hadkan kelebaran maksimum bar supaya tidak terlalu gemuk
-            }]
-        },
+        data: { labels: labelJabatan, datasets: [{ label: 'Jumlah Nilai (RM)', data: dataJabatan, backgroundColor: warnaBar, borderRadius: 6, borderSkipped: false, maxBarThickness: 50 }] },
         options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    ticks: {
-                        autoSkip: false, // Paksa papar semua label
-                        maxRotation: 45, // Sendengkan tulisan jika terlalu panjang
-                        minRotation: 0,
-                        font: { size: 11 }
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            // Ringkaskan nombor besar (Contoh: RM 100k atau RM 1M)
+            responsive: true, maintainAspectRatio: false,
+            scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 0, font: { size: 11 } } },
+                y: { beginAtZero: true, ticks: { callback: function(value) {
                             if (value >= 1000000000) return 'RM ' + (value / 1000000000).toFixed(1) + 'B';
                             if (value >= 1000000) return 'RM ' + (value / 1000000).toFixed(1) + 'M';
                             if (value >= 1000) return 'RM ' + (value / 1000).toFixed(1) + 'k';
                             return 'RM ' + value;
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    titleFont: { size: 13 },
-                    bodyFont: { size: 13 },
-                    padding: 10,
-                    callbacks: {
-                        label: function(context) {
-                            return ' RM ' + context.parsed.y.toLocaleString('en-MY', {minimumFractionDigits: 2});
-                        }
-                    }
-                }
-            }
+                        } } } },
+            plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleFont: { size: 13 }, bodyFont: { size: 13 }, padding: 10, callbacks: { label: function(context) { return ' RM ' + context.parsed.y.toLocaleString('en-MY', {minimumFractionDigits: 2}); } } } }
         }
     });
 
-    // Render Carta Pie (Pecahan Jenis Geran)
     pieChartInstance = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
-        data: {
-            labels: Object.keys(stats.jenis),
-            datasets: [{ 
-                data: Object.values(stats.jenis), 
-                backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            cutout: '65%', // Kurangkan sikit ruang tengah supaya cincin lebih tebal
-            plugins: { 
-                legend: { 
-                    position: 'bottom', 
-                    labels: { boxWidth: 12, padding: 15, font: { size: 10, family: "'Inter', sans-serif" } } 
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.label || '';
-                            let val = context.parsed;
-                            let total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            let percent = Math.round((val / total) * 100);
-                            return ` ${label}: ${val} Projek (${percent}%)`;
-                        }
-                    }
-                }
-            }
-        }
+        data: { labels: Object.keys(stats.jenis), datasets: [{ data: Object.values(stats.jenis), backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'], borderWidth: 2, borderColor: '#ffffff' }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { size: 10, family: "'Inter', sans-serif" } } }, tooltip: { callbacks: { label: function(context) { let label = context.label || ''; let val = context.parsed; let total = context.dataset.data.reduce((a, b) => a + b, 0); let percent = Math.round((val / total) * 100); return ` ${label}: ${val} Projek (${percent}%)`; } } } } }
     });
 }
-    </script>
+</script>
 	
-	<script>
+<script>
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Ambil peranan pengguna dari sessionStorage (pastikan huruf besar untuk keseragaman)
         const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
-        
-        // 2. Senarai peranan yang dibenarkan melihat butang ini
         const perananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
-        
-        // 3. Cari butang berdasarkan ID
         const btnSesi = document.getElementById("btnTetapanSesi");
-        
-        // 4. Semak jika peranan pengguna ada di dalam senarai yang dibenarkan
         if (perananDibenarkan.includes(userPeranan) && btnSesi) {
-            // Tunjukkan butang dan jadikan ia 'flex' supaya ikon dan teks tersusun kemas
             btnSesi.style.display = "flex";
         }
     });
 </script>
 	
-	
-	
-	
-	
-	
-	<script>
+<script>
 window.onload = () => {
-        // 1. Logik asal untuk pengesahan sesi/login
-        const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
-        const perananPengguna = (sessionStorage.getItem("peranan") || "").trim().toUpperCase();
+    const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
+    const perananPengguna = (sessionStorage.getItem("peranan") || "").trim().toUpperCase();
 
-        if (sudahLogin) {
-            const btnLogMasuk = document.getElementById('btnLogMasuk');
-            if (btnLogMasuk) {
-                btnLogMasuk.classList.add('hidden');
-                btnLogMasuk.style.display = 'none';
-            }
-
-            const infoPengguna = document.getElementById('infoPengguna');
-            if (infoPengguna) {
-                infoPengguna.classList.remove('hidden');
-                infoPengguna.style.display = 'block'; 
-            }
-
-            const pNama = document.getElementById('paparNama');
-            const pPeranan = document.getElementById('paparPeranan');
-            const pJabatan = document.getElementById('paparJabatan');
-            
-            if (pNama) pNama.innerText = sessionStorage.getItem("namaPengguna") || "Pengguna";
-            if (pPeranan) pPeranan.innerText = perananPengguna;
-            
-            // 🌟 KEMASKINI: Ekstrak singkatan untuk paparan Jabatan
-            if (pJabatan) {
-                let jabatanAsal = sessionStorage.getItem("jabatan") || "TIADA";
-                let paparanJabatan = jabatanAsal;
-                
-                // Cari teks di dalam kurungan (contoh: JKA, JKE)
-                const matchJabatan = jabatanAsal.match(/\(([^)]+)\)/);
-                if (matchJabatan) {
-                    paparanJabatan = matchJabatan[1].trim(); // Ambil singkatan sahaja
-                }
-                
-                pJabatan.innerText = paparanJabatan;
-            }
-
-const btnLogKeluar = document.getElementById('btnLogKeluar');
-if (btnLogKeluar) {
-    btnLogKeluar.classList.remove('hidden');
-    btnLogKeluar.style.display = 'flex';
-
-    // 🌟 TAMBAH BAIK: Papar dialog pengesahan sebelum log keluar
-    btnLogKeluar.onclick = function(event) {
-        // Paparkan kotak dialog 'Confirm' bawaan pelayar web
-        const sahkanKeluar = confirm("Adakah anda pasti ingin log keluar dari sistem?");
-        
-        if (sahkanKeluar) {
-            // Jika pengguna klik "OK", jalankan fungsi log keluar asal
-            logKeluar(); 
-        } else {
-            // Jika pengguna klik "Cancel/Batal", batalkan tindakan klik
-            event.preventDefault();
-            return false;
+    if (sudahLogin) {
+        const btnLogMasuk = document.getElementById('btnLogMasuk');
+        if (btnLogMasuk) {
+            btnLogMasuk.classList.add('hidden');
+            btnLogMasuk.style.display = 'none';
         }
-    };
+
+        const infoPengguna = document.getElementById('infoPengguna');
+        if (infoPengguna) {
+            infoPengguna.classList.remove('hidden');
+            infoPengguna.style.display = 'block'; 
+        }
+
+        const pNama = document.getElementById('paparNama');
+        const pPeranan = document.getElementById('paparPeranan');
+        const pJabatan = document.getElementById('paparJabatan');
+        
+        if (pNama) pNama.innerText = sessionStorage.getItem("namaPengguna") || "Pengguna";
+        if (pPeranan) pPeranan.innerText = perananPengguna;
+        if (pJabatan) {
+            let jabatanAsal = sessionStorage.getItem("jabatan") || "TIADA";
+            let paparanJabatan = jabatanAsal;
+            const matchJabatan = jabatanAsal.match(/\(([^)]+)\)/);
+            if (matchJabatan) { paparanJabatan = matchJabatan[1].trim(); }
+            pJabatan.innerText = paparanJabatan;
+        }
+
+        const btnLogKeluar = document.getElementById('btnLogKeluar');
+        if (btnLogKeluar) {
+            btnLogKeluar.classList.remove('hidden');
+            btnLogKeluar.style.display = 'flex';
+            btnLogKeluar.onclick = function(event) {
+                const sahkanKeluar = confirm("Adakah anda pasti ingin log keluar dari sistem?");
+                if (sahkanKeluar) { logKeluar(); } 
+                else { event.preventDefault(); return false; }
+            };
+        }
+
+        const btnTukarKataLaluan = document.getElementById('btnTukarKataLaluan');
+        if (btnTukarKataLaluan && perananPengguna !== "STAF" && perananPengguna !== "") {
+            btnTukarKataLaluan.classList.remove('hidden'); 
+            btnTukarKataLaluan.style.display = 'flex';
+        }
+
+        const btnSidePenyelaras = document.getElementById('btnSidePenyelaras');
+        const btnSidePengurusan = document.getElementById('btnSidePengurusan');
+
+        if (["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"].includes(perananPengguna)) {
+            if (btnSidePengurusan) { btnSidePengurusan.classList.remove('hidden'); btnSidePengurusan.style.display = 'flex'; }
+        }
+        
+        if (perananPengguna !== "STAF" && perananPengguna !== "") {
+            if (btnSidePenyelaras) { btnSidePenyelaras.classList.remove('hidden'); btnSidePenyelaras.style.display = 'flex'; }
+        }
+    }
+
+    if (typeof tukarTab === "function") { tukarTab('INOVASI'); }
+};
+
+function aksesModul(event, sasaranURL) {
+    event.preventDefault(); 
+    const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
+    if (sudahLogin) { window.location.href = sasaranURL; } 
+    else { alert("Sila log masuk terlebih dahulu untuk mengakses modul ini."); window.location.href = "login.html"; }
 }
 
-            const btnTukarKataLaluan = document.getElementById('btnTukarKataLaluan');
-            if (btnTukarKataLaluan && perananPengguna !== "STAF" && perananPengguna !== "") {
-                btnTukarKataLaluan.classList.remove('hidden'); 
-                btnTukarKataLaluan.style.display = 'flex';
-            }
-
-            const btnSidePenyelaras = document.getElementById('btnSidePenyelaras');
-            const btnSidePengurusan = document.getElementById('btnSidePengurusan');
-
-            if (["ADMIN", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "KUPIK"].includes(perananPengguna)) {
-                if (btnSidePengurusan) { 
-                    btnSidePengurusan.classList.remove('hidden'); 
-                    btnSidePengurusan.style.display = 'flex';
-                }
-            }
-            
-            if (perananPengguna !== "STAF" && perananPengguna !== "") {
-                if (btnSidePenyelaras) { 
-                    btnSidePenyelaras.classList.remove('hidden'); 
-                    btnSidePenyelaras.style.display = 'flex';
-                }
-            }
-        }
-
-        // 2. KOD BARU: Aktifkan TAB INOVASI secara automatik
-        // Pastikan fungsi tukarTab() sudah didefinisikan dalam fail anda
-        if (typeof tukarTab === "function") {
-            tukarTab('INOVASI');
-        }
-    };
-
-    function aksesModul(event, sasaranURL) {
-        event.preventDefault(); 
-        const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
-
-        if (sudahLogin) {
-            window.location.href = sasaranURL;
-        } else {
-            alert("Sila log masuk terlebih dahulu untuk mengakses modul ini.");
-            window.location.href = "login.html";
-        }
-    }
-
-    function logKeluar() {
-        sessionStorage.clear(); 
-        window.location.reload(); 
-    }
-	
-
+function logKeluar() {
+    sessionStorage.clear(); 
+    window.location.reload(); 
+}
 </script>
 
 <div id="modalSesi" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden flex items-center justify-center p-4">
@@ -1800,10 +1432,8 @@ if (btnLogKeluar) {
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
         </div>
-
         <div class="p-6 space-y-4">
             <p class="text-xs text-gray-500 italic">* Tetapan ini akan menentukan sesi aktif bagi sistem log masuk dan pelaporan.</p>
-            
 			<div>
                 <label for="inputSesi" class="block text-sm font-bold text-gray-700 mb-1">Sesi Semasa</label>
                 <select id="inputSesi" class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required>
@@ -1812,59 +1442,37 @@ if (btnLogKeluar) {
                     <option value="2">2</option>
                 </select>
             </div>
-
             <div>
                 <label for="inputTahun" class="block text-sm font-bold text-gray-700 mb-1">Tahun Semasa</label>
-                <input type="number" id="inputTahun" 
-                       class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" 
-                       placeholder="Contoh: 2024" 
-                       min="2000" max="2100"
-                       autocomplete="off" required>
+                <input type="number" id="inputTahun" class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Contoh: 2024" min="2000" max="2100" autocomplete="off" required>
             </div>
-
             <div id="pesananSesi" class="hidden text-center p-2 rounded text-xs font-bold"></div>
         </div>
-
         <div class="bg-gray-50 p-4 flex justify-end gap-2">
-            <button onclick="tutupModalSesi()" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-lg transition">
-                Batal
-            </button>
-            <button id="btnSimpanSesi" onclick="simpanSesiAktif()" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition">
-                Simpan Tetapan
-            </button>
+            <button onclick="tutupModalSesi()" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-lg transition">Batal</button>
+            <button id="btnSimpanSesi" onclick="simpanSesiAktif()" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition">Simpan Tetapan</button>
         </div>
     </div>
 </div>
-
 
 <script>
 function bukaTetapanSesi() {
     const modal = document.getElementById('modalSesi');
     modal.classList.remove('hidden');
-    
-    // Reset mesej amaran
     const pesanan = document.getElementById('pesananSesi');
     if (pesanan) pesanan.classList.add('hidden');
-    
-    // Tarik data terbaru dari Google Sheet
     muatSesiDanTahun(); 
 }
 
-// Fungsi untuk menutup modal
 function tutupModalSesi() {
     document.getElementById('modalSesi').classList.add('hidden');
-    
-    // Pilihan: Anda juga boleh clearkan input di sini jika pengguna klik "Batal"
     document.getElementById('inputSesi').value = "";
     document.getElementById('inputTahun').value = "";
 }
 
-// Fungsi untuk mengisi data dari Google Sheet ke dalam ruang input
 function muatSesiDanTahun() {
     const inputSesi = document.getElementById('inputSesi');
     const inputTahun = document.getElementById('inputTahun');
-
-    // Tunjukkan status sedang memuatkan (optional)
     inputSesi.disabled = true;
     inputTahun.disabled = true;
 
@@ -1875,29 +1483,20 @@ function muatSesiDanTahun() {
     .then(res => res.json())
     .then(data => {
         if (data.status === "BERJAYA") {
-            // Masukkan data dari Google Sheet ke dalam input/select
             inputSesi.value = data.sesi;
             inputTahun.value = data.tahun;
-            
-            // Kemaskini localStorage supaya selari dengan cloud
             localStorage.setItem("sesiAktif", data.sesi);
             localStorage.setItem("tahunAktif", data.tahun);
-            
-            // Panggil semula fungsi kemaskini tajuk di header jika perlu
             if (typeof kemaskiniTajukTahun === "function") kemaskiniTajukTahun();
         }
-        
         inputSesi.disabled = false;
         inputTahun.disabled = false;
     })
     .catch(err => {
-        console.error("Gagal mengambil data sesi:", err);
-        // Jika gagal cloud, gunakan data localStorage sebagai backup
         const sAktif = localStorage.getItem("sesiAktif");
         const tAktif = localStorage.getItem("tahunAktif");
         if (sAktif) inputSesi.value = sAktif;
         if (tAktif) inputTahun.value = tAktif;
-        
         inputSesi.disabled = false;
         inputTahun.disabled = false;
     });
@@ -1909,79 +1508,51 @@ function simpanSesiAktif() {
     const btn = document.getElementById('btnSimpanSesi');
     const pesanan = document.getElementById('pesananSesi');
 
-    // Validasi input
-    if (!sesi || !tahun) {
-        alert("Sila masukkan Sesi dan Tahun!");
-        return;
-    }
-
-    // Tukar rupa butang semasa proses menyimpan
+    if (!sesi || !tahun) { alert("Sila masukkan Sesi dan Tahun!"); return; }
     btn.disabled = true;
     btn.innerText = "Menyimpan ke Cloud...";
 
-    // 1. Simpan di Local Storage (untuk kegunaan pantas browser)
     localStorage.setItem("sesiAktif", sesi);
     localStorage.setItem("tahunAktif", tahun);
 
-    // 2. Hantar ke Google Apps Script
     fetch(SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: "simpanSesiGlobal", sesi: sesi, tahun: tahun })
     })
-    .then(res => res.json()) // Baca respons dari Google Script
+    .then(res => res.json())
     .then(data => {
         if (data.status === "BERJAYA") {
-            // Paparkan mesej berjaya
             pesanan.innerText = "✅ Tetapan Tahun Semasa dan Sesi telah dikemaskini!";
             pesanan.className = "text-center p-2 rounded text-xs font-bold bg-green-100 text-green-700 mt-3";
             pesanan.classList.remove('hidden');
-
-            // Proses tutup modal & reload selepas 1.5 saat
             setTimeout(() => {
                 tutupModalSesi();
                 pesanan.classList.add('hidden');
                 btn.disabled = false;
                 btn.innerText = "Simpan Tetapan";
-                
-                // Segarkan semula halaman agar sistem menggunakan sesi yang baru
                 window.location.reload(); 
             }, 1500);
-            
         } else {
-            // Ralat dari Google Apps Script (contoh: Tab SISTEM tidak wujud)
             alert("Gagal: " + data.mesej);
             btn.disabled = false;
             btn.innerText = "Simpan Tetapan";
         }
     })
     .catch(err => {
-        // Ralat rangkaian (contoh: tiada internet / SCRIPT_URL salah)
-        console.error("Ralat Fetch:", err);
         alert("Ralat sistem. Gagal berhubung dengan pangkalan data.");
-        
-        // Pastikan butang kembali aktif jika berlaku ralat
         btn.disabled = false;
         btn.innerText = "Simpan Tetapan";
     });
 }
 
-// Fungsi utama untuk kemaskini tajuk tahun pada header dari localStorage
 function kemaskiniTajukTahun() {
     const tahunAktif = localStorage.getItem("tahunAktif");
     const paparanTahun = document.getElementById('paparanTahunHeader');
-    
-    // Jika elemen tidak wujud di halaman ini, berhentikan fungsi untuk elak ralat (error)
     if (!paparanTahun) return;
-    
-    // Kemaskini paparan jika ada tahun, jika tidak letak status memuat turun
-    if (tahunAktif) {
-        paparanTahun.innerText = `BAGI TAHUN ${tahunAktif}`;
-    } else {
-        paparanTahun.innerText = "⏳ Menyemak Tahun..."; 
-    }
+    if (tahunAktif) { paparanTahun.innerText = `BAGI TAHUN ${tahunAktif}`; } 
+    else { paparanTahun.innerText = "⏳ Menyemak Tahun..."; }
 }
 
-// Fungsi BARU: Menyedut tahun terkini dari Google Sheet (ambilSesiGlobal)
 function semakTahunDariServer() {
     fetch(SCRIPT_URL, {
         method: 'POST',
@@ -1991,59 +1562,27 @@ function semakTahunDariServer() {
     .then(res => res.json())
     .then(data => {
         if (data.status === 'BERJAYA') {
-            // Ambil tahun dari response (menyokong huruf kecil atau besar)
             const tahunServer = data.tahun || data.TAHUN;
-            
-            // Jika tahun dari server wujud dan BERBEZA dengan localStorage, kemaskini!
             if (tahunServer && tahunServer !== localStorage.getItem("tahunAktif")) {
-                
-                // Kemaskini data dalam sistem pelayar (browser)
                 localStorage.setItem("tahunAktif", tahunServer);
-                
-                // (Pilihan) Anda juga boleh simpan sesiAktif jika perlu
                 const sesiServer = data.sesi || data.SESI;
                 if (sesiServer) localStorage.setItem("sesiAktif", sesiServer);
-                
-                // Arahkan sistem kemaskini paparan serta-merta tanpa perlu refresh!
                 window.dispatchEvent(new Event("kemaskiniTahunSertaMerta"));
             }
         }
-    })
-    .catch(error => {
-        console.error("Gagal menyemak tahun dari pangkalan data:", error);
-        // Jika ralat (contoh: tiada internet), ia kekal guna data localStorage sedia ada
     });
 }
 
-// 1. Jalankan fungsi secara automatik apabila halaman mula dimuatkan
 document.addEventListener("DOMContentLoaded", function() {
-    // Paparkan data sedia ada dari localStorage SEGERA (untuk kelajuan UI)
     kemaskiniTajukTahun(); 
-    
-    // Tarik data terkini dari pangkalan data secara senyap (Background check)
     semakTahunDariServer();
 });
 
-// 2. Auto-update jika tahun ditukar di Tab/Tetingkap browser yang lain (Cross-tab)
 window.addEventListener("storage", function(e) {
-    if (e.key === "tahunAktif") {
-        kemaskiniTajukTahun();
-    }
+    if (e.key === "tahunAktif") { kemaskiniTajukTahun(); }
 });
 
-// 3. Auto-update jika tahun ditukar di dalam tab/halaman yang sama (Custom Event)
 window.addEventListener("kemaskiniTahunSertaMerta", kemaskiniTajukTahun);
-
-
-
-
-
-
-
-
-
-
 </script>
-
 </body>
 </html>
