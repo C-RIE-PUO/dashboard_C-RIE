@@ -75,6 +75,13 @@
       <tbody id="bodyJadual">
         </tbody>
     </table>
+    
+    <!-- 🌟 TAMBAHAN: Kawalan Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3" id="paginationControls" style="display: none;">
+      <button class="btn btn-outline-primary fw-bold" id="btnPrev" onclick="tukarPage(-1)">⬅ Previous</button>
+      <span id="pageInfo" class="fw-bold text-secondary">Muka Surat: 1 / 1</span>
+      <button class="btn btn-outline-primary fw-bold" id="btnNext" onclick="tukarPage(1)">Next ➡</button>
+    </div>
   </div>
 </div>
 
@@ -231,6 +238,10 @@
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec"; 
   let dataAsalInovasi = []; // 🌟 TAMBAHAN: Menyimpan keseluruhan data dari server
   let dataInovasiSemasa = []; 
+  
+  // 🌟 TAMBAHAN: Pembolehubah untuk Pagination
+  let currentPage = 1;
+  const recordsPerPage = 10;
 
   function baikiPautanDrive(url) {
     if (!url || typeof url !== 'string' || url.trim() === "") return "";
@@ -315,7 +326,30 @@
       return matchJab && matchTahun && matchStatus;
     });
 
+    // 🌟 PENAMBAHBAIKAN: Susun rekod untuk memastikan memaparkan "10 rekod yang terkini"
+    // Disusun mengikut tahun (descending) untuk DISAHKAN, SEMUA STATUS, BAIKI SEMULA dan MENUNGGU PENGESAHAN
+    if (valStatus === "DISAHKAN" || valStatus === "" || valStatus === "BAIKI SEMULA" || valStatus === "MENUNGGU PENGESAHAN") {
+        dataInovasiSemasa.sort((a, b) => {
+            let tahunA = parseInt(a[8] || 0);
+            let tahunB = parseInt(b[8] || 0);
+            if (tahunB !== tahunA) return tahunB - tahunA;
+            // Jika tahun sama, gunakan turutan ID (No.) menurun sebagai fallback
+            return parseInt(b[0] || 0) - parseInt(a[0] || 0);
+        });
+    } else {
+        // Susunan lalai: andaikan No. (rekod[0]) adalah ID menaik, kita susun menurun supaya terkini dipaparkan
+        dataInovasiSemasa.sort((a, b) => parseInt(b[0] || 0) - parseInt(a[0] || 0));
+    }
+
+    // Reset pagination kembali ke muka surat 1 setiap kali filter dikenakan
+    currentPage = 1; 
     binaJadual(dataInovasiSemasa);
+  }
+
+  // 🌟 TAMBAHAN: Fungsi Tukar Muka Surat (Pagination)
+  function tukarPage(arah) {
+      currentPage += arah;
+      binaJadual(dataInovasiSemasa);
   }
 
   function binaJadual(data) {
@@ -326,11 +360,32 @@
 
     if (data.length === 0) {
       tbody.innerHTML = "<tr><td colspan='11' class='text-center text-muted py-4'>Tiada rekod dijumpai berdasarkan tapisan ini.</td></tr>";
+      document.getElementById("paginationControls").style.display = "none";
       return;
     }
 
-    data.forEach((rekod, index) => {
-      let tr = document.createElement("tr");
+    // 🌟 PENAMBAHBAIKAN: Paparan Logik Pagination
+    document.getElementById("paginationControls").style.display = "flex";
+    let totalPages = Math.ceil(data.length / recordsPerPage);
+    if (currentPage < 1) currentPage = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    document.getElementById("pageInfo").innerText = `Muka Surat: ${currentPage} / ${totalPages}`;
+    document.getElementById("btnPrev").disabled = (currentPage === 1);
+    document.getElementById("btnNext").disabled = (currentPage === totalPages);
+
+    // Ambil hanya sekatan 10 rekod berdasarkan muka surat
+    let start = (currentPage - 1) * recordsPerPage;
+    let end = start + recordsPerPage;
+    let paginatedItems = data.slice(start, end);
+
+    paginatedItems.forEach((rekod, index) => {
+      // Index sebenar di dalam senarai data penuh untuk butang tindakan berfungsi dengan tepat
+      let actualIndex = start + index; 
+      
+      // 🌟 KEMASKINI: Kiraan nombor urutan hanya untuk paparan di front-end (1, 2, 3...)
+      let noPaparan = actualIndex + 1; 
+
       let dataSijil = rekod[10] ? rekod[10].toString().trim() : "";
       let butangSijilHtml = "<span class='text-muted small'>Tiada</span>";
 
@@ -363,8 +418,9 @@
           paparanStatus = `<span class="badge bg-warning text-dark px-2 py-1">⏳ ${statusText}</span>`;
       }
 
+      let tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="text-center">${rekod[0]}</td>
+        <td class="text-center">${noPaparan}</td> <!-- 🌟 KEMASKINI: Digantikan dengan nombor urutan -->
         <td>
             <strong>${rekod[1]}</strong>
             <br><span class="text-muted small">${rekod[2] ? 'Ahli: ' + rekod[2] : ''}</span>
@@ -379,9 +435,9 @@
         <td class="text-center">${butangSijilHtml}</td>
         <td class="text-center">
           <div class="d-flex flex-column gap-1">
-            <button class="btn btn-success btn-sm shadow-sm" onclick="sahkanRekod(${index})">✅ Sah</button>
-            <button class="btn btn-warning text-dark fw-bold btn-sm shadow-sm" style="background-color: #ffc107; border-color: #ffc107;" onclick="bukaModalBaiki(${index})">⚠️ Baiki Semula</button>
-            <button class="btn btn-primary btn-sm shadow-sm" onclick="bukaModalEdit(${index})">✏️ Edit</button>
+            <button class="btn btn-success btn-sm shadow-sm" onclick="sahkanRekod(${actualIndex})">✅ Sah</button>
+            <button class="btn btn-warning text-dark fw-bold btn-sm shadow-sm" style="background-color: #ffc107; border-color: #ffc107;" onclick="bukaModalBaiki(${actualIndex})">⚠️ Baiki Semula</button>
+            <button class="btn btn-primary btn-sm shadow-sm" onclick="bukaModalEdit(${actualIndex})">✏️ Edit</button>
             <button class="btn btn-danger btn-sm shadow-sm" onclick="padamRekod('${rekod[0]}')">🗑️ Tolak</button>
           </div>
         </td>
