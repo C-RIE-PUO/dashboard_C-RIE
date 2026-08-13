@@ -1376,7 +1376,46 @@
             const currentYear = new Date().getFullYear();
             const labelCarta = [];
             const dataCarta = [];
-            let tajuk = "";
+            
+            // --- MULA PENAMBAHBAIKAN CARTA DINAMIK --- //
+            let tahunDipilih = document.getElementById('filterTahun').value.trim();
+            let jabatanDipilih = document.getElementById('filterJabatan') ? document.getElementById('filterJabatan').value : "Semua";
+            
+            if (perananBiasa.includes(userPeranan.toUpperCase()) && userJabatan !== "") {
+                jabatanDipilih = userJabatan;
+            }
+
+            let tajuk = "Keseluruhan Rekod Pencapaian KPI ";
+            let singkatanJ = ""; // Pembolehubah untuk menyimpan singkatan jabatan
+
+            if (jabatanDipilih === "Semua") {
+                tajuk += "Bagi Semua Jabatan ";
+                if (tahunDipilih === "") {
+                    tajuk += "Bagi 3 Tahun Terkini";
+                } else {
+                    tajuk += `Bagi Tahun ${tahunDipilih}`;
+                }
+            } else {
+                singkatanJ = dapatkanSingkatanJabatan(jabatanDipilih);
+                tajuk += `Bagi  ${singkatanJ} `;
+                if (tahunDipilih === "") {
+                    tajuk += "Bagi 3 Tahun Terkini";
+                } else {
+                    tajuk += `Tahun ${tahunDipilih}`;
+                }
+            }
+            
+            // Sesuaikan susunan huruf supaya format tajuk lebih kemas (Title Case)
+            tajuk = tajuk.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}).replace('Kpi', 'KPI');
+            
+            // Pastikan singkatan jabatan kekal dalam huruf besar semua (Contoh: JKA)
+            if (singkatanJ !== "") {
+                let singkatanTitleCase = singkatanJ.charAt(0).toUpperCase() + singkatanJ.substr(1).toLowerCase();
+                tajuk = tajuk.replace(singkatanTitleCase, singkatanJ.toUpperCase());
+            }
+
+            document.getElementById('tajukCarta').innerText = tajuk;
+            // --- TAMAT PENAMBAHBAIKAN CARTA DINAMIK --- //
 
             if (!isPrivileged) {
                 // PAPARAN KHAS STAF/PENGGUNA BIASA (3 Tahun Terkini)
@@ -1390,7 +1429,6 @@
 
                 labelCarta.push(year3.toString(), year2.toString(), year1.toString());
                 dataCarta.push(countYear3, countYear2, countYear1);
-                tajuk = `Rekod KPI 3 Tahun Terkini (${year3} - ${year1})`;
                 
                 // Sembunyikan carta kedua bagi pengguna biasa
                 document.getElementById('bekasTahunChart').classList.add('hidden');
@@ -1407,7 +1445,6 @@
                 }); 
                 labelCarta.push(...Object.keys(rekodJabatan));
                 dataCarta.push(...Object.values(rekodJabatan));
-                tajuk = "Rekod KPI mengikut Jabatan";
 
                 // Paparkan carta kedua
                 document.getElementById('bekasTahunChart').classList.remove('hidden');
@@ -1450,8 +1487,6 @@
                 });
             }
 
-            document.getElementById('tajukCarta').innerText = tajuk;
-
             const warnaBar = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
 
             if (jabatanChartInstance) jabatanChartInstance.destroy();
@@ -1468,7 +1503,7 @@
                     maintainAspectRatio: false, 
                     plugins: { 
                         legend: { display: false },
-                        title: { display: isPrivileged, text: 'Keseluruhan Rekod Pencapaian' }
+                        title: { display: true, text: tajuk }
                     } 
                 }
             });
