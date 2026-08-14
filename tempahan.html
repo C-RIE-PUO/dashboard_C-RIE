@@ -288,7 +288,7 @@
         const rekodPerHalaman = 10;
         let statusLogMasuk = false; 
         
-        const perananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN"];
+        const perananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS INOVASI","PENYELARAS PENYELIDIKAN", "PENYELARAS PENYELIDIKAN (C-RIE)"];
 
         document.addEventListener("DOMContentLoaded", function() {
             if(typeof muatTurunJabatan === 'function') muatTurunJabatan(); 
@@ -300,9 +300,12 @@
                 tempahTarikhElem.min = hariIni.toISOString().split('T')[0];
             }
 
-            const sesiPeranan = sessionStorage.getItem("log_peranan") || localStorage.getItem("log_peranan");
-            const sesiNama = sessionStorage.getItem("log_nama") || localStorage.getItem("log_nama");
-            const sesiJabatan = sessionStorage.getItem("log_jabatan") || localStorage.getItem("log_jabatan");
+			
+			// 3. --- AUTOMATIK LOAD PENGGUNA SEMASA ---
+            // Sistem menangkap semua kemungkinan kunci (keys) dari paparan.html
+            const sesiPeranan = sessionStorage.getItem("log_peranan") || localStorage.getItem("log_peranan") || sessionStorage.getItem("peranan") || localStorage.getItem("peranan");
+            const sesiNama = sessionStorage.getItem("log_nama") || localStorage.getItem("log_nama") || sessionStorage.getItem("nama") || localStorage.getItem("nama");
+            const sesiJabatan = sessionStorage.getItem("log_jabatan") || localStorage.getItem("log_jabatan") || sessionStorage.getItem("jabatan") || localStorage.getItem("jabatan");
 
             if (sesiPeranan && sesiPeranan.trim() !== "") {
                 statusLogMasuk = true;
