@@ -438,6 +438,17 @@
                         <input type="text" id="daftar_ic" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm" placeholder="Tanpa sengkang ( - )">
                     </div>
                 </div>
+				
+				
+				<div>
+					<label class="block text-xs font-bold text-gray-700 mb-1">No. Telefon (HP)</label>
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+							<i class="fa-solid fa-phone text-sm"></i>
+						</div>
+						<input type="text" id="daftar_nohp" required class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm" placeholder="Contoh: 0123456789">
+					</div>
+				</div>
                 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">Kata Laluan Baru</label>
@@ -1234,6 +1245,7 @@ document.getElementById('borangDaftar').addEventListener('submit', function(e) {
         action: "tambahPengguna", 
         NAMA: document.getElementById('daftar_nama').value.toUpperCase(),
         NO_IC: document.getElementById('daftar_ic').value.trim(),
+		NO_HP: document.getElementById('daftar_nohp').value.trim(), // 🌟 KEMASKINI: Dihantar ke Google Script
         KATA_LALUAN: document.getElementById('daftar_password').value,
         PERANAN: document.getElementById('daftar_peranan').value,
         JABATAN: document.getElementById('daftar_jabatan').value,
