@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekod Maklumat Penerbitan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- PUSTAKA TAMBAHAN UNTUK GABUNG PDF & MEMUAT TURUN FAIL -->
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
     <script>
         if (sessionStorage.getItem("userLulus") !== "YA") {
             alert("Sila log masuk terlebih dahulu.");
@@ -90,6 +96,7 @@
                 <!-- MEDAN TERSEMBUNYI UNTUK KAWALAN TINDAKAN -->
                 <input type="hidden" id="tindakanBorang" value="simpan">
                 <input type="hidden" id="rowIndexSemasa" value="">
+                <input type="hidden" id="kodIdSemasa" value="">
                 <input type="hidden" id="kategoriPenerbitan" value="buku">
 
                 <!-- TABS NAVIGATION -->
@@ -135,11 +142,11 @@
                             </div>
                             <!-- MUAT NAIK FAIL PDF TAB BUKU -->
                             <div class="md:col-span-2 bg-white p-4 rounded-lg border border-blue-200">
-                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF Buku / Bab (Maks 2 Fail, Maks 7 MB/fail)</label>
+                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF Buku / Bab (Maks 7 MB/fail)</label>
                                 <input type="file" id="tab1_fail" accept=".pdf" multiple onchange="kendalikanPilihanFail(this, 'buku')" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                 <!-- WIDGET INTERAKTIF FAIL DIPILIH -->
                                 <div id="tab1_senarai_fail" class="mt-3 space-y-2"></div>
-                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive Sub Folder BUKU ID: 1jsMcoRr-XH-HfOH4RKEKBvmpaxbeFoV_</span>
+                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive</span>
                             </div>
                         </div>
                     </div>
@@ -151,11 +158,11 @@
                         <div class="grid grid-cols-1 gap-6">
                             <!-- Muat naik PDF Artikel Akhbar/Majalah/Penulisan Kreatif -->
                             <div class="bg-white p-4 rounded-lg border border-blue-200">
-                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF (Maks 2 Fail, Maks 7 MB/fail)</label>
+                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF (Maks 7 MB/fail)</label>
                                 <input type="file" id="tab2_fail" accept=".pdf" multiple onchange="kendalikanPilihanFail(this, 'prosiding')" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                 <!-- WIDGET INTERAKTIF FAIL DIPILIH -->
                                 <div id="tab2_senarai_fail" class="mt-3 space-y-2"></div>
-                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive Sub Folder ID: 1JuJktmbuggNKrZMziCxCAGsKQVouKp6H</span>
+                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive</span>
                             </div>
                         </div>
                     </div>
@@ -190,11 +197,11 @@
                             </div>
                             <!-- MUAT NAIK FAIL PDF TAB PENERBITAN UMUM -->
                             <div class="md:col-span-2 bg-white p-4 rounded-lg border border-blue-200">
-                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF Penerbitan Umum (Maks 2 Fail, Maks 7 MB/fail)</label>
+                                <label class="block text-sm font-semibold text-gray-800 mb-1">📄 Muat Naik Dokumen PDF Penerbitan Umum (Maks 7 MB/fail)</label>
                                 <input type="file" id="tab3_fail" accept=".pdf" multiple onchange="kendalikanPilihanFail(this, 'umum')" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                 <!-- WIDGET INTERAKTIF FAIL DIPILIH -->
                                 <div id="tab3_senarai_fail" class="mt-3 space-y-2"></div>
-                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive Sub Folder UMUM ID: 1c7jjoYO9Ko-7GPPiF8g8u0TZvR4XSt4d</span>
+                                <span class="text-xs text-gray-500 mt-2 block">📁 Disimpan di Google Drive</span>
                             </div>
                         </div>
                     </div>
@@ -287,13 +294,31 @@
                     </h2>
                     <p class="text-gray-400 text-xs mt-1">Paparan 10 rekod terkini mengikut tab. Status pengesahan dan tindakan hanya bagi peranan dibenarkan.</p>
                 </div>
+            </div>
+            
+            <!-- 🌟 KAWASAN PENAPIS (FILTERS) -->
+            <div class="p-4 bg-gray-100 border-b border-gray-300 flex flex-wrap items-center gap-3">
+                <input type="text" id="inputCarian" onkeyup="tapisJadual()" placeholder="🔍 Cari carian umum..." class="px-3 py-2 text-sm text-gray-800 rounded-lg border border-gray-300 outline-none focus:ring-2 focus:ring-blue-400 flex-1 min-w-[150px]">
                 
-                <div class="flex items-center gap-3">
-                    <input type="text" id="inputCarian" onkeyup="tapisJadual()" placeholder="🔍 Cari tajuk, ketua, jabatan..." class="px-4 py-2 text-sm text-gray-800 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 w-full md:w-72">
-                    <button onclick="muatTurunData()" title="Muat semula data" class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-sm transition">
-                        🔄 Kemaskini
-                    </button>
-                </div>
+                <input type="text" id="filterTahun" onkeyup="tapisJadual()" placeholder="📅 Tahun (Cth: 2026)" class="px-3 py-2 text-sm text-gray-800 rounded-lg border border-gray-300 outline-none focus:ring-2 focus:ring-blue-400 w-32">
+                
+                <select id="filterJabatan" onchange="tapisJadual()" class="px-3 py-2 text-sm text-gray-800 rounded-lg border border-gray-300 outline-none focus:ring-2 focus:ring-blue-400 bg-white min-w-[150px]">
+                    <option value="">-- Semua Jabatan --</option>
+                </select>
+
+                <select id="filterBahasa" onchange="tapisJadual()" class="px-3 py-2 text-sm text-gray-800 rounded-lg border border-gray-300 outline-none focus:ring-2 focus:ring-blue-400 bg-white min-w-[150px]">
+                    <option value="">-- Semua Bahasa --</option>
+                    <option value="Bahasa Melayu">Bahasa Melayu</option>
+                    <option value="English">English</option>
+                </select>
+                
+                <button id="btnMuatTurunDokumen" onclick="bukaModalMuatTurun()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm transition font-semibold items-center gap-1 shadow">
+                    📥 Download Dokumen
+                </button>
+
+                <button onclick="muatTurunData()" title="Muat semula data" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm transition font-semibold">
+                    🔄 Kemaskini
+                </button>
             </div>
 
             <div class="overflow-x-auto">
@@ -331,6 +356,57 @@
                         Seterusnya ▶
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 🌟 MODAL PILIHAN MUAT TURUN ================= -->
+    <div id="modalMuatTurun" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 space-y-5">
+            <!-- Tajuk Header -->
+            <div class="flex items-center gap-3 border-b pb-3">
+                <span class="text-2xl">📥</span>
+                <h3 class="text-lg font-bold text-gray-800">Pilihan Format Muat Turun</h3>
+            </div>
+            
+            <p class="text-xs text-gray-500 font-medium">Sila pilih format susunan fail di dalam fail ZIP / PDF:</p>
+            
+            <!-- Pilihan 1 & 2 -->
+            <div class="space-y-3">
+                <!-- Option 1: Tanpa Gabung (Asal) -->
+                <label class="block p-4 border-2 rounded-xl cursor-pointer transition hover:border-blue-500 border-gray-200 bg-gray-50/50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/30">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="formatMuatTurun" value="1" checked class="mt-1 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">1. Tanpa Gabung (Asal)</h4>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">Fail bukti akan dimuat turun dalam keadaan asal berasingan tanpa dicantumkan ke dalam ZIP.</p>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Option 2: Merge PDF (Gabung) dalam ZIP -->
+                <label class="block p-4 border-2 rounded-xl cursor-pointer transition hover:border-blue-500 border-gray-200 bg-gray-50/50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/30">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="formatMuatTurun" value="2" class="mt-1 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">2. Merge PDF (Gabung) dalam ZIP</h4>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">Kesemua fail bukti bagi setiap ID akan dicantumkan menjadi satu (1) fail PDF tunggal dan dibungkus ke dalam ZIP.</p>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Status Proses (Loading) -->
+            <div id="statusProsesMuatTurun" class="hidden text-xs text-center font-semibold p-2.5 rounded-lg bg-blue-100 text-blue-800 border border-blue-200"></div>
+
+            <!-- Butang Batal & Muat Turun -->
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button" onclick="tutupModalMuatTurun()" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">
+                    Batal
+                </button>
+                <button type="button" id="btnProsesDownload" onclick="kendalikanProsesMuatTurun()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-1">
+                    Muat Turun ⬇
+                </button>
             </div>
         </div>
     </div>
@@ -417,16 +493,35 @@
             const peranan = document.getElementById('perananPengguna').value;
             const jabatan = document.getElementById('jabatanPengguna').value;
             document.getElementById('paparanLogMasuk').innerHTML = `<b>${peranan}</b> | ${jabatan}`;
+            semakPaparanButangMuatTurun();
         }
 
-        // ==============================================================================
-        // PENAMBAHBAIKAN FUNGSI MUAT JABATAN SISTEM (PENGENDALIAN RALAT & RETRY)
-        // ==============================================================================
+        // 🌟 SEMAK HAK AKSES DAN PAPARKAN BUTANG DOWNLOAD DOKUMEN
+        function semakPaparanButangMuatTurun() {
+            const perananSemasa = (document.getElementById('perananPengguna') ? document.getElementById('perananPengguna').value : '').trim().toUpperCase();
+            const perananKhasDownload = [
+                "PENYELARAS INOVASI (C-RIE)",
+                "PENYELARAS PENYELIDIKAN (C-RIE)",
+                "ADMIN",
+                "KUPIK"
+            ];
+            
+            const btnDownload = document.getElementById('btnMuatTurunDokumen');
+            if (btnDownload) {
+                if (perananKhasDownload.includes(perananSemasa)) {
+                    btnDownload.classList.remove('hidden');
+                    btnDownload.classList.add('flex');
+                } else {
+                    btnDownload.classList.add('hidden');
+                    btnDownload.classList.remove('flex');
+                }
+            }
+        }
+
         async function muatJabatanSistem() {
             const selectUtama = document.getElementById('jabatanUtama');
             if (!selectUtama) return;
 
-            // Jika data jabatan sudah sedia ada dalam memori, terus isi semula
             if (senaraiJabatan.length > 0) {
                 isiPilihanJabatan();
                 return;
@@ -450,10 +545,10 @@
             }
         }
 
-        // FUNGSI KHAS UNTUK MENGISI DROPDOWN DENGAN SELAMAT
         function isiPilihanJabatan() {
             const selectUtama = document.getElementById('jabatanUtama');
             const selectJabatanPengguna = document.getElementById('jabatanPengguna');
+            const filterJabatan = document.getElementById('filterJabatan'); // 🌟 Tambahan untuk Filter
 
             if (!selectUtama) return;
 
@@ -462,6 +557,9 @@
             if (selectJabatanPengguna && sessionStorage.getItem("userLulus") !== "YA") {
                 selectJabatanPengguna.innerHTML = '<option value="Semua Jabatan">- Semua Jabatan -</option>';
             }
+            if (filterJabatan) {
+                filterJabatan.innerHTML = '<option value="">-- Semua Jabatan --</option>'; // Tetapkan semula ruang filter
+            }
 
             senaraiJabatan.forEach(jab => {
                 selectUtama.appendChild(new Option(jab.teks, jab.nilai));
@@ -469,22 +567,18 @@
                 if (selectJabatanPengguna && sessionStorage.getItem("userLulus") !== "YA") {
                     selectJabatanPengguna.appendChild(new Option(jab.teks, jab.nilai));
                 }
+                if (filterJabatan) {
+                    filterJabatan.appendChild(new Option(jab.teks, jab.nilai));
+                }
             });
             selectUtama.disabled = false;
         }
 
-        // ==============================================================================
-        // PENGENDALI FAIL INTERAKTIF (TAMBAH, PAPAR & REMOVE INDIVIDU)
-        // ==============================================================================
         function kendalikanPilihanFail(inputElem, kat) {
             const files = Array.from(inputElem.files);
             const saizMaksimumBytes = 7 * 1024 * 1024; // 7 MB
 
             for (let file of files) {
-                if (failDipilih[kat].length >= 2) {
-                    alert("Ralat: Anda hanya dibenarkan memuat naik maksimum 2 fail PDF sahaja.");
-                    break;
-                }
                 if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
                     alert(`Ralat: Fail "${file.name}" bukan berformat PDF.`);
                     continue;
@@ -493,13 +587,12 @@
                     alert(`Ralat: Fail "${file.name}" melebihi saiz maksimum yang dibenarkan (7 MB).`);
                     continue;
                 }
-                // Semak jika fail sudah ada dalam senarai
                 if (!failDipilih[kat].some(f => f.name === file.name && f.size === file.size)) {
                     failDipilih[kat].push(file);
                 }
             }
             
-            inputElem.value = ""; // Reset input
+            inputElem.value = ""; 
             paparSenaraiFail(kat);
         }
 
@@ -606,8 +699,9 @@
                 const result = await response.json(); 
                 let dataDiterima = Array.isArray(result) ? result : (result.data || []);
                 semuaData = [...dataDiterima].reverse(); 
-                dataBercetak = semuaData;
-                paparJadual(dataBercetak);
+                
+                // Mesti menggunakan `tapisJadual()` bagi memohon sebarang filter selepas data dimuat turun
+                tapisJadual();
             } catch (error) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-red-500">Gagal memuatkan data pangkalan.</td></tr>';
                 kemaskiniKawalanPaginasi(0, 0, 0, 1);
@@ -615,13 +709,14 @@
         }
 
         function paparJadual(data) {
-            dataBercetak = data;
             const tbody = document.getElementById('jadualBody');
             const perananSemasa = document.getElementById('perananPengguna').value;
             const katSemasa = document.getElementById('kategoriPenerbitan').value;
             
             const perananSah = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS PENYELIDIKAN (C-RIE)"];
             const bolehUrus = perananSah.includes(perananSemasa);
+
+            semakPaparanButangMuatTurun();
 
             tbody.innerHTML = '';
             
@@ -658,10 +753,19 @@
                     butangPadam = `<button onclick="padamRekod(${row.Row_Index}, this)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded shadow w-full md:w-auto">Padam</button>`;
                 }
 
-                // JANAKAN PAUTAN DOKUMEN JIKA ADA
+                const cariKunci = (obj, ...kunci) => {
+                    for (let k of kunci) {
+                        if (obj[k]) return obj[k];
+                        const lowK = k.toLowerCase();
+                        const fKey = Object.keys(obj).find(key => key.toLowerCase() === lowK);
+                        if (fKey && obj[fKey]) return obj[fKey];
+                    }
+                    return null;
+                };
+
                 let pautanDokumenHTML = '';
-                const url1 = row.Url_Fail1 || row.Fail_1 || '';
-                const url2 = row.Url_Fail2 || row.Fail_2 || '';
+                const url1 = cariKunci(row, 'Url_Fail1', 'URL_Fail1', 'Fail_1');
+                const url2 = cariKunci(row, 'Url_Fail2', 'URL_Fail2', 'Fail_2');
                 
                 if (url1 || url2) {
                     pautanDokumenHTML += `<div class="mt-2 space-y-1">`;
@@ -670,7 +774,9 @@
                     pautanDokumenHTML += `</div>`;
                 }
 
-                // BUTIRAN SPESIFIK LAJUR
+                // TAMBAH BAIK: Gunakan cariKunci untuk KOD_ID supaya lebih dinamik
+                const kodIdPapar = cariKunci(row, 'KOD_ID', 'Kod_ID', 'KOD ID') || '-';
+
                 let butiranSpesifik = '-';
                 if (katSemasa === 'buku') {
                     butiranSpesifik = `<b>Penerbit:</b> ${row.Penerbit || '-'}<br><span class="text-xs text-gray-500"><b>Bab:</b> ${row.Nama_Bab || '-'} (${row.Mukasurat || '-'} ms)</span>${pautanDokumenHTML}`;
@@ -685,6 +791,7 @@
                         <td class="p-4 text-xs text-gray-500">${row.Timestamp || '-'}</td>
                         <td class="p-4 font-semibold text-gray-800">${row.Jabatan || '-'}</td>
                         <td class="p-4 font-medium text-gray-900">
+                            <span class="bg-purple-100 text-purple-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold mr-1">ID: ${kodIdPapar}</span><br>
                             ${row.Tajuk || '-'}<br>
                             <span class="text-xs text-gray-500 font-normal">Tahun: ${row.Tahun} | ISSN/ISBN: ${row.ISSN_ISBN || 'Tiada'}</span>
                         </td>
@@ -763,6 +870,7 @@
             if (isSahBypass) {
                 document.getElementById('tindakanBorang').value = "edit";
                 document.getElementById('rowIndexSemasa').value = rowIndex;
+                document.getElementById('kodIdSemasa').value = rekod.KOD_ID || rekod.Kod_ID || "";
                 document.getElementById('btnHantar').innerHTML = "Kemaskini Rekod 📝";
                 document.getElementById('btnHantar').classList.replace("bg-blue-600", "bg-yellow-500");
                 document.getElementById('btnHantar').classList.replace("hover:bg-blue-700", "hover:bg-yellow-600");
@@ -835,32 +943,26 @@
             }
         }
 
-        // ==============================================================================
-        // PENAMBAHBAIKAN FUNGSI BATAL EDIT (PENETAPAN SEMULA JABATAN TANPA RELOAD)
-        // ==============================================================================
         function batalEdit() {
-            // Tangkap kategori (tab) semasa sebelum reset
             const katSemasa = document.getElementById('kategoriPenerbitan').value; 
 
             document.getElementById('borangPenerbitan').reset();
             document.getElementById('bekasAhli').innerHTML = '';
             document.getElementById('tindakanBorang').value = "simpan";
             document.getElementById('rowIndexSemasa').value = "";
+            document.getElementById('kodIdSemasa').value = "";
             
-            // RESET SENARAI FAIL
             failDipilih = { buku: [], prosiding: [], umum: [] };
             paparSenaraiFail('buku');
             paparSenaraiFail('prosiding');
             paparSenaraiFail('umum');
 
-            // MEKANISME RE-FILL / AUTO-RETRY DROPDOWN JABATAN
             if (senaraiJabatan.length > 0) {
                 isiPilihanJabatan();
             } else {
                 muatJabatanSistem();
             }
 
-            // Set semula paparan tanpa menukar tab ke 'buku'
             tukarTab(katSemasa); 
             
             document.getElementById('btnHantar').innerHTML = "Hantar Rekod 🚀";
@@ -924,20 +1026,35 @@
             });
         }
 
+        // 🌟 KEMAS KINI LOGIK TAPIS JADUAL
         function tapisJadual() {
             halamanSemasa = 1; 
             const kataKunci = document.getElementById('inputCarian').value.toLowerCase();
+            const filterTahun = document.getElementById('filterTahun').value.toLowerCase();
+            const filterJabatan = document.getElementById('filterJabatan').value;
+            const filterBahasa = document.getElementById('filterBahasa').value;
+
             dataBercetak = semuaData.filter(item => {
-                return (
+                const kodIdVal = item.KOD_ID || item.Kod_ID || '';
+                const matchCarian = (
                     (item.Tajuk && item.Tajuk.toLowerCase().includes(kataKunci)) ||
                     (item.Ketua && item.Ketua.toLowerCase().includes(kataKunci)) ||
-                    (item.Jabatan && item.Jabatan.toLowerCase().includes(kataKunci))
+                    (item.Jabatan && item.Jabatan.toLowerCase().includes(kataKunci)) ||
+                    (kodIdVal && kodIdVal.toLowerCase().includes(kataKunci))
                 );
+
+                const tahunVal = item.Tahun ? String(item.Tahun).toLowerCase() : '';
+                const matchTahun = filterTahun === '' || tahunVal.includes(filterTahun);
+                
+                const matchJabatan = filterJabatan === '' || item.Jabatan === filterJabatan;
+                
+                const matchBahasa = filterBahasa === '' || item.Bahasa === filterBahasa;
+
+                return matchCarian && matchTahun && matchJabatan && matchBahasa;
             });
             paparJadual(dataBercetak);
         }
 
-        // TUKAR FAIL KEPADA BASE64
         function tukarFailKeBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -945,6 +1062,246 @@
                 reader.onload = () => resolve(reader.result.split(',')[1]);
                 reader.onerror = error => reject(error);
             });
+        }
+
+        // ==============================================================================
+        // 🌟 FUNGSI-FUNGSI PENGENDALIAN MODAL & PROSES GABUNG PDF / ZIP DOKUMEN
+        // ==============================================================================
+        function bukaModalMuatTurun() {
+            document.getElementById('modalMuatTurun').classList.remove('hidden');
+            document.getElementById('statusProsesMuatTurun').classList.add('hidden');
+        }
+
+        function tutupModalMuatTurun() {
+            document.getElementById('modalMuatTurun').classList.add('hidden');
+        }
+
+        // 🌟 KAEDAH MEMACU CORS TERUS DARI SERVER GOOGLE USERCONTENT (TELAH DITAMBAH BAIK)
+        // KAEDAH BARU: Menggunakan backend Google Apps Script sendiri sebagai jambatan proksi (CORS Bypass)
+        async function fetchDenganProxy(url) {
+            if (!url || typeof url !== 'string') throw new Error("URL tidak sah");
+            const match = url.match(/[-\w]{25,}/); 
+            const fileId = (match && match[0]) ? match[0] : null;
+            
+            if (!fileId) {
+                throw new Error("ID fail tidak sah.");
+            }
+
+            try {
+                console.log(`Memuat turun fail ID: ${fileId} melalui Apps Script...`);
+                // Memanggil SCRIPT_URL sendiri untuk mendapatkan fail dalam bentuk Base64
+                // Ini mengelakkan sebarang isu CORS dan Rate-Limit kerana menggunakan pelayan Google sendiri
+                const res = await fetch(`${SCRIPT_URL}?action=getFailBase64&fileId=${fileId}`);
+                
+                if (res.ok) {
+                    const result = await res.json();
+                    if (result.status === "BERJAYA" && result.base64) {
+                        // Tukar string Base64 kembali menjadi ArrayBuffer (Binary)
+                        const binaryString = window.atob(result.base64);
+                        const len = binaryString.length;
+                        const bytes = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        
+                        // 🌟 SEMAK HEADERS/MAGIC BYTES PDF (%PDF = 0x25, 0x50, 0x44, 0x46)
+                        if (bytes.length >= 4 && bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) {
+                            console.log(`Berjaya dimuat turun dari Apps Script.`);
+                            return bytes.buffer;
+                        } else {
+                            console.warn(`Amaran: Fail berjaya didapati tetapi bukan format PDF yang sah.`);
+                        }
+                    } else {
+                        throw new Error(result.mesej || "Pelayan GAS tidak mengembalikan data Base64.");
+                    }
+                }
+            } catch (e) {
+                console.warn(`Muat turun melalui Apps Script gagal:`, e.message);
+            }
+            
+            throw new Error("Kaedah muat turun tanpa proksi gagal. Sila pastikan kod Google Apps Script (Code.gs) telah dikemaskini dengan fungsi 'getFailBase64'.");
+        }
+
+        async function kendalikanProsesMuatTurun() {
+            const katSemasa = document.getElementById('kategoriPenerbitan').value;
+            const pilihanFormat = document.querySelector('input[name="formatMuatTurun"]:checked').value;
+            const statusElem = document.getElementById('statusProsesMuatTurun');
+            const btnProses = document.getElementById('btnProsesDownload');
+
+            // Tetapkan Nama Folder Induk Berdasarkan Tab[cite: 14]
+            let namaFolderTab = "Penerbitan_Lain";
+            if (katSemasa === 'buku') namaFolderTab = "Buku_dan_Bab_Dalam_Buku";
+            else if (katSemasa === 'prosiding') namaFolderTab = "Artikel_dan_Prosiding";
+            else if (katSemasa === 'umum') namaFolderTab = "Penerbitan_Umum";
+
+            // 🌟 MUAT TURUN BERDASARKAN DATA YANG TELAH DITAPIS (dataBercetak)
+            let senaraiRekod = [];
+            dataBercetak.forEach(row => {
+                if (row.Status_Pengesahan === 'Disahkan') {
+                    const cariKunciLajur = (obj, ...kunci) => {
+                        for (let k of kunci) {
+                            if (obj[k]) return obj[k];
+                            const lowK = k.toLowerCase();
+                            const foundKey = Object.keys(obj).find(key => key.toLowerCase() === lowK);
+                            if (foundKey && obj[foundKey]) return obj[foundKey];
+                        }
+                        return null;
+                    };
+
+                    const u1 = cariKunciLajur(row, 'Url_Fail1', 'URL_Fail1', 'Fail_1');
+                    const u2 = cariKunciLajur(row, 'Url_Fail2', 'URL_Fail2', 'Fail_2');
+                    
+                    // TAMBAH BAIK: Gunakan cariKunciLajur untuk KOD_ID secara dinamik
+                    const kodIdSebenar = cariKunciLajur(row, 'KOD_ID', 'Kod_ID', 'KOD ID') || 'TIADA_ID';
+                    
+                    // DAPATKAN TAHUN DAN JABATAN UNTUK SUSUNAN FOLDER[cite: 14]
+                    const tahunSemasa = row.Tahun || 'Tiada_Tahun';
+                    const jabatanSemasa = row.Jabatan || 'Tiada_Jabatan';
+
+                    if (u1 || u2) {
+                        const icBersih = (row.IC_Ketua || 'TIADA_IC').toString().replace(/[^0-9]/g, '');
+                        senaraiRekod.push({
+                            id: row.Row_Index,
+                            kodId: kodIdSebenar,
+                            icKetua: icBersih,
+                            tajuk: row.Tajuk || 'Dokumen',
+                            tahun: tahunSemasa,         // Ditambah untuk susunan folder
+                            jabatan: jabatanSemasa,     // Ditambah untuk susunan folder
+                            fail1: u1,
+                            fail2: u2
+                        });
+                    }
+                }
+            });
+
+            if (senaraiRekod.length === 0) {
+                alert("Tiada fail dokumen PDF berstatus 'Disahkan' ditemui untuk dimuat turun dalam saringan paparan ini.");
+                return;
+            }
+
+            statusElem.classList.remove('hidden');
+            statusElem.innerText = "Memulakan proses muat turun... ⏳";
+            btnProses.disabled = true;
+
+            try {
+                if (pilihanFormat === "2") {
+                    // =======================================================
+                    // PILIHAN 2: MERGE PDF (GABUNG) IKUT REKOD DAN MASUK DALAM ZIP[cite: 14]
+                    // =======================================================
+                    statusElem.innerText = "Menyediakan pembungkusan ZIP untuk PDF gabungan... ⏳";
+                    const zip = new JSZip();
+                    let failDimuat = 0;
+
+                    for (let i = 0; i < senaraiRekod.length; i++) {
+                        const rekod = senaraiRekod[i];
+                        statusElem.innerText = `Memproses gabungan untuk rekod (${i + 1}/${senaraiRekod.length})... ⏳`;
+                        
+                        try {
+                            const mergedPdf = await PDFLib.PDFDocument.create();
+                            let adaPdfDigabung = false;
+
+                            const tambahKeMerge = async (urlFail) => {
+                                if (!urlFail) return;
+                                const arrayBuffer = await fetchDenganProxy(urlFail);
+                                const pdfAsal = await PDFLib.PDFDocument.load(arrayBuffer);
+                                const mukaSuratCopied = await mergedPdf.copyPages(pdfAsal, pdfAsal.getPageIndices());
+                                mukaSuratCopied.forEach(page => mergedPdf.addPage(page));
+                                adaPdfDigabung = true;
+                            };
+
+                            await tambahKeMerge(rekod.fail1);
+                            await tambahKeMerge(rekod.fail2);
+
+                            if (adaPdfDigabung) {
+                                const mergedPdfBytes = await mergedPdf.save();
+                                
+                                // Bersihkan nama untuk mengelakkan ralat penamaan fail/folder dalam ZIP
+                                const folderTahun = rekod.tahun.toString().replace(/[^a-zA-Z0-9\s_-]/g, '').trim();
+                                const folderJabatan = rekod.jabatan.toString().replace(/[^a-zA-Z0-9\s_-]/g, '').trim();
+                                const laluanPenuh = `${namaFolderTab}/${folderTahun}/${folderJabatan}`;
+
+                                // Nama fail ditetapkan kepada Kod ID Gabung[cite: 14]
+                                const namaFailMerge = `${rekod.kodId}_gabung.pdf`.replace(/[^a-zA-Z0-9_\-.]/g, '');
+                                
+                                // Memasukkan fail ke dalam laluan folder spesifik[cite: 14]
+                                zip.file(`${laluanPenuh}/${namaFailMerge}`, mergedPdfBytes);
+                                failDimuat++;
+                            }
+                        } catch (errPdf) {
+                            console.error("Gagal menggabung/memuat turun fail untuk rekod:", rekod.kodId, errPdf);
+                        }
+                    }
+
+                    if (failDimuat === 0) {
+                        alert("Semua sambungan gagal untuk memuat turun PDF anda. Sila pastikan Google Apps Script (Code.gs) telah dikemaskini.");
+                        return;
+                    }
+
+                    statusElem.innerText = "Menjana fail ZIP... ⏳";
+                    const zipContent = await zip.generateAsync({ type: "blob" });
+                    saveAs(zipContent, `Dokumen_Penerbitan_${katSemasa.toUpperCase()}_Gabungan.zip`);
+                    statusElem.innerText = "✅ Muat turun ZIP selesai!";
+
+                } else {
+                    // =======================================================
+                    // PILIHAN 1: TANPA GABUNG (ASAL) - DIMUAT TURUN DALAM ZIP[cite: 14]
+                    // =======================================================
+                    statusElem.innerText = "Menyediakan pembungkusan ZIP... ⏳";
+                    const zip = new JSZip();
+                    let failDimuat = 0;
+
+                    for (let i = 0; i < senaraiRekod.length; i++) {
+                        const rekod = senaraiRekod[i];
+                        statusElem.innerText = `Memuat turun fail rekod (${i + 1}/${senaraiRekod.length})... ⏳`;
+                        
+                        const prosesFailAsal = async (urlFail, nomborFail) => {
+                            if (!urlFail) return;
+                            try {
+                                const arrayBuffer = await fetchDenganProxy(urlFail);
+                                // Pembentukan Blob PDF tulen berasaskan ArrayBuffer yang telah disahkan
+                                const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+                                
+                                // Bersihkan nama untuk mengelakkan ralat penamaan fail/folder dalam ZIP
+                                const folderTahun = rekod.tahun.toString().replace(/[^a-zA-Z0-9\s_-]/g, '').trim();
+                                const folderJabatan = rekod.jabatan.toString().replace(/[^a-zA-Z0-9\s_-]/g, '').trim();
+                                const laluanPenuh = `${namaFolderTab}/${folderTahun}/${folderJabatan}`;
+
+                                // Contoh Format: BK-20260818-001_1_820618016121.pdf
+                                const namaFailAsal = `${rekod.kodId}_${nomborFail}_${rekod.icKetua}.pdf`.replace(/[^a-zA-Z0-9_\-.]/g, '');
+                                
+                                // Memasukkan fail ke dalam laluan folder spesifik[cite: 14]
+                                zip.file(`${laluanPenuh}/${namaFailAsal}`, blob);
+                                failDimuat++;
+                            } catch (errZip) {
+                                console.error("Gagal muat fail ke ZIP:", urlFail, errZip);
+                            }
+                        };
+
+                        await prosesFailAsal(rekod.fail1, '1');
+                        await prosesFailAsal(rekod.fail2, '2');
+                    }
+
+                    if (failDimuat === 0) {
+                        alert("Semua sambungan gagal untuk memuat turun PDF anda. Sila pastikan Google Apps Script (Code.gs) telah dikemaskini.");
+                        return;
+                    }
+
+                    statusElem.innerText = "Menjana fail ZIP... ⏳";
+                    const zipContent = await zip.generateAsync({ type: "blob" });
+                    saveAs(zipContent, `Dokumen_Penerbitan_${katSemasa.toUpperCase()}_Asal.zip`);
+                    statusElem.innerText = "✅ Muat turun ZIP selesai!";
+                }
+
+                setTimeout(() => {
+                    tutupModalMuatTurun();
+                }, 1500);
+
+            } catch (errGlobal) {
+                console.error("Ralat muat turun:", errGlobal);
+                alert("Berlaku ralat semasa memproses fail muat turun.");
+            } finally {
+                btnProses.disabled = false;
+            }
         }
 
         // ==============================================================================
@@ -978,6 +1335,7 @@
             
             if (tindakan === "edit") {
                 formData.append("Row_Index", document.getElementById('rowIndexSemasa').value);
+                formData.append("Kod_ID", document.getElementById('kodIdSemasa').value);
             }
             
             formData.append("Kategori_Penerbitan", katSemasa);
@@ -994,8 +1352,9 @@
             formData.append("Bilangan_Ahli", bilAhli);
             formData.append("Senarai_Ahli", JSON.stringify(senaraiAhliJSON));
 
-            // AMBIL FAIL DARIPADA ARRAY INTERAKTIF `failDipilih[katSemasa]`
             const listFail = failDipilih[katSemasa] || [];
+            formData.append("Fail_Is_Gabung", "false");
+            
             for (let i = 0; i < listFail.length; i++) {
                 const base64Data = await tukarFailKeBase64(listFail[i]);
                 formData.append(`Fail_${i + 1}_Nama`, listFail[i].name);
