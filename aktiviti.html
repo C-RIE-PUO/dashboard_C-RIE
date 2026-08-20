@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hub Aktiviti Penyelidikan & Inovasi</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -14,7 +14,7 @@
 <body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col">
 
 <header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 text-white shadow-md select-none">
-    <div class="border-b border-white/10 bg-black/10 backdrop-blur-xs">
+    <div class="border-b border-white/10 bg-black/10 backdrop-blur-sm">
         <div class="max-w-7xl mx-auto px-4 py-2.5 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-2 text-sm">
             <div class="flex items-center flex-wrap justify-center sm:justify-start gap-2">
                 <i class="fa-solid fa-circle-user text-amber-400 text-lg animate-pulse"></i>
@@ -35,7 +35,7 @@
 
     <div class="max-w-7xl mx-auto px-4 py-7 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center justify-center sm:justify-start gap-3 drop-shadow-xs">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center justify-center sm:justify-start gap-3 drop-shadow-md">
                 <i class="fa-solid fa-chart-line text-amber-400 animate-pulse"></i>
                 Hub Aktiviti Penyelidikan & Inovasi
             </h1>
@@ -53,28 +53,28 @@
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8">
         
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
                 <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i class="fa-solid fa-calendar-days text-2xl"></i></div>
                 <div>
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Jumlah Aktiviti</p>
                     <h3 class="text-2xl font-bold text-gray-800" id="statTotal">0</h3>
                 </div>
             </div>
-            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
                 <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg"><i class="fa-solid fa-microscope text-2xl"></i></div>
                 <div>
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Penyelidikan</p>
                     <h3 class="text-2xl font-bold text-gray-800" id="statPenyelidikan">0</h3>
                 </div>
             </div>
-            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
                 <div class="p-3 bg-purple-100 text-purple-600 rounded-lg"><i class="fa-solid fa-lightbulb text-2xl"></i></div>
                 <div>
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Inovasi</p>
                     <h3 class="text-2xl font-bold text-gray-800" id="statInovasi">0</h3>
                 </div>
             </div>
-            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
                 <div class="p-3 bg-amber-100 text-amber-600 rounded-lg"><i class="fa-solid fa-graduation-cap text-2xl"></i></div>
                 <div>
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Bengkel / Impak</p>
@@ -83,19 +83,19 @@
             </div>
         </section>
 
-        <section class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <section class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="relative w-full md:w-1/3">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
                 <input type="text" id="cariAktiviti" oninput="prosesTapisan()" placeholder="Cari nama aktiviti atau info..." 
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 text-sm">
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
             </div>
 
-            <div class="flex flex-wrap w-full md:w-auto gap-3 justify-end">
+            <div class="flex flex-wrap w-full md:w-auto gap-3 justify-end items-center">
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-bold text-gray-500 uppercase"><i class="fa-solid fa-filter mr-1"></i> Kategori:</label>
-                    <select id="filterKategori" onchange="prosesTapisan()" class="bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500">
+                    <select id="filterKategori" onchange="prosesTapisan()" class="bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="SEMUA">Semua Kategori</option>
                         <option value="PENYELIDIKAN">Penyelidikan</option>
                         <option value="INOVASI">Inovasi</option>
@@ -105,22 +105,40 @@
 
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-bold text-gray-500 uppercase"><i class="fa-solid fa-calendar mr-1"></i> Tahun:</label>
-                    <select id="filterTahunAktiviti" onchange="prosesTapisan()" class="bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500">
-                        <option value="SEMUA">Semua Tahun</option>
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                    </select>
+                    <input type="text" id="filterTahunAktiviti" oninput="prosesTapisan()" placeholder="Cth: 2026" class="w-24 bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center">
                 </div>
+                
+                <!-- BUTANG DOWNLOAD CSV TAMBAHAN -->
+                <button id="btnMuatTurunCSV" onclick="muatTurunCSV()" class="hidden items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition">
+                    <i class="fa-solid fa-download"></i> Muat Turun CSV
+                </button>
+
+                <button id="btnTambahAktiviti" onclick="bukaModalTambah()" class="hidden items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition">
+                    <i class="fa-solid fa-plus"></i> Tambah Aktiviti
+                </button>
             </div>
         </section>
 
-        <section id="kawasanKadAktiviti" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            </section>
+        <!-- KAWASAN KAD -->
+        <section id="kawasanKadAktiviti" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></section>
 
-        <div id="tiadaAktiviti" class="hidden text-center py-16 bg-white rounded-xl shadow-xs border border-gray-200">
+        <!-- KAWASAN TIADA REKOD -->
+        <div id="tiadaAktiviti" class="hidden text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
             <i class="fa-regular fa-folder-open text-5xl text-gray-300 mb-3"></i>
             <p class="text-gray-500 font-medium">Tiada aktiviti ditemui berdasarkan tapisan anda.</p>
+        </div>
+
+        <!-- KAWASAN PAGINATION (BARU) -->
+        <div id="paginationControls" class="hidden mt-10 flex flex-wrap justify-center items-center gap-4">
+            <button id="btnPrevPage" onclick="tukarHalaman(-1)" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed font-bold transition flex items-center hover:bg-blue-700">
+                <i class="fa-solid fa-chevron-left mr-2"></i>Sebelum
+            </button>
+            <span id="paparMukaSurat" class="font-bold text-gray-700 bg-white px-4 py-2 rounded border border-gray-200 shadow-sm">
+                Muka Surat 1
+            </span>
+            <button id="btnNextPage" onclick="tukarHalaman(1)" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed font-bold transition flex items-center hover:bg-blue-700">
+                Selepas<i class="fa-solid fa-chevron-right ml-2"></i>
+            </button>
         </div>
 
     </main>
@@ -129,76 +147,158 @@
         <p>&copy; 2026 Sistem Pengurusan Harta Intelek, Penyelidikan & Inovasi.</p>
     </footer>
 
+    <!-- MODAL TAMBAH & EDIT AKTIVITI -->
+    <div id="modalAktiviti" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg border border-gray-200 overflow-hidden">
+            <div id="modalHeader" class="bg-blue-700 px-6 py-4 flex justify-between items-center text-white">
+                <h3 id="tajukModal" class="font-bold text-lg">Tambah Aktiviti Baru</h3>
+                <button onclick="tutupModal()" class="hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="borangAktiviti" class="p-6 space-y-4" onsubmit="simpanAktiviti(event)">
+                <input type="hidden" id="aktiviti_id">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Aktiviti</label>
+                    <input type="text" id="aktiviti_nama" required placeholder="Contoh: BENGKEL INOVASI DIGITAL" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tahun</label>
+                        <input type="number" id="aktiviti_tahun" required placeholder="YYYY" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tarikh</label>
+                        <input type="date" id="aktiviti_tarikh" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
+                    <select id="aktiviti_kategori" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase bg-gray-50">
+                        <option value="PENYELIDIKAN">Penyelidikan</option>
+                        <option value="INOVASI">Inovasi</option>
+                        <option value="BENGKEL">Bengkel & Seminar</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Keterangan (Info)</label>
+                    <textarea id="aktiviti_info" rows="3" required placeholder="Masukkan butiran atau pencapaian..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+                
+                <div id="mesejModal" class="hidden text-sm font-semibold text-center p-2 rounded"></div>
+
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="tutupModal()" class="px-5 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 font-semibold rounded-lg transition">Batal</button>
+                    <button type="submit" id="btnSimpanAktiviti" class="px-5 py-2 text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-lg shadow-md transition">Simpan Rekod</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // URL Google Apps Script Web App
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
+        // MASUKKAN URL GOOGLE APP SCRIPT WEB APP DI SINI
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
 
-// Takrifan global pembolehubah data
-let dataAsalAktiviti = [];
-let dataDipaparkan = [];
-
-// KEMASKINI BARU: Dapatkan nama pengguna dari sessionStorage
-const userNama = (sessionStorage.getItem("nama") || "TETAMU").toUpperCase();
-
-window.onload = () => {
-    // 1. Logik pengesahan sesi/login
-    const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
-    const perananPengguna = (sessionStorage.getItem("peranan") || "TETAMU").trim().toUpperCase();
-
-    // Keamanan: Tendang pengguna keluar jika belum sah login
-    if (!sudahLogin) {
-        alert("Akses ditolak! Sila log masuk terlebih dahulu.");
-        window.location.href = "index.html"; 
-        return; 
-    }
-
-    // 2. Paparkan nama pengguna pada UI Header
-    const paparNamaEl = document.getElementById('paparNamaPengguna');
-    if (paparNamaEl) {
-        paparNamaEl.innerText = userNama;
-    }
-
-    // 🌟 KEMASKINI BARU: Paparkan peranan pengguna pada Badge Lencana
-    const paparPerananEl = document.getElementById('paparPerananPengguna');
-    if (paparPerananEl) {
-        paparPerananEl.innerText = perananPengguna;
+        // Takrifan global pembolehubah data
+        let dataAsalAktiviti = [];
+        let dataDipaparkan = [];
         
-        // Memberi warna berbeza secara automatik jika peranan adalah ADMIN
-        if (perananPengguna === "ADMIN" || perananPengguna === "PENTADBIR") {
-            paparPerananEl.className = "px-2 py-0.5 text-[10px] font-extrabold tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-md uppercase";
-        } else {
-            paparPerananEl.className = "px-2 py-0.5 text-[10px] font-extrabold tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-md uppercase";
+        // PEMBOLEHUBAH PAGINATION
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // Logik Kebenaran (Role-based access)
+        const userNama = (sessionStorage.getItem("nama") || "TETAMU").toUpperCase();
+        const perananPengguna = (sessionStorage.getItem("peranan") || "TETAMU").trim().toUpperCase();
+        
+        // PEMBOLEHUBAH KAWALAN (DITAMBAH FUNGSI PADAM & CSV)
+        const bolehTambah = perananPengguna !== "STAF";
+        const roleDilarangEditPadamDownload = ["PENYELARAS JABATAN", "STAF", "PENYELIA PROJEK PELAJAR"];
+        
+        const bolehEdit = !roleDilarangEditPadamDownload.includes(perananPengguna);
+        const bolehPadam = !roleDilarangEditPadamDownload.includes(perananPengguna);
+        const bolehMuatTurunCSV = !roleDilarangEditPadamDownload.includes(perananPengguna);
+
+        // ==========================================
+        // FUNGSI BARU: FORMAT TARIKH UNTUK PAPARAN
+        // ==========================================
+        function formatTarikhPaparan(tarikhISO) {
+            if (!tarikhISO) return "Akan Dikemaskini";
+            // Periksa jika format adalah YYYY-MM-DD
+            if (tarikhISO.includes('-')) {
+                const parts = tarikhISO.split('-');
+                if (parts.length === 3) {
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`; // Menghasilkan DD/MM/YYYY
+                }
+            }
+            return tarikhISO; // Kembalikan nilai asal jika bukan format yang dijangka
         }
-    }
 
-    // Set tahun otomatis pada elemen liveYear
-    const liveYearEl = document.getElementById('liveYear');
-    if (liveYearEl) {
-        liveYearEl.innerText = new Date().getFullYear();
-    }
+        window.onload = () => {
+            const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
+            if (!sudahLogin) {
+                alert("Akses ditolak! Sila log masuk terlebih dahulu.");
+                window.location.href = "login.html"; 
+                return; 
+            }
 
-    // 3. Ambil rekod dari Google Sheets
-    muatDataDariSheets();
-};
-        // 1. FUNGSI FETCH DATA DARI GOOGLE APPS SCRIPT WEB APP
+            const paparNamaEl = document.getElementById('paparNamaPengguna');
+            if (paparNamaEl) paparNamaEl.innerText = userNama;
+
+            const paparPerananEl = document.getElementById('paparPerananPengguna');
+            if (paparPerananEl) {
+                paparPerananEl.innerText = perananPengguna;
+                if (perananPengguna === "ADMIN" || perananPengguna === "PENTADBIR") {
+                    paparPerananEl.className = "px-2 py-0.5 text-[10px] font-extrabold tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-md uppercase";
+                } else {
+                    paparPerananEl.className = "px-2 py-0.5 text-[10px] font-extrabold tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-md uppercase";
+                }
+            }
+
+            // Peringkat paparan Butang Tambah
+            if (bolehTambah) {
+                const btnTambah = document.getElementById('btnTambahAktiviti');
+                if(btnTambah) {
+                    btnTambah.classList.remove('hidden');
+                    btnTambah.classList.add('flex');
+                }
+            }
+            
+            // Peringkat paparan Butang CSV
+            if (bolehMuatTurunCSV) {
+                const btnMuatTurunCSV = document.getElementById('btnMuatTurunCSV');
+                if(btnMuatTurunCSV) {
+                    btnMuatTurunCSV.classList.remove('hidden');
+                    btnMuatTurunCSV.classList.add('flex');
+                }
+            }
+
+            const liveYearEl = document.getElementById('liveYear');
+            if (liveYearEl) liveYearEl.innerText = new Date().getFullYear();
+
+            muatDataDariSheets();
+        };
+
         async function muatDataDariSheets() {
             const kontena = document.getElementById('kawasanKadAktiviti');
+            const paginationControls = document.getElementById('paginationControls');
+            const mesejKosong = document.getElementById('tiadaAktiviti'); // Pembolehubah ditambah
             
-            // Papar kesan loading spinner semasa data sedang ditarik
+            paginationControls.classList.add('hidden'); // Sembunyi ketika load
+            mesejKosong.classList.add('hidden'); // KEMASKINI BARU: Sembunyikan mesej "tiada aktiviti" semasa proses memuatkan (loading) berlaku
+            
             kontena.innerHTML = `
-                <div class="col-span-full text-center py-16 bg-white rounded-xl border border-gray-100 shadow-xs">
+                <div class="col-span-full text-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
                     <i class="fa-solid fa-spinner fa-spin text-4xl text-blue-600 mb-3"></i>
                     <p class="text-gray-500 font-medium animate-pulse">Sedang memuatkan paparan aktiviti terkini...</p>
                 </div>
             `;
 
             try {
-                const respon = await fetch(SCRIPT_URL);
+                // KEMASKINI: Menghantar parameter action=ambilAktiviti secara spesifik
+                const respon = await fetch(`${SCRIPT_URL}?action=ambilAktiviti`);
                 if (!respon.ok) throw new Error("Respon rangkaian tidak berjaya.");
                 
                 const dataMentah = await respon.json();
 
-                // Proses data & jana elemen UI (ikon, warna badge) secara dinamik berdasarkan kategori sheet
                 dataAsalAktiviti = dataMentah.map(item => {
                     const kategoriBersih = (item.kategori || "PENYELIDIKAN").toUpperCase().trim();
                     let warna = "bg-blue-100 text-blue-800 border-blue-200";
@@ -216,20 +316,21 @@ window.onload = () => {
                     }
 
                     return {
-                        id: item.id || Math.random(),
+                        id: item.id || "",
                         nama: item.nama || "Tiada Nama Aktiviti",
                         tahun: String(item.tahun || ""),
-                        tarikh: item.tarikh || "Akan Dikemaskini",
+                        tarikhSistem: item.tarikh || "", // Disimpan untuk populasikan kembali di form Edit (Memerlukan format ISO)
+                        tarikh: formatTarikhPaparan(item.tarikh), // Digunakan untuk paparan antaramuka (Diubah kepada DD/MM/YYYY)
                         kategori: kategoriBersih,
                         info: item.info || "Tiada maklumat tambahan berkaitan aktiviti ini buat masa sekarang.",
+                        status: (item.status || "BELUM DISAHKAN").toUpperCase(),
                         ikon: ikon,
                         warnaBadge: warna
                     };
                 });
 
-                // Selesai memuatkan data, kemaskini dashboard statistik atas dan senarai kad
                 kemaskiniPapanStatistik(dataAsalAktiviti);
-                prosesTapisan();
+                prosesTapisan(); // Akan mencetuskan binaKadAktiviti dan reset page ke 1
 
             } catch (error) {
                 console.error("Ralat muat data Google Sheet:", error);
@@ -243,43 +344,81 @@ window.onload = () => {
             }
         }
 
-        // 2. FUNGSI TAPISAN & PENGISIHAN (FILTER & SORT)
+        // FUNGSI TAPISAN
         function prosesTapisan() {
             const kataKunci = document.getElementById('cariAktiviti').value.toLowerCase().trim();
             const katDipilih = document.getElementById('filterKategori').value;
-            const tahunDipilih = document.getElementById('filterTahunAktiviti').value;
+            const tahunDipilih = document.getElementById('filterTahunAktiviti').value.trim();
 
-            // Logik Penapisan
             dataDipaparkan = dataAsalAktiviti.filter(item => {
                 let matchKataKunci = item.nama.toLowerCase().includes(kataKunci) || item.info.toLowerCase().includes(kataKunci);
                 let matchKategori = (katDipilih === "SEMUA" || item.kategori === katDipilih);
-                let matchTahun = (tahunDipilih === "SEMUA" || item.tahun === tahunDipilih);
+                let matchTahun = (tahunDipilih === "" || item.tahun.includes(tahunDipilih));
 
                 return matchKataKunci && matchKategori && matchTahun;
             });
 
-            // Isih tahun secara menurun (Tahun Terkini ke Bawah)
+            // Isih tahun secara menurun
             dataDipaparkan.sort((a, b) => Number(b.tahun) - Number(a.tahun));
 
-            binaKadAktiviti();
+            // Reset pagination bila search/filter
+            currentPage = 1;
+            renderPaginasi();
         }
 
-        // 3. FUNGSI STRUKTUR KAD DINAMIK
-        function binaKadAktiviti() {
+        // FUNGSI UNTUK MERENDER MENGIKUT MUKA SURAT
+        function renderPaginasi() {
             const kontena = document.getElementById('kawasanKadAktiviti');
             const mesejKosong = document.getElementById('tiadaAktiviti');
+            const paginationControls = document.getElementById('paginationControls');
             
             kontena.innerHTML = "";
 
             if (dataDipaparkan.length === 0) {
                 mesejKosong.classList.remove('hidden');
+                paginationControls.classList.add('hidden');
                 return;
             }
+            
             mesejKosong.classList.add('hidden');
+            
+            // Pengiraan Total Muka Surat
+            const totalPages = Math.ceil(dataDipaparkan.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
 
-            dataDipaparkan.forEach(item => {
+            // Sembunyikan atau tunjuk butang paginasi jika perlu
+            if (totalPages > 1) {
+                paginationControls.classList.remove('hidden');
+            } else {
+                paginationControls.classList.add('hidden');
+            }
+
+            // Tetapkan Status Butang
+            document.getElementById('paparMukaSurat').innerText = `Muka Surat ${currentPage} dari ${totalPages}`;
+            document.getElementById('btnPrevPage').disabled = (currentPage === 1);
+            document.getElementById('btnNextPage').disabled = (currentPage === totalPages);
+
+            // Gunting Array Mengikut Index Muka Surat Semasa
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const rekodHalamanIni = dataDipaparkan.slice(startIndex, endIndex);
+
+            binaKadAktiviti(rekodHalamanIni, kontena);
+        }
+
+        // FUNGSI TUKAR HALAMAN (BUTANG SEBELUM / SELEPAS)
+        function tukarHalaman(arah) {
+            currentPage += arah;
+            renderPaginasi();
+            // Scroll sedikit ke atas
+            document.getElementById('kawasanKadAktiviti').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function binaKadAktiviti(senaraiRekod, kontena) {
+            senaraiRekod.forEach(item => {
                 const kad = document.createElement('div');
-                kad.className = "bg-white rounded-2xl shadow-xs hover:shadow-xl border border-gray-100 p-6 flex flex-col justify-between transform hover:-translate-y-1 transition duration-300 relative overflow-hidden";
+                kad.className = "bg-white rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 p-6 flex flex-col justify-between transform hover:-translate-y-1 transition duration-300 relative overflow-hidden";
                 
                 let borderWarnaTop = "border-blue-500";
                 if(item.kategori === "INOVASI") borderWarnaTop = "border-purple-500";
@@ -287,6 +426,27 @@ window.onload = () => {
                 if(item.kategori === "PENYELIDIKAN") borderWarnaTop = "border-emerald-500";
                 
                 kad.classList.add('border-t-4', borderWarnaTop);
+
+                let butangTindakanHTML = '';
+                
+                // Tambahan Butang Edit & Padam
+                if (item.status === "BELUM DISAHKAN") {
+                    if (bolehEdit) {
+                        // KEMASKINI: Menggunakan item.tarikhSistem supaya butang edit boleh membaca YYYY-MM-DD
+                        butangTindakanHTML += `
+                            <button onclick="bukaModalEdit('${item.id}', '${item.nama.replace(/'/g, "\\'")}', '${item.tahun}', '${item.tarikhSistem}', '${item.kategori}', '${item.info.replace(/'/g, "\\'")}')" class="text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1 cursor-pointer mr-3">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </button>
+                        `;
+                    }
+                    if (bolehPadam) {
+                        butangTindakanHTML += `
+                            <button onclick="padamAktiviti('${item.id}', '${item.nama.replace(/'/g, "\\'")}')" class="text-red-600 hover:text-red-700 font-bold flex items-center gap-1 cursor-pointer mr-3">
+                                <i class="fa-solid fa-trash"></i> Padam
+                            </button>
+                        `;
+                    }
+                }
 
                 kad.innerHTML = `
                     <div>
@@ -306,17 +466,21 @@ window.onload = () => {
                         </p>
                     </div>
                     <div class="pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600 mt-auto">
-                        <span class="font-medium"><i class="fa-regular fa-clock text-gray-400 mr-1"></i> ${item.tarikh}</span>
-                        <button onclick="paparDetail('${item.nama.replace(/'/g, "\\'")}', '${item.tarikh}', '${item.info.replace(/'/g, "\\'")}')" class="text-blue-600 hover:text-indigo-800 font-bold flex items-center gap-1 cursor-pointer">
-                            Info Lanjut <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </button>
+                        <span class="font-medium flex items-center gap-1">
+                            <i class="fa-regular fa-clock text-gray-400"></i> ${item.tarikh}
+                        </span>
+                        <div class="flex items-center">
+                            ${butangTindakanHTML}
+                            <button onclick="paparDetail('${item.nama.replace(/'/g, "\\'")}', '${item.tarikh}', '${item.info.replace(/'/g, "\\'")}')" class="text-blue-600 hover:text-indigo-800 font-bold flex items-center gap-1 cursor-pointer">
+                                Info Lanjut <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
                 kontena.appendChild(kad);
             });
         }
 
-        // 4. MENGIRA DASHBOARD STATISTIK SECARA DINAMIK
         function kemaskiniPapanStatistik(senarai) {
             document.getElementById('statTotal').innerText = senarai.length;
             document.getElementById('statPenyelidikan').innerText = senarai.filter(i => i.kategori === "PENYELIDIKAN").length;
@@ -324,9 +488,179 @@ window.onload = () => {
             document.getElementById('statBengkel').innerText = senarai.filter(i => i.kategori === "BENGKEL").length;
         }
 
-        // 5. RESPONS POPUP INFO
         function paparDetail(nama, tarikh, info) {
             alert(`📌 INFO AKTIVITI\n\nNama: ${nama}\nTarikh: ${tarikh}\n\nKeterangan:\n${info}`);
+        }
+
+        // ==========================================
+        // FUNGSI MUAT TURUN CSV (BARU)
+        // ==========================================
+        function muatTurunCSV() {
+            if (dataDipaparkan.length === 0) {
+                alert("Tiada rekod untuk dimuat turun berdasarkan tapisan semasa.");
+                return;
+            }
+
+            // Membina Pengepala (Headers)
+            const headers = ["ID", "NAMA AKTIVITI", "TAHUN", "TARIKH", "KATEGORI", "STATUS", "INFO KETERANGAN"];
+            const barisCSV = [];
+            barisCSV.push(headers.join(","));
+
+            // Membina Data CSV
+            dataDipaparkan.forEach(item => {
+                // Melarikan (escape) tanda kutip " di dalam rentetan CSV
+                const nilai = [
+                    `"${item.id}"`,
+                    `"${item.nama.replace(/"/g, '""')}"`,
+                    `"${item.tahun}"`,
+                    `"${item.tarikh}"`, // Ini akan mengekstrak format DD/MM/YYYY
+                    `"${item.kategori}"`,
+                    `"${item.status}"`,
+                    `"${item.info.replace(/"/g, '""')}"`
+                ];
+                barisCSV.push(nilai.join(","));
+            });
+
+            // Menyediakan Blob untuk fail dimuat turun
+            const rentetanCSV = barisCSV.join("\n");
+            const blob = new Blob(["\uFEFF" + rentetanCSV], { type: 'text/csv;charset=utf-8;' }); // \uFEFF disertakan agar format Excel utf-8 boleh dibaca terus
+            const url = URL.createObjectURL(blob);
+            
+            // Mencipta pautan memuat turun
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Senarai_Aktiviti_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==========================================
+        // FUNGSI PADAM AKTIVITI (BARU)
+        // ==========================================
+        function padamAktiviti(id, nama) {
+            const pengesahan = confirm(`AWAS: Adakah anda pasti mahu memadam rekod aktiviti ini secara kekal?\n\n"${nama}"`);
+            
+            if (!pengesahan) return;
+
+            // Menggunakan fetch untuk hantar permintaan padam ke Google Apps Script
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "padamAktiviti", ID: id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'BERJAYA') {
+                    alert("Rekod berjaya dipadam!");
+                    muatDataDariSheets(); // Muat semula senarai
+                } else {
+                    alert("Gagal memadam rekod: " + (data.mesej || "Sila cuba lagi."));
+                }
+            })
+            .catch(error => {
+                console.error("Ralat Padam:", error);
+                alert("Ralat pelayan/rangkaian semasa cuba memadam rekod.");
+            });
+        }
+
+
+        // ==========================================
+        // FUNGSI MODAL & PENYIMPANAN
+        // ==========================================
+        const modal = document.getElementById('modalAktiviti');
+        
+        function bukaModalTambah() {
+            document.getElementById('borangAktiviti').reset();
+            document.getElementById('aktiviti_id').value = ""; 
+            document.getElementById('tajukModal').innerText = "Tambah Aktiviti Baru";
+            document.getElementById('modalHeader').className = "bg-blue-700 px-6 py-4 flex justify-between items-center text-white";
+            document.getElementById('mesejModal').classList.add('hidden');
+			// Pastikan butang aktif dan kembali kepada "Simpan Rekod"
+            const btn = document.getElementById('btnSimpanAktiviti');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Simpan Rekod";
+            }
+			
+            modal.classList.remove('hidden');
+        }
+
+        function bukaModalEdit(id, nama, tahun, tarikh, kategori, info) {
+            document.getElementById('aktiviti_id').value = id; 
+            document.getElementById('aktiviti_nama').value = nama;
+            document.getElementById('aktiviti_tahun').value = tahun;
+            document.getElementById('aktiviti_tarikh').value = tarikh;
+            document.getElementById('aktiviti_kategori').value = kategori;
+            document.getElementById('aktiviti_info').value = info;
+
+            document.getElementById('tajukModal').innerText = "Kemaskini Rekod Aktiviti";
+            document.getElementById('modalHeader').className = "bg-amber-600 px-6 py-4 flex justify-between items-center text-white";
+            document.getElementById('mesejModal').classList.add('hidden');
+            modal.classList.remove('hidden');
+        }
+
+        function tutupModal() {
+            modal.classList.add('hidden');
+        }
+
+        function simpanAktiviti(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btnSimpanAktiviti');
+            const mesej = document.getElementById('mesejModal');
+            
+            btn.disabled = true; 
+            btn.innerText = "Menyimpan...";
+            mesej.classList.add('hidden');
+
+            const idSediaAda = document.getElementById('aktiviti_id').value;
+            
+            const payload = {
+                action: idSediaAda ? "kemaskiniAktiviti" : "tambahAktiviti",
+                ID: idSediaAda, // Jika id kosong, backend (Code.gs) akan jana ID secara auto 'AKT-x'
+                NAMA: document.getElementById('aktiviti_nama').value.toUpperCase(),
+                TAHUN: document.getElementById('aktiviti_tahun').value,
+                TARIKH: document.getElementById('aktiviti_tarikh').value,
+                KATEGORI: document.getElementById('aktiviti_kategori').value,
+                INFO: document.getElementById('aktiviti_info').value
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                mesej.classList.remove('hidden');
+                if (data.status === 'BERJAYA') {
+                    mesej.className = "text-sm font-semibold text-center p-2 rounded bg-green-100 text-green-800 border border-green-200 mt-4";
+                    mesej.innerText = idSediaAda ? "Rekod berjaya dikemaskini!" : `Rekod baru berjaya ditambah (${data.id_baru})!`;
+                    
+                    setTimeout(() => {
+                        tutupModal();
+                        muatDataDariSheets(); // Panggil data segar
+						// ======== KOD BARU DITAMBAH DI SINI ========
+                        // Reset semula butang supaya boleh digunakan untuk rekod seterusnya
+                        btn.disabled = false; 
+                        btn.innerText = "Simpan Rekod";
+                        // ===========================================
+                    }, 2000);
+                } else {
+                    mesej.className = "text-sm font-semibold text-center p-2 rounded bg-red-100 text-red-800 border border-red-200 mt-4";
+                    mesej.innerText = data.mesej || "Gagal menyimpan rekod.";
+                    btn.disabled = false; 
+                    btn.innerText = "Simpan Rekod";
+                }
+            })
+            .catch(error => {
+                mesej.classList.remove('hidden');
+                mesej.className = "text-sm font-semibold text-center p-2 rounded bg-red-100 text-red-800 border border-red-200 mt-4";
+                mesej.innerText = "Ralat pelayan/rangkaian.";
+                btn.disabled = false; 
+                btn.innerText = "Simpan Rekod";
+            });
         }
     </script>
 </body>
