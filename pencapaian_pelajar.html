@@ -15,8 +15,12 @@
             window.location.href = "login.html";
         }
 
-        // Semak jika pengguna mempunyai akses kemaskini penuh
-        const bolehEditPenuh = ["PENYELARAS INOVASI", "KUPIK", "ADMIN"].includes(userPeranan.toUpperCase());
+        // Semak jika pengguna mempunyai akses kemaskini penuh sedia ada
+        const bolehEditPenuh = ["PENYELARAS INOVASI", "PENYELARAS INOVASI (C-RIE)", "KUPIK", "ADMIN"].includes(userPeranan.toUpperCase());
+        
+        // KAWALAN BAHARU: Akses spesifik untuk Tambah dan Padam
+        const perananKhasTambahPadam = ["ADMIN", "KUPIK", "PENYELARAS INOVAS (C-RIE)", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS INOVASI", "PENYELARAS PROJEK (CRIE)"];
+        const bolehTambahPadam = perananKhasTambahPadam.includes(userPeranan.toUpperCase());
     </script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
@@ -38,7 +42,7 @@
                 <a href="projek_pelajar.html" class="bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-indigo-800 transition text-sm flex items-center gap-2">
                     🎓 Pencalonan Projek Pelajar
                 </a>
-                <a href="projek_pelajar.html" class="bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-emerald-800 transition text-sm flex items-center gap-2">
+                <a href="projek_pelajar.html?action=daftar" class="bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-emerald-800 transition text-sm flex items-center gap-2">
                     ➕ Daftar Projek
                 </a>
                 <a href="paparan.html" class="bg-slate-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-slate-800 transition text-sm flex items-center gap-2">
@@ -72,7 +76,7 @@
         <div class="mb-6">
             <h2 class="text-sm font-bold text-gray-700 mb-3 uppercase border-b pb-2">🏢 Statistik Pencapaian Mengikut Jabatan</h2>
             <div id="statistikJabatan" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                </div>
+            </div>
         </div>
         
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 items-end">
@@ -100,8 +104,19 @@
             </div>
             <div class="w-full md:w-auto ml-auto flex gap-2">
                 <div id="paparMesejUI" class="hidden font-bold text-sm px-4 py-2 rounded-lg flex items-center text-white shadow-md"></div>
+                
+                <!-- BUTANG TAMBAH DATA PUKAL (Baru) -->
+                <button id="btnMuatNaikPukal" onclick="bukaModalPukal()" class="hidden bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 shadow-md transition flex items-center gap-2">
+                    📤 Muat Naik Pukal
+                </button>
+
+                <!-- BUTANG TAMBAH DATA MANUAL -->
+                <button id="btnTambahData" onclick="bukaModalTambah()" class="hidden bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 shadow-md transition flex items-center gap-2">
+                    ➕ Tambah Manual
+                </button>
+
                 <button onclick="downloadCSV()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2">
-                    📥 Download CSV
+                    📥 Download Laporan
                 </button>
                 <button onclick="muatDataPencapaian()" class="bg-amber-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-amber-600 shadow-md">🔄 Refresh</button>
             </div>
@@ -136,6 +151,7 @@
         </div>
     </main>
 
+    <!-- MODAL KEMASKINI SEDIA ADA -->
     <div id="modalKemaskini" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-y-auto">
             <div class="bg-amber-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
@@ -165,11 +181,19 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan</label>
-                            <input type="text" id="in_jabatan" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
+                            <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
+                            <select id="in_jabatan" class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
+                                <option value="">-- SILA PILIH JABATAN --</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Kategori</label>
-                            <input type="text" id="in_kategori" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
+                            <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
+                            <select id="in_kategori" class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
+                                <option value="">-- SILA PILIH KATEGORI --</option>
+                                <option value="TEKNIKAL">TEKNIKAL</option>
+                                <option value="SAINS SOSIAL">SAINS SOSIAL</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua Projek</label>
@@ -202,12 +226,126 @@
         </div>
     </div>
 
+    <!-- MODAL TAMBAH DATA MANUAL -->
+    <div id="modalTambah" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-y-auto">
+            <div class="bg-blue-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
+                <h3 class="font-bold text-lg">➕ Tambah Pencapaian Manual</h3>
+                <button onclick="tutupModalTambah()" class="hover:text-blue-200 text-2xl font-bold leading-none">&times;</button>
+            </div>
+            
+            <div class="p-6">
+                <div class="mb-4 p-3 bg-blue-50 text-blue-800 text-xs font-bold rounded-lg border border-blue-200">
+                    ℹ️ Projek ID tidak perlu dimasukkan. Ia akan dijana secara automatik berdasarkan format (Contoh: JKA-2025-1001).
+                </div>
+                <form id="borangTambah" onsubmit="simpanTambah(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
+                            <input type="number" id="tambah_tahun" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
+                            <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
+                            <select id="tambah_jabatan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="">-- SILA PILIH JABATAN --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Projek <span class="text-red-500">*</span></label>
+                            <input type="text" id="tambah_nama_projek" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
+                            <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
+                            <select id="tambah_kategori" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="">-- SILA PILIH KATEGORI --</option>
+                                <option value="TEKNIKAL">TEKNIKAL</option>
+                                <option value="SAINS SOSIAL">SAINS SOSIAL</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua Projek</label>
+                            <input type="text" id="tambah_nama_ketua" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Penyelia Projek</label>
+                            <input type="text" id="tambah_penyelia" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+
+                        <div class="md:col-span-2 p-3 bg-blue-50 rounded-lg border border-blue-200 mt-2">
+                            <label class="block text-sm font-bold text-blue-800 mb-2">🏅 Pencapaian <span class="text-red-500">*</span></label>
+                            <select id="tambah_pencapaian" required class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-900 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="">-- SILA PILIH PENCAPAIAN --</option>
+                                <option value="EMAS">EMAS</option>
+                                <option value="PERAK">PERAK</option>
+                                <option value="GANGSA">GANGSA</option>
+                                <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN</option>
+                                <option value="TIADA">TIADA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+                        <button type="button" onclick="tutupModalTambah()" class="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Batal</button>
+                        <button type="submit" id="btnSimpanTambah" class="px-8 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg">Simpan Rekod</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL MUAT NAIK PUKAL (BAHARU) -->
+    <div id="modalPukal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-y-auto">
+            <div class="bg-purple-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
+                <h3 class="font-bold text-lg">📤 Muat Naik Data Pukal</h3>
+                <button onclick="tutupModalPukal()" class="hover:text-purple-200 text-2xl font-bold leading-none">&times;</button>
+            </div>
+            
+            <div class="p-6">
+                <div class="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <h4 class="font-bold text-purple-800 mb-2">Panduan Muat Naik Pukal:</h4>
+                    <ol class="list-decimal list-inside text-sm text-purple-700 space-y-1">
+                        <li>Muat turun template CSV yang disediakan.</li>
+                        <li>Jangan ubah tajuk lajur (Header) di dalam template.</li>
+                        <li>Projek ID dijana secara automatik. Jangan cipta lajur Projek ID.</li>
+                        <li>Simpan fail sebagai <strong>.csv</strong> dan muat naik di bawah.</li>
+                    </ol>
+                    <button onclick="muatTurunTemplatePukal()" class="mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-4 rounded text-xs shadow transition">
+                        ⬇️ Muat Turun Template CSV
+                    </button>
+                </div>
+
+                <div class="mb-4 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Fail CSV Data Pencapaian</label>
+                    <input type="file" id="failPukal" accept=".csv" onchange="semakDataPukal(event)" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer">
+                </div>
+
+                <!-- Statistik Prebiu Pukal -->
+                <div id="pukalStatistikAwal" class="hidden bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                    <h4 class="font-bold text-gray-700 border-b pb-2 mb-2">📊 Semakan Statistik Data (Prebiu)</h4>
+                    <div id="pukalStatsKandungan" class="text-sm text-gray-600 space-y-1">
+                        <!-- Dimuatkan menerusi JS -->
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+                    <button type="button" onclick="tutupModalPukal()" class="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Batal</button>
+                    <button type="button" id="btnSimpanPukal" onclick="simpanPukal()" class="hidden px-8 py-2.5 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition shadow-lg">Muat Naik Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ⚠️ MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
         let dataGlobal = [];
-        let dataDitapisGlobal = []; // Disimpan untuk fungsi export CSV
+        let dataDitapisGlobal = [];
+        let parsedPukalData = []; // Untuk simpan data CSV sementara
         
         let currentPage = 1;
         const rowsPerPage = 10;
@@ -216,8 +354,43 @@
             if(bolehEditPenuh) {
                 document.getElementById('amaranPeranan').classList.remove('hidden');
             }
+            if(bolehTambahPadam) {
+                document.getElementById('btnTambahData').classList.remove('hidden');
+                document.getElementById('btnMuatNaikPukal').classList.remove('hidden');
+            }
             muatDataPencapaian();
+            muatPilihanJabatan(); // <-- FUNGSI BAHARU DIPANGGIL DI SINI
         };
+
+        // ================= FUNGSI BAHARU: MUAT PILIHAN JABATAN =================
+        function extractSingkatan(teks) {
+            // Regex mencari teks dalam kurungan. Cth: "JABATAN KEJURUTERAAN AWAM (JKA)" -> "JKA"
+            const match = teks.match(/\(([^)]+)\)/);
+            return match ? match[1].trim() : teks.trim();
+        }
+
+        function muatPilihanJabatan() {
+            fetch(`${SCRIPT_URL}?action=ambilPilihan`)
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === "BERJAYA" && result.jabatan) {
+                    const selTambah = document.getElementById('tambah_jabatan');
+                    const selKemaskini = document.getElementById('in_jabatan');
+                    
+                    let optionsHTML = '<option value="">-- SILA PILIH JABATAN --</option>';
+                    result.jabatan.forEach(jab => {
+                        let singkatan = extractSingkatan(jab);
+                        // Filter jabatan mengikut singkatan sebagai 'value' dan text paparan
+                        optionsHTML += `<option value="${singkatan}">${singkatan}</option>`;
+                    });
+                    
+                    selTambah.innerHTML = optionsHTML;
+                    selKemaskini.innerHTML = optionsHTML;
+                }
+            }).catch(err => console.error("Ralat memuat turun senarai jabatan", err));
+        }
+
+        // =========================================================================
 
         function muatDataPencapaian() {
             const tbody = document.getElementById('isiJadual');
@@ -261,9 +434,8 @@
             const valJabatan = document.getElementById('filterJabatan').value;
             const valPencapaian = document.getElementById('filterPencapaian').value;
 
-            // 1. Tapis Data
             dataDitapisGlobal = dataGlobal.filter(item => {
-                let matchTahun = (valTahun === "SEMUA" || item.tahun === valTahun);
+                let matchTahun = (valTahun === "SEMUA" || item.tahun == valTahun);
                 let matchJabatan = (valJabatan === "SEMUA" || item.jabatan.toUpperCase() === valJabatan);
                 let matchPencapaian = (valPencapaian === "SEMUA" || (item.pencapaian || "").toUpperCase() === valPencapaian);
                 return matchTahun && matchJabatan && matchPencapaian;
@@ -271,7 +443,6 @@
 
             KiraStatistik(dataDitapisGlobal);
 
-            // 2. Logik Pagination
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
             const dataPaginasi = dataDitapisGlobal.slice(startIndex, endIndex);
@@ -284,7 +455,6 @@
                 return;
             }
 
-            // 3. Papar Data Paginasi
             dataPaginasi.forEach((row) => {
                 let badgeColor = "bg-gray-100 text-gray-600";
                 let badgeIkon = "";
@@ -295,10 +465,9 @@
                 else if(statusPencapaian === "GANGSA") { badgeColor = "bg-orange-100 text-orange-800 border border-orange-300"; badgeIkon = "🥉"; }
                 else if(statusPencapaian.includes("SIJIL")) { badgeColor = "bg-blue-50 text-blue-700 border border-blue-200"; badgeIkon = "📜"; }
 
-                // Jika pengguna ada akses Admin/Penyelaras Inovasi, tunjuk butang. Kalau Staf, tunjuk sengkang (-)
-                let aksiBtn = bolehEditPenuh 
-                    ? `<button onclick="bukaModalKemaskini('${row.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition">Kemaskini</button>` 
-                    : `<span class="text-xs text-gray-400 font-bold">-</span>`;
+                let btnEdit = bolehEditPenuh ? `<button onclick="bukaModalKemaskini('${row.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition">Kemaskini</button>` : ``;
+                let btnPadam = bolehTambahPadam ? `<button onclick="padamRekodPencapaian('${row.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition mt-1">Padam</button>` : ``;
+                let aksiBtn = (btnEdit || btnPadam) ? `<div class="flex flex-col">${btnEdit}${btnPadam}</div>` : `<span class="text-xs text-gray-400 font-bold block text-center">-</span>`;
 
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-amber-50/50 transition duration-150 text-xs";
@@ -317,9 +486,7 @@
                             ${badgeIkon} ${row.pencapaian || 'BELUM DIKEMASKINI'}
                         </span>
                     </td>
-                    <td class="p-3 text-center w-24">
-                        ${aksiBtn}
-                    </td>
+                    <td class="p-3 text-center w-24 align-middle">${aksiBtn}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -358,13 +525,10 @@
             document.getElementById('statPerak').innerText = perak;
             document.getElementById('statGangsa').innerText = gangsa;
 
-            // --- KIRA STATISTIK MENGIKUT JABATAN ---
             let statJabatan = {};
             data.forEach(d => {
                 let jab = (d.jabatan || "TIADA").toUpperCase();
-                if (!statJabatan[jab]) {
-                    statJabatan[jab] = { total: 0, emas: 0, perak: 0, gangsa: 0 };
-                }
+                if (!statJabatan[jab]) statJabatan[jab] = { total: 0, emas: 0, perak: 0, gangsa: 0 };
                 statJabatan[jab].total++;
                 let pencapaian = (d.pencapaian || "").toUpperCase();
                 if (pencapaian === "EMAS") statJabatan[jab].emas++;
@@ -380,9 +544,7 @@
                 return;
             }
 
-            // Susun Jabatan mengikut abjad
             let senaraiJab = Object.keys(statJabatan).sort();
-
             senaraiJab.forEach(jab => {
                 let s = statJabatan[jab];
                 let cardHTML = `
@@ -416,21 +578,17 @@
                 alert("Tiada rekod untuk dieksport.");
                 return;
             }
-
             paparToast("⏳ Menyediakan fail untuk dimuat turun...", "blue");
 
             let csvContent = "PROJEK ID,TAHUN,JABATAN,KATEGORI,NAMA PROJEK,NAMA KETUA,PENYELIA PROJEK,PENCAPAIAN\n";
-            
             dataDitapisGlobal.forEach(r => {
                 let clean = (str) => `"${(str || "").replace(/"/g, '""')}"`;
-                
                 csvContent += `${clean(r.id)},${clean(r.tahun)},${clean(r.jabatan)},${clean(r.kategori)},${clean(r.namaProjek)},${clean(r.namaKetua)},${clean(r.penyelia)},${clean(r.pencapaian || "TIADA")}\n`;
             });
 
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            
             link.setAttribute("href", url);
             link.setAttribute("download", "Laporan_Pencapaian_Pelajar.csv");
             document.body.appendChild(link);
@@ -440,10 +598,179 @@
             setTimeout(() => { paparToast("✅ Berjaya dimuat turun!", "green"); }, 1000);
         }
 
-        // ================= PENGURUSAN MODAL KEMASKINI =================
-        function bukaModalKemaskini(id) {
-            if (!bolehEditPenuh) return; // Lapisan keselamatan tambahan
+        // ================= MUAT NAIK PUKAL (BAHARU) =================
+        function bukaModalPukal() {
+            if (!bolehTambahPadam) return;
+            document.getElementById('failPukal').value = "";
+            document.getElementById('pukalStatistikAwal').classList.add('hidden');
+            document.getElementById('btnSimpanPukal').classList.add('hidden');
+            parsedPukalData = [];
+            document.getElementById('modalPukal').classList.remove('hidden');
+        }
 
+        function tutupModalPukal() { document.getElementById('modalPukal').classList.add('hidden'); }
+
+        function muatTurunTemplatePukal() {
+            let csv = "TAHUN,JABATAN,KATEGORI,NAMA PROJEK,KETUA PROJEK,PENYELIA,PENCAPAIAN\n";
+            csv += "2025,JKA,INOVASI PENSYARAH,SISTEM A,ALI,ABU,EMAS\n";
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", "Template_Upload_Pukal.csv");
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        // Fungsi CSV Parser
+        function csvToArr(strData) {
+            const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\"\\,\\r\\n]*))"), "gi");
+            let arrData = [[]], arrMatches = null;
+            while (arrMatches = objPattern.exec(strData)) {
+                let strMatchedDelimiter = arrMatches[1];
+                if (strMatchedDelimiter.length && strMatchedDelimiter !== ",") arrData.push([]);
+                let strMatchedValue;
+                if (arrMatches[2]) strMatchedValue = arrMatches[2].replace(new RegExp("\"\"", "g"), "\"");
+                else strMatchedValue = arrMatches[3];
+                arrData[arrData.length - 1].push(strMatchedValue);
+            }
+            return arrData;
+        }
+
+        function semakDataPukal(event) {
+            const fail = event.target.files[0];
+            if (!fail) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const arrayData = csvToArr(text);
+                
+                if(arrayData.length < 2) {
+                    alert("Fail CSV tiada data."); return;
+                }
+
+                const headers = arrayData[0].map(h => h ? h.trim().toUpperCase() : "");
+                parsedPukalData = [];
+                
+                for (let i = 1; i < arrayData.length; i++) {
+                    if (arrayData[i].length === 1 && !arrayData[i][0]) continue; // baris kosong
+                    let obj = {};
+                    for (let j = 0; j < headers.length; j++) {
+                        obj[headers[j]] = (arrayData[i][j] || "").trim();
+                    }
+                    if(obj["JABATAN"] && obj["TAHUN"]) {
+                        parsedPukalData.push(obj);
+                    }
+                }
+
+                // Kira Statistik
+                let total = parsedPukalData.length;
+                let emas = 0, perak = 0, gangsa = 0;
+                let jabatanSet = new Set();
+                
+                parsedPukalData.forEach(r => {
+                    jabatanSet.add(r["JABATAN"]);
+                    let p = (r["PENCAPAIAN"] || "").toUpperCase();
+                    if(p === 'EMAS') emas++;
+                    if(p === 'PERAK') perak++;
+                    if(p === 'GANGSA') gangsa++;
+                });
+
+                document.getElementById('pukalStatsKandungan').innerHTML = `
+                    <div class="flex justify-between"><span>Jumlah Data Sedia Dimuat Naik:</span> <strong>${total}</strong></div>
+                    <div class="flex justify-between"><span>Bilangan Jabatan Terlibat:</span> <strong>${jabatanSet.size}</strong></div>
+                    <div class="flex justify-between text-amber-600 mt-2"><span>🥇 Emas:</span> <strong>${emas}</strong></div>
+                    <div class="flex justify-between text-slate-600"><span>🥈 Perak:</span> <strong>${perak}</strong></div>
+                    <div class="flex justify-between text-orange-600"><span>🥉 Gangsa:</span> <strong>${gangsa}</strong></div>
+                `;
+                
+                document.getElementById('pukalStatistikAwal').classList.remove('hidden');
+                
+                if(total > 0) {
+                    document.getElementById('btnSimpanPukal').classList.remove('hidden');
+                } else {
+                    document.getElementById('btnSimpanPukal').classList.add('hidden');
+                }
+            };
+            reader.readAsText(fail);
+        }
+
+        function simpanPukal() {
+            if(parsedPukalData.length === 0) return;
+            const btn = document.getElementById('btnSimpanPukal');
+            btn.disabled = true; btn.innerText = "⏳ Sedang Memuat Naik...";
+
+            fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: "tambahPencapaianPukal", data: parsedPukalData }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                paparToast(data.status === "BERJAYA" ? `✅ ${data.mesej}` : `❌ ${data.mesej}`, data.status === "BERJAYA" ? "green" : "red");
+                if(data.status === "BERJAYA") { 
+                    tutupModalPukal(); 
+                    muatDataPencapaian(); 
+                }
+            }).catch(() => {
+                paparToast("❌ Ralat Pelayan.", "red");
+            }).finally(() => { 
+                btn.disabled = false; btn.innerText = "Muat Naik Data"; 
+            });
+        }
+
+        // ================= PENGURUSAN TAMBAH DATA MANUAL =================
+        function bukaModalTambah() {
+            if (!bolehTambahPadam) return; 
+            document.getElementById('borangTambah').reset();
+            document.getElementById('modalTambah').classList.remove('hidden');
+        }
+
+        function tutupModalTambah() { document.getElementById('modalTambah').classList.add('hidden'); }
+
+        function simpanTambah(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpanTambah');
+            btn.disabled = true; btn.innerText = "⏳ Menyimpan...";
+
+            const payload = {
+                action: "tambahPencapaianPelajar", 
+                TAHUN: document.getElementById('tambah_tahun').value,
+                PENCAPAIAN: document.getElementById('tambah_pencapaian').value,
+                NAMA_PROJEK: document.getElementById('tambah_nama_projek').value.toUpperCase(),
+                JABATAN: document.getElementById('tambah_jabatan').value.toUpperCase(),
+                KATEGORI: document.getElementById('tambah_kategori').value.toUpperCase(),
+                NAMA_KETUA: document.getElementById('tambah_nama_ketua').value.toUpperCase(),
+                PENYELIA: document.getElementById('tambah_penyelia').value.toUpperCase()
+            };
+
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(data => {
+                paparToast(data.status === "BERJAYA" ? `✅ ${data.mesej}` : `❌ ${data.mesej}`, data.status === "BERJAYA" ? "green" : "red");
+                if(data.status === "BERJAYA") { 
+                    tutupModalTambah(); 
+                    muatDataPencapaian(); 
+                }
+            }).finally(() => { 
+                btn.disabled = false; btn.innerText = "Simpan Rekod"; 
+            });
+        }
+
+        // ================= PENGURUSAN PADAM & KEMASKINI =================
+        function padamRekodPencapaian(id) {
+            if (!bolehTambahPadam) return;
+            if(!confirm(`Amaran: Anda pasti mahu memadam rekod pencapaian untuk Projek ID: ${id}?`)) return;
+            paparToast("⏳ Sedang memadam rekod...", "blue");
+
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "padamPencapaianPelajar", PROJEK_ID: id }) })
+            .then(res => res.json())
+            .then(data => {
+                paparToast(data.status === "BERJAYA" ? `✅ ${data.mesej}` : `❌ ${data.mesej}`, data.status === "BERJAYA" ? "green" : "red");
+                if (data.status === "BERJAYA") muatDataPencapaian();
+            });
+        }
+
+        function bukaModalKemaskini(id) {
+            if (!bolehEditPenuh) return;
             const r = dataGlobal.find(item => item.id === id);
             if(!r) return;
 
@@ -456,23 +783,17 @@
             document.getElementById('in_penyelia').value = r.penyelia || "";
             document.getElementById('in_pencapaian').value = (r.pencapaian || "").toUpperCase();
 
-            const medanTambahan = ['in_nama_projek', 'in_jabatan', 'in_kategori', 'in_nama_ketua', 'in_penyelia'];
-            
-            // Medan-medan ini akan dibuka untuk diedit kerana fungsi bukaModalKemaskini 
-            // hanya dipanggil jika (bolehEditPenuh === true)
-            medanTambahan.forEach(medan => {
-                let elemen = document.getElementById(medan);
-                elemen.removeAttribute('readonly');
-                elemen.classList.remove('bg-gray-100', 'text-gray-500');
-                elemen.classList.add('bg-white', 'focus:ring-2', 'focus:ring-amber-400', 'border-gray-300');
+            ['in_nama_projek', 'in_jabatan', 'in_kategori', 'in_nama_ketua', 'in_penyelia'].forEach(medan => {
+                let el = document.getElementById(medan);
+                el.removeAttribute('readonly');
+                el.classList.remove('bg-gray-100', 'text-gray-500');
+                el.classList.add('bg-white', 'focus:ring-2', 'focus:ring-amber-400', 'border-gray-300');
             });
 
             document.getElementById('modalKemaskini').classList.remove('hidden');
         }
 
-        function tutupModal() { 
-            document.getElementById('modalKemaskini').classList.add('hidden'); 
-        }
+        function tutupModal() { document.getElementById('modalKemaskini').classList.add('hidden'); }
 
         function simpanKemaskini(e) {
             e.preventDefault();
@@ -494,13 +815,8 @@
             .then(res => res.json())
             .then(data => {
                 paparToast(data.status === "BERJAYA" ? `✅ ${data.mesej}` : `❌ ${data.mesej}`, data.status === "BERJAYA" ? "green" : "red");
-                if(data.status === "BERJAYA") { 
-                    tutupModal(); 
-                    muatDataPencapaian(); // Refresh jadual
-                }
-            }).finally(() => { 
-                btn.disabled = false; btn.innerText = "Simpan Kemaskini"; 
-            });
+                if(data.status === "BERJAYA") { tutupModal(); muatDataPencapaian(); }
+            }).finally(() => { btn.disabled = false; btn.innerText = "Simpan Kemaskini"; });
         }
 
         function paparToast(teks, warna) {

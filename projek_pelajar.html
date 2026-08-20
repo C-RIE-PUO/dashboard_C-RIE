@@ -137,13 +137,8 @@
                     <h4 class="font-bold text-indigo-800 border-b-2 border-indigo-100 pb-2 mb-4 uppercase text-sm">📁 Maklumat Projek</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Tajuk Projek</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tajuk Projek <span class="text-red-500">*</span></label>
                             <input type="text" id="in_tajuk" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase bg-gray-50">
-                        </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Program</label>
-                            <input type="text" id="in_program" list="senaraiProgramDatalist" autocomplete="off" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase bg-gray-50" placeholder="Mula taip untuk carian program...">
-                            <datalist id="senaraiProgramDatalist"></datalist>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori Projek <span class="text-red-500">*</span></label>
@@ -154,13 +149,19 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan</label>
-                            <select id="in_jabatan" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase bg-gray-50">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
+                            <!-- 🌟 KEMASKINI: Tambah event handler onchange untuk menapis program secara dinamik -->
+                            <select id="in_jabatan" required onchange="kemaskiniDatalistProgram(this.value)" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase bg-gray-50">
                                 <option value="">-- PILIH --</option>
                             </select>
                         </div>
+                        <div class="lg:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Program <span class="text-red-500">*</span></label>
+                            <input type="text" id="in_program" list="senaraiProgramDatalist" autocomplete="off" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase bg-gray-50" placeholder="Mula taip untuk carian program...">
+                            <datalist id="senaraiProgramDatalist"></datalist>
+                        </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Tahun</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
                             <input type="number" id="in_tahun" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 bg-gray-50">
                         </div>
                         <div>
@@ -174,19 +175,19 @@
                     <h4 class="font-bold text-indigo-800 border-b-2 border-indigo-100 pb-2 mb-4 uppercase text-sm">👤 Maklumat Ketua Projek</h4>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua <span class="text-red-500">*</span></label>
                             <input type="text" id="in_namaKetua" required class="w-full px-3 py-2 border rounded-lg uppercase bg-gray-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">No. Pendaftaran</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">No. Pendaftaran <span class="text-red-500">*</span></label>
                             <input type="text" id="in_matrikKetua" required class="w-full px-3 py-2 border rounded-lg uppercase bg-gray-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">No. IC Ketua</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">No. IC Ketua <span class="text-red-500">*</span></label>
                             <input type="text" id="in_icKetua" required class="w-full px-3 py-2 border rounded-lg bg-gray-50">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Email Ketua</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Email Ketua <span class="text-red-500">*</span></label>
                             <input type="email" id="in_emailKetua" required class="w-full px-3 py-2 border rounded-lg bg-gray-50">
                         </div>
                     </div>
@@ -213,20 +214,20 @@
                     <h4 class="font-bold text-indigo-800 border-b-2 border-indigo-100 pb-2 mb-4 uppercase text-sm">👨‍🏫 Maklumat Penyelia</h4>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Penyelia</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Penyelia <span class="text-red-500">*</span></label>
                             <input type="text" id="in_penyelia" required class="w-full px-3 py-2 border rounded-lg uppercase bg-indigo-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">No. IC Penyelia</label>
-                            <input type="text" id="in_icPenyelia" class="w-full px-3 py-2 border rounded-lg bg-indigo-50">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">No. IC Penyelia <span class="text-red-500">*</span></label>
+                            <input type="text" id="in_icPenyelia" required class="w-full px-3 py-2 border rounded-lg bg-indigo-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">No Telefon</label>
-                            <input type="text" id="in_hpPenyelia" class="w-full px-3 py-2 border rounded-lg bg-indigo-50">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">No Telefon <span class="text-red-500">*</span></label>
+                            <input type="text" id="in_hpPenyelia" required class="w-full px-3 py-2 border rounded-lg bg-indigo-50">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Email Penyelia</label>
-                            <input type="email" id="in_emailPenyelia" class="w-full px-3 py-2 border rounded-lg bg-indigo-50">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Email Penyelia <span class="text-red-500">*</span></label>
+                            <input type="email" id="in_emailPenyelia" required class="w-full px-3 py-2 border rounded-lg bg-indigo-50">
                         </div>
                     </div>
 
@@ -253,6 +254,7 @@
 		let dataGlobal = [];
         let dataDitapisGlobal = []; // Disimpan untuk ekspot CSV
         let senaraiDokumenBase64 = []; // Untuk simpan data file
+        let senaraiProgramGlobal = []; // 🌟 KEMASKINI: Simpan senarai program secara global
 
         // 🌟 VARIABEL PAGINATION
         let currentPage = 1;
@@ -260,9 +262,17 @@
 
         const userPeranan = (sessionStorage.getItem("peranan") || "").toUpperCase();
         const userJabatan = (sessionStorage.getItem("jabatan") || "").toUpperCase();
+
+        // --- KOD TAMBAHAN MULA: MENYEDIAKAN SINGKATAN JABATAN PENGGUNA ---
+        let userJabatanSingkatan = userJabatan;
+        const matchUserJabatan = userJabatan.match(/\(([^)]+)\)/);
+        if (matchUserJabatan) {
+            userJabatanSingkatan = matchUserJabatan[1]; // Ekstrak "JKP" dari "JABATAN KEJURUTERAAN PERKAPALAN (JKP)"
+        }
+        // --- KOD TAMBAHAN TAMAT ---
         
-        const isApprover = ["PENYELARAS INOVASI", "PENYELARAS PENYELIDIKAN", "ADMIN", "KUPIK"].includes(userPeranan);
-        const isEditor = ["KUPIK", "ADMIN", "PENYELARAS INOVASI", "PENYELARAS JABATAN"].includes(userPeranan);
+        const isApprover = ["PENYELARAS INOVASI","PENYELARAS INOVASI (C-RIE)", "PENYELARAS PROJEK (C-RIE)", "PENYELARAS PENYELIDIKAN", "PENYELARAS PENYELIDIKAN (C-RIE)", "ADMIN", "KUPIK"].includes(userPeranan);
+        const isEditor = ["KUPIK", "ADMIN", "PENYELARAS INOVASI","PENYELARAS INOVASI (C-RIE)","PENYELARAS PROJEK (C-RIE)", "PENYELARAS JABATAN"].includes(userPeranan);
 
         window.onload = () => {
             muatDropdownJabatan();
@@ -279,8 +289,15 @@
                     
                     if (data.JABATAN) {
                         data.JABATAN.forEach(j => {
-                            htmlJab += `<option value="${j}">${j}</option>`;
-                            htmlForm += `<option value="${j}">${j}</option>`;
+                            // --- KOD BARU MULA: Dapatkan singkatan jabatan dalam kurungan ---
+                            let singkatan = j;
+                            const match = j.match(/\(([^)]+)\)/); // Cari teks dalam kurungan ()
+                            if (match) {
+                                singkatan = match[1]; // Gantikan teks penuh dengan singkatan
+                            }
+                            htmlJab += `<option value="${singkatan}">${singkatan}</option>`;
+                            htmlForm += `<option value="${singkatan}">${singkatan}</option>`;
+                            // --- KOD BARU TAMAT ---
                         });
                     }
 
@@ -288,17 +305,14 @@
                     document.getElementById('in_jabatan').innerHTML = htmlForm;
 
                     if (!isApprover) {
-                        document.getElementById('filterJabatan').value = userJabatan;
+                        document.getElementById('filterJabatan').value = userJabatanSingkatan; // <-- Ditukar guna Singkatan
                         document.getElementById('filterJabatan').disabled = true;
                     }
 
-                    // 2. Logik untuk Autocomplete Program
+                    // 2. 🌟 LOGIK DIBAIKI: Simpan Objek Program dan Papar Mengikut Jabatan
                     if (data.PROGRAM) {
-                        let htmlProgram = '';
-                        data.PROGRAM.forEach(p => {
-                            htmlProgram += `<option value="${p}">`;
-                        });
-                        document.getElementById('senaraiProgramDatalist').innerHTML = htmlProgram;
+                        senaraiProgramGlobal = data.PROGRAM;
+                        kemaskiniDatalistProgram(document.getElementById('in_jabatan').value || userJabatanSingkatan);
                     }
 
                     // 3. Logik untuk Dropdown Pencapaian Peringkat Jabatan
@@ -313,8 +327,58 @@
 					if (typeof renderJadual === "function") {
                         renderJadual(); 
                     }
+
+                    // --- KOD TAMBAHAN DIUBAHSUAI: PINDAH KE SINI ---
+                    // Semak parameter URL untuk auto pop-up borang pendaftaran
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('action') === 'daftar') {
+                        bukaModalBorang(); // Panggil fungsi buka modal SELEPAS senarai jabatan diisi
+                        window.history.replaceState(null, '', window.location.pathname);
+                    }
+                    // --- KOD TAMBAHAN TAMAT ---
                 }
             });
+        }
+
+        // 🌟 FUNGSI BAHARU: Kemaskini Datalist Program Berdasarkan Jabatan Dipilih (Selesai masalah [object Object] & Tapisan)
+        function kemaskiniDatalistProgram(jabatanDipilih = "") {
+            const datalist = document.getElementById('senaraiProgramDatalist');
+            const inputProgram = document.getElementById('in_program');
+            if (!datalist) return;
+
+            let htmlProgram = '';
+            let jumlahPilihan = 0; // Tambahan untuk menyemak bilangan program
+            
+            senaraiProgramGlobal.forEach(p => {
+                let namaProgram = typeof p === 'object' ? p.nilai : p;
+                let jabatanProgram = typeof p === 'object' ? (p.jabatan || "") : "";
+
+                let jabClean = jabatanDipilih ? jabatanDipilih.toUpperCase().trim() : "";
+                let jabProgClean = jabatanProgram ? jabatanProgram.toUpperCase().trim() : "";
+
+                // Syarat Padanan: Papar jika tiada jabatan dipilih, ATAU jabatan program padan dengan pilihan/singkatan
+                let match = !jabClean || jabClean === "SEMUA" || !jabProgClean || 
+                            jabProgClean === jabClean || 
+                            jabClean.includes(jabProgClean) || 
+                            jabProgClean.includes(jabClean);
+
+                if (match && namaProgram) {
+                    htmlProgram += `<option value="${namaProgram}">`;
+                    jumlahPilihan++;
+                }
+            });
+
+            // --- KOD TAMBAHAN MULA: Tetapkan "TIDAK BERKENAAN" jika tiada program untuk jabatan tersebut ---
+            if (jumlahPilihan === 0 && jabatanDipilih && jabatanDipilih !== "SEMUA") {
+                htmlProgram += `<option value="TIDAK BERKENAAN">`;
+                if (inputProgram) inputProgram.value = "TIDAK BERKENAAN";
+            } else {
+                // --- KEMASKINI BARU: Kosongkan textbox secara automatik untuk pengguna buat pilihan ---
+                if (inputProgram) inputProgram.value = ""; 
+            }
+            // --- KOD TAMBAHAN TAMAT ---
+
+            datalist.innerHTML = htmlProgram;
         }
 
         function muatDataProjek() {
@@ -587,16 +651,24 @@
             document.getElementById('edit_id').value = ""; 
             document.getElementById('tajukModal').innerHTML = "➕ Pendaftaran Projek Pelajar";
             
+            // --- KEMASKINI BARU: Kosongkan terus textbox program bila butang Daftar Projek ditekan ---
+            document.getElementById('in_program').value = "";
+            
             document.getElementById('in_dokumen').value = '';
             document.getElementById('senaraiDokumenUI').innerHTML = '';
             senaraiDokumenBase64 = [];
 
+            const dropJabatan = document.getElementById('in_jabatan');
             if(!isApprover) {
-                const dropJabatan = document.getElementById('in_jabatan');
-                dropJabatan.value = userJabatan;
+                dropJabatan.value = userJabatanSingkatan; // <-- Ditukar guna Singkatan
                 dropJabatan.disabled = true; 
+            } else {
+                dropJabatan.value = ""; // Pastikan kosong untuk approver agar program menyenaraikan semua pada asalnya
             }
             
+            // 🌟 Kemaskini program mengikut Jabatan aktif (atau kosong untuk semua)
+            kemaskiniDatalistProgram(dropJabatan.value);
+
             if (userPeranan === "STAF") {
                 document.getElementById('seksyenUploadCSV').classList.add('hidden');
                 document.getElementById('pemisahBorang').classList.add('hidden');
@@ -631,6 +703,9 @@
                 dropJabatan.disabled = false;
             }
             
+            // 🌟 Tapis senarai program berdasarkan Jabatan rekod yang diedit
+            kemaskiniDatalistProgram(r.jabatan);
+
             document.getElementById('in_tajuk').value = r.tajuk;
             document.getElementById('in_program').value = r.program;
             document.getElementById('in_kategori').value = r.kategori;
