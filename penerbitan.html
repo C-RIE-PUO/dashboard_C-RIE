@@ -153,7 +153,7 @@
 
                     <!-- TAB 2: Artikel Akhbar/Majalah/Penulisan Kreatif -->
                     <div id="sek-prosiding" class="tab-content hidden fade-in space-y-4">
-                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Artikel Akhbar/Majalah/Penulisan Kreatif</h3>
+                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Artikel Akhbar/Majalah/Penulisan Kreatif/Prosiding</h3>
                         <p class="text-xs text-gray-600 text-center mb-4">Sila isi maklumat penerbitan di bahagian Maklumat Asas dan muat naik dokumen berkaitan di bawah.</p>
                         <div class="grid grid-cols-1 gap-6">
                             <!-- Muat naik PDF Artikel Akhbar/Majalah/Penulisan Kreatif -->
@@ -225,12 +225,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Status Penerbitan <span class="text-red-500">*</span></label>
-                        <select id="status" name="status" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
-                            <option value="">-- Pilih Status --</option>
-                            <option value="Draf">Draf</option>
-                            <option value="Dalam Semakan">Dalam Semakan</option>
-                            <option value="Diterbitkan">Diterbitkan</option>
-                        </select>
+                        <input type="text" id="status" name="status" value="Diterbitkan" readonly class="w-full px-4 py-2 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg outline-none cursor-not-allowed">
                     </div>
 
                     <div>
@@ -240,6 +235,12 @@
                             <option value="Bahasa Melayu">Bahasa Melayu</option>
                             <option value="English">English</option>
                         </select>
+                    </div>
+
+                    <!-- RUANG BAHARU: DOI/URL SELEPAS BAHASA & SEBELUM ISSN/ISBN -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">DOI / URL</label>
+                        <input type="text" id="doiUrl" name="doiUrl" placeholder="Masukkan pautan DOI atau URL (jika ada)" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
 
                     <div class="md:col-span-2">
@@ -776,6 +777,16 @@
 
                 // TAMBAH BAIK: Gunakan cariKunci untuk KOD_ID supaya lebih dinamik
                 const kodIdPapar = cariKunci(row, 'KOD_ID', 'Kod_ID', 'KOD ID') || '-';
+                
+                // =======================================================
+                // TAMBAH BAIK: TANGKAP DAN PAPARKAN DOI / URL[cite: 16]
+                // =======================================================
+                const doiUrlPapar = cariKunci(row, 'DOI_URL', 'DOI/URL', 'URL') || '';
+                let paparanDoi = '';
+                if (doiUrlPapar) {
+                    let linkHref = doiUrlPapar.startsWith('http') ? doiUrlPapar : `https://${doiUrlPapar}`;
+                    paparanDoi = `<div class="mt-1.5"><a href="${linkHref}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-2 py-0.5 rounded transition">🔗 ${doiUrlPapar} ↗</a></div>`;
+                }
 
                 let butiranSpesifik = '-';
                 if (katSemasa === 'buku') {
@@ -794,6 +805,7 @@
                             <span class="bg-purple-100 text-purple-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold mr-1">ID: ${kodIdPapar}</span><br>
                             ${row.Tajuk || '-'}<br>
                             <span class="text-xs text-gray-500 font-normal">Tahun: ${row.Tahun} | ISSN/ISBN: ${row.ISSN_ISBN || 'Tiada'}</span>
+                            ${paparanDoi} <!-- 🌟 DOI/URL DISISIP DI SINI -->
                         </td>
                         <td class="p-4 text-sm text-gray-700">
                             <b>${row.Ketua || '-'}</b>
@@ -881,8 +893,9 @@
 
                 document.getElementById('jabatanUtama').value = rekod.Jabatan || "";
                 document.getElementById('tahun').value = rekod.Tahun || "";
-                document.getElementById('status').value = rekod.Status || "";
+                // Status automatik direset / ditetapkan kepada Diterbitkan tidak dapat diubah kerana attribute readonly
                 document.getElementById('bahasa').value = rekod.Bahasa || "";
+                document.getElementById('doiUrl').value = rekod.DOI_URL || rekod.DOI || "";
                 document.getElementById('issnIsbn').value = rekod.ISSN_ISBN || "";
                 document.getElementById('tajuk').value = rekod.Tajuk || "";
                 document.getElementById('ketua').value = rekod.Ketua || "";
@@ -947,6 +960,8 @@
             const katSemasa = document.getElementById('kategoriPenerbitan').value; 
 
             document.getElementById('borangPenerbitan').reset();
+            // Kembalikan nilai kekal untuk status selepas borang di set semula
+            document.getElementById('status').value = "Diterbitkan";
             document.getElementById('bekasAhli').innerHTML = '';
             document.getElementById('tindakanBorang').value = "simpan";
             document.getElementById('rowIndexSemasa').value = "";
@@ -1345,6 +1360,7 @@
             formData.append("Tahun", document.getElementById('tahun').value);
             formData.append("Status", document.getElementById('status').value);
             formData.append("Bahasa", document.getElementById('bahasa').value);
+            formData.append("DOI_URL", document.getElementById('doiUrl').value);
             formData.append("ISSN_ISBN", document.getElementById('issnIsbn').value);
             formData.append("Tajuk", document.getElementById('tajuk').value);
             formData.append("Ketua", document.getElementById('ketua').value);
