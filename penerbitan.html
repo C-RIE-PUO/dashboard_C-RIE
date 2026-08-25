@@ -437,6 +437,18 @@
         let halamanSemasa = 1;
         const rekodSetiapHalaman = 10;
 
+        // FUNGSI PEMBANTU GLOBAL UNTUK MENCARI KUNCI DENGAN VARIATIF TAJUK LAJUR
+        const cariKunci = (obj, ...kunci) => {
+            if (!obj) return null;
+            for (let k of kunci) {
+                if (obj[k] !== undefined && obj[k] !== null && obj[k] !== "") return obj[k];
+                const lowK = k.toLowerCase().replace(/[^a-z0-9]/g, "");
+                const fKey = Object.keys(obj).find(key => key.toLowerCase().replace(/[^a-z0-9]/g, "") === lowK);
+                if (fKey && obj[fKey] !== undefined && obj[fKey] !== null && obj[fKey] !== "") return obj[fKey];
+            }
+            return null;
+        };
+
         document.addEventListener("DOMContentLoaded", async function() {
             const sudahLogin = sessionStorage.getItem("userLulus") === "YA";
             const perananPengguna = (sessionStorage.getItem("peranan") || "PENGGUNA BIASA").trim().toUpperCase();
@@ -754,16 +766,6 @@
                     butangPadam = `<button onclick="padamRekod(${row.Row_Index}, this)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded shadow w-full md:w-auto">Padam</button>`;
                 }
 
-                const cariKunci = (obj, ...kunci) => {
-                    for (let k of kunci) {
-                        if (obj[k]) return obj[k];
-                        const lowK = k.toLowerCase();
-                        const fKey = Object.keys(obj).find(key => key.toLowerCase() === lowK);
-                        if (fKey && obj[fKey]) return obj[fKey];
-                    }
-                    return null;
-                };
-
                 let pautanDokumenHTML = '';
                 const url1 = cariKunci(row, 'Url_Fail1', 'URL_Fail1', 'Fail_1');
                 const url2 = cariKunci(row, 'Url_Fail2', 'URL_Fail2', 'Fail_2');
@@ -779,9 +781,9 @@
                 const kodIdPapar = cariKunci(row, 'KOD_ID', 'Kod_ID', 'KOD ID') || '-';
                 
                 // =======================================================
-                // TAMBAH BAIK: TANGKAP DAN PAPARKAN DOI / URL[cite: 16]
+                // TAMBAH BAIK: TANGKAP DAN PAPARKAN DOI / URL
                 // =======================================================
-                const doiUrlPapar = cariKunci(row, 'DOI_URL', 'DOI/URL', 'URL') || '';
+                const doiUrlPapar = cariKunci(row, 'DOI_URL', 'DOI/URL', 'DOI', 'URL') || '';
                 let paparanDoi = '';
                 if (doiUrlPapar) {
                     let linkHref = doiUrlPapar.startsWith('http') ? doiUrlPapar : `https://${doiUrlPapar}`;
@@ -895,7 +897,10 @@
                 document.getElementById('tahun').value = rekod.Tahun || "";
                 // Status automatik direset / ditetapkan kepada Diterbitkan tidak dapat diubah kerana attribute readonly
                 document.getElementById('bahasa').value = rekod.Bahasa || "";
-                document.getElementById('doiUrl').value = rekod.DOI_URL || rekod.DOI || "";
+                
+                // TAMBAH BAIK: Gunakan cariKunci untuk membaca medan DOI / URL yang tersimpan dalam Sheet
+                document.getElementById('doiUrl').value = cariKunci(rekod, 'DOI_URL', 'DOI/URL', 'DOI', 'doiUrl') || "";
+                
                 document.getElementById('issnIsbn').value = rekod.ISSN_ISBN || "";
                 document.getElementById('tajuk').value = rekod.Tajuk || "";
                 document.getElementById('ketua').value = rekod.Ketua || "";
@@ -1143,7 +1148,7 @@
             const statusElem = document.getElementById('statusProsesMuatTurun');
             const btnProses = document.getElementById('btnProsesDownload');
 
-            // Tetapkan Nama Folder Induk Berdasarkan Tab[cite: 14]
+            // Tetapkan Nama Folder Induk Berdasarkan Tab
             let namaFolderTab = "Penerbitan_Lain";
             if (katSemasa === 'buku') namaFolderTab = "Buku_dan_Bab_Dalam_Buku";
             else if (katSemasa === 'prosiding') namaFolderTab = "Artikel_dan_Prosiding";
@@ -1169,7 +1174,7 @@
                     // TAMBAH BAIK: Gunakan cariKunciLajur untuk KOD_ID secara dinamik
                     const kodIdSebenar = cariKunciLajur(row, 'KOD_ID', 'Kod_ID', 'KOD ID') || 'TIADA_ID';
                     
-                    // DAPATKAN TAHUN DAN JABATAN UNTUK SUSUNAN FOLDER[cite: 14]
+                    // DAPATKAN TAHUN DAN JABATAN UNTUK SUSUNAN FOLDER
                     const tahunSemasa = row.Tahun || 'Tiada_Tahun';
                     const jabatanSemasa = row.Jabatan || 'Tiada_Jabatan';
 
@@ -1201,7 +1206,7 @@
             try {
                 if (pilihanFormat === "2") {
                     // =======================================================
-                    // PILIHAN 2: MERGE PDF (GABUNG) IKUT REKOD DAN MASUK DALAM ZIP[cite: 14]
+                    // PILIHAN 2: MERGE PDF (GABUNG) IKUT REKOD DAN MASUK DALAM ZIP
                     // =======================================================
                     statusElem.innerText = "Menyediakan pembungkusan ZIP untuk PDF gabungan... ⏳";
                     const zip = new JSZip();
@@ -1235,10 +1240,10 @@
                                 const folderJabatan = rekod.jabatan.toString().replace(/[^a-zA-Z0-9\s_-]/g, '').trim();
                                 const laluanPenuh = `${namaFolderTab}/${folderTahun}/${folderJabatan}`;
 
-                                // Nama fail ditetapkan kepada Kod ID Gabung[cite: 14]
+                                // Nama fail ditetapkan kepada Kod ID Gabung
                                 const namaFailMerge = `${rekod.kodId}_gabung.pdf`.replace(/[^a-zA-Z0-9_\-.]/g, '');
                                 
-                                // Memasukkan fail ke dalam laluan folder spesifik[cite: 14]
+                                // Memasukkan fail ke dalam laluan folder spesifik
                                 zip.file(`${laluanPenuh}/${namaFailMerge}`, mergedPdfBytes);
                                 failDimuat++;
                             }
@@ -1259,7 +1264,7 @@
 
                 } else {
                     // =======================================================
-                    // PILIHAN 1: TANPA GABUNG (ASAL) - DIMUAT TURUN DALAM ZIP[cite: 14]
+                    // PILIHAN 1: TANPA GABUNG (ASAL) - DIMUAT TURUN DALAM ZIP
                     // =======================================================
                     statusElem.innerText = "Menyediakan pembungkusan ZIP... ⏳";
                     const zip = new JSZip();
@@ -1284,7 +1289,7 @@
                                 // Contoh Format: BK-20260818-001_1_820618016121.pdf
                                 const namaFailAsal = `${rekod.kodId}_${nomborFail}_${rekod.icKetua}.pdf`.replace(/[^a-zA-Z0-9_\-.]/g, '');
                                 
-                                // Memasukkan fail ke dalam laluan folder spesifik[cite: 14]
+                                // Memasukkan fail ke dalam laluan folder spesifik
                                 zip.file(`${laluanPenuh}/${namaFailAsal}`, blob);
                                 failDimuat++;
                             } catch (errZip) {
