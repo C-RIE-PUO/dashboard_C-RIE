@@ -17,7 +17,7 @@
             </button>
 
             <h1 class="text-xl sm:text-2xl font-bold tracking-wide mt-8 sm:mt-0"><i class="fa-solid fa-toolbox mr-2"></i>SISTEM TEMPAHAN PERALATAN</h1>
-            <p class="text-blue-100 text-sm mt-1">Sila buat tempahan sekurang-kurangnya 2 hari sebelum tarikh pertandingan</p>
+            <p class="text-blue-100 text-sm mt-1">Sila buat tempahan sekurang-kurangnya 1 hari sebelum tarikh pertandingan</p>
             
             <div id="headerInfoPengguna" class="hidden mt-4 inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-white/20 px-5 py-2 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm border border-white/30 shadow-sm transition-all duration-300">
                 <span class="flex items-center"><i class="fa-solid fa-circle-user mr-1.5 text-blue-200"></i> <span id="header_nama" class="tracking-wide uppercase"></span></span>
@@ -169,8 +169,8 @@
                     <select id="login_peranan" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="ADMIN">ADMIN</option>
                         <option value="KUPIK">KUPIK</option>
-                        <option value="PENYELARAS INOVASI">PENYELARAS INOVASI</option>
-                        <option value="PENYELARAS PENYELIDIKAN">PENYELARAS PENYELIDIKAN</option>
+                        <option value="PENYELARAS INOVASI (C-RIE)">PENYELARAS INOVASI (C-RIE)</option>
+                        <option value="PENYELARAS PENYELIDIKAN (C-RIE)">PENYELARAS PENYELIDIKAN (C-RIE)</option>
                     </select>
                 </div>
                 <div>
@@ -189,17 +189,42 @@
 
     <!-- Modal Edit Admin -->
     <div id="modalEdit" class="hidden fixed inset-0 bg-slate-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden my-auto max-h-[90vh] flex flex-col">
+            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white shrink-0">
                 <h3 class="font-bold text-lg">Kemaskini Rekod Pengurusan</h3>
                 <button onclick="tutupModal()" class="text-white hover:text-red-200 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-6 space-y-4">
+            
+            <div class="p-6 space-y-4 overflow-y-auto">
                 <input type="hidden" id="edit_row"> 
+                
                 <div>
-                    <label class="block text-sm font-medium mb-1 text-slate-700">Kuantiti</label>
-                    <input type="number" id="edit_bilangan" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <label class="block text-sm font-medium mb-1 text-slate-700">Nama Penuh</label>
+                    <input type="text" id="edit_nama" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-700">No. Telefon Bimbit</label>
+                        <input type="tel" id="edit_nohp" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-700">Tarikh Pertandingan</label>
+                        <input type="date" id="edit_tarikh" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-700">Kuantiti Peralatan</label>
+                        <input type="number" id="edit_bilangan" min="1" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-700">Bil Hari Pinjam</label>
+                        <input type="number" id="edit_bil_hari" min="1" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium mb-1 text-slate-700">Status Tempahan</label>
                     <select id="edit_status" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
@@ -212,14 +237,15 @@
                 <div>
                     <label class="block text-sm font-medium mb-1 text-slate-700">Status Pemulangan</label>
                     <select id="edit_status_pemulangan" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
-					<option value="BELUM AMBIL">BELUM AMBIL</option>
-					<option value="BELUM PULANG">BELUM PULANG</option>
-					<option value="DIKEMBALIKAN">DIKEMBALIKAN</option>
-					</select>
+                        <option value="BELUM AMBIL">BELUM AMBIL</option>
+                        <option value="BELUM PULANG">BELUM PULANG</option>
+                        <option value="DIKEMBALIKAN">DIKEMBALIKAN</option>
+                    </select>
                 </div>
                 <div id="msgEdit" class="hidden text-sm text-center font-bold p-2 rounded"></div>
             </div>
-            <div class="bg-slate-50 px-6 py-4 border-t flex justify-end gap-3">
+            
+            <div class="bg-slate-50 px-6 py-4 border-t flex justify-end gap-3 shrink-0">
                 <button onclick="tutupModal()" class="px-4 py-2 text-slate-600 bg-slate-200 hover:bg-slate-300 font-semibold rounded-lg">Batal</button>
                 <button onclick="simpanKemaskini()" id="btnSimpanEdit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg flex items-center">
                     <i class="fa-solid fa-save mr-2"></i> Simpan
@@ -227,7 +253,7 @@
             </div>
         </div>
     </div>
-
+	
     <!-- Modal Edit Pengguna (Menunggu Pengesahan) -->
     <div id="modalEditPengguna" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
@@ -291,24 +317,16 @@
         const perananDibenarkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS INOVASI","PENYELARAS PENYELIDIKAN", "PENYELARAS PENYELIDIKAN (C-RIE)"];
 
         document.addEventListener("DOMContentLoaded", function() {
-            if(typeof muatTurunJabatan === 'function') muatTurunJabatan(); 
-            
-            const tempahTarikhElem = document.getElementById('tempah_tarikh');
-            if (tempahTarikhElem) {
-                const hariIni = new Date();
-                hariIni.setDate(hariIni.getDate() + 2);
-                tempahTarikhElem.min = hariIni.toISOString().split('T')[0];
-            }
-
-			
-			// 3. --- AUTOMATIK LOAD PENGGUNA SEMASA ---
-            // Sistem menangkap semua kemungkinan kunci (keys) dari paparan.html
-            const sesiPeranan = sessionStorage.getItem("log_peranan") || localStorage.getItem("log_peranan") || sessionStorage.getItem("peranan") || localStorage.getItem("peranan");
-            const sesiNama = sessionStorage.getItem("log_nama") || localStorage.getItem("log_nama") || sessionStorage.getItem("nama") || localStorage.getItem("nama");
-            const sesiJabatan = sessionStorage.getItem("log_jabatan") || localStorage.getItem("log_jabatan") || sessionStorage.getItem("jabatan") || localStorage.getItem("jabatan");
+            // 3. --- AUTOMATIK LOAD PENGGUNA SEMASA ---
+            // PENAMBAHBAIKAN: Mengutamakan KEY yang di set pada paparan.html seperti 'peranan', 'namaPengguna', dan 'jabatan'.
+            const sesiPeranan = sessionStorage.getItem("peranan") || sessionStorage.getItem("log_peranan") || sessionStorage.getItem("user_peranan") || sessionStorage.getItem("sesi_peranan") || localStorage.getItem("log_peranan") || localStorage.getItem("peranan") || "";
+            const sesiNama = sessionStorage.getItem("namaPengguna") || sessionStorage.getItem("log_nama") || sessionStorage.getItem("user_nama") || sessionStorage.getItem("nama") || sessionStorage.getItem("sesi_nama") || localStorage.getItem("log_nama") || localStorage.getItem("nama") || "";
+            const sesiJabatan = sessionStorage.getItem("jabatan") || sessionStorage.getItem("log_jabatan") || sessionStorage.getItem("user_jabatan") || sessionStorage.getItem("sesi_jabatan") || localStorage.getItem("log_jabatan") || localStorage.getItem("jabatan") || "";
 
             if (sesiPeranan && sesiPeranan.trim() !== "") {
                 statusLogMasuk = true;
+                
+                // Set kembali untuk kegunaan dalaman tempahan.html
                 sessionStorage.setItem("log_peranan", sesiPeranan.trim().toUpperCase());
                 sessionStorage.setItem("log_nama", sesiNama || "Pengguna");
                 sessionStorage.setItem("log_jabatan", sesiJabatan || "Tiada Maklumat");
@@ -316,10 +334,38 @@
                 if (typeof kemaskiniPaparanProfil === 'function') {
                     kemaskiniPaparanProfil(sesiNama || "Pengguna", sesiPeranan.trim().toUpperCase(), sesiJabatan || "Tiada Maklumat");
                 }
+
+                // --- TAMBAHAN KOD: Autofill borang tempahan dengan logik khas STAF ---
+                const inputNamaBorang = document.getElementById("tempah_nama");
+                if (inputNamaBorang) {
+                    if (sesiPeranan.trim().toUpperCase() === "STAF") {
+                        // Jika peranan STAF, kosongkan
+                        inputNamaBorang.value = "";
+                    } else if (sesiNama && sesiNama !== "Pengguna") {
+                        // Jika peranan lain (contoh: ADMIN, PENYELARAS), isikan nama secara automatik
+                        inputNamaBorang.value = sesiNama;
+                    }
+                }
             } else {
+                statusLogMasuk = false;
+                // By Default jika tiada pengguna log masuk, tetapkan combo box jabatan ke PILIH JABATAN dan kosongkan nama
+                const elJabatan = document.getElementById("tempah_jabatan");
+                if (elJabatan) elJabatan.value = "";
+                const inputNamaBorang = document.getElementById("tempah_nama");
+                if (inputNamaBorang) inputNamaBorang.value = "";
+
                 if (typeof kemaskiniPaparanProfil === 'function') {
                     kemaskiniPaparanProfil("-", "-", "-");
                 }
+            }
+
+            if(typeof muatTurunJabatan === 'function') muatTurunJabatan(); 
+            
+            const tempahTarikhElem = document.getElementById('tempah_tarikh');
+            if (tempahTarikhElem) {
+                const hariIni = new Date();
+                hariIni.setDate(hariIni.getDate() + 1);
+                tempahTarikhElem.min = hariIni.toISOString().split('T')[0];
             }
         });
 
@@ -441,6 +487,9 @@
                         
                         kemaskiniPaparanProfil(penggunaSah.nama, penggunaSah.peranan, penggunaSah.jabatan);
                         
+                        // Kemaskini semula combo box jabatan mengikut akaun pengguna
+                        if (typeof muatTurunJabatan === 'function') muatTurunJabatan();
+
                         tutupModalLogin();
                         tukarTab('tabAdmin'); 
                         
@@ -465,11 +514,29 @@
             if(confirm("Adakah anda pasti mahu log keluar?")) {
                 statusLogMasuk = false;
                 
+                // Padam key yang digunakan oleh tempahan.html
                 sessionStorage.removeItem("log_peranan");
                 sessionStorage.removeItem("log_nama");
                 sessionStorage.removeItem("log_jabatan");
                 localStorage.removeItem("log_peranan");
+                localStorage.removeItem("log_jabatan");
+                localStorage.removeItem("log_nama");
                 
+                // PENAMBAHBAIKAN: Padam key yang digunakan oleh paparan.html
+                sessionStorage.removeItem("userLulus");
+                sessionStorage.removeItem("peranan");
+                sessionStorage.removeItem("namaPengguna");
+                sessionStorage.removeItem("jabatan");
+                localStorage.removeItem("peranan");
+                localStorage.removeItem("namaPengguna");
+                localStorage.removeItem("jabatan");
+                
+                // Reset combo box jabatan kepada 'PILIH JABATAN' dan kosongkan semula nama borang
+                const elJabatan = document.getElementById("tempah_jabatan");
+                if (elJabatan) elJabatan.value = "";
+                const inputNamaBorang = document.getElementById("tempah_nama");
+                if (inputNamaBorang) inputNamaBorang.value = "";
+
                 kemaskiniPaparanProfil("-", "-", "-");
                 
                 const jadualAdmin = document.getElementById('jadualAdmin');
@@ -493,7 +560,38 @@
                 if(response.status === "BERJAYA" && response.JABATAN) {
                     let html = '<option value="">-- PILIH JABATAN --</option>';
                     response.JABATAN.forEach(j => { html += `<option value="${j}">${j}</option>`; });
-                    document.getElementById('tempah_jabatan').innerHTML = html;
+                    
+                    const elJabatan = document.getElementById('tempah_jabatan');
+                    elJabatan.innerHTML = html;
+
+                    // --- TAMBAHAN KOD: Tetapkan Jabatan Semasa Pengguna Secara Automatik ---
+                    // Hanya set nilai jika ada pengguna yang sah sedang log masuk
+                    if (statusLogMasuk) {
+                        const sesiJabatan = sessionStorage.getItem("jabatan") || sessionStorage.getItem("log_jabatan") || sessionStorage.getItem("user_jabatan") || sessionStorage.getItem("sesi_jabatan") || localStorage.getItem("log_jabatan") || localStorage.getItem("jabatan");
+                        
+                        if (sesiJabatan && sesiJabatan !== "Tiada Maklumat") {
+                            // Semak jika jabatan pengguna memang wujud di dalam senarai dropdown pelayan
+                            let padananJabatan = response.JABATAN.find(j => j.toUpperCase() === sesiJabatan.toUpperCase());
+                            if (!padananJabatan) {
+                                // Pemadanan fleksibel jika mengandungi singkatan (cth: JKA) atau nama penuh
+                                padananJabatan = response.JABATAN.find(j => 
+                                    j.toUpperCase().includes(sesiJabatan.toUpperCase()) || 
+                                    sesiJabatan.toUpperCase().includes(j.toUpperCase())
+                                );
+                            }
+                            if (padananJabatan) {
+                                elJabatan.value = padananJabatan;
+                            } else {
+                                elJabatan.value = "";
+                            }
+                        } else {
+                            elJabatan.value = "";
+                        }
+                    } else {
+                        // Jika tiada maklumat pengguna log masuk, tetapkan secara automatik kepada PILIH JABATAN
+                        elJabatan.value = "";
+                    }
+                    // -----------------------------------------------------------------------
                 }
             }).catch(() => {});
         }
@@ -554,6 +652,15 @@
                 if(data.status === 'BERJAYA') {
                     document.getElementById('formTempahan').reset();
                     document.getElementById('semak_nohp').value = inputNoHp;
+                    
+                    // PENAMBAHBAIKAN: Jika pengguna tadi log masuk sebagai bukan STAF, isikan semula nama supaya tak hilang
+                    const sesiPeranan = sessionStorage.getItem("peranan") || sessionStorage.getItem("log_peranan") || "";
+                    const sesiNama = sessionStorage.getItem("namaPengguna") || sessionStorage.getItem("log_nama") || "";
+                    if(sesiPeranan.trim().toUpperCase() !== "STAF" && sesiNama) {
+                        const inNama = document.getElementById('tempah_nama');
+                        if(inNama) inNama.value = sesiNama;
+                    }
+                    
                     tukarTab('tabSemak');
                     semakStatus(); 
                 }
@@ -840,9 +947,9 @@
                             <span class="text-[10px] text-slate-500 font-semibold">${r.tarikh_pulang}</span>
                         </td>
                         <td class="px-4 py-3 text-center space-x-2 whitespace-nowrap">
-                            <button onclick="bukaModalEdit('${r.row_index}', '${r.bilangan}', '${r.status}', '${r.status_pemulangan}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 p-2 rounded shadow-sm transition" title="Kemaskini">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
+                            <button onclick="bukaModalEdit('${r.row_index}', '${r.nama}', '${r.no_hp}', '${r.bilangan}', '${r.bil_hari}', '${r.tarikh_majlis}', '${r.status}', '${r.status_pemulangan}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 p-2 rounded shadow-sm transition" title="Kemaskini">
+							<i class="fa-solid fa-pen-to-square"></i>
+							</button>
                             <button onclick="padamRekod('${r.row_index}')" class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded shadow-sm transition" title="Padam Rekod">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
@@ -911,9 +1018,23 @@
             });
         }
 
-        function bukaModalEdit(rowIndex, bilangan, status, status_pemulangan) {
+        function bukaModalEdit(rowIndex, nama, no_hp, bilangan, bil_hari, tarikh_majlis, status, status_pemulangan) {
             document.getElementById('edit_row').value = rowIndex;
+            document.getElementById('edit_nama').value = nama;
+            document.getElementById('edit_nohp').value = no_hp;
             document.getElementById('edit_bilangan').value = bilangan;
+            document.getElementById('edit_bil_hari').value = bil_hari !== "-" ? bil_hari : "1";
+            
+            // Format Tarikh untuk HTML Date Input
+            let dString = tarikh_majlis;
+            if(dString && dString.includes("/")) {
+                let p = dString.split("/");
+                if (p.length === 3) dString = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+            } else if (dString && dString.includes("T")) {
+                dString = dString.split("T")[0];
+            }
+            document.getElementById('edit_tarikh').value = dString;
+
             document.getElementById('edit_status').value = status;
             
             // Default "BELUM PULANG" jika tiada nilai
@@ -933,8 +1054,13 @@
         function simpanKemaskini() {
             const btn = document.getElementById('btnSimpanEdit');
             const msg = document.getElementById('msgEdit');
+            
             const rowIndex = document.getElementById('edit_row').value;
+            const nama = document.getElementById('edit_nama').value;
+            const noHp = document.getElementById('edit_nohp').value;
             const bilangan = document.getElementById('edit_bilangan').value;
+            const bilHari = document.getElementById('edit_bil_hari').value;
+            const tarikh = document.getElementById('edit_tarikh').value;
             const status = document.getElementById('edit_status').value;
             const statusPemulangan = document.getElementById('edit_status_pemulangan').value;
             
@@ -947,6 +1073,10 @@
             const payload = {
                 action: "kemaskiniTempahan",
                 ROW: rowIndex,
+                NAMA: nama,
+                NO_HP: noHp,
+                TARIKH_MAJLIS: tarikh,
+                BIL_HARI: bilHari,
                 BILANGAN: bilangan,
                 STATUS: status,
                 STATUS_PEMULANGAN: statusPemulangan,
