@@ -108,7 +108,6 @@
                     <input type="text" id="filterTahunAktiviti" oninput="prosesTapisan()" placeholder="Cth: 2026" class="w-24 bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-center">
                 </div>
                 
-                <!-- BUTANG DOWNLOAD CSV TAMBAHAN -->
                 <button id="btnMuatTurunCSV" onclick="muatTurunCSV()" class="hidden items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition">
                     <i class="fa-solid fa-download"></i> Muat Turun CSV
                 </button>
@@ -122,13 +121,11 @@
         <!-- KAWASAN KAD -->
         <section id="kawasanKadAktiviti" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></section>
 
-        <!-- KAWASAN TIADA REKOD -->
         <div id="tiadaAktiviti" class="hidden text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
             <i class="fa-regular fa-folder-open text-5xl text-gray-300 mb-3"></i>
             <p class="text-gray-500 font-medium">Tiada aktiviti ditemui berdasarkan tapisan anda.</p>
         </div>
 
-        <!-- KAWASAN PAGINATION (BARU) -->
         <div id="paginationControls" class="hidden mt-10 flex flex-wrap justify-center items-center gap-4">
             <button id="btnPrevPage" onclick="tukarHalaman(-1)" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed font-bold transition flex items-center hover:bg-blue-700">
                 <i class="fa-solid fa-chevron-left mr-2"></i>Sebelum
@@ -148,13 +145,13 @@
     </footer>
 
     <!-- MODAL TAMBAH & EDIT AKTIVITI -->
-    <div id="modalAktiviti" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4 transition-opacity">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg border border-gray-200 overflow-hidden">
-            <div id="modalHeader" class="bg-blue-700 px-6 py-4 flex justify-between items-center text-white">
+    <div id="modalAktiviti" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[50] flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg border border-gray-200 overflow-hidden flex flex-col max-h-[90vh]">
+            <div id="modalHeader" class="bg-blue-700 px-6 py-4 flex justify-between items-center text-white shrink-0">
                 <h3 id="tajukModal" class="font-bold text-lg">Tambah Aktiviti Baru</h3>
-                <button onclick="tutupModal()" class="hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button type="button" onclick="tutupModal()" class="hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <form id="borangAktiviti" class="p-6 space-y-4" onsubmit="simpanAktiviti(event)">
+            <form id="borangAktiviti" class="p-6 space-y-4 overflow-y-auto" onsubmit="simpanAktiviti(event)">
                 <input type="hidden" id="aktiviti_id">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Aktiviti</label>
@@ -183,9 +180,26 @@
                     <textarea id="aktiviti_info" rows="3" required placeholder="Masukkan butiran atau pencapaian..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
                 </div>
                 
+                <div id="bekasGambarSediaAda" class="hidden border-t pt-3 mt-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Gambar Sedia Ada</label>
+                    <div id="senaraiGambarSediaAda" class="space-y-2 mt-2"></div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tambah Gambar Baru</label>
+                    <input type="file" id="aktiviti_gambar" accept="image/jpeg, image/jpg, image/png" multiple class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-gray-50">
+                    <p class="text-[11px] text-gray-500 mt-1 leading-tight"><i class="fa-solid fa-circle-info mr-1"></i>Maksimum 5 gambar kesemuanya. Format: JPEG, JPG, PNG sahaja. Had setiap fail: 10MB.</p>
+                </div>
+                
+                <!-- KOD BARU: BEKAS SENARAI GAMBAR BARU UNTUK DIPADAM SEBELUM UPLOAD -->
+                <div id="bekasGambarBaru" class="hidden border-t pt-3 mt-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Senarai Gambar Baru Dipilih</label>
+                    <div id="senaraiGambarBaru" class="space-y-2 mt-2"></div>
+                </div>
+                
                 <div id="mesejModal" class="hidden text-sm font-semibold text-center p-2 rounded"></div>
 
-                <div class="pt-4 flex justify-end gap-3">
+                <div class="pt-4 flex justify-end gap-3 shrink-0">
                     <button type="button" onclick="tutupModal()" class="px-5 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 font-semibold rounded-lg transition">Batal</button>
                     <button type="submit" id="btnSimpanAktiviti" class="px-5 py-2 text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-lg shadow-md transition">Simpan Rekod</button>
                 </div>
@@ -193,43 +207,100 @@
         </div>
     </div>
 
+    <!-- MODAL INFO LANJUT (BARU) -->
+    <div id="modalInfoAktiviti" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200 overflow-hidden flex flex-col max-h-[95vh]">
+            <div class="bg-indigo-700 px-6 py-4 flex justify-between items-center text-white shrink-0">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-circle-info mr-2"></i>Paparan Maklumat Aktiviti</h3>
+                <button type="button" onclick="tutupModalInfo()" class="hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4">
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Nama Aktiviti</p>
+                    <p id="infoNama" class="text-lg font-bold text-gray-900"></p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Tarikh</p>
+                    <p id="infoTarikh" class="text-sm font-medium text-gray-800"></p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Keterangan</p>
+                    <p id="infoKeterangan" class="text-sm text-gray-800 whitespace-pre-wrap"></p>
+                </div>
+                
+                <!-- GALERI GAMBAR INFO LANJUT -->
+                <div id="gallerySection" class="hidden mt-6 pt-4 border-t border-gray-200">
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Album Gambar Aktiviti</p>
+                    <div class="bg-gray-900 rounded-xl p-4 flex flex-col items-center relative shadow-inner">
+                        <div class="flex justify-between items-center w-full mb-3 text-white">
+                            <button onclick="tukarGambar(-1)" class="bg-gray-700 hover:bg-gray-600 rounded-full h-9 w-9 flex items-center justify-center transition focus:outline-none"><i class="fa-solid fa-chevron-left"></i></button>
+                            <span id="galleryLabel" class="font-semibold text-sm tracking-wide bg-black/40 px-3 py-1 rounded-full"></span>
+                            <button onclick="tukarGambar(1)" class="bg-gray-700 hover:bg-gray-600 rounded-full h-9 w-9 flex items-center justify-center transition focus:outline-none"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <img id="galleryImage" src="" class="max-h-[400px] object-contain rounded-md shadow-md" />
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end shrink-0">
+                <button type="button" onclick="tutupModalInfo()" class="px-5 py-2 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg transition">Tutup Paparan</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // MASUKKAN URL GOOGLE APP SCRIPT WEB APP DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec';
 
-        // Takrifan global pembolehubah data
         let dataAsalAktiviti = [];
         let dataDipaparkan = [];
-        
-        // PEMBOLEHUBAH PAGINATION
         let currentPage = 1;
         const itemsPerPage = 10;
+        
+        // PEMBOLEHUBAH GLOBAL UNTUK GAMBAR
+        window.gambarKekal = [];
+        window.gambarBaruArray = []; // KOD BARU: Array untuk simpan fail gambar baru
+        
+        let currentGallery = [];
+        let currentGalleryIndex = 0;
+        let currentGalleryId = "";
+        let currentGalleryName = "";
 
-        // Logik Kebenaran (Role-based access)
         const userNama = (sessionStorage.getItem("nama") || "TETAMU").toUpperCase();
         const perananPengguna = (sessionStorage.getItem("peranan") || "TETAMU").trim().toUpperCase();
         
-        // PEMBOLEHUBAH KAWALAN (DITAMBAH FUNGSI PADAM & CSV)
         const bolehTambah = perananPengguna !== "STAF";
+        
+        const perananSahAksesPenuh = [
+            "ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS PENYELIDIKAN (C-RIE)", 
+            "PENYELARAS GERAN (C-RIE)", "PENYELARAS PENGKOMERSILAN (C-RIE)", 
+            "PENYELARAS KIK (C-RIE)", "PENYELARAS HARTA INTELEK (C-RIE)"
+        ];
+        const isAksesPenuh = perananSahAksesPenuh.includes(perananPengguna);
+
         const roleDilarangEditPadamDownload = ["PENYELARAS JABATAN", "STAF", "PENYELIA PROJEK PELAJAR"];
         
-        const bolehEdit = !roleDilarangEditPadamDownload.includes(perananPengguna);
-        const bolehPadam = !roleDilarangEditPadamDownload.includes(perananPengguna);
-        const bolehMuatTurunCSV = !roleDilarangEditPadamDownload.includes(perananPengguna);
+        const bolehEdit = !roleDilarangEditPadamDownload.includes(perananPengguna) || isAksesPenuh;
+        const bolehPadam = !roleDilarangEditPadamDownload.includes(perananPengguna) || isAksesPenuh;
+        const bolehMuatTurunCSV = !roleDilarangEditPadamDownload.includes(perananPengguna) || isAksesPenuh;
 
-        // ==========================================
-        // FUNGSI BARU: FORMAT TARIKH UNTUK PAPARAN
-        // ==========================================
         function formatTarikhPaparan(tarikhISO) {
             if (!tarikhISO) return "Akan Dikemaskini";
-            // Periksa jika format adalah YYYY-MM-DD
             if (tarikhISO.includes('-')) {
                 const parts = tarikhISO.split('-');
                 if (parts.length === 3) {
-                    return `${parts[2]}/${parts[1]}/${parts[0]}`; // Menghasilkan DD/MM/YYYY
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`; 
                 }
             }
-            return tarikhISO; // Kembalikan nilai asal jika bukan format yang dijangka
+            return tarikhISO; 
+        }
+
+        function bacaFailKeBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]); 
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
         }
 
         window.onload = () => {
@@ -253,7 +324,6 @@
                 }
             }
 
-            // Peringkat paparan Butang Tambah
             if (bolehTambah) {
                 const btnTambah = document.getElementById('btnTambahAktiviti');
                 if(btnTambah) {
@@ -262,7 +332,6 @@
                 }
             }
             
-            // Peringkat paparan Butang CSV
             if (bolehMuatTurunCSV) {
                 const btnMuatTurunCSV = document.getElementById('btnMuatTurunCSV');
                 if(btnMuatTurunCSV) {
@@ -274,16 +343,27 @@
             const liveYearEl = document.getElementById('liveYear');
             if (liveYearEl) liveYearEl.innerText = new Date().getFullYear();
 
+            // KOD BARU: Event listener untuk input gambar baru (bagi menyimpan fail ke dalam array)
+            const inputGambarEl = document.getElementById('aktiviti_gambar');
+            if(inputGambarEl) {
+                inputGambarEl.addEventListener('change', function(e) {
+                    const files = Array.from(e.target.files);
+                    window.gambarBaruArray = window.gambarBaruArray.concat(files);
+                    e.target.value = ''; // Reset input supaya boleh pilih fail yang sama jika perlu
+                    renderGambarBaru();
+                });
+            }
+
             muatDataDariSheets();
         };
 
         async function muatDataDariSheets() {
             const kontena = document.getElementById('kawasanKadAktiviti');
             const paginationControls = document.getElementById('paginationControls');
-            const mesejKosong = document.getElementById('tiadaAktiviti'); // Pembolehubah ditambah
+            const mesejKosong = document.getElementById('tiadaAktiviti'); 
             
-            paginationControls.classList.add('hidden'); // Sembunyi ketika load
-            mesejKosong.classList.add('hidden'); // KEMASKINI BARU: Sembunyikan mesej "tiada aktiviti" semasa proses memuatkan (loading) berlaku
+            paginationControls.classList.add('hidden'); 
+            mesejKosong.classList.add('hidden'); 
             
             kontena.innerHTML = `
                 <div class="col-span-full text-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
@@ -293,7 +373,6 @@
             `;
 
             try {
-                // KEMASKINI: Menghantar parameter action=ambilAktiviti secara spesifik
                 const respon = await fetch(`${SCRIPT_URL}?action=ambilAktiviti`);
                 if (!respon.ok) throw new Error("Respon rangkaian tidak berjaya.");
                 
@@ -319,18 +398,19 @@
                         id: item.id || "",
                         nama: item.nama || "Tiada Nama Aktiviti",
                         tahun: String(item.tahun || ""),
-                        tarikhSistem: item.tarikh || "", // Disimpan untuk populasikan kembali di form Edit (Memerlukan format ISO)
-                        tarikh: formatTarikhPaparan(item.tarikh), // Digunakan untuk paparan antaramuka (Diubah kepada DD/MM/YYYY)
+                        tarikhSistem: item.tarikh || "", 
+                        tarikh: formatTarikhPaparan(item.tarikh),
                         kategori: kategoriBersih,
                         info: item.info || "Tiada maklumat tambahan berkaitan aktiviti ini buat masa sekarang.",
                         status: (item.status || "BELUM DISAHKAN").toUpperCase(),
                         ikon: ikon,
-                        warnaBadge: warna
+                        warnaBadge: warna,
+                        pautanGambar: item.link_gambar || item.pautan_gambar || item.gambar || item.pautan || "" 
                     };
                 });
 
                 kemaskiniPapanStatistik(dataAsalAktiviti);
-                prosesTapisan(); // Akan mencetuskan binaKadAktiviti dan reset page ke 1
+                prosesTapisan(); 
 
             } catch (error) {
                 console.error("Ralat muat data Google Sheet:", error);
@@ -344,7 +424,6 @@
             }
         }
 
-        // FUNGSI TAPISAN
         function prosesTapisan() {
             const kataKunci = document.getElementById('cariAktiviti').value.toLowerCase().trim();
             const katDipilih = document.getElementById('filterKategori').value;
@@ -358,15 +437,12 @@
                 return matchKataKunci && matchKategori && matchTahun;
             });
 
-            // Isih tahun secara menurun
             dataDipaparkan.sort((a, b) => Number(b.tahun) - Number(a.tahun));
 
-            // Reset pagination bila search/filter
             currentPage = 1;
             renderPaginasi();
         }
 
-        // FUNGSI UNTUK MERENDER MENGIKUT MUKA SURAT
         function renderPaginasi() {
             const kontena = document.getElementById('kawasanKadAktiviti');
             const mesejKosong = document.getElementById('tiadaAktiviti');
@@ -382,24 +458,20 @@
             
             mesejKosong.classList.add('hidden');
             
-            // Pengiraan Total Muka Surat
             const totalPages = Math.ceil(dataDipaparkan.length / itemsPerPage);
             if (currentPage > totalPages) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
 
-            // Sembunyikan atau tunjuk butang paginasi jika perlu
             if (totalPages > 1) {
                 paginationControls.classList.remove('hidden');
             } else {
                 paginationControls.classList.add('hidden');
             }
 
-            // Tetapkan Status Butang
             document.getElementById('paparMukaSurat').innerText = `Muka Surat ${currentPage} dari ${totalPages}`;
             document.getElementById('btnPrevPage').disabled = (currentPage === 1);
             document.getElementById('btnNextPage').disabled = (currentPage === totalPages);
 
-            // Gunting Array Mengikut Index Muka Surat Semasa
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const rekodHalamanIni = dataDipaparkan.slice(startIndex, endIndex);
@@ -407,11 +479,9 @@
             binaKadAktiviti(rekodHalamanIni, kontena);
         }
 
-        // FUNGSI TUKAR HALAMAN (BUTANG SEBELUM / SELEPAS)
         function tukarHalaman(arah) {
             currentPage += arah;
             renderPaginasi();
-            // Scroll sedikit ke atas
             document.getElementById('kawasanKadAktiviti').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -427,21 +497,26 @@
                 
                 kad.classList.add('border-t-4', borderWarnaTop);
 
+                // Mencegah isu memuatkan parameter dalam onclick (Ganti watak khas)
+                const safeInfo = item.info.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+                const safeNama = item.nama.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                
+                // PENAMBAHBAIKAN: Tangkap pautan tidak kira jika dipisahkan dengan Enter (newlines), koma atau ruang (spaces)
+                const safePautan = item.pautanGambar ? String(item.pautanGambar).trim().replace(/[\r\n,\s]+/g, '|||') : '';
+
                 let butangTindakanHTML = '';
                 
-                // Tambahan Butang Edit & Padam
-                if (item.status === "BELUM DISAHKAN") {
+                if (item.status === "BELUM DISAHKAN" || isAksesPenuh) {
                     if (bolehEdit) {
-                        // KEMASKINI: Menggunakan item.tarikhSistem supaya butang edit boleh membaca YYYY-MM-DD
                         butangTindakanHTML += `
-                            <button onclick="bukaModalEdit('${item.id}', '${item.nama.replace(/'/g, "\\'")}', '${item.tahun}', '${item.tarikhSistem}', '${item.kategori}', '${item.info.replace(/'/g, "\\'")}')" class="text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1 cursor-pointer mr-3">
+                            <button onclick="bukaModalEdit('${item.id}', '${safeNama}', '${item.tahun}', '${item.tarikhSistem}', '${item.kategori}', '${safeInfo}', '${safePautan}')" class="text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1 cursor-pointer mr-3">
                                 <i class="fa-solid fa-pen-to-square"></i> Edit
                             </button>
                         `;
                     }
                     if (bolehPadam) {
                         butangTindakanHTML += `
-                            <button onclick="padamAktiviti('${item.id}', '${item.nama.replace(/'/g, "\\'")}')" class="text-red-600 hover:text-red-700 font-bold flex items-center gap-1 cursor-pointer mr-3">
+                            <button onclick="padamAktiviti('${item.id}', '${safeNama}')" class="text-red-600 hover:text-red-700 font-bold flex items-center gap-1 cursor-pointer mr-3">
                                 <i class="fa-solid fa-trash"></i> Padam
                             </button>
                         `;
@@ -465,15 +540,18 @@
                             ${item.info}
                         </p>
                     </div>
-                    <div class="pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600 mt-auto">
-                        <span class="font-medium flex items-center gap-1">
-                            <i class="fa-regular fa-clock text-gray-400"></i> ${item.tarikh}
-                        </span>
-                        <div class="flex items-center">
-                            ${butangTindakanHTML}
-                            <button onclick="paparDetail('${item.nama.replace(/'/g, "\\'")}', '${item.tarikh}', '${item.info.replace(/'/g, "\\'")}')" class="text-blue-600 hover:text-indigo-800 font-bold flex items-center gap-1 cursor-pointer">
-                                Info Lanjut <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                            </button>
+                    
+                    <div>
+                        <div class="pt-4 mt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600">
+                            <span class="font-medium flex items-center gap-1">
+                                <i class="fa-regular fa-clock text-gray-400"></i> ${item.tarikh}
+                            </span>
+                            <div class="flex items-center">
+                                ${butangTindakanHTML}
+                                <button onclick="paparDetail('${item.id}', '${safeNama}', '${item.tarikh}', '${safeInfo}', '${safePautan}')" class="text-blue-600 hover:text-indigo-800 font-bold flex items-center gap-1 cursor-pointer">
+                                    Info Lanjut <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -488,32 +566,84 @@
             document.getElementById('statBengkel').innerText = senarai.filter(i => i.kategori === "BENGKEL").length;
         }
 
-        function paparDetail(nama, tarikh, info) {
-            alert(`📌 INFO AKTIVITI\n\nNama: ${nama}\nTarikh: ${tarikh}\n\nKeterangan:\n${info}`);
+        // ==========================================
+        // GALERI: LOGIK PAPARAN INFO LANJUT
+        // ==========================================
+        function paparDetail(id, nama, tarikh, info, pautanRaw) {
+            document.getElementById('infoNama').innerText = nama;
+            document.getElementById('infoTarikh').innerText = tarikh;
+            // Kembalikan newline asal dari watak gantian
+            document.getElementById('infoKeterangan').innerText = info.replace(/\\n/g, '\n');
+            
+            let pautanArray = pautanRaw ? pautanRaw.split('|||').filter(p => p.trim() !== '') : [];
+            currentGallery = pautanArray;
+            currentGalleryIndex = 0;
+            currentGalleryId = id;
+            currentGalleryName = nama;
+
+            const galSec = document.getElementById('gallerySection');
+            if (currentGallery.length > 0) {
+                galSec.classList.remove('hidden');
+                updateGalleryUI();
+            } else {
+                galSec.classList.add('hidden');
+            }
+
+            document.getElementById('modalInfoAktiviti').classList.remove('hidden');
         }
 
         // ==========================================
-        // FUNGSI MUAT TURUN CSV (BARU)
+        // GALERI: LOGIK PAPARAN INFO LANJUT
+        // ==========================================
+        function updateGalleryUI() {
+            const img = document.getElementById('galleryImage');
+            const lbl = document.getElementById('galleryLabel');
+            
+            const urlAsal = currentGallery[currentGalleryIndex];
+            
+            // PENAMBAHBAIKAN: Jika imej tetap gagal dimuatkan, tukar dengan fallback imej.
+            img.onerror = function() {
+                this.onerror = null; 
+                this.src = "https://placehold.co/600x400/eeeeee/999999?text=Imej+Gagal+Dimuatkan";
+            };
+
+            // Guna pautan imej terus agar boleh dipaparkan dalam tag <img>
+            img.src = dapatkanPautanImejTerus(urlAsal); 
+            
+            // Tukar label kepada format nama singkat baharu: ID-AKTIVITI Bilangan
+            lbl.innerText = `${currentGalleryId}-AKTIVITI ${currentGalleryIndex + 1}`;
+        }
+
+        function tukarGambar(arah) {
+            currentGalleryIndex += arah;
+            if (currentGalleryIndex < 0) currentGalleryIndex = currentGallery.length - 1;
+            if (currentGalleryIndex >= currentGallery.length) currentGalleryIndex = 0;
+            updateGalleryUI();
+        }
+
+        function tutupModalInfo() {
+            document.getElementById('modalInfoAktiviti').classList.add('hidden');
+        }
+
+
+        // ==========================================
+        // FUNGSI MUAT TURUN CSV
         // ==========================================
         function muatTurunCSV() {
             if (dataDipaparkan.length === 0) {
                 alert("Tiada rekod untuk dimuat turun berdasarkan tapisan semasa.");
                 return;
             }
-
-            // Membina Pengepala (Headers)
             const headers = ["ID", "NAMA AKTIVITI", "TAHUN", "TARIKH", "KATEGORI", "STATUS", "INFO KETERANGAN"];
             const barisCSV = [];
             barisCSV.push(headers.join(","));
 
-            // Membina Data CSV
             dataDipaparkan.forEach(item => {
-                // Melarikan (escape) tanda kutip " di dalam rentetan CSV
                 const nilai = [
                     `"${item.id}"`,
                     `"${item.nama.replace(/"/g, '""')}"`,
                     `"${item.tahun}"`,
-                    `"${item.tarikh}"`, // Ini akan mengekstrak format DD/MM/YYYY
+                    `"${item.tarikh}"`, 
                     `"${item.kategori}"`,
                     `"${item.status}"`,
                     `"${item.info.replace(/"/g, '""')}"`
@@ -521,12 +651,10 @@
                 barisCSV.push(nilai.join(","));
             });
 
-            // Menyediakan Blob untuk fail dimuat turun
             const rentetanCSV = barisCSV.join("\n");
-            const blob = new Blob(["\uFEFF" + rentetanCSV], { type: 'text/csv;charset=utf-8;' }); // \uFEFF disertakan agar format Excel utf-8 boleh dibaca terus
+            const blob = new Blob(["\uFEFF" + rentetanCSV], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             
-            // Mencipta pautan memuat turun
             const link = document.createElement("a");
             link.setAttribute("href", url);
             link.setAttribute("download", `Senarai_Aktiviti_${new Date().toISOString().slice(0,10)}.csv`);
@@ -536,14 +664,13 @@
         }
 
         // ==========================================
-        // FUNGSI PADAM AKTIVITI (BARU)
+        // FUNGSI PADAM AKTIVITI
         // ==========================================
         function padamAktiviti(id, nama) {
             const pengesahan = confirm(`AWAS: Adakah anda pasti mahu memadam rekod aktiviti ini secara kekal?\n\n"${nama}"`);
             
             if (!pengesahan) return;
 
-            // Menggunakan fetch untuk hantar permintaan padam ke Google Apps Script
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -553,7 +680,7 @@
             .then(data => {
                 if (data.status === 'BERJAYA') {
                     alert("Rekod berjaya dipadam!");
-                    muatDataDariSheets(); // Muat semula senarai
+                    muatDataDariSheets(); 
                 } else {
                     alert("Gagal memadam rekod: " + (data.mesej || "Sila cuba lagi."));
                 }
@@ -574,56 +701,202 @@
             document.getElementById('borangAktiviti').reset();
             document.getElementById('aktiviti_id').value = ""; 
             document.getElementById('tajukModal').innerText = "Tambah Aktiviti Baru";
-            document.getElementById('modalHeader').className = "bg-blue-700 px-6 py-4 flex justify-between items-center text-white";
+            document.getElementById('modalHeader').className = "bg-blue-700 px-6 py-4 flex justify-between items-center text-white shrink-0";
             document.getElementById('mesejModal').classList.add('hidden');
-			// Pastikan butang aktif dan kembali kepada "Simpan Rekod"
+            
+            document.getElementById('bekasGambarSediaAda').classList.add('hidden');
+            window.gambarKekal = []; 
+            window.gambarBaruArray = []; // KOD BARU: Reset array gambar baru
+            renderGambarBaru(); // KOD BARU: Render senarai kosong
+
             const btn = document.getElementById('btnSimpanAktiviti');
             if (btn) {
                 btn.disabled = false;
                 btn.innerText = "Simpan Rekod";
             }
-			
+            
             modal.classList.remove('hidden');
         }
 
-        function bukaModalEdit(id, nama, tahun, tarikh, kategori, info) {
+        function bukaModalEdit(id, nama, tahun, tarikh, kategori, info, pautanRaw) {
+            document.getElementById('borangAktiviti').reset(); 
             document.getElementById('aktiviti_id').value = id; 
             document.getElementById('aktiviti_nama').value = nama;
             document.getElementById('aktiviti_tahun').value = tahun;
             document.getElementById('aktiviti_tarikh').value = tarikh;
             document.getElementById('aktiviti_kategori').value = kategori;
-            document.getElementById('aktiviti_info').value = info;
+            document.getElementById('aktiviti_info').value = info.replace(/\\n/g, '\n');
 
             document.getElementById('tajukModal').innerText = "Kemaskini Rekod Aktiviti";
-            document.getElementById('modalHeader').className = "bg-amber-600 px-6 py-4 flex justify-between items-center text-white";
+            document.getElementById('modalHeader').className = "bg-amber-600 px-6 py-4 flex justify-between items-center text-white shrink-0";
             document.getElementById('mesejModal').classList.add('hidden');
+            
+            window.gambarBaruArray = []; // KOD BARU: Reset array gambar baru
+            renderGambarBaru(); // KOD BARU: Render senarai kosong
+
+            // LOGIK PAPARKAN GAMBAR SEDIA ADA
+            window.gambarKekal = pautanRaw ? pautanRaw.split('|||').filter(p => p.trim() !== '') : [];
+            const bekasSediaAda = document.getElementById('bekasGambarSediaAda');
+            if(window.gambarKekal.length > 0) {
+                bekasSediaAda.classList.remove('hidden');
+                renderGambarSediaAda(id, nama);
+            } else {
+                bekasSediaAda.classList.add('hidden');
+            }
+
             modal.classList.remove('hidden');
+        }
+
+        // FUNGSI RENDER & BUANG GAMBAR SEDIA ADA SEMASA EDIT
+        function renderGambarSediaAda(id, nama) {
+            const div = document.getElementById('senaraiGambarSediaAda');
+            div.innerHTML = '';
+            
+            if (window.gambarKekal.length === 0) {
+                document.getElementById('bekasGambarSediaAda').classList.add('hidden');
+                return;
+            }
+
+            window.gambarKekal.forEach((pautan, index) => {
+                // Gunakan format baharu untuk paparan
+                const namaPapar = `${id}-AKTIVITI ${index + 1}`; 
+                div.innerHTML += `
+                    <div class="flex justify-between items-center bg-gray-50 border border-gray-200 p-2.5 rounded-lg text-sm mb-2 shadow-sm">
+                        
+                        <!-- REKA BENTUK PADA PAUTAN INI TELAH DITUKAR MENJADI BUTANG -->
+                        <a href="${pautan}" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-md font-bold text-xs flex items-center shadow-sm transition">
+                            <i class="fa-solid fa-arrow-up-right-from-square mr-2"></i> ${namaPapar}
+                        </a>
+                        
+                        <button type="button" onclick="padamGambarSediaAda(${index}, '${id}', '${nama.replace(/'/g, "\\'")}')" class="text-red-500 hover:text-white bg-red-50 hover:bg-red-500 px-3 py-1.5 rounded-md font-bold transition flex items-center shadow-sm text-xs border border-red-200 hover:border-red-500">
+                            <i class="fa-solid fa-trash mr-1.5"></i> Padam
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function padamGambarSediaAda(index, id, nama) {
+            window.gambarKekal.splice(index, 1);
+            renderGambarSediaAda(id, nama);
+        }
+
+        // ==========================================
+        // KOD BARU: FUNGSI RENDER & BUANG GAMBAR BARU SEBELUM UPLOAD
+        // ==========================================
+        function renderGambarBaru() {
+            const div = document.getElementById('senaraiGambarBaru');
+            const bekas = document.getElementById('bekasGambarBaru');
+            div.innerHTML = '';
+            
+            if (window.gambarBaruArray.length === 0) {
+                bekas.classList.add('hidden');
+                return;
+            }
+
+            bekas.classList.remove('hidden');
+            window.gambarBaruArray.forEach((file, index) => {
+                div.innerHTML += `
+                    <div class="flex justify-between items-center bg-green-50 border border-green-100 p-2 rounded text-sm mb-1">
+                        <span class="text-green-700 font-medium flex items-center truncate max-w-[70%]">
+                            <i class="fa-solid fa-file-image mr-2"></i> ${file.name}
+                        </span>
+                        <button type="button" onclick="padamGambarBaru(${index})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md font-bold transition">
+                            <i class="fa-solid fa-trash mr-1"></i> Padam
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function padamGambarBaru(index) {
+            window.gambarBaruArray.splice(index, 1);
+            renderGambarBaru();
         }
 
         function tutupModal() {
             modal.classList.add('hidden');
         }
 
-        function simpanAktiviti(e) {
+        async function simpanAktiviti(e) {
             e.preventDefault();
             
             const btn = document.getElementById('btnSimpanAktiviti');
             const mesej = document.getElementById('mesejModal');
             
             btn.disabled = true; 
-            btn.innerText = "Menyimpan...";
+            btn.innerText = "Memproses...";
             mesej.classList.add('hidden');
 
             const idSediaAda = document.getElementById('aktiviti_id').value;
-            
+            // KOD BARU: Mengambil fail dari array global, bukan input secara terus
+            const senaraiFail = window.gambarBaruArray; 
+            let arrayGambarUpload = [];
+            const saizMax = 10 * 1024 * 1024; 
+
+            // Jumlah Gambar Tidak Boleh Lebih 5
+            if ((senaraiFail.length + window.gambarKekal.length) > 5) {
+                mesej.classList.remove('hidden');
+                mesej.className = "text-sm font-semibold text-center p-2 rounded bg-red-100 text-red-800 border border-red-200 mt-4";
+                mesej.innerText = "Maksimum keseluruhan 5 gambar sahaja dibenarkan (Termasuk yang sedia ada).";
+                btn.disabled = false; 
+                btn.innerText = "Simpan Rekod";
+                return;
+            }
+
+            for (let i = 0; i < senaraiFail.length; i++) {
+                let failSemasa = senaraiFail[i];
+
+                if (failSemasa.size > saizMax) {
+                    mesej.classList.remove('hidden');
+                    mesej.className = "text-sm font-semibold text-center p-2 rounded bg-red-100 text-red-800 border border-red-200 mt-4";
+                    mesej.innerText = `Saiz fail "${failSemasa.name}" melebihi had maksimum 10MB.`;
+                    btn.disabled = false; 
+                    btn.innerText = "Simpan Rekod";
+                    return;
+                }
+
+                const jenisDibenarkan = ["image/jpeg", "image/jpg", "image/png"];
+                if (!jenisDibenarkan.includes(failSemasa.type.toLowerCase())) {
+                    mesej.classList.remove('hidden');
+                    mesej.className = "text-sm font-semibold text-center p-2 rounded bg-red-100 text-red-800 border border-red-200 mt-4";
+                    mesej.innerText = `Fail "${failSemasa.name}" format tidak sah. Sila guna JPEG/PNG.`;
+                    btn.disabled = false; 
+                    btn.innerText = "Simpan Rekod";
+                    return;
+                }
+
+                try {
+                    btn.innerText = `Memproses fail ${i + 1}/${senaraiFail.length}...`;
+                    let base64String = await bacaFailKeBase64(failSemasa);
+                    arrayGambarUpload.push({
+                        nama: failSemasa.name,
+                        mimeType: failSemasa.type,
+                        dataBase64: base64String
+                    });
+                } catch (err) {
+                    mesej.classList.remove('hidden');
+                    mesej.className = "text-sm font-semibold text-center p-2 rounded bg-red-100 text-red-800 border border-red-200 mt-4";
+                    mesej.innerText = "Ralat sewaktu membaca dan menukar fail gambar.";
+                    btn.disabled = false; 
+                    btn.innerText = "Simpan Rekod";
+                    return;
+                }
+            }
+
+            btn.innerText = "Menyimpan ke pangkalan data...";
+
             const payload = {
                 action: idSediaAda ? "kemaskiniAktiviti" : "tambahAktiviti",
-                ID: idSediaAda, // Jika id kosong, backend (Code.gs) akan jana ID secara auto 'AKT-x'
+                ID: idSediaAda, 
                 NAMA: document.getElementById('aktiviti_nama').value.toUpperCase(),
                 TAHUN: document.getElementById('aktiviti_tahun').value,
                 TARIKH: document.getElementById('aktiviti_tarikh').value,
                 KATEGORI: document.getElementById('aktiviti_kategori').value,
-                INFO: document.getElementById('aktiviti_info').value
+                INFO: document.getElementById('aktiviti_info').value,
+                GAMBAR: arrayGambarUpload,
+                GAMBAR_KEKAL: window.gambarKekal, // Serah maklumat fail kekal
+                PERANAN: perananPengguna
             };
 
             fetch(SCRIPT_URL, {
@@ -640,12 +913,10 @@
                     
                     setTimeout(() => {
                         tutupModal();
-                        muatDataDariSheets(); // Panggil data segar
-						// ======== KOD BARU DITAMBAH DI SINI ========
-                        // Reset semula butang supaya boleh digunakan untuk rekod seterusnya
+                        muatDataDariSheets(); 
+                        
                         btn.disabled = false; 
                         btn.innerText = "Simpan Rekod";
-                        // ===========================================
                     }, 2000);
                 } else {
                     mesej.className = "text-sm font-semibold text-center p-2 rounded bg-red-100 text-red-800 border border-red-200 mt-4";
@@ -657,11 +928,26 @@
             .catch(error => {
                 mesej.classList.remove('hidden');
                 mesej.className = "text-sm font-semibold text-center p-2 rounded bg-red-100 text-red-800 border border-red-200 mt-4";
-                mesej.innerText = "Ralat pelayan/rangkaian.";
+                mesej.innerText = "Ralat pelayan/rangkaian. Sila cuba lagi.";
                 btn.disabled = false; 
                 btn.innerText = "Simpan Rekod";
             });
         }
+		
+		
+	    // ==========================================
+        // FUNGSI PENUKAR PAUTAN GAMBAR GOOGLE DRIVE
+        // ==========================================
+        function dapatkanPautanImejTerus(url) {
+            if (!url) return "";
+            const match = url.match(/[-\w]{25,}/);
+            if (match) {
+                // KEMASKINI: Menukar pautan viewer kepada direct image link berasaskan thumbnail (Mematuhi polisi baharu Google)
+                return `https://drive.google.com/thumbnail?id=${match[0]}&sz=w1000`;
+            }
+            return url;
+        }	
+	
     </script>
 </body>
 </html>
