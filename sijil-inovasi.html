@@ -75,6 +75,8 @@
           <th>Jabatan</th>
           <th>Produk</th>
           <th>Pertandingan</th>
+          <th>Tarikh & Tempat</th>
+          <th>Pingat</th>
           <th>Tahun</th>
           <th>Status Sijil</th>
           <th>Tindakan</th>
@@ -217,7 +219,8 @@
     tbody.innerHTML = "";
 
     if (dataTapisSemasa.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='9' class='text-center'>Tiada rekod inovasi ditemui.</td></tr>"; 
+      // 🌟 KEMASKINI: colspan ditukar dari 9 ke 11 kerana penambahan 2 lajur baharu
+      tbody.innerHTML = "<tr><td colspan='11' class='text-center'>Tiada rekod inovasi ditemui.</td></tr>"; 
       kemaskiniButangPagination(0);
       return;
     }
@@ -259,15 +262,17 @@
             : `<span class="text-muted small">Menunggu Sijil</span>`;
       }
 
-      // 🌟 KEMASKINI: Menggantikan ${rekod[0]} kepada ${displayBil} hanya pada kolum pertama (Bil)
+      // 🌟 KEMASKINI: Penambahan td untuk r[6] (Tarikh & Tempat) dan r[7] (Pingat)
       tr.innerHTML = `
         <td>${displayBil}</td>
-        <td>${rekod[1]}</td>
+        <td>${rekod[1] || "-"}</td>
         <td>${rekod[2] || "-"}</td> 
-        <td>${rekod[3]}</td>
-        <td>${rekod[4]}</td>
-        <td>${rekod[5]}</td>
-        <td>${rekod[8]}</td>
+        <td>${rekod[3] || "-"}</td>
+        <td>${rekod[4] || "-"}</td>
+        <td>${rekod[5] || "-"}</td>
+        <td>${rekod[6] || "-"}</td>
+        <td>${rekod[7] || "-"}</td>
+        <td>${rekod[8] || "-"}</td>
         <td>${statusSijil}</td>
         <td>${butangAksi}</td>
       `;
