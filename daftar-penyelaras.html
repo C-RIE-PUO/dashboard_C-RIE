@@ -310,12 +310,20 @@
                 if (data.status === "BERJAYA") {
                     // --- SETUP JABATAN ---
                     let htmlJabatan = '<option value="">-- Pilih Jabatan --</option>';
-                    data.JABATAN.forEach(j => htmlJabatan += `<option value="${j}">${j}</option>`);
+                    data.JABATAN.forEach(j => {
+                        if (j.toString().trim().toUpperCase() !== "LAIN-LAIN INSTITUSI") {
+                            htmlJabatan += `<option value="${j}">${j}</option>`;
+                        }
+                    });
                     document.getElementById('jabatan').innerHTML = htmlJabatan;
                     document.getElementById('editJabatan').innerHTML = htmlJabatan;
                     
                     let htmlFilterJab = '<option value="">Semua Jabatan</option>';
-                    data.JABATAN.forEach(j => htmlFilterJab += `<option value="${j}">${j}</option>`);
+                    data.JABATAN.forEach(j => {
+                        if (j.toString().trim().toUpperCase() !== "LAIN-LAIN INSTITUSI") {
+                            htmlFilterJab += `<option value="${j}">${j}</option>`;
+                        }
+                    });
                     document.getElementById('filterJabatan').innerHTML = htmlFilterJab;
 
                     // --- SETUP BAHAGIAN ---

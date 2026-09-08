@@ -36,13 +36,15 @@
             </div>
             
             <div class="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                <a href="juri.html" class="bg-purple-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-purple-800 transition text-sm flex items-center gap-2">
+                <!-- 🌟 ID ditambah pada butang untuk kawalan akses STAF -->
+                <a href="juri.html" id="btnJuri" class="bg-purple-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-purple-800 transition text-sm flex items-center gap-2">
                     👨‍⚖️ Juri/Panel
                 </a>
                 <a href="projek_pelajar.html" class="bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-indigo-800 transition text-sm flex items-center gap-2">
                     🎓 Pencalonan Projek Pelajar
                 </a>
-                <a href="projek_pelajar.html?action=daftar" class="bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-emerald-800 transition text-sm flex items-center gap-2">
+                <!-- 🌟 ID ditambah pada butang untuk kawalan akses STAF -->
+                <a href="projek_pelajar.html?action=daftar" id="btnDaftarProjek" class="bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-emerald-800 transition text-sm flex items-center gap-2">
                     ➕ Daftar Projek
                 </a>
                 <a href="paparan.html" class="bg-slate-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-slate-800 transition text-sm flex items-center gap-2">
@@ -81,11 +83,9 @@
         
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 items-end">
             <div class="w-full md:w-1/4">
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Tahun</label>
-                <select id="filterTahun" onchange="resetPageDanRender()" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
-                    <option value="SEMUA">-- Semua Tahun --</option>
-                </select>
-            </div>
+				<label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Tahun</label>
+				<input type="text" id="filterTahun" oninput="resetPageDanRender()" placeholder="Cth: 2024" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
+			</div>
             <div class="w-full md:w-1/4">
                 <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Jabatan</label>
                 <select id="filterJabatan" onchange="resetPageDanRender()" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
@@ -115,7 +115,8 @@
                     ➕ Tambah Manual
                 </button>
 
-                <button onclick="downloadCSV()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2">
+                <!-- 🌟 ID ditambah pada butang untuk kawalan akses STAF -->
+                <button id="btnDownloadLaporan" onclick="downloadCSV()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2">
                     📥 Download Laporan
                 </button>
                 <button onclick="muatDataPencapaian()" class="bg-amber-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-amber-600 shadow-md">🔄 Refresh</button>
@@ -129,16 +130,18 @@
                         <tr class="bg-amber-50 text-amber-900 uppercase tracking-wide text-[11px] border-b-2 border-amber-200">
                             <th class="p-3 text-center">PROJEK ID</th>
                             <th class="p-3 text-center">TAHUN</th>
+                            <th class="p-3 text-center">SESI</th>
                             <th class="p-3 text-center">JABATAN</th>
                             <th class="p-3">KATEGORI</th>
                             <th class="p-3">NAMA PROJEK</th>
                             <th class="p-3">KETUA / PENYELIA</th>
+                            <th class="p-3 text-center">MARKAH</th>
                             <th class="p-3 text-center">PENCAPAIAN</th>
                             <th class="p-3 text-center">TINDAKAN</th>
                         </tr>
                     </thead>
                     <tbody id="isiJadual" class="text-gray-700 bg-white">
-                        <tr><td colspan="8" class="p-10 text-center font-bold text-amber-600 animate-pulse">⏳ Memuat turun data pencapaian...</td></tr>
+                        <tr><td colspan="10" class="p-10 text-center font-bold text-amber-600 animate-pulse">⏳ Memuat turun data pencapaian...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -170,6 +173,16 @@
                             <label class="block text-xs font-bold text-gray-700 mb-1">Projek ID</label>
                             <input type="text" id="in_projek_id" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100 font-bold text-gray-600 outline-none">
                         </div>
+						
+						<div>
+						<label class="block text-xs font-bold text-gray-700 mb-1">Sesi</label>
+						<select id="in_sesi" class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
+							<option value="">-- SILA PILIH SESI --</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+						</select>
+						</div>
+						
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Tahun</label>
                             <input type="number" id="in_tahun" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100 font-bold text-gray-600 outline-none">
@@ -214,6 +227,8 @@
                                 <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN</option>
                                 <option value="TIADA">TIADA</option>
                             </select>
+							<label class="block text-sm font-bold text-amber-800 mt-4 mb-2">💯 Kemaskini Markah</label>
+							<input type="number" id="in_markah" step="0.01" class="w-full px-4 py-2 border border-amber-300 rounded-lg font-bold text-amber-900 bg-white focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Masukkan Markah">
                         </div>
                     </div>
 
@@ -241,10 +256,18 @@
                 <form id="borangTambah" onsubmit="simpanTambah(event)">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Sesi</label>
+                            <select id="tambah_sesi" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="">-- SILA PILIH SESI --</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </div>
+                        <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
                             <input type="number" id="tambah_tahun" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
-                        <div>
+                        <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
                             <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
                             <select id="tambah_jabatan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
@@ -284,6 +307,8 @@
                                 <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN</option>
                                 <option value="TIADA">TIADA</option>
                             </select>
+                            <label class="block text-sm font-bold text-blue-800 mt-4 mb-2">💯 Markah</label>
+                            <input type="number" id="tambah_markah" step="0.01" class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-900 bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan Markah">
                         </div>
                     </div>
 
@@ -351,6 +376,18 @@
         const rowsPerPage = 10;
 
         window.onload = () => {
+            // 🌟 KOD BAHARU: Kawalan paparan butang khas untuk peranan STAF
+            if (userPeranan.toUpperCase() === "STAF") {
+                const btnJuri = document.getElementById("btnJuri");
+                if (btnJuri) btnJuri.style.display = "none";
+
+                const btnDaftarProjek = document.getElementById("btnDaftarProjek");
+                if (btnDaftarProjek) btnDaftarProjek.style.display = "none";
+
+                const btnDownloadLaporan = document.getElementById("btnDownloadLaporan");
+                if (btnDownloadLaporan) btnDownloadLaporan.style.display = "none";
+            }
+
             if(bolehEditPenuh) {
                 document.getElementById('amaranPeranan').classList.remove('hidden');
             }
@@ -394,7 +431,7 @@
 
         function muatDataPencapaian() {
             const tbody = document.getElementById('isiJadual');
-            tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center font-bold text-amber-500 animate-pulse">⏳ Memuat turun pangkalan data pencapaian...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center font-bold text-amber-500 animate-pulse">⏳ Memuat turun pangkalan data pencapaian...</td></tr>`;
 
             fetch(`${SCRIPT_URL}?action=ambilPencapaianPelajar`)
             .then(res => res.json())
@@ -404,24 +441,20 @@
                     binaFilterDropdown();
                     resetPageDanRender();
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">❌ Mesej: ${result.mesej}</td></tr>`;
                 }
             }).catch(err => {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke pelayan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-red-600 font-bold">⚠️ Ralat menyambung ke pelayan.</td></tr>`;
             });
         }
 
         function binaFilterDropdown() {
-            const selTahun = document.getElementById('filterTahun');
-            const tahunUnik = [...new Set(dataGlobal.map(item => item.tahun).filter(t => t !== ""))].sort().reverse(); 
-            selTahun.innerHTML = '<option value="SEMUA">-- Semua Tahun --</option>';
-            tahunUnik.forEach(t => selTahun.innerHTML += `<option value="${t}">${t}</option>`);
-
-            const selJabatan = document.getElementById('filterJabatan');
-            const jabatanUnik = [...new Set(dataGlobal.map(item => item.jabatan.toUpperCase()).filter(j => j !== ""))].sort();
-            selJabatan.innerHTML = '<option value="SEMUA">-- Semua Jabatan --</option>';
-            jabatanUnik.forEach(j => selJabatan.innerHTML += `<option value="${j}">${j}</option>`);
-        }
+			// HANYA Jabatan akan di filter melalui dropdown
+			const selJabatan = document.getElementById('filterJabatan');
+			const jabatanUnik = [...new Set(dataGlobal.map(item => item.jabatan.toUpperCase()).filter(j => j !== ""))].sort();
+			selJabatan.innerHTML = '<option value="SEMUA">-- Semua Jabatan --</option>';
+			jabatanUnik.forEach(j => selJabatan.innerHTML += `<option value="${j}">${j}</option>`);
+		}
 
         function resetPageDanRender() {
             currentPage = 1; 
@@ -429,17 +462,17 @@
         }
 
         function renderJadual() {
-            const tbody = document.getElementById('isiJadual');
-            const valTahun = document.getElementById('filterTahun').value;
-            const valJabatan = document.getElementById('filterJabatan').value;
-            const valPencapaian = document.getElementById('filterPencapaian').value;
+			const tbody = document.getElementById('isiJadual');
+			const valTahun = document.getElementById('filterTahun').value.trim(); // Dapatkan value textbox
+			const valJabatan = document.getElementById('filterJabatan').value;
+			const valPencapaian = document.getElementById('filterPencapaian').value;
 
-            dataDitapisGlobal = dataGlobal.filter(item => {
-                let matchTahun = (valTahun === "SEMUA" || item.tahun == valTahun);
-                let matchJabatan = (valJabatan === "SEMUA" || item.jabatan.toUpperCase() === valJabatan);
-                let matchPencapaian = (valPencapaian === "SEMUA" || (item.pencapaian || "").toUpperCase() === valPencapaian);
-                return matchTahun && matchJabatan && matchPencapaian;
-            });
+			dataDitapisGlobal = dataGlobal.filter(item => {
+				let matchTahun = (valTahun === "" || String(item.tahun).includes(valTahun)); // Padanan textbox
+				let matchJabatan = (valJabatan === "SEMUA" || item.jabatan.toUpperCase() === valJabatan);
+				let matchPencapaian = (valPencapaian === "SEMUA" || (item.pencapaian || "").toUpperCase() === valPencapaian);
+				return matchTahun && matchJabatan && matchPencapaian;
+		});
 
             KiraStatistik(dataDitapisGlobal);
 
@@ -450,7 +483,7 @@
             tbody.innerHTML = "";
 
             if (dataDitapisGlobal.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-gray-500 font-medium">Tiada rekod pencapaian dijumpai.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-gray-500 font-medium">Tiada rekod pencapaian dijumpai.</td></tr>`;
                 document.getElementById('paginationControls').classList.add('hidden');
                 return;
             }
@@ -474,6 +507,7 @@
                 tr.innerHTML = `
                     <td class="p-3 text-center font-bold text-gray-500">${row.id}</td>
                     <td class="p-3 text-center font-bold">${row.tahun}</td>
+                    <td class="p-3 text-center font-bold text-gray-700">${row.sesi || '-'}</td>
                     <td class="p-3 text-center font-bold text-gray-700 uppercase">${row.jabatan}</td>
                     <td class="p-3 font-semibold uppercase text-gray-600">${row.kategori}</td>
                     <td class="p-3 font-bold text-gray-900 whitespace-normal min-w-[200px] uppercase">${row.namaProjek}</td>
@@ -481,6 +515,7 @@
                         <div class="font-bold text-blue-700" title="Penyelia">👨‍🏫 ${row.penyelia || '-'}</div>
                         <div class="text-[10px] text-gray-500 mt-1" title="Ketua Projek">👤 ${row.namaKetua || '-'}</div>
                     </td>
+                    <td class="p-3 text-center font-bold text-gray-800">${row.markah || '-'}</td>
                     <td class="p-3 text-center">
                         <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase shadow-sm ${badgeColor}">
                             ${badgeIkon} ${row.pencapaian || 'BELUM DIKEMASKINI'}
@@ -580,10 +615,10 @@
             }
             paparToast("⏳ Menyediakan fail untuk dimuat turun...", "blue");
 
-            let csvContent = "PROJEK ID,TAHUN,JABATAN,KATEGORI,NAMA PROJEK,NAMA KETUA,PENYELIA PROJEK,PENCAPAIAN\n";
+            let csvContent = "PROJEK ID,TAHUN,SESI,JABATAN,KATEGORI,NAMA PROJEK,NAMA KETUA,PENYELIA PROJEK,MARKAH,PENCAPAIAN\n";
             dataDitapisGlobal.forEach(r => {
                 let clean = (str) => `"${(str || "").replace(/"/g, '""')}"`;
-                csvContent += `${clean(r.id)},${clean(r.tahun)},${clean(r.jabatan)},${clean(r.kategori)},${clean(r.namaProjek)},${clean(r.namaKetua)},${clean(r.penyelia)},${clean(r.pencapaian || "TIADA")}\n`;
+                csvContent += `${clean(r.id)},${clean(r.tahun)},${clean(r.sesi)},${clean(r.jabatan)},${clean(r.kategori)},${clean(r.namaProjek)},${clean(r.namaKetua)},${clean(r.penyelia)},${clean(r.markah)},${clean(r.pencapaian || "TIADA")}\n`;
             });
 
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -611,8 +646,8 @@
         function tutupModalPukal() { document.getElementById('modalPukal').classList.add('hidden'); }
 
         function muatTurunTemplatePukal() {
-            let csv = "TAHUN,JABATAN,KATEGORI,NAMA PROJEK,KETUA PROJEK,PENYELIA,PENCAPAIAN\n";
-            csv += "2025,JKA,INOVASI PENSYARAH,SISTEM A,ALI,ABU,EMAS\n";
+            let csv = "TAHUN,SESI,JABATAN,KATEGORI,NAMA PROJEK,KETUA PROJEK,PENYELIA,PENCAPAIAN,MARKAH\n";
+            csv += "2025,1,JKA,INOVASI PENSYARAH,SISTEM A,ALI,ABU,EMAS,88.50\n";
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.setAttribute("href", URL.createObjectURL(blob));
@@ -733,8 +768,10 @@
 
             const payload = {
                 action: "tambahPencapaianPelajar", 
+                SESI: document.getElementById('tambah_sesi').value,
                 TAHUN: document.getElementById('tambah_tahun').value,
                 PENCAPAIAN: document.getElementById('tambah_pencapaian').value,
+                MARKAH: document.getElementById('tambah_markah').value,
                 NAMA_PROJEK: document.getElementById('tambah_nama_projek').value.toUpperCase(),
                 JABATAN: document.getElementById('tambah_jabatan').value.toUpperCase(),
                 KATEGORI: document.getElementById('tambah_kategori').value.toUpperCase(),
@@ -775,6 +812,7 @@
             if(!r) return;
 
             document.getElementById('in_projek_id').value = r.id;
+			document.getElementById('in_sesi').value = r.sesi || ""; // Data sesi jika wujud
             document.getElementById('in_tahun').value = r.tahun;
             document.getElementById('in_nama_projek').value = r.namaProjek;
             document.getElementById('in_jabatan').value = r.jabatan;
@@ -782,8 +820,8 @@
             document.getElementById('in_nama_ketua').value = r.namaKetua || "";
             document.getElementById('in_penyelia').value = r.penyelia || "";
             document.getElementById('in_pencapaian').value = (r.pencapaian || "").toUpperCase();
-
-            ['in_nama_projek', 'in_jabatan', 'in_kategori', 'in_nama_ketua', 'in_penyelia'].forEach(medan => {
+            document.getElementById('in_markah').value = r.markah || ""; // Data markah jika wujud
+            ['in_nama_projek', 'in_jabatan', 'in_kategori', 'in_nama_ketua', 'in_penyelia', 'in_sesi', 'in_markah'].forEach(medan => {
                 let el = document.getElementById(medan);
                 el.removeAttribute('readonly');
                 el.classList.remove('bg-gray-100', 'text-gray-500');
@@ -803,6 +841,8 @@
             const payload = {
                 action: "kemaskiniPencapaianPelajar", 
                 PROJEK_ID: document.getElementById('in_projek_id').value,
+				SESI: document.getElementById('in_sesi').value,
+				MARKAH: document.getElementById('in_markah').value,
                 PENCAPAIAN: document.getElementById('in_pencapaian').value,
                 NAMA_PROJEK: document.getElementById('in_nama_projek').value.toUpperCase(),
                 JABATAN: document.getElementById('in_jabatan').value.toUpperCase(),

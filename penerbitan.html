@@ -102,7 +102,7 @@
                 <!-- TABS NAVIGATION -->
                 <div class="flex flex-col md:flex-row border-b border-gray-200">
                     <button type="button" id="btn-buku" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-bold text-sm transition-colors border-blue-600 text-blue-700" onclick="tukarTab('buku')">Buku Dan Bab Dalam Buku</button>
-                    <button type="button" id="btn-prosiding" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-semibold text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" onclick="tukarTab('prosiding')">Artikel Akhbar/Majalah/Penulisan Kreatif</button>
+                    <button type="button" id="btn-prosiding" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-semibold text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" onclick="tukarTab('prosiding')">Artikel Akhbar/Majalah/Penulisan Kreatif/eProsiding</button>
                     <button type="button" id="btn-umum" class="tab-btn md:w-1/3 py-3 px-4 text-center border-b-2 font-semibold text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" onclick="tukarTab('umum')">Penerbitan Umum</button>
                 </div>
 
@@ -153,7 +153,7 @@
 
                     <!-- TAB 2: Artikel Akhbar/Majalah/Penulisan Kreatif -->
                     <div id="sek-prosiding" class="tab-content hidden fade-in space-y-4">
-                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Artikel Akhbar/Majalah/Penulisan Kreatif/Prosiding</h3>
+                        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">Artikel Akhbar/Majalah/Penulisan Kreatif/eProsiding</h3>
                         <p class="text-xs text-gray-600 text-center mb-4">Sila isi maklumat penerbitan di bahagian Maklumat Asas dan muat naik dokumen berkaitan di bawah.</p>
                         <div class="grid grid-cols-1 gap-6">
                             <!-- Muat naik PDF Artikel Akhbar/Majalah/Penulisan Kreatif -->
@@ -183,7 +183,6 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Jenis Penerbitan</label>
                                 <select id="tab3_jenis" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white">
                                     <option>MONOGRAF</option>
-                                    <option>MAJALAH</option>
                                     <option>ARTIKEL UMUM</option>
                                 </select>
                             </div>
@@ -790,6 +789,35 @@
                     paparanDoi = `<div class="mt-1.5"><a href="${linkHref}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-2 py-0.5 rounded transition">🔗 ${doiUrlPapar} ↗</a></div>`;
                 }
 
+                // =======================================================
+                // TAMBAH BAIK: TANGKAP DAN PAPARKAN SENARAI AHLI PADA MAKLUMAT KETUA
+                // =======================================================
+                let senaraiAhliHTML = '';
+                const bilAhli = parseInt(row.Bilangan_Ahli) || 0;
+                if (bilAhli > 0 && row.Senarai_Ahli) {
+                    let paparanAhli = [];
+                    try {
+                        const ahliArrayJSON = JSON.parse(row.Senarai_Ahli);
+                        for (let i = 0; i < bilAhli; i++) {
+                            if (ahliArrayJSON[i] && ahliArrayJSON[i].nama) {
+                                paparanAhli.push(`${ahliArrayJSON[i].nama} <br><span class="text-[10px] text-gray-500">(${ahliArrayJSON[i].peranan || '-'} | ${ahliArrayJSON[i].jabatan || '-'})</span>`);
+                            }
+                        }
+                    } catch (e) {
+                        const ahliArray = row.Senarai_Ahli.split(" | ");
+                        paparanAhli = ahliArray;
+                    }
+
+                    if (paparanAhli.length > 0) {
+                        senaraiAhliHTML = `<div class="mt-2 text-xs text-gray-600 border-t pt-1 border-gray-200">
+                            <span class="font-semibold block mb-1">Senarai Ahli:</span>
+                            <ul class="list-decimal pl-4 space-y-1">
+                                ${paparanAhli.map(ahli => `<li>${ahli}</li>`).join('')}
+                            </ul>
+                        </div>`;
+                    }
+                }
+
                 let butiranSpesifik = '-';
                 if (katSemasa === 'buku') {
                     butiranSpesifik = `<b>Penerbit:</b> ${row.Penerbit || '-'}<br><span class="text-xs text-gray-500"><b>Bab:</b> ${row.Nama_Bab || '-'} (${row.Mukasurat || '-'} ms)</span>${pautanDokumenHTML}`;
@@ -809,8 +837,9 @@
                             <span class="text-xs text-gray-500 font-normal">Tahun: ${row.Tahun} | ISSN/ISBN: ${row.ISSN_ISBN || 'Tiada'}</span>
                             ${paparanDoi} <!-- 🌟 DOI/URL DISISIP DI SINI -->
                         </td>
-                        <td class="p-4 text-sm text-gray-700">
+                        <td class="p-4 text-sm text-gray-700 align-top">
                             <b>${row.Ketua || '-'}</b>
+                            ${senaraiAhliHTML}
                         </td>
                         <td class="p-4 text-xs text-gray-700">
                             ${butiranSpesifik}
