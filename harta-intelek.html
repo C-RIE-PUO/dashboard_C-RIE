@@ -534,9 +534,10 @@ function renderJadual(resetPage = false) {
 
         // GABUNGKAN NAMA KETUA & AHLI
         let senaraiAhli = [row.ahli1, row.ahli2, row.ahli3, row.ahli4, row.ahli5]
-            .filter(ahli => ahli && ahli.toString().trim() !== "");
+            .filter(ahli => ahli && ahli.toString().trim() !== "")
+            .map(ahli => ahli.toString().toUpperCase()); // Pastikan ahli juga huruf besar
 
-        let paparanKetuaDanAhli = `<div class="font-semibold text-blue-700 uppercase whitespace-normal">${row.ketua || "-"}</div>`;
+        let paparanKetuaDanAhli = `<div class="font-semibold text-blue-700 uppercase whitespace-normal">${(row.ketua || "-").toString().toUpperCase()}</div>`;
         
         if (senaraiAhli.length > 0) {
             paparanKetuaDanAhli += `
@@ -553,14 +554,14 @@ function renderJadual(resetPage = false) {
             <td class="p-3 text-center font-bold text-gray-500">${actualRowNumber}</td>
             <td class="p-3">
                 <div class="font-bold text-gray-800 whitespace-normal min-w-[150px] uppercase">
-                    ${row.tajuk || "-"} <span class="text-blue-600 font-semibold">(${row.tahun || "-"})</span>
+                    ${(row.tajuk || "-").toString().toUpperCase()} <span class="text-blue-600 font-semibold">(${row.tahun || "-"})</span>
                 </div>
-                <div class="text-[10px] text-gray-500 mt-1">Pemilik: ${row.pemilik || "-"}</div>
+                <div class="text-[10px] text-gray-500 mt-1 uppercase">PEMILIK: ${(row.pemilik || "-").toString().toUpperCase()}</div>
             </td>
             <td class="p-3 min-w-[180px]">${paparanKetuaDanAhli}</td>
-            <td class="p-3 text-center font-bold text-gray-700 uppercase">${row.jabatan || "-"}</td>
-            <td class="p-3 text-center"><span class="bg-gray-100 text-gray-700 border border-gray-300 px-2 py-1 rounded text-[10px] font-bold">${row.jenis || "-"}</span></td>
-            <td class="p-3 font-mono font-bold text-gray-800 whitespace-normal min-w-[120px]">${row.noDaftar || "-"}</td>
+            <td class="p-3 text-center font-bold text-gray-700 uppercase">${(row.jabatan || "-").toString().toUpperCase()}</td>
+            <td class="p-3 text-center"><span class="bg-gray-100 text-gray-700 border border-gray-300 px-2 py-1 rounded text-[10px] font-bold uppercase">${(row.jenis || "-").toString().toUpperCase()}</span></td>
+            <td class="p-3 font-mono font-bold text-gray-800 whitespace-normal min-w-[120px] uppercase">${(row.noDaftar || "-").toString().toUpperCase()}</td>
             <td class="p-3 text-center">${badgeStatus}</td>
             <td class="p-3 text-center w-24">${aksiBtn}</td>
         `;
@@ -615,36 +616,37 @@ function tukarPage(arah) {
 }
 
         // ================= FUNGSI DOWNLOAD CSV =================
-        function downloadCSV() {
-            if (!dataDitapisGlobal || dataDitapisGlobal.length === 0) {
-                alert("Tiada rekod untuk dieksport.");
-                return;
-            }
+	function downloadCSV() {
+    if (!dataDitapisGlobal || dataDitapisGlobal.length === 0) {
+        alert("Tiada rekod untuk dieksport.");
+        return;
+    }
 
-            paparToast("⏳ Menyediakan fail untuk dimuat turun...", "blue");
+    paparToast("⏳ Menyediakan fail untuk dimuat turun...", "blue");
 
-            // 🌟 KEMASKINI: Tambah header lajur O hingga R (PERMOHONAN, LINK CR1, LINK LAPORAN, LINK IP)
-            let csvContent = "BIL,TAHUN,KETUA,AHLI 1,AHLI 2,AHLI 3,AHLI 4,AHLI 5,TAJUK,JABATAN,PEMILIK,JENIS,NO DAFTAR,STATUS,PERMOHONAN,LINK CR1,LINK LAPORAN,LINK IP\n";
-            
-            dataDitapisGlobal.forEach((r, idx) => {
-                let clean = (str) => `"${(String(str) || "").replace(/"/g, '""')}"`;
-                
-                // 🌟 KEMASKINI: Tambah pemetaan data r.permohonan, r.linkCR1, r.linkLaporan, r.linkIP
-                csvContent += `${idx + 1},${clean(r.tahun)},${clean(r.ketua)},${clean(r.ahli1)},${clean(r.ahli2)},${clean(r.ahli3)},${clean(r.ahli4)},${clean(r.ahli5)},${clean(r.tajuk)},${clean(r.jabatan)},${clean(r.pemilik)},${clean(r.jenis)},${clean(r.noDaftar)},${clean(r.statusHI)},${clean(r.permohonan)},${clean(r.linkCR1)},${clean(r.linkLaporan)},${clean(r.linkIP)}\n`;
-            });
+    // 🌟 KEMASKINI: Tambah header lajur O hingga R (PERMOHONAN, LINK CR1, LINK LAPORAN, LINK IP)
+    let csvContent = "BIL,TAHUN,KETUA,AHLI 1,AHLI 2,AHLI 3,AHLI 4,AHLI 5,TAJUK,JABATAN,PEMILIK,JENIS,NO DAFTAR,STATUS,PERMOHONAN,LINK CR1,LINK LAPORAN,LINK IP\n";
+    
+    dataDitapisGlobal.forEach((r, idx) => {
+        // PENAMBAHBAIKAN: Tambah .toUpperCase() supaya semua data CSV diformat ke huruf besar
+        let clean = (str) => `"${(String(str) || "").toUpperCase().replace(/"/g, '""')}"`;
+        
+        // 🌟 KEMASKINI: Tambah pemetaan data r.permohonan, r.linkCR1, r.linkLaporan, r.linkIP
+        csvContent += `${idx + 1},${clean(r.tahun)},${clean(r.ketua)},${clean(r.ahli1)},${clean(r.ahli2)},${clean(r.ahli3)},${clean(r.ahli4)},${clean(r.ahli5)},${clean(r.tajuk)},${clean(r.jabatan)},${clean(r.pemilik)},${clean(r.jenis)},${clean(r.noDaftar)},${clean(r.statusHI)},${clean(r.permohonan)},${clean(r.linkCR1)},${clean(r.linkLaporan)},${clean(r.linkIP)}\n`;
+    });
 
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            
-            link.setAttribute("href", url);
-            link.setAttribute("download", "Rekod_Harta_Intelek.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            setTimeout(() => { paparToast("✅ Berjaya dimuat turun!", "green"); }, 1000);
-        }
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", "Rekod_Harta_Intelek.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => { paparToast("✅ Berjaya dimuat turun!", "green"); }, 1000);
+	}
 
         // ================= KAWALAN MODAL & BORANG =================
         function importCSVHI(event) {
@@ -920,23 +922,23 @@ function hantarBorangHI(e) {
         }
     }
 
-    const payload = {
+	const payload = {
         action: actionType,
         BIL: idBil,
         TAHUN: document.getElementById('in_tahun').value,
-        JABATAN: document.getElementById('in_jabatan').value,
-        TAJUK: document.getElementById('in_tajuk').value,
-        KETUA: document.getElementById('in_ketua').value,
-        AHLI1: document.getElementById('in_ahli1').value,
-        AHLI2: document.getElementById('in_ahli2').value,
-        AHLI3: document.getElementById('in_ahli3').value,
-        AHLI4: document.getElementById('in_ahli4').value,
-        AHLI5: document.getElementById('in_ahli5').value,
-        PEMILIK: document.getElementById('in_pemilik').value,
-        JENIS: document.getElementById('in_jenis').value,
-        NO_DAFTAR: document.getElementById('in_noDaftar').value,
-        STATUS: statusHIFinal, // <-- Hantar nilai status yang telah dikemaskini
-        PERMOHONAN: statusPermohonanValue
+        JABATAN: document.getElementById('in_jabatan').value.toUpperCase(),
+        TAJUK: document.getElementById('in_tajuk').value.toUpperCase(),
+        KETUA: document.getElementById('in_ketua').value.toUpperCase(),
+        AHLI1: document.getElementById('in_ahli1').value.toUpperCase(),
+        AHLI2: document.getElementById('in_ahli2').value.toUpperCase(),
+        AHLI3: document.getElementById('in_ahli3').value.toUpperCase(),
+        AHLI4: document.getElementById('in_ahli4').value.toUpperCase(),
+        AHLI5: document.getElementById('in_ahli5').value.toUpperCase(),
+        PEMILIK: document.getElementById('in_pemilik').value.toUpperCase(),
+        JENIS: document.getElementById('in_jenis').value.toUpperCase(),
+        NO_DAFTAR: document.getElementById('in_noDaftar').value.toUpperCase(),
+        STATUS: statusHIFinal.toUpperCase(), 
+        PERMOHONAN: statusPermohonanValue.toUpperCase()
     };
     
     fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
