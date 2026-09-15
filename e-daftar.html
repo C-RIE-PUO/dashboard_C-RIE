@@ -88,25 +88,31 @@
 
         <div id="statusMesejUI" class="hidden mb-4 p-4 rounded-xl text-center text-sm font-bold shadow-sm"></div>
 
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <!-- 1. Kad Menunggu Pengesahan -->
-            <div class="bg-orange-50 border border-orange-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
-                <h3 class="text-orange-800 font-bold text-sm md:text-base uppercase tracking-wide">Menunggu Pengesahan</h3>
-                <p class="text-4xl md:text-5xl font-extrabold text-orange-600 mt-2" id="statMenunggu">0</p>
-            </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- 1. Kad Menunggu Pengesahan -->
+    <div class="bg-orange-50 border border-orange-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
+        <h3 class="text-orange-800 font-bold text-sm md:text-base uppercase tracking-wide">Menunggu Pengesahan</h3>
+        <p class="text-4xl md:text-5xl font-extrabold text-orange-600 mt-2" id="statMenunggu">0</p>
+    </div>
 
-            <!-- 2. 🌟 TAMBAHAN BARU: Kad Baiki Semula -->
-            <div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
-                <h3 class="text-amber-800 font-bold text-sm md:text-base uppercase tracking-wide">Baiki Semula</h3>
-                <p class="text-4xl md:text-5xl font-extrabold text-amber-600 mt-2" id="statBaiki">0</p>
-            </div>
+    <!-- 2. Kad Baiki Semula -->
+    <div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
+        <h3 class="text-amber-800 font-bold text-sm md:text-base uppercase tracking-wide">Baiki Semula</h3>
+        <p class="text-4xl md:text-5xl font-extrabold text-amber-600 mt-2" id="statBaiki">0</p>
+    </div>
 
-            <!-- 3. Kad Projek Disahkan -->
-            <div class="bg-green-50 border border-green-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
-                <h3 class="text-green-800 font-bold text-sm md:text-base uppercase tracking-wide">Projek Disahkan</h3>
-                <p class="text-4xl md:text-5xl font-extrabold text-green-600 mt-2" id="statDisahkan">0</p>
-            </div>
-        </div>
+    <!-- 3. Kad Projek Disahkan -->
+    <div class="bg-green-50 border border-green-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
+        <h3 class="text-green-800 font-bold text-sm md:text-base uppercase tracking-wide">Projek Disahkan</h3>
+        <p class="text-4xl md:text-5xl font-extrabold text-green-600 mt-2" id="statDisahkan">0</p>
+    </div>
+
+    <!-- 4. 🌟 TAMBAHAN BARU: Kad Staf Terlibat -->
+    <div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl text-center shadow-sm flex flex-col justify-center items-center">
+        <h3 class="text-blue-800 font-bold text-sm md:text-base uppercase tracking-wide">Staf Terlibat (Aktif)</h3>
+        <p class="text-4xl md:text-5xl font-extrabold text-blue-600 mt-2" id="statStaf">0</p>
+    </div>
+</div>
 
         <!-- 🌟 TAMBAHAN BARU: Carta Bar 3 Tahun Terkini (Dinamik) -->
         <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
@@ -657,17 +663,15 @@ window.onload = () => {
         }
 
 function terapkanTapisan() {
-    // 🌟 DIKEMASKINI: Guna .trim() untuk membuang jarak (space) tidak sengaja pada carian tahun
     const valTahun = document.getElementById('filterTahun').value.trim();
     const valJab = document.getElementById('filterJabatan').value;
     const valStatus = document.getElementById('filterStatus').value;
-    
-    // Ambil nilai carian dan tukar ke huruf kecil
     const valCari = document.getElementById('inputCarian').value.toLowerCase().trim();
 
     let cMenunggu = 0;
     let cDisahkan = 0;
-    let cBaiki = 0; // 🌟 TAMBAHAN: Pembolehubah kaunter khusus untuk status Baiki Semula
+    let cBaiki = 0; 
+    let setStafUnik = new Set(); // 🌟 TAMBAHAN BARU: Set untuk menghalang staf dikira berulang kali
 
     dataTapis = dataAsal.filter(row => {
         // 1. Semakan Tahun 
@@ -677,7 +681,7 @@ function terapkanTapisan() {
 
         let checkTahun = (valTahun === "" || tahunMulaStr.includes(valTahun) || tahunDaftarStr.includes(valTahun));
         
-        // 2. Semakan Jabatan (🌟 DIKEMASKINI: Padanan kebal ralat huruf besar/kecil & kebebasan PENYELARAS JABATAN)
+        // 2. Semakan Jabatan 
         const dbJabatan = (dapatkanData(row, ["jabatan", "JABATAN"]) || "").toUpperCase().trim();
         const cleanValJab = valJab.toUpperCase().trim();
         const cleanUserJab = (userJabatan || "").toUpperCase().trim();
@@ -687,14 +691,13 @@ function terapkanTapisan() {
             checkJabatan = (dbJabatan === cleanUserJab);
         }
 
-        // 3. Semakan Status (🌟 DIKEMASKINI: Sokongan untuk teks ulasan pada status BAIKI SEMULA)
+        // 3. Semakan Status
         const dbStatus = dapatkanData(row, ["status", "STATUS", "statusProjek"]) || "MENUNGGU PENGESAHAN";
         const statusUpper = dbStatus.toUpperCase();
         
         let checkStatus = true;
         if (valStatus !== "") {
             if (valStatus.toUpperCase() === "BAIKI SEMULA") {
-                // Gunakan .startsWith() supaya ulasan di belakang perkataan tidak mengganggu tapisan
                 checkStatus = statusUpper.startsWith("BAIKI SEMULA");
             } else {
                 checkStatus = (statusUpper === valStatus.toUpperCase());
@@ -712,38 +715,53 @@ function terapkanTapisan() {
             const a4 = String(dapatkanData(row, ["ahli4", "AHLI_4", "namaAhli4"])).toLowerCase();
             const a5 = String(dapatkanData(row, ["ahli5", "AHLI_5", "namaAhli5"])).toLowerCase();
 
-            checkCarian = dbTajuk.includes(valCari) || 
-                          dbKetua.includes(valCari) || 
-                          a1.includes(valCari) || 
-                          a2.includes(valCari) || 
-                          a3.includes(valCari) || 
-                          a4.includes(valCari) || 
-                          a5.includes(valCari);
+            checkCarian = dbTajuk.includes(valCari) || dbKetua.includes(valCari) || a1.includes(valCari) || a2.includes(valCari) || a3.includes(valCari) || a4.includes(valCari) || a5.includes(valCari);
         }
 
         // Gabungkan semua tapisan
         let isSesuai = checkTahun && checkJabatan && checkStatus && checkCarian;
         
-        // 🌟 DIKEMASKINI: Pengiraan kad ringkasan diasingkan dengan tepat
         if(isSesuai) {
             if (statusUpper === "DISAHKAN") {
                 cDisahkan++;
+                
+                // 🌟 TAMBAHAN BARU: Jika Disahkan, ambil semua nama dan daftar ke dalam Set Unik
+                const senaraiField = [
+                    ["ketua", "KETUA", "namaKetua"],
+                    ["ahli1", "AHLI_1", "namaAhli1"],
+                    ["ahli2", "AHLI_2", "namaAhli2"],
+                    ["ahli3", "AHLI_3", "namaAhli3"],
+                    ["ahli4", "AHLI_4", "namaAhli4"],
+                    ["ahli5", "AHLI_5", "namaAhli5"]
+                ];
+                
+                senaraiField.forEach(field => {
+                    let namaRaw = dapatkanData(row, field);
+                    let namaClean = String(namaRaw || "").toUpperCase().trim();
+                    // Hanya kira jika ada nama, dan bukan "TIADA" atau "-"
+                    if (namaClean && namaClean !== "" && namaClean !== "TIADA" && namaClean !== "-") {
+                        setStafUnik.add(namaClean);
+                    }
+                });
+
             } else if (statusUpper.startsWith("BAIKI SEMULA")) {
                 cBaiki++;
             } else {
                 cMenunggu++;
             }
         }
-
         return isSesuai;
     });
 
     document.getElementById('statMenunggu').innerText = cMenunggu;
     document.getElementById('statDisahkan').innerText = cDisahkan;
     
-    // 🌟 TAMBAHAN: Kemaskini kad statistik Baiki Semula
     const elBaiki = document.getElementById('statBaiki') || document.getElementById('statBaikiSemula');
     if (elBaiki) elBaiki.innerText = cBaiki;
+    
+    // 🌟 TAMBAHAN BARU: Kemaskini kad statistik Staf Terlibat
+    const elStaf = document.getElementById('statStaf');
+    if (elStaf) elStaf.innerText = setStafUnik.size;
 
     // =========================================================================
     // 🌟 PENAMBAHBAIKAN BARU: Logik Isihan (Sorting) Dioptimumkan dengan Cache
