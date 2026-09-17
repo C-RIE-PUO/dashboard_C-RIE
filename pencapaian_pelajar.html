@@ -21,6 +21,11 @@
         // KAWALAN BAHARU: Akses spesifik untuk Tambah dan Padam
         const perananKhasTambahPadam = ["ADMIN", "KUPIK", "PENYELARAS INOVAS (C-RIE)", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS INOVASI", "PENYELARAS PROJEK (CRIE)"];
         const bolehTambahPadam = perananKhasTambahPadam.includes(userPeranan.toUpperCase());
+
+        // KAWALAN BAHARU: Akses kemaskini untuk Penyelia Projek Pelajar & Penyelaras Jabatan (Memerlukan Kata Laluan No IC Penyelia)
+        const perananDenganPengesahan = ["PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN"];
+        const bolehEditDenganPengesahan = perananDenganPengesahan.includes(userPeranan.toUpperCase());
+        const bolehEditMasingMasing = bolehEditPenuh || bolehEditDenganPengesahan;
     </script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
@@ -102,7 +107,7 @@
                     <option value="SIJIL PENYERTAAN">Sijil Penyertaan</option>
                 </select>
             </div>
-            <div class="w-full md:w-auto ml-auto flex gap-2">
+            <div class="w-full md:auto ml-auto flex gap-2">
                 <div id="paparMesejUI" class="hidden font-bold text-sm px-4 py-2 rounded-lg flex items-center text-white shadow-md"></div>
                 
                 <!-- BUTANG TAMBAH DATA PUKAL (Baru) -->
@@ -116,7 +121,7 @@
                 </button>
 
                 <!-- 🌟 ID ditambah pada butang untuk kawalan akses STAF -->
-                <button id="btnDownloadLaporan" onclick="downloadCSV()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2">
+                <button id="btnDownloadLaporan" onclick="bukaModalDownload()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2">
                     📥 Download Laporan
                 </button>
                 <button onclick="muatDataPencapaian()" class="bg-amber-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-amber-600 shadow-md">🔄 Refresh</button>
@@ -154,9 +159,32 @@
         </div>
     </main>
 
+    <!-- MODAL POPUP KATA LALUAN (SEBELUM KEMASKINI UNTUK PENYELIA PROJEK PELAJAR & PENYELARAS JABATAN) -->
+    <div id="modalPengesahanKatalaluan" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="font-bold text-lg text-amber-700">🔒 Pengesahan Kata Laluan</h3>
+                <button type="button" onclick="tutupModalPengesahan()" class="hover:text-amber-200 text-2xl font-bold leading-none text-gray-500">&times;</button>
+            </div>
+            <p class="text-xs text-gray-600 mb-4">Sila masukkan <strong>NO IC PENYELIA</strong> (Lajur AE) untuk pengesahan keselamatan sebelum mengemaskini maklumat projek ini.</p>
+            <form onsubmit="sahkanKatalaluanDanBukaModal(event)">
+                <input type="hidden" id="pengesahan_projek_id">
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">NO IC PENYELIA</label>
+                    <input type="password" id="input_katalaluan_ic" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-amber-500 text-sm" placeholder="Masukkan No IC Penyelia">
+                </div>
+                <div id="mesejRalatKatalaluan" class="text-xs text-red-600 font-bold mb-3 hidden">❌ No IC Penyelia tidak tepat! Sila cuba lagi.</div>
+                <div class="flex justify-end gap-2 border-t pt-3">
+                    <button type="button" onclick="tutupModalPengesahan()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 transition shadow">Sahkan & Mula Kemaskini</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL KEMASKINI SEDIA ADA -->
     <div id="modalKemaskini" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-y-auto">
             <div class="bg-amber-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
                 <h3 class="font-bold text-lg">✏️ Kemaskini Maklumat Projek</h3>
                 <button onclick="tutupModal()" class="hover:text-amber-200 text-2xl font-bold leading-none">&times;</button>
@@ -164,61 +192,157 @@
             
             <div class="p-6">
                 <div id="amaranPeranan" class="hidden mb-4 p-3 bg-blue-50 text-blue-800 text-xs font-bold rounded-lg border border-blue-200">
-                    ℹ️ Mod Pentadbir Diaktifkan: Anda dibenarkan mengemaskini maklumat terperinci projek.
+                    ℹ️ Mod Pentadbir Diaktifkan: Anda dibenarkan mengemaskini maklumat terperinci projek tanpa kata laluan.
                 </div>
 
                 <form id="borangKemaskini" onsubmit="simpanKemaskini(event)">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Projek ID</label>
-                            <input type="text" id="in_projek_id" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100 font-bold text-gray-600 outline-none">
+                    <!-- MAKLUMAT PROJEK ASAS -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-amber-700 mb-3 border-b pb-1">Maklumat Projek</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Projek ID</label>
+                                <input type="text" id="in_projek_id" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100 font-bold text-gray-600 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Sesi <span class="text-red-500">*</span></label>
+                                <select id="in_sesi" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
+                                    <option value="">-- SILA PILIH SESI --</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
+                                <input type="number" id="in_tahun" required readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100 font-bold text-gray-600 outline-none">
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Nama Projek <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_nama_projek" required class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
+                                <select id="in_jabatan" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
+                                    <option value="">-- SILA PILIH JABATAN --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
+                                <select id="in_kategori" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
+                                    <option value="">-- SILA PILIH KATEGORI --</option>
+                                    <option value="TEKNIKAL">TEKNIKAL</option>
+                                    <option value="SAINS SOSIAL">SAINS SOSIAL</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Projek Berimpak Tinggi <span class="text-red-500">*</span></label>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="in_impak" value="Kolaborasi Industri" class="rounded text-amber-600 focus:ring-amber-500"><span>Kolaborasi Industri</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="in_impak" value="Kolaborasi Komuniti" class="rounded text-amber-600 focus:ring-amber-500"><span>Kolaborasi Komuniti</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="in_impak" value="Memenangi Pertandingan" class="rounded text-amber-600 focus:ring-amber-500"><span>Menang Pertandingan</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="in_impak" value="Mendapat Geran" class="rounded text-amber-600 focus:ring-amber-500"><span>Dapat Geran</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="in_impak" value="Komersial" class="rounded text-amber-600 focus:ring-amber-500"><span>Komersial</span></label>
+                                </div>
+                            </div>
+                            <!-- Ringkasan Projek -->
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Ringkasan Projek <span class="text-red-500">*</span></label>
+                                <textarea id="in_ringkasan_projek" required rows="2" class="w-full px-3 py-2 border rounded-lg outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
+                            </div>
                         </div>
-						
-						<div>
-						<label class="block text-xs font-bold text-gray-700 mb-1">Sesi</label>
-						<select id="in_sesi" class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
-							<option value="">-- SILA PILIH SESI --</option>
-							<option value="1">1</option>
-							<option value="2">2</option>
-						</select>
-						</div>
-						
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Tahun</label>
-                            <input type="number" id="in_tahun" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100 font-bold text-gray-600 outline-none">
+                    </div>
+
+                    <!-- MAKLUMAT KETUA PROJEK -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-blue-700 mb-3 border-b pb-1">Maklumat Ketua Projek</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua Projek <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_nama_ketua" required class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ketua) <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_no_daftar_ketua" required class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ketua) <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_no_ic_ketua" required class="w-full px-3 py-2 border rounded-lg outline-none transition-colors">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MAKLUMAT AHLI KUMPULAN -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-emerald-700 mb-3 border-b pb-1">Maklumat Ahli Kumpulan</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Kedua</label><input type="text" id="in_nama_ahli2" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 2)</label><input type="text" id="in_no_daftar_ahli2" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 2)</label><input type="text" id="in_no_ic_ahli2" class="w-full px-3 py-2 border rounded-lg outline-none transition-colors"></div>
                         </div>
                         
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Projek</label>
-                            <input type="text" id="in_nama_projek" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Ketiga</label><input type="text" id="in_nama_ahli3" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 3)</label><input type="text" id="in_no_daftar_ahli3" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 3)</label><input type="text" id="in_no_ic_ahli3" class="w-full px-3 py-2 border rounded-lg outline-none transition-colors"></div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan</label>
-                            <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
-                            <select id="in_jabatan" class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
-                                <option value="">-- SILA PILIH JABATAN --</option>
-                            </select>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Keempat</label><input type="text" id="in_nama_ahli4" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 4)</label><input type="text" id="in_no_daftar_ahli4" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 4)</label><input type="text" id="in_no_ic_ahli4" class="w-full px-3 py-2 border rounded-lg outline-none transition-colors"></div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Kategori</label>
-                            <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
-                            <select id="in_kategori" class="w-full px-3 py-2 border rounded-lg bg-white outline-none uppercase transition-colors">
-                                <option value="">-- SILA PILIH KATEGORI --</option>
-                                <option value="TEKNIKAL">TEKNIKAL</option>
-                                <option value="SAINS SOSIAL">SAINS SOSIAL</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua Projek</label>
-                            <input type="text" id="in_nama_ketua" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Penyelia Projek</label>
-                            <input type="text" id="in_penyelia" class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
-                        </div>
+                    </div>
 
-                        <div class="md:col-span-2 p-3 bg-amber-50 rounded-lg border border-amber-200 mt-2">
-                            <label class="block text-sm font-bold text-amber-800 mb-2">🏅 Kemaskini Pencapaian Semasa</label>
+                    <!-- MAKLUMAT PENYELIA (KEMASKINI) -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-purple-700 mb-3 border-b pb-1">Maklumat Penyelia</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Nama Penyelia Projek <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_penyelia" required class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">No IC Penyelia <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_no_ic_penyelia" required class="w-full px-3 py-2 border rounded-lg outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">No HP (Penyelia) <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_no_hp_penyelia" required class="w-full px-3 py-2 border rounded-lg outline-none transition-colors" placeholder="Cth: 012-3257824">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TARAF & MAKLUMAT PERTANDINGAN -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-gray-800 mb-3 border-b pb-1">Taraf & Maklumat Pertandingan</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Nama Pertandingan (Lebar Penuh) -->
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Nama Pertandingan <span class="text-red-500">*</span></label>
+                                <input type="text" id="in_nama_pertandingan" required class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <!-- Tarikh Pertandingan -->
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tarikh Pertandingan <span class="text-red-500">*</span></label>
+                                <input type="date" id="in_tarikh_pertandingan" required class="w-full px-3 py-2 border rounded-lg outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <!-- Peringkat Pertandingan -->
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Peringkat Pertandingan <span class="text-red-500">*</span></label>
+                                <select id="in_peringkat_pertandingan" required class="w-full px-3 py-2 border rounded-lg outline-none uppercase transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                    <option value="">-- SILA PILIH PERINGKAT --</option>
+                                    <option value="INSTITUSI">INSTITUSI</option>
+                                    <option value="KEBANGSAAN">KEBANGSAAN</option>
+                                    <option value="ANTARABANGSA">ANTARABANGSA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-amber-50 rounded-lg border border-amber-200 mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-amber-800 mb-2">🏅 Pencapaian Semasa</label>
                             <select id="in_pencapaian" required class="w-full px-4 py-2 border border-amber-300 rounded-lg font-bold text-amber-900 bg-white focus:ring-2 focus:ring-amber-500 outline-none">
                                 <option value="">-- SILA PILIH PENCAPAIAN --</option>
                                 <option value="EMAS">EMAS</option>
@@ -227,9 +351,18 @@
                                 <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN</option>
                                 <option value="TIADA">TIADA</option>
                             </select>
-							<label class="block text-sm font-bold text-amber-800 mt-4 mb-2">💯 Kemaskini Markah</label>
-							<input type="number" id="in_markah" step="0.01" class="w-full px-4 py-2 border border-amber-300 rounded-lg font-bold text-amber-900 bg-white focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Masukkan Markah">
                         </div>
+                        <div>
+                            <label class="block text-sm font-bold text-amber-800 mb-2">💯 Kemaskini Markah</label>
+                            <input type="number" id="in_markah" step="0.01" class="w-full px-4 py-2 border border-amber-300 rounded-lg font-bold text-amber-900 bg-white focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Masukkan Markah">
+                        </div>
+                    </div>
+
+                    <!-- KAWALAN PENGESAHAN (KATA LALUAN) -->
+                    <div id="ruanganKatalaluan" class="mt-4 p-4 bg-red-50 rounded-lg border border-red-200 hidden">
+                        <label class="block text-sm font-bold text-red-800 mb-1">🔒 Pengesahan Keselamatan</label>
+                        <p class="text-xs text-red-600 mb-2">Sila masukkan No IC Penyelia sebagai kata laluan untuk meneruskan kemaskini.</p>
+                        <input type="password" id="in_katalaluan_semakan" class="w-full px-3 py-2 border border-red-300 rounded-lg outline-none focus:ring-2 focus:ring-red-400" placeholder="Masukkan No IC Penyelia">
                     </div>
 
                     <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
@@ -243,7 +376,7 @@
 
     <!-- MODAL TAMBAH DATA MANUAL -->
     <div id="modalTambah" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-y-auto">
             <div class="bg-blue-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
                 <h3 class="font-bold text-lg">➕ Tambah Pencapaian Manual</h3>
                 <button onclick="tutupModalTambah()" class="hover:text-blue-200 text-2xl font-bold leading-none">&times;</button>
@@ -254,50 +387,128 @@
                     ℹ️ Projek ID tidak perlu dimasukkan. Ia akan dijana secara automatik berdasarkan format (Contoh: JKA-2025-1001).
                 </div>
                 <form id="borangTambah" onsubmit="simpanTambah(event)">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Sesi</label>
-                            <select id="tambah_sesi" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="">-- SILA PILIH SESI --</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                            </select>
+                    
+                    <!-- MAKLUMAT PROJEK ASAS -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-blue-700 mb-3 border-b pb-1">Maklumat Projek</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Sesi <span class="text-red-500">*</span></label>
+                                <select id="tambah_sesi" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="">-- SILA PILIH SESI --</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
+                                <input type="number" id="tambah_tahun" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
+                                <select id="tambah_jabatan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="">-- SILA PILIH JABATAN --</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Nama Projek <span class="text-red-500">*</span></label>
+                                <input type="text" id="tambah_nama_projek" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
+                                <select id="tambah_kategori" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="">-- SILA PILIH KATEGORI --</option>
+                                    <option value="TEKNIKAL">TEKNIKAL</option>
+                                    <option value="SAINS SOSIAL">SAINS SOSIAL</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Projek Berimpak Tinggi <span class="text-red-500">*</span></label>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Kolaborasi Industri" class="rounded text-blue-600 focus:ring-blue-500"><span>Kolaborasi Industri</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Kolaborasi Komuniti" class="rounded text-blue-600 focus:ring-blue-500"><span>Kolaborasi Komuniti</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Memenangi Pertandingan" class="rounded text-blue-600 focus:ring-blue-500"><span>Menang Pertandingan</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Mendapat Geran" class="rounded text-blue-600 focus:ring-blue-500"><span>Dapat Geran</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Komersial" class="rounded text-blue-600 focus:ring-blue-500"><span>Komersial</span></label>
+                                </div>
+                            </div>
+                            <!-- Ringkasan Projek -->
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Ringkasan Projek <span class="text-red-500">*</span></label>
+                                <textarea id="tambah_ringkasan_projek" required rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
-                            <input type="number" id="tambah_tahun" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+
+                    <!-- MAKLUMAT KETUA PROJEK -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-blue-700 mb-3 border-b pb-1">Maklumat Ketua Projek</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua Projek <span class="text-red-500">*</span></label><input type="text" id="tambah_nama_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ketua) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_daftar_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ketua) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_ic_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
                         </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
-                            <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
-                            <select id="tambah_jabatan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="">-- SILA PILIH JABATAN --</option>
-                            </select>
+                    </div>
+
+                    <!-- MAKLUMAT AHLI KUMPULAN -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-emerald-700 mb-3 border-b pb-1">Maklumat Ahli Kumpulan</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Kedua</label><input type="text" id="tambah_nama_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 2)</label><input type="text" id="tambah_no_daftar_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 2)</label><input type="text" id="tambah_no_ic_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
                         </div>
                         
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Projek <span class="text-red-500">*</span></label>
-                            <input type="text" id="tambah_nama_projek" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Ketiga</label><input type="text" id="tambah_nama_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 3)</label><input type="text" id="tambah_no_daftar_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 3)</label><input type="text" id="tambah_no_ic_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
-                            <!-- KEMASKINI: Ditukar kepada ComboBox (Select) -->
-                            <select id="tambah_kategori" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="">-- SILA PILIH KATEGORI --</option>
-                                <option value="TEKNIKAL">TEKNIKAL</option>
-                                <option value="SAINS SOSIAL">SAINS SOSIAL</option>
-                            </select>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Keempat</label><input type="text" id="tambah_nama_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 4)</label><input type="text" id="tambah_no_daftar_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 4)</label><input type="text" id="tambah_no_ic_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua Projek</label>
-                            <input type="text" id="tambah_nama_ketua" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Penyelia Projek</label>
-                            <input type="text" id="tambah_penyelia" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
+                    </div>
 
-                        <div class="md:col-span-2 p-3 bg-blue-50 rounded-lg border border-blue-200 mt-2">
+                    <!-- MAKLUMAT PENYELIA (TAMBAH MANUAL) -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-purple-700 mb-3 border-b pb-1">Maklumat Penyelia</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Penyelia Projek <span class="text-red-500">*</span></label><input type="text" id="tambah_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC Penyelia <span class="text-red-500">*</span></label><input type="text" id="tambah_no_ic_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No HP (Penyelia) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_hp_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Cth: 0123257824"></div>
+                        </div>
+                    </div>
+
+                    <!-- TARAF & MAKLUMAT PERTANDINGAN -->
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="text-sm font-bold text-gray-800 mb-3 border-b pb-1">Taraf & Maklumat Pertandingan</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Nama Pertandingan <span class="text-red-500">*</span></label>
+                                <input type="text" id="tambah_nama_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tarikh Pertandingan <span class="text-red-500">*</span></label>
+                                <input type="date" id="tambah_tarikh_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Peringkat Pertandingan <span class="text-red-500">*</span></label>
+                                <select id="tambah_peringkat_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="">-- SILA PILIH PERINGKAT --</option>
+                                    <option value="INSTITUSI">INSTITUSI</option>
+                                    <option value="KEBANGSAAN">KEBANGSAAN</option>
+                                    <option value="ANTARABANGSA">ANTARABANGSA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
                             <label class="block text-sm font-bold text-blue-800 mb-2">🏅 Pencapaian <span class="text-red-500">*</span></label>
                             <select id="tambah_pencapaian" required class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-900 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
                                 <option value="">-- SILA PILIH PENCAPAIAN --</option>
@@ -307,7 +518,9 @@
                                 <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN</option>
                                 <option value="TIADA">TIADA</option>
                             </select>
-                            <label class="block text-sm font-bold text-blue-800 mt-4 mb-2">💯 Markah</label>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-blue-800 mb-2">💯 Markah</label>
                             <input type="number" id="tambah_markah" step="0.01" class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-900 bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan Markah">
                         </div>
                     </div>
@@ -320,7 +533,6 @@
             </div>
         </div>
     </div>
-
     <!-- MODAL MUAT NAIK PUKAL (BAHARU) -->
     <div id="modalPukal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-y-auto">
@@ -360,6 +572,72 @@
                     <button type="button" onclick="tutupModalPukal()" class="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Batal</button>
                     <button type="button" id="btnSimpanPukal" onclick="simpanPukal()" class="hidden px-8 py-2.5 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition shadow-lg">Muat Naik Data</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PILIH LAJUR DOWNLOAD LAPORAN (BAHARU) -->
+    <div id="modalDownload" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh] overflow-y-auto">
+            <div class="bg-emerald-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
+                <h3 class="font-bold text-lg">📥 Muat Turun Laporan Data</h3>
+                <button onclick="tutupModalDownload()" class="hover:text-emerald-200 text-2xl font-bold leading-none">&times;</button>
+            </div>
+            
+            <div class="p-6">
+                <div class="mb-4 p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-200 flex justify-between items-center flex-wrap gap-2">
+                    <span>Pilih lajur yang ingin dimuat turun ke dalam fail CSV atau muat turun semua lajur Google Spreadsheet.</span>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="pilihSemuaLajurDownload(true)" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow transition">Pilih Semua</button>
+                        <button type="button" onclick="pilihSemuaLajurDownload(false)" class="bg-gray-500 hover:bg-gray-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow transition">Nyahpilih Semua</button>
+                    </div>
+                </div>
+
+                <form id="borangDownload" onsubmit="janaDownloadCSV(event)">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs mb-6 max-h-[50vh] overflow-y-auto p-2 border rounded-lg bg-gray-50">
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="id" data-header="PROJEK ID" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Projek ID</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="tahun" data-header="TAHUN" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Tahun</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="sesi" data-header="SESI" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Sesi</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="jabatan" data-header="JABATAN" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Jabatan</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="kategori" data-header="KATEGORI" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Kategori</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="namaProjek" data-header="NAMA PROJEK" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Nama Projek</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="projekBerimpakTinggi" data-header="PROJEK BERIMPAK TINGGI" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Projek Berimpak Tinggi</span></label>
+                        
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="namaKetua" data-header="NAMA KETUA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Nama Ketua Projek</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noDaftarKetua" data-header="NO DAFTAR KETUA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No Daftar Ketua</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noIcKetua" data-header="NO IC KETUA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No IC Ketua</span></label>
+                        
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="namaAhliKedua" data-header="NAMA AHLI KEDUA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Nama Ahli Kedua</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noDaftarAhliKedua" data-header="NO DAFTAR AHLI KEDUA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No Daftar Ahli Kedua</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noIcAhliKedua" data-header="NO IC AHLI KEDUA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No IC Ahli Kedua</span></label>
+                        
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="namaAhliKetiga" data-header="NAMA AHLI KETIGA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Nama Ahli Ketiga</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noDaftarAhliKetiga" data-header="NO DAFTAR AHLI KETIGA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No Daftar Ahli Ketiga</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noIcAhliKetiga" data-header="NO IC AHLI KETIGA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No IC Ahli Ketiga</span></label>
+                        
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="namaAhliKeempat" data-header="NAMA AHLI KEEMPAT" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Nama Ahli Keempat</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noDaftarAhliKeempat" data-header="NO DAFTAR AHLI KEEMPAT" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No Daftar Ahli Keempat</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noIcAhliKeempat" data-header="NO IC AHLI KEEMPAT" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No IC Ahli Keempat</span></label>
+                        
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="penyelia" data-header="PENYELIA PROJEK" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Penyelia Projek</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noIcPenyelia" data-header="NO IC PENYELIA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No IC Penyelia</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="noHpPenyelia" data-header="NO HP PENYELIA" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">No HP Penyelia</span></label>
+                        
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="namaPertandingan" data-header="NAMA PERTANDINGAN" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Nama Pertandingan</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="tarikhPertandingan" data-header="TARIKH PERTANDINGAN" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Tarikh Pertandingan</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="peringkatPertandingan" data-header="PERINGKAT PERTANDINGAN" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Peringkat Pertandingan</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="ringkasanProjek" data-header="RINGKASAN PROJEK" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Ringkasan Projek</span></label>
+                        
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="markah" data-header="MARKAH" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Markah</span></label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-200 cursor-pointer hover:bg-emerald-50"><input type="checkbox" name="lajur_download" value="pencapaian" data-header="PENCAPAIAN" checked class="rounded text-emerald-600 focus:ring-emerald-500"><span class="font-bold text-gray-700">Pencapaian</span></label>
+                    </div>
+
+                    <div class="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-100">
+                        <button type="button" onclick="tutupModalDownload()" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition text-xs">Batal</button>
+                        <button type="button" onclick="downloadSemuaLajurCSV()" class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition shadow-lg text-xs">🌐 Download Semua Lajur</button>
+                        <button type="submit" class="px-6 py-2.5 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition shadow-lg text-xs">📥 Download Lajur Dipilih</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -498,12 +776,18 @@
                 else if(statusPencapaian === "GANGSA") { badgeColor = "bg-orange-100 text-orange-800 border border-orange-300"; badgeIkon = "🥉"; }
                 else if(statusPencapaian.includes("SIJIL")) { badgeColor = "bg-blue-50 text-blue-700 border border-blue-200"; badgeIkon = "📜"; }
 
-                let btnEdit = bolehEditPenuh ? `<button onclick="bukaModalKemaskini('${row.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition">Kemaskini</button>` : ``;
+                let btnEdit = bolehEditMasingMasing ? `<button onclick="mulaKemaskini('${row.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition">Kemaskini</button>` : ``;
                 let btnPadam = bolehTambahPadam ? `<button onclick="padamRekodPencapaian('${row.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition mt-1">Padam</button>` : ``;
                 let aksiBtn = (btnEdit || btnPadam) ? `<div class="flex flex-col">${btnEdit}${btnPadam}</div>` : `<span class="text-xs text-gray-400 font-bold block text-center">-</span>`;
 
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-amber-50/50 transition duration-150 text-xs";
+                
+                // --- PENAMBAHAN AHLI 2, 3 & 4 DALAM JADUAL ---
+                let htmlAhli2 = row.namaAhliKedua ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 2">👥 ${row.namaAhliKedua}</div>` : "";
+                let htmlAhli3 = row.namaAhliKetiga ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 3">👥 ${row.namaAhliKetiga}</div>` : "";
+                let htmlAhli4 = row.namaAhliKeempat ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 4">👥 ${row.namaAhliKeempat}</div>` : "";
+
                 tr.innerHTML = `
                     <td class="p-3 text-center font-bold text-gray-500">${row.id}</td>
                     <td class="p-3 text-center font-bold">${row.tahun}</td>
@@ -513,19 +797,27 @@
                     <td class="p-3 font-bold text-gray-900 whitespace-normal min-w-[200px] uppercase">${row.namaProjek}</td>
                     <td class="p-3 uppercase">
                         <div class="font-bold text-blue-700" title="Penyelia">👨‍🏫 ${row.penyelia || '-'}</div>
-                        <div class="text-[10px] text-gray-500 mt-1" title="Ketua Projek">👤 ${row.namaKetua || '-'}</div>
+                        <div class="text-[10px] text-gray-600 mt-1 font-bold" title="Ketua Projek">👤 ${row.namaKetua || '-'}</div>
+                        ${htmlAhli2}
+                        ${htmlAhli3}
+                        ${htmlAhli4}
                     </td>
                     <td class="p-3 text-center font-bold text-gray-800">${row.markah || '-'}</td>
-                    <td class="p-3 text-center">
-                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase shadow-sm ${badgeColor}">
-                            ${badgeIkon} ${row.pencapaian || 'BELUM DIKEMASKINI'}
-                        </span>
+                    <td class="p-3 text-left min-w-[220px] whitespace-normal">
+                        <div class="mb-1 text-center">
+                            <span class="inline-block px-2.5 py-1 rounded-full font-bold text-[10px] uppercase shadow-sm ${badgeColor}">
+                                ${badgeIkon} ${row.pencapaian || 'BELUM DIKEMASKINI'}
+                            </span>
+                        </div>
+                        <div class="font-bold text-gray-900 text-xs uppercase" title="Nama Pertandingan">🏆 ${row.namaPertandingan || '-'}</div>
+                        <div class="text-[10px] text-gray-600 mt-0.5 uppercase" title="Tarikh & Peringkat Pertandingan">
+                            📅 ${row.tarikhPertandingan || '-'} <span class="mx-1 text-gray-300">|</span> 🌐 ${row.peringkatPertandingan || '-'}
+                        </div>
                     </td>
                     <td class="p-3 text-center w-24 align-middle">${aksiBtn}</td>
                 `;
                 tbody.appendChild(tr);
             });
-
             urusButangPagination();
         }
 
@@ -607,18 +899,66 @@
             });
         }
 
-        // ================= FUNGSI DOWNLOAD CSV =================
-        function downloadCSV() {
+        // ================= FUNGSI DOWNLOAD CSV (DIKEMASKINI DENGAN MODAL PILIHAN LAJUR) =================
+        function bukaModalDownload() {
+            if (!dataDitapisGlobal || dataDitapisGlobal.length === 0) {
+                alert("Tiada rekod untuk dieksport.");
+                return;
+            }
+            document.getElementById('modalDownload').classList.remove('hidden');
+        }
+
+        function tutupModalDownload() {
+            document.getElementById('modalDownload').classList.add('hidden');
+        }
+
+        function pilihSemuaLajurDownload(pilih) {
+            const checkboxes = document.querySelectorAll('input[name="lajur_download"]');
+            checkboxes.forEach(cb => cb.checked = pilih);
+        }
+
+        function janaDownloadCSV(e) {
+            if (e) e.preventDefault();
+            const checkedBoxes = Array.from(document.querySelectorAll('input[name="lajur_download"]:checked'));
+            if (checkedBoxes.length === 0) {
+                alert("Sila pilih sekurang-kurangnya satu lajur untuk dimuat turun.");
+                return;
+            }
+            
+            const lajurObj = checkedBoxes.map(cb => ({
+                key: cb.value,
+                header: cb.getAttribute('data-header') || cb.value.toUpperCase()
+            }));
+
+            prosesMuatTurunCSV(lajurObj);
+            tutupModalDownload();
+        }
+
+        function downloadSemuaLajurCSV() {
+            const allBoxes = Array.from(document.querySelectorAll('input[name="lajur_download"]'));
+            const lajurObj = allBoxes.map(cb => ({
+                key: cb.value,
+                header: cb.getAttribute('data-header') || cb.value.toUpperCase()
+            }));
+
+            prosesMuatTurunCSV(lajurObj);
+            tutupModalDownload();
+        }
+
+        function prosesMuatTurunCSV(lajurSenarai) {
             if (!dataDitapisGlobal || dataDitapisGlobal.length === 0) {
                 alert("Tiada rekod untuk dieksport.");
                 return;
             }
             paparToast("⏳ Menyediakan fail untuk dimuat turun...", "blue");
 
-            let csvContent = "PROJEK ID,TAHUN,SESI,JABATAN,KATEGORI,NAMA PROJEK,NAMA KETUA,PENYELIA PROJEK,MARKAH,PENCAPAIAN\n";
+            let headers = lajurSenarai.map(l => l.header).join(",");
+            let csvContent = headers + "\n";
+
             dataDitapisGlobal.forEach(r => {
-                let clean = (str) => `"${(str || "").replace(/"/g, '""')}"`;
-                csvContent += `${clean(r.id)},${clean(r.tahun)},${clean(r.sesi)},${clean(r.jabatan)},${clean(r.kategori)},${clean(r.namaProjek)},${clean(r.namaKetua)},${clean(r.penyelia)},${clean(r.markah)},${clean(r.pencapaian || "TIADA")}\n`;
+                let clean = (str) => `"${(str || "").toString().replace(/"/g, '""')}"`;
+                let rowStr = lajurSenarai.map(l => clean(r[l.key])).join(",");
+                csvContent += rowStr + "\n";
             });
 
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -631,6 +971,10 @@
             document.body.removeChild(link);
             
             setTimeout(() => { paparToast("✅ Berjaya dimuat turun!", "green"); }, 1000);
+        }
+
+        function downloadCSV() {
+            bukaModalDownload();
         }
 
         // ================= MUAT NAIK PUKAL (BAHARU) =================
@@ -646,15 +990,35 @@
         function tutupModalPukal() { document.getElementById('modalPukal').classList.add('hidden'); }
 
         function muatTurunTemplatePukal() {
-            let csv = "TAHUN,SESI,JABATAN,KATEGORI,NAMA PROJEK,KETUA PROJEK,PENYELIA,PENCAPAIAN,MARKAH\n";
-            csv += "2025,1,JKA,INOVASI PENSYARAH,SISTEM A,ALI,ABU,EMAS,88.50\n";
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.setAttribute("href", URL.createObjectURL(blob));
-            link.setAttribute("download", "Template_Upload_Pukal.csv");
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
+		let headers = [
+        "TAHUN", "SESI", "JABATAN", "KATEGORI", "NAMA PROJEK",
+        "KETUA PROJEK", "NO DAFTAR KETUA", "NO IC KETUA",
+        "NAMA AHLI KEDUA", "NO DAFTAR AHLI KEDUA", "NO IC AHLI KEDUA",
+        "NAMA AHLI KETIGA", "NO DAFTAR AHLI KETIGA", "NO IC AHLI KETIGA",
+        "NAMA AHLI KEEMPAT", "NO DAFTAR AHLI KEEMPAT", "NO IC AHLI KEEMPAT",
+        "PENYELIA", "NO IC PENYELIA", "NO HP PENYELIA",
+        "PENCAPAIAN", "MARKAH", "PROJEK BERIMPAK",
+        "NAMA PERTANDINGAN", "TARIKH PERTANDINGAN", "PERINGKAT PERTANDINGAN", "RINGKASAN PROJEK"
+		];
+    
+		let sampleRow = [
+        "2025", "1", "JKA", "TEKNIKAL", "SISTEM MONITORING PINTAR",
+        "ALI BIN AHMAD", "01DKA21F1001", "030101085000",
+        "MUTU A/L SAMY", "01DKA21F1002", "030202085000",
+        "", "", "",
+        "", "", "",
+        "DR ABU BIN OTHMAN", "750101085000", "0123456789",
+        "EMAS", "88.50", "Kolaborasi Industri, Menang Pertandingan",
+        "PERTANDINGAN INOVASI KEBANGSAAN", "2025-05-20", "KEBANGSAAN", "Ringkasan ringkas mengenai projek inovasi."
+		];
 
+		let csv = headers.join(",") + "\n" + sampleRow.map(v => `"${v}"`).join(",") + "\n";
+		const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+		const link = document.createElement("a");
+		link.setAttribute("href", URL.createObjectURL(blob));
+		link.setAttribute("download", "Template_Upload_Pukal.csv");
+		document.body.appendChild(link); link.click(); document.body.removeChild(link);
+		}
         // Fungsi CSV Parser
         function csvToArr(strData) {
             const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\"\\,\\r\\n]*))"), "gi");
@@ -761,8 +1125,33 @@
 
         function tutupModalTambah() { document.getElementById('modalTambah').classList.add('hidden'); }
 
+		// Dapatkan string gabungan untuk checkbox (Projek Berimpak)
+        function dapatkanNilaiCheckbox(namaCheckbox) {
+            let checkboxes = document.querySelectorAll(`input[name="${namaCheckbox}"]:checked`);
+            let nilai = [];
+            checkboxes.forEach((cb) => { nilai.push(cb.value); });
+            return nilai.join(", ");
+        }
+
+        function tetapkanNilaiCheckbox(namaCheckbox, stringData) {
+            let checkboxes = document.querySelectorAll(`input[name="${namaCheckbox}"]`);
+            let arrData = stringData ? stringData.split(",").map(item => item.trim()) : [];
+            checkboxes.forEach((cb) => {
+                cb.checked = arrData.includes(cb.value);
+            });
+        }
+
+        // ================= PENGURUSAN TAMBAH DATA (LENGKAP) =================
+        // Sambungan dari fungsi simpanTambah(e) dari arahan anda
         function simpanTambah(e) {
             e.preventDefault();
+
+            const impakGabungan = dapatkanNilaiCheckbox("tambah_impak");
+            if (!impakGabungan) {
+                alert("Sila pilih sekurang-kurangnya satu pilihan bagi Projek Berimpak Tinggi.");
+                return;
+            }
+
             const btn = document.getElementById('btnSimpanTambah');
             btn.disabled = true; btn.innerText = "⏳ Menyimpan...";
 
@@ -775,21 +1164,50 @@
                 NAMA_PROJEK: document.getElementById('tambah_nama_projek').value.toUpperCase(),
                 JABATAN: document.getElementById('tambah_jabatan').value.toUpperCase(),
                 KATEGORI: document.getElementById('tambah_kategori').value.toUpperCase(),
+                
                 NAMA_KETUA: document.getElementById('tambah_nama_ketua').value.toUpperCase(),
-                PENYELIA: document.getElementById('tambah_penyelia').value.toUpperCase()
+                NO_DAFTAR_KETUA: document.getElementById('tambah_no_daftar_ketua').value.toUpperCase(),
+                NO_IC_KETUA: document.getElementById('tambah_no_ic_ketua').value,
+                
+                NAMA_AHLI_KEDUA: document.getElementById('tambah_nama_ahli2').value.toUpperCase(),
+                NO_DAFTAR_AHLI_KEDUA: document.getElementById('tambah_no_daftar_ahli2').value.toUpperCase(),
+                NO_IC_AHLI_KEDUA: document.getElementById('tambah_no_ic_ahli2').value,
+                
+                NAMA_AHLI_KETIGA: document.getElementById('tambah_nama_ahli3').value.toUpperCase(),
+                NO_DAFTAR_AHLI_KETIGA: document.getElementById('tambah_no_daftar_ahli3').value.toUpperCase(),
+                NO_IC_AHLI_KETIGA: document.getElementById('tambah_no_ic_ahli3').value,
+                
+                NAMA_AHLI_KEEMPAT: document.getElementById('tambah_nama_ahli4').value.toUpperCase(),
+                NO_DAFTAR_AHLI_KEEMPAT: document.getElementById('tambah_no_daftar_ahli4').value.toUpperCase(),
+                NO_IC_AHLI_KEEMPAT: document.getElementById('tambah_no_ic_ahli4').value,
+                
+                PENYELIA: document.getElementById('tambah_penyelia').value.toUpperCase(),
+                NO_IC_PENYELIA: document.getElementById('tambah_no_ic_penyelia').value,
+                NO_HP_PENYELIA: document.getElementById('tambah_no_hp_penyelia').value, // HANTAR NO HP TAMBAH BARU
+
+                PROJEK_BERIMPAK: impakGabungan,
+                NAMA_PERTANDINGAN: document.getElementById('tambah_nama_pertandingan').value.toUpperCase(),
+                TARIKH_PERTANDINGAN: document.getElementById('tambah_tarikh_pertandingan').value,
+                PERINGKAT_PERTANDINGAN: document.getElementById('tambah_peringkat_pertandingan').value.toUpperCase(),
+                RINGKASAN_PROJEK: document.getElementById('tambah_ringkasan_projek').value
             };
 
-            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
             .then(res => res.json())
             .then(data => {
-                paparToast(data.status === "BERJAYA" ? `✅ ${data.mesej}` : `❌ ${data.mesej}`, data.status === "BERJAYA" ? "green" : "red");
-                if(data.status === "BERJAYA") { 
-                    tutupModalTambah(); 
-                    muatDataPencapaian(); 
+                if (data.status === "BERJAYA") {
+                    alert(`✅ ${data.mesej}`);
+                    tutupModalTambah();
+                    muatDataPencapaian();
+                } else {
+                    alert(`❌ Ralat: ${data.mesej}`);
                 }
-            }).finally(() => { 
-                btn.disabled = false; btn.innerText = "Simpan Rekod"; 
-            });
+            })
+            .catch(() => alert("❌ Ralat Server."))
+            .finally(() => { btn.disabled = false; btn.innerText = "Simpan Rekod"; });
         }
 
         // ================= PENGURUSAN PADAM & KEMASKINI =================
@@ -806,59 +1224,159 @@
             });
         }
 
-        function bukaModalKemaskini(id) {
-            if (!bolehEditPenuh) return;
-            const r = dataGlobal.find(item => item.id === id);
-            if(!r) return;
+        // ================= PENGURUSAN KEMASKINI DATA & PENGESAHAN NO IC =================
+        function mulaKemaskini(id) {
+            const rowData = dataGlobal.find(d => d.id === id);
+            if (!rowData) return;
 
-            document.getElementById('in_projek_id').value = r.id;
-			document.getElementById('in_sesi').value = r.sesi || ""; // Data sesi jika wujud
-            document.getElementById('in_tahun').value = r.tahun;
-            document.getElementById('in_nama_projek').value = r.namaProjek;
-            document.getElementById('in_jabatan').value = r.jabatan;
-            document.getElementById('in_kategori').value = r.kategori;
-            document.getElementById('in_nama_ketua').value = r.namaKetua || "";
-            document.getElementById('in_penyelia').value = r.penyelia || "";
-            document.getElementById('in_pencapaian').value = (r.pencapaian || "").toUpperCase();
-            document.getElementById('in_markah').value = r.markah || ""; // Data markah jika wujud
-            ['in_nama_projek', 'in_jabatan', 'in_kategori', 'in_nama_ketua', 'in_penyelia', 'in_sesi', 'in_markah'].forEach(medan => {
-                let el = document.getElementById(medan);
-                el.removeAttribute('readonly');
-                el.classList.remove('bg-gray-100', 'text-gray-500');
-                el.classList.add('bg-white', 'focus:ring-2', 'focus:ring-amber-400', 'border-gray-300');
-            });
+            // Semak jika pengguna tertakluk kepada pengesahan sebelum buka modal
+            if (bolehEditDenganPengesahan && !bolehEditPenuh) {
+                document.getElementById('pengesahan_projek_id').value = id;
+                document.getElementById('input_katalaluan_ic').value = "";
+                document.getElementById('mesejRalatKatalaluan').classList.add('hidden');
+                document.getElementById('modalPengesahanKatalaluan').classList.remove('hidden');
+            } else {
+                bukaModalKemaskiniTerus(rowData);
+            }
+        }
+
+
+        function tutupModalPengesahan() {
+            document.getElementById('modalPengesahanKatalaluan').classList.add('hidden');
+        }
+
+        function sahkanKatalaluanDanBukaModal(e) {
+            e.preventDefault();
+            const id = document.getElementById('pengesahan_projek_id').value;
+            let inputIC = document.getElementById('input_katalaluan_ic').value.trim();
+            
+            const rowData = dataGlobal.find(d => d.id === id);
+            if (!rowData) return;
+            
+            // Buang sengkang (-) untuk memastikan format seperti 750201-08-5788 atau 750201085788 diterima sama.
+            let cleanInputIC = inputIC.replace(/-/g, "");
+            let cleanDbIC = (rowData.noIcPenyelia || "").replace(/-/g, "");
+            
+            if (cleanInputIC === cleanDbIC && cleanDbIC !== "") {
+                document.getElementById('modalPengesahanKatalaluan').classList.add('hidden');
+                bukaModalKemaskiniTerus(rowData);
+            } else {
+                document.getElementById('mesejRalatKatalaluan').classList.remove('hidden');
+            }
+        }
+
+        function bukaModalKemaskiniTerus(rowData) {
+            document.getElementById('borangKemaskini').reset();
+            document.getElementById('in_projek_id').value = rowData.id;
+            document.getElementById('in_sesi').value = rowData.sesi || "";
+            document.getElementById('in_tahun').value = rowData.tahun || "";
+            document.getElementById('in_nama_projek').value = rowData.namaProjek || "";
+            document.getElementById('in_jabatan').value = (rowData.jabatan || "").toUpperCase();
+            document.getElementById('in_kategori').value = (rowData.kategori || "").toUpperCase();
+            tetapkanNilaiCheckbox('in_impak', rowData.projekBerimpakTinggi);
+
+            document.getElementById('in_nama_ketua').value = rowData.namaKetua || "";
+            document.getElementById('in_no_daftar_ketua').value = rowData.noDaftarKetua || "";
+            document.getElementById('in_no_ic_ketua').value = rowData.noIcKetua || "";
+
+            document.getElementById('in_nama_ahli2').value = rowData.namaAhliKedua || "";
+            document.getElementById('in_no_daftar_ahli2').value = rowData.noDaftarAhliKedua || "";
+            document.getElementById('in_no_ic_ahli2').value = rowData.noIcAhliKedua || "";
+
+            document.getElementById('in_nama_ahli3').value = rowData.namaAhliKetiga || "";
+            document.getElementById('in_no_daftar_ahli3').value = rowData.noDaftarAhliKetiga || "";
+            document.getElementById('in_no_ic_ahli3').value = rowData.noIcAhliKetiga || "";
+
+            document.getElementById('in_nama_ahli4').value = rowData.namaAhliKeempat || "";
+            document.getElementById('in_no_daftar_ahli4').value = rowData.noDaftarAhliKeempat || "";
+            document.getElementById('in_no_ic_ahli4').value = rowData.noIcAhliKeempat || "";
+
+            document.getElementById('in_penyelia').value = rowData.penyelia || "";
+            document.getElementById('in_no_ic_penyelia').value = rowData.noIcPenyelia || "";
+            document.getElementById('in_no_hp_penyelia').value = rowData.noHpPenyelia || ""; // SET NO HP KEMASKINI
+
+            document.getElementById('in_nama_pertandingan').value = rowData.namaPertandingan || "";
+            document.getElementById('in_tarikh_pertandingan').value = rowData.tarikhPertandingan || "";
+            document.getElementById('in_peringkat_pertandingan').value = (rowData.peringkatPertandingan || "").toUpperCase();
+            document.getElementById('in_ringkasan_projek').value = rowData.ringkasanProjek || "";
+
+            let pencapaianTerkini = (rowData.pencapaian || "").toUpperCase();
+            let selectPencapaian = document.getElementById('in_pencapaian');
+            let optionExists = Array.from(selectPencapaian.options).some(opt => opt.value === pencapaianTerkini);
+            if (!optionExists && pencapaianTerkini) selectPencapaian.innerHTML += `<option value="${pencapaianTerkini}">${pencapaianTerkini}</option>`;
+            selectPencapaian.value = pencapaianTerkini || "";
+            
+            document.getElementById('in_markah').value = rowData.markah || "";
 
             document.getElementById('modalKemaskini').classList.remove('hidden');
         }
 
-        function tutupModal() { document.getElementById('modalKemaskini').classList.add('hidden'); }
+        function tutupModal() {
+            document.getElementById('modalKemaskini').classList.add('hidden');
+        }
+        
 
         function simpanKemaskini(e) {
             e.preventDefault();
+
+            const impakGabungan = dapatkanNilaiCheckbox("in_impak");
+            if (!impakGabungan) {
+                alert("Sila pilih sekurang-kurangnya satu pilihan bagi Projek Berimpak Tinggi.");
+                return;
+            }
+
             const btn = document.getElementById('btnSimpan');
             btn.disabled = true; btn.innerText = "⏳ Menyimpan...";
 
             const payload = {
-                action: "kemaskiniPencapaianPelajar", 
+                action: "kemaskiniPencapaianPelajar",
                 PROJEK_ID: document.getElementById('in_projek_id').value,
-				SESI: document.getElementById('in_sesi').value,
-				MARKAH: document.getElementById('in_markah').value,
+                SESI: document.getElementById('in_sesi').value,
+                TAHUN: document.getElementById('in_tahun').value,
+                NAMA_PROJEK: document.getElementById('in_nama_projek').value,
+                JABATAN: document.getElementById('in_jabatan').value,
+                KATEGORI: document.getElementById('in_kategori').value,
+                PROJEK_BERIMPAK: impakGabungan,
+                NAMA_KETUA: document.getElementById('in_nama_ketua').value,
+                NO_DAFTAR_KETUA: document.getElementById('in_no_daftar_ketua').value,
+                NO_IC_KETUA: document.getElementById('in_no_ic_ketua').value,
+                NAMA_AHLI_KEDUA: document.getElementById('in_nama_ahli2').value,
+                NO_DAFTAR_AHLI_KEDUA: document.getElementById('in_no_daftar_ahli2').value,
+                NO_IC_AHLI_KEDUA: document.getElementById('in_no_ic_ahli2').value,
+                NAMA_AHLI_KETIGA: document.getElementById('in_nama_ahli3').value,
+                NO_DAFTAR_AHLI_KETIGA: document.getElementById('in_no_daftar_ahli3').value,
+                NO_IC_AHLI_KETIGA: document.getElementById('in_no_ic_ahli3').value,
+                NAMA_AHLI_KEEMPAT: document.getElementById('in_nama_ahli4').value,
+                NO_DAFTAR_AHLI_KEEMPAT: document.getElementById('in_no_daftar_ahli4').value,
+                NO_IC_AHLI_KEEMPAT: document.getElementById('in_no_ic_ahli4').value,
+                PENYELIA: document.getElementById('in_penyelia').value,
+                NO_IC_PENYELIA: document.getElementById('in_no_ic_penyelia').value,
+                NO_HP_PENYELIA: document.getElementById('in_no_hp_penyelia').value, // HANTAR NO HP KEMASKINI
+                NAMA_PERTANDINGAN: document.getElementById('in_nama_pertandingan').value,
+                TARIKH_PERTANDINGAN: document.getElementById('in_tarikh_pertandingan').value,
+                PERINGKAT_PERTANDINGAN: document.getElementById('in_peringkat_pertandingan').value,
+                RINGKASAN_PROJEK: document.getElementById('in_ringkasan_projek').value,
                 PENCAPAIAN: document.getElementById('in_pencapaian').value,
-                NAMA_PROJEK: document.getElementById('in_nama_projek').value.toUpperCase(),
-                JABATAN: document.getElementById('in_jabatan').value.toUpperCase(),
-                KATEGORI: document.getElementById('in_kategori').value.toUpperCase(),
-                NAMA_KETUA: document.getElementById('in_nama_ketua').value.toUpperCase(),
-                PENYELIA: document.getElementById('in_penyelia').value.toUpperCase()
+                MARKAH: document.getElementById('in_markah').value
             };
 
-            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
             .then(res => res.json())
             .then(data => {
-                paparToast(data.status === "BERJAYA" ? `✅ ${data.mesej}` : `❌ ${data.mesej}`, data.status === "BERJAYA" ? "green" : "red");
-                if(data.status === "BERJAYA") { tutupModal(); muatDataPencapaian(); }
-            }).finally(() => { btn.disabled = false; btn.innerText = "Simpan Kemaskini"; });
+                if (data.status === "BERJAYA") {
+                    alert("✅ Rekod berjaya dikemaskini.");
+                    tutupModal();
+                    muatDataPencapaian();
+                } else {
+                    alert("❌ Gagal mengemaskini: " + data.mesej);
+                }
+            })
+            .catch(() => alert("Ralat Server. Sila cuba lagi."))
+            .finally(() => { btn.disabled = false; btn.innerText = "Simpan Kemaskini"; });
         }
-
         function paparToast(teks, warna) {
             const msgBox = document.getElementById('paparMesejUI');
             msgBox.className = `mb-4 p-4 rounded-xl text-center text-sm font-bold shadow-md text-white fixed top-5 right-5 z-[100] transition-opacity ` + 
