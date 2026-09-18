@@ -773,34 +773,96 @@
             });
         }
 
-		function eksportCSV() {
+		// --- BERMULA KOD CSV BAHARU ---
+        const semuaHeaderCSV = [
+            "BIL", "INNOVATOR", "AHLI KUMPULAN", "JABATAN", "PRODUK INOVASI", 
+            "PERTANDINGAN", "TARIKH & TEMPAT", "PINGAT", "TAHUN", "STATUS", 
+            "SIJIL PENCAPAIAN", "SIJIL PENGHARGAAN", "YURAN PENDAFTARAN", 
+            "LINK GAMBAR AHLI", "LINK GAMBAR PRODUK", "NO KP KETUA", 
+            "KATEGORI PRODUK", "EMAIL KETUA", "NO HP KETUA"
+        ];
+
+        function eksportCSV() {
             if (!dataSemasa || dataSemasa.length === 0) {
                 alert("Tiada data untuk dieksport.");
                 return;
             }
+            
+            // Jana checkbox berdasarkan header yang dikemaskini
+            const container = document.getElementById('senaraiLajurCSV');
+            container.innerHTML = "";
+            semuaHeaderCSV.forEach((header, index) => {
+                container.innerHTML += `
+                    <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-teal-50 rounded-md border border-transparent hover:border-teal-200 transition">
+                        <input type="checkbox" class="lajur-csv-checkbox w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500" value="${index}" checked>
+                        <span class="text-sm font-bold text-gray-700">${header}</span>
+                    </label>
+                `;
+            });
+            document.getElementById('modalCSV').classList.remove('hidden');
+            document.getElementById('modalCSV').classList.add('flex');
+        }
 
-            let csvContent = "BIL,INNOVATOR,AHLI KUMPULAN,JABATAN,PRODUK INOVASI,PERTANDINGAN,TARIKH & TEMPAT,PINGAT,TAHUN,STATUS,LINK PENCAPAIAN,LINK PENGHARGAAN,YURAN\n";
+        function toggleSemuaLajurCSV(status) {
+            document.querySelectorAll('.lajur-csv-checkbox').forEach(cb => cb.checked = status);
+        }
 
+        function tutupModalCSV() {
+            document.getElementById('modalCSV').classList.add('hidden');
+            document.getElementById('modalCSV').classList.remove('flex');
+        }
+
+        function laksanaEksportCSV() {
+            const checkboxes = document.querySelectorAll('.lajur-csv-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert("Sila pilih sekurang-kurangnya satu lajur.");
+                return;
+            }
+
+            let lajurDipilih = [];
+            let headerDipilih = [];
+            checkboxes.forEach(cb => {
+                lajurDipilih.push(parseInt(cb.value));
+                headerDipilih.push(semuaHeaderCSV[cb.value]);
+            });
+
+            // Tulis barisan pengepala (header)
+            let csvContent = headerDipilih.map(h => `"${h}"`).join(",") + "\n";
+
+            // Tulis data baris demi baris
             dataSemasa.forEach(row => {
-                let rowData = row.map(cell => {
-                    let teks = String(cell || "").replace(/"/g, '""'); 
-                    return `"${teks}"`; 
+                let rowData = [];
+                lajurDipilih.forEach(index => {
+                    let cell = row[index] || "";
+                    let teks = String(cell).replace(/"/g, '""'); // Escape watak quote (") dalam CSV
+                    
+                    // PENTING: Format Khas untuk No. KP (Index 15) dan No HP (Index 18)
+                    // Digunakan format ="teks" agar Excel tidak menjadikannya angka saintifik/membuang 0
+                    if (index === 15 || index === 18) {
+                        rowData.push('"=""' + teks + '"""'); 
+                    } else {
+                        rowData.push(`"${teks}"`);
+                    }
                 });
                 csvContent += rowData.join(",") + "\n";
             });
 
+            // Laksana Muat Turun (Download Blob)
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             
             link.setAttribute("href", url);
-            link.setAttribute("download", "Data_Inovasi_Eksport.csv");
+            link.setAttribute("download", "Data_Inovasi_Terkini.csv");
             link.style.visibility = 'hidden';
             
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            tutupModalCSV(); // Tutup modal selepas berjaya muat turun
         }
+        // --- TAMAT KOD CSV BAHARU ---
 		
         function muatTurunPDFLaporan() {
             let dataUntukEksport = dataSemasa && dataSemasa.length > 0 ? dataSemasa : semuaData;
@@ -965,5 +1027,30 @@
 
         window.onload = ambilData;
     </script>
+	
+
+<!-- Modal Pilihan Lajur CSV -->
+    <div id="modalCSV" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-[95%] max-w-3xl max-h-[90vh] flex flex-col">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800 border-b pb-3">⚙️ Pilih Lajur CSV</h2>
+            
+            <div class="flex gap-3 mb-5">
+                <button onclick="toggleSemuaLajurCSV(true)" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm">Pilih Semua</button>
+                <button onclick="toggleSemuaLajurCSV(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm">Nyahpilih Semua</button>
+            </div>
+            
+            <!-- Bekas untuk senarai checkbox (akan dijana secara dinamik) -->
+            <div id="senaraiLajurCSV" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 flex-1">
+            </div>
+            
+            <div class="flex justify-end gap-3 mt-4 pt-4 border-t">
+                <button onclick="tutupModalCSV()" class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2.5 rounded-lg font-bold transition shadow-sm">Batal</button>
+                <button onclick="laksanaEksportCSV()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 transition shadow-md">
+                    📥 Muat Turun Data
+                </button>
+            </div>
+        </div>
+    </div>
+	
 </body>
 </html>

@@ -108,7 +108,6 @@
                                 <option value="PERAK">PERAK (Silver)</option>
                                 <option value="GANGSA">GANGSA (Bronze)</option>
                                 <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN Sahaja</option>
-                                <option value="LAIN-LAIN">Lain-lain</option>
                             </select>
                         </div>
                         <div>
@@ -588,9 +587,9 @@ async function muatTetapanSenarai() {
         // ==========================================
         // FUNGSI UPLOAD PUKAL (CSV)
         // ==========================================
-        // 🌟 KEMASKINI TEMPLATE: Tambah Lajur K, L dan Lajur M (YURAN_PENYERTAAN)
-        // *Sengaja dikekalkan format ini untuk elak susunan lari pada sistem pengguna.
-        const csvTemplateData = "BIL,INNOVATOR,AHLI,JABATAN,PRODUK,NAMA,TARIKH,PINGAT,TAHUN,LINK_SIJIL_PENCAPAIAN,KOSONG_K,KOSONG_L,YURAN_PENYERTAAN\n1,Ali Bin Abu,\"Siti, Ahmad\",JTMK,Sistem Pintar,Inovasi Kebangsaan,2024-05-20 (PICC Putrajaya),EMAS,2024,\"https://link-sijil-1.com, https://link-sijil-2.com\",,,150.00";
+        // 🌟 KEMASKINI TEMPLATE: Tambah lajur penuh sehingga NO_HP_KETUA mengikut susunan terkini di Google Sheet
+        // Ditambah tanda (') pada nilai No KP dan No HP supaya perisian Excel membacanya sebagai format Teks
+        const csvTemplateData = "BIL,INNOVATOR,AHLI,JABATAN,PRODUK,NAMA,TARIKH,PINGAT,TAHUN,LINK_SIJIL_PENCAPAIAN,KOSONG_K,KOSONG_L,YURAN_PENYERTAAN,GAMBAR_AHLI,GAMBAR_PRODUK,NO_KP_KETUA,KATEGORI_PRODUK,EMAIL_KETUA,NO_HP_KETUA\n1,Ali Bin Abu,\"Siti, Ahmad\",JTMK,Sistem Pintar,Inovasi Kebangsaan,2024-05-20 (PICC Putrajaya),EMAS,2024,\"https://link-sijil-1.com, https://link-sijil-2.com\",,,150.00,,,'820618016121,Kategori A,ali@domain.com,'0123257824";
 
         document.getElementById('btnDownloadTemplate').addEventListener('click', () => {
             const blob = new Blob([csvTemplateData], { type: 'text/csv;charset=utf-8;' });
@@ -640,7 +639,9 @@ async function muatTetapanSenarai() {
                 // Bermula dari index 1 (Abaikan Tajuk/Header)
                 for (let i = 1; i < rows.length; i++) {
                     let d = rows[i];
-                    if (d.length >= 9 && d[0].trim() !== "") {
+                    
+                    // Semak minimum data yang ada sebelum teruskan parsing
+                    if (d.length >= 9 && d[0] && d[0].trim() !== "") {
                         
                         let linkSijilRaw = d[9] ? d[9].trim() : "";
                         let linkArray = linkSijilRaw.split(/[\n,]+/).filter(l => l.trim() !== "");
@@ -650,7 +651,14 @@ async function muatTetapanSenarai() {
                             linkArray = linkArray.slice(0, 2); 
                         }
 
+                        // Mengambil nilai mengikut indeks CSV baru
                         let yuranCSV = d[12] ? d[12].trim() : "";
+                        let gambarAhliCSV = d[13] ? d[13].trim() : "";
+                        let gambarProdukCSV = d[14] ? d[14].trim() : "";
+                        let noKpKetuaCSV = d[15] ? d[15].trim() : "";
+                        let kategoriCSV = d[16] ? d[16].trim() : "";
+                        let emailKetuaCSV = d[17] ? d[17].trim() : "";
+                        let noHpKetuaCSV = d[18] ? d[18].trim() : "";
                         
                         dataPukal.push({
                             "BIL": d[0],
@@ -664,6 +672,12 @@ async function muatTetapanSenarai() {
                             "TAHUN": d[8],
                             "LINK_SIJIL": linkArray.join(", "),
                             "YURAN": yuranCSV,
+                            "GAMBAR_AHLI": gambarAhliCSV,
+                            "GAMBAR_PRODUK": gambarProdukCSV,
+                            "NO_KP_KETUA": noKpKetuaCSV,
+                            "KATEGORI": kategoriCSV,
+                            "EMAIL_KETUA": emailKetuaCSV,
+                            "NO_HP_KETUA": noHpKetuaCSV,
                             "STATUS": "DISAHKAN" 
                         });
                     }
