@@ -402,6 +402,33 @@
             const btn = document.getElementById('btnHantar');
             const mesej = document.getElementById('mesejBorang');
             btn.disabled = true; btn.innerHTML = '⏳ Menghantar...'; mesej.classList.add('hidden');
+            
+            // TAMBAHAN BAHARU: KAWALAN PENGESAHAN AUTOMATIK
+            const perananDipilih = document.getElementById('peranan').value.toUpperCase();
+            
+            const pendaftarLayak = [
+                "KUPIK", 
+                "ADMIN", 
+                "PENYELARAS INOVASI (C-RIE)", 
+                "PENYELARAS PENYELIDIKAN (C-RIE)"
+            ];
+            
+            const perananAutoSah = [
+                "PENYELARAS JABATAN", 
+                "PENYELIA PROJEK PELAJAR", 
+                "PENYELARAS PROJEK (CRIE)", 
+				"PENYELARAS KIK (CRIE)",
+                "PENYELARAS HARTA INTELEK (C-RIE)",
+                "PENYELARAS GERAN (C-RIE)", 
+                "PENYELARAS PENGKOMERSILAN (C-RIE)"
+            ];
+            
+            let statusDaftar = "MENUNGGU PENGESAHAN";
+            
+            // Semak jika peranan semasa layak dan peranan dipilih ada dalam senarai disahkan automatik
+            if (pendaftarLayak.includes(userPeranan) && perananAutoSah.includes(perananDipilih)) {
+                statusDaftar = "AKTIF"; // Boleh terus ke status disahkan/aktif
+            }
 
             const payload = {
                 action: "tambahPengguna",
@@ -411,10 +438,11 @@
                 KATA_LALUAN: pass1,
                 JABATAN: document.getElementById('jabatan').value.toUpperCase(),
                 BAHAGIAN: document.getElementById('bahagian').value.toUpperCase(), 
-                PERANAN: document.getElementById('peranan').value.toUpperCase(),
+                PERANAN: perananDipilih,
                 SESI: document.getElementById('sesi').value,
                 TAHUN: document.getElementById('tahun').value,
-                STATUS: "MENUNGGU PENGESAHAN" 
+                STATUS: statusDaftar, // KEMAS KINI: Gunakan status dinamik
+				LOGIN_ROLE: userPeranan // <--- TAMBAHKAN BARIS INI
             };
 
             fetch(SCRIPT_URL, { 

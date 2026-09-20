@@ -6,24 +6,31 @@
     <title>Pencapaian Projek Pelajar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Kawalan Akses Asas & Peranan
+       // Kawalan Akses Asas & Peranan
         const userLulus = sessionStorage.getItem("userLulus");
         const userPeranan = sessionStorage.getItem("peranan") || "";
+        const userJabatan = sessionStorage.getItem("jabatan") || ""; // Untuk semakan Penyelaras Jabatan
         
         if (userLulus !== "YA") {
             alert("Sila log masuk terlebih dahulu.");
             window.location.href = "login.html";
         }
-
-        // Semak jika pengguna mempunyai akses kemaskini penuh sedia ada
-        const bolehEditPenuh = ["PENYELARAS INOVASI", "PENYELARAS INOVASI (C-RIE)", "KUPIK", "ADMIN"].includes(userPeranan.toUpperCase());
         
-        // KAWALAN BAHARU: Akses spesifik untuk Tambah dan Padam
-        const perananKhasTambahPadam = ["ADMIN", "KUPIK", "PENYELARAS INOVAS (C-RIE)", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS INOVASI", "PENYELARAS PROJEK (CRIE)"];
-        const bolehTambahPadam = perananKhasTambahPadam.includes(userPeranan.toUpperCase());
+        // Semak jika pengguna mempunyai akses kemaskini penuh sedia ada
+        const perananPengesahPenuh = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS PROJEK (CRIE)"];
+        const bolehEditPenuh = perananPengesahPenuh.includes(userPeranan.toUpperCase());
+        const perananStafAtauPenyelia = ["STAF", "PENYELIA PROJEK PELAJAR"];
+		
+		// KAWALAN BAHARU: Akses spesifik untuk Pengesahan
+        const perananPengesah = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS JABATAN", "PENYELARAS PROJEK (CRIE)"];
+        const bolehSahkan = perananPengesah.includes(userPeranan.toUpperCase());
+        
+        // KAWALAN BAHARU: Akses spesifik untuk Padam (Staf, Penyelia, dan Penyelaras Jabatan TIDAK BOLEH padam)
+        const perananDilarangPadam = ["STAF", "PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN"];
+        const bolehPadam = !perananDilarangPadam.includes(userPeranan.toUpperCase());
 
         // KAWALAN BAHARU: Akses kemaskini untuk Penyelia Projek Pelajar & Penyelaras Jabatan (Memerlukan Kata Laluan No IC Penyelia)
-        const perananDenganPengesahan = ["PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN"];
+        const perananDenganPengesahan = ["PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN", "STAF"];
         const bolehEditDenganPengesahan = perananDenganPengesahan.includes(userPeranan.toUpperCase());
         const bolehEditMasingMasing = bolehEditPenuh || bolehEditDenganPengesahan;
     </script>
@@ -45,9 +52,17 @@
                 <a href="juri.html" id="btnJuri" class="bg-purple-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-purple-800 transition text-sm flex items-center gap-2">
                     👨‍⚖️ Juri/Panel
                 </a>
-                <a href="projek_pelajar.html" class="bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-indigo-800 transition text-sm flex items-center gap-2">
+                
+                <!-- BUTANG TAMBAH PENCAPAIAN BERSEBELAHAN BUTANG JURI/PANEL (MENGANDUNGI 2 TAB) -->
+                <button id="btnTambahPencapaian" onclick="bukaModalTambahPencapaian('manual')" class="hidden bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-blue-800 transition text-sm flex items-center gap-2">
+                    🏆 Tambah Pencapaian
+                </button>
+
+                <!-- PENCALONAN PROJEK PELAJAR: Terus buka modal Pendaftaran Projek di projek_pelajar.html -->
+                <a href="projek_pelajar.html?action=daftar" class="bg-indigo-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-indigo-800 transition text-sm flex items-center gap-2">
                     🎓 Pencalonan Projek Pelajar
                 </a>
+                
                 <!-- 🌟 ID ditambah pada butang untuk kawalan akses STAF -->
                 <a href="projek_pelajar.html?action=daftar" id="btnDaftarProjek" class="bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-bold shadow hover:bg-emerald-800 transition text-sm flex items-center gap-2">
                     ➕ Daftar Projek
@@ -86,47 +101,46 @@
             </div>
         </div>
         
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 items-end">
-            <div class="w-full md:w-1/4">
-				<label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Tahun</label>
-				<input type="text" id="filterTahun" oninput="resetPageDanRender()" placeholder="Cth: 2024" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
-			</div>
-            <div class="w-full md:w-1/4">
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Jabatan</label>
-                <select id="filterJabatan" onchange="resetPageDanRender()" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
-                    <option value="SEMUA">-- Semua Jabatan --</option>
-                </select>
-            </div>
-            <div class="w-full md:w-1/4">
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Pencapaian</label>
-                <select id="filterPencapaian" onchange="resetPageDanRender()" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
-                    <option value="SEMUA">-- Semua Pencapaian --</option>
-                    <option value="EMAS">Emas</option>
-                    <option value="PERAK">Perak</option>
-                    <option value="GANGSA">Gangsa</option>
-                    <option value="SIJIL PENYERTAAN">Sijil Penyertaan</option>
-                </select>
-            </div>
-            <div class="w-full md:auto ml-auto flex gap-2">
-                <div id="paparMesejUI" class="hidden font-bold text-sm px-4 py-2 rounded-lg flex items-center text-white shadow-md"></div>
-                
-                <!-- BUTANG TAMBAH DATA PUKAL (Baru) -->
-                <button id="btnMuatNaikPukal" onclick="bukaModalPukal()" class="hidden bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 shadow-md transition flex items-center gap-2">
-                    📤 Muat Naik Pukal
-                </button>
-
-                <!-- BUTANG TAMBAH DATA MANUAL -->
-                <button id="btnTambahData" onclick="bukaModalTambah()" class="hidden bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 shadow-md transition flex items-center gap-2">
-                    ➕ Tambah Manual
-                </button>
-
-                <!-- 🌟 ID ditambah pada butang untuk kawalan akses STAF -->
-                <button id="btnDownloadLaporan" onclick="bukaModalDownload()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2">
-                    📥 Download Laporan
-                </button>
-                <button onclick="muatDataPencapaian()" class="bg-amber-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-amber-600 shadow-md">🔄 Refresh</button>
-            </div>
-        </div>
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 mb-6 flex flex-col lg:flex-row flex-wrap gap-4 items-end">
+    <div class="w-full lg:flex-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Tahun</label>
+        <input type="text" id="filterTahun" oninput="resetPageDanRender()" placeholder="Cth: 2024" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
+    </div>
+    <div class="w-full lg:flex-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Jabatan</label>
+        <select id="filterJabatan" onchange="resetPageDanRender()" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="SEMUA">-- Semua Jabatan --</option>
+        </select>
+    </div>
+    <div class="w-full lg:flex-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Pencapaian</label>
+        <select id="filterPencapaian" onchange="resetPageDanRender()" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="SEMUA">-- Semua Pencapaian --</option>
+            <option value="EMAS">Emas</option>
+            <option value="PERAK">Perak</option>
+            <option value="GANGSA">Gangsa</option>
+            <option value="SIJIL PENYERTAAN">Sijil Penyertaan</option>
+        </select>
+    </div>
+    <!-- 🌟 Filter Status Ditambah -->
+    <div class="w-full lg:flex-1">
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Status</label>
+        <select id="filterStatus" onchange="resetPageDanRender()" class="w-full px-4 py-2 border rounded-lg bg-gray-50 font-semibold outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="SEMUA">-- Semua Status --</option>
+            <option value="DISAHKAN">Disahkan</option>
+            <option value="BELUM DISAHKAN">Belum Disahkan</option>
+        </select>
+    </div>
+    <!-- 🌟 Kelas dibaiki di sini: w-full lg:w-auto shrink-0 -->
+    <div class="w-full lg:w-auto ml-auto flex gap-2 mt-2 lg:mt-0 shrink-0">
+        <div id="paparMesejUI" class="hidden font-bold text-sm px-4 py-2 rounded-lg flex items-center text-white shadow-md"></div>
+        <!-- 🌟 ID ditambah pada butang untuk kawalan akses STAF -->
+        <button id="btnDownloadLaporan" onclick="bukaModalDownload()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2 whitespace-nowrap">
+            📥 Download Laporan
+        </button>
+        <button onclick="muatDataPencapaian()" class="bg-amber-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-amber-600 shadow-md whitespace-nowrap">🔄 Refresh</button>
+    </div>
+</div>
 
         <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
@@ -142,6 +156,8 @@
                             <th class="p-3">KETUA / PENYELIA</th>
                             <th class="p-3 text-center">MARKAH</th>
                             <th class="p-3 text-center">PENCAPAIAN</th>
+							<!-- LAJUR STATUS DITAMBAH -->
+                            <th class="p-3 text-center">STATUS</th>
                             <th class="p-3 text-center">TINDAKAN</th>
                         </tr>
                     </thead>
@@ -187,7 +203,7 @@
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-y-auto">
             <div class="bg-amber-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
                 <h3 class="font-bold text-lg">✏️ Kemaskini Maklumat Projek</h3>
-                <button onclick="tutupModal()" class="hover:text-amber-200 text-2xl font-bold leading-none">&times;</button>
+                <button type="button" onclick="tutupModal()" class="hover:text-amber-200 text-2xl font-bold leading-none">&times;</button>
             </div>
             
             <div class="p-6">
@@ -357,6 +373,15 @@
                             <input type="number" id="in_markah" step="0.01" class="w-full px-4 py-2 border border-amber-300 rounded-lg font-bold text-amber-900 bg-white focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Masukkan Markah">
                         </div>
                     </div>
+					
+					<div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200 mt-2">
+                        <label class="block text-sm font-bold text-emerald-800 mb-2">✅ Status Pengesahan Data</label>
+                        <select id="in_status" class="w-full px-4 py-2 border border-emerald-300 rounded-lg font-bold text-emerald-900 bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <option value="BELUM DISAHKAN">BELUM DISAHKAN</option>
+                            <option value="DISAHKAN">DISAHKAN</option>
+                        </select>
+                        <p class="text-xs text-emerald-700 mt-1" id="in_status_hint">Hanya Penyelaras Jabatan dan Pengurusan Tertinggi (Admin/Kupik/C-RIE) boleh mengesahkan data ini.</p>
+                    </div>
 
                     <!-- KAWALAN PENGESAHAN (KATA LALUAN) -->
                     <div id="ruanganKatalaluan" class="mt-4 p-4 bg-red-50 rounded-lg border border-red-200 hidden">
@@ -374,203 +399,208 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH DATA MANUAL -->
-    <div id="modalTambah" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
+    <!-- MODAL GABUNGAN TAMBAH PENCAPAIAN (2 TAB: MANUAL & MUAT NAIK PUKAL) -->
+    <div id="modalTambahPencapaian" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-y-auto">
             <div class="bg-blue-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
-                <h3 class="font-bold text-lg">➕ Tambah Pencapaian Manual</h3>
-                <button onclick="tutupModalTambah()" class="hover:text-blue-200 text-2xl font-bold leading-none">&times;</button>
+                <h3 class="font-bold text-lg">🏆 Tambah Pencapaian Pelajar</h3>
+                <button onclick="tutupModalTambahPencapaian()" class="hover:text-blue-200 text-2xl font-bold leading-none">&times;</button>
             </div>
             
+            <!-- SISTEM TAB -->
+            <div class="flex border-b bg-gray-100 px-6 pt-3 gap-2 sticky top-[60px] z-10">
+                <button id="tabHeaderManual" onclick="tukarTabPencapaian('manual')" class="px-5 py-2.5 font-bold text-sm text-blue-600 border-b-2 border-blue-600 focus:outline-none transition">
+                    ➕ Tambah Manual
+                </button>
+                <button id="tabHeaderPukal" onclick="tukarTabPencapaian('pukal')" class="px-5 py-2.5 font-bold text-sm text-gray-500 hover:text-purple-600 border-b-2 border-transparent focus:outline-none transition">
+                    📤 Muat Naik Pukal
+                </button>
+            </div>
+
             <div class="p-6">
-                <div class="mb-4 p-3 bg-blue-50 text-blue-800 text-xs font-bold rounded-lg border border-blue-200">
-                    ℹ️ Projek ID tidak perlu dimasukkan. Ia akan dijana secara automatik berdasarkan format (Contoh: JKA-2025-1001).
-                </div>
-                <form id="borangTambah" onsubmit="simpanTambah(event)">
-                    
-                    <!-- MAKLUMAT PROJEK ASAS -->
-                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
-                        <h4 class="text-sm font-bold text-blue-700 mb-3 border-b pb-1">Maklumat Projek</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Sesi <span class="text-red-500">*</span></label>
-                                <select id="tambah_sesi" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                                    <option value="">-- SILA PILIH SESI --</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
-                                <input type="number" id="tambah_tahun" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
-                                <select id="tambah_jabatan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                                    <option value="">-- SILA PILIH JABATAN --</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Nama Projek <span class="text-red-500">*</span></label>
-                                <input type="text" id="tambah_nama_projek" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
-                                <select id="tambah_kategori" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                                    <option value="">-- SILA PILIH KATEGORI --</option>
-                                    <option value="TEKNIKAL">TEKNIKAL</option>
-                                    <option value="SAINS SOSIAL">SAINS SOSIAL</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-3">
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Projek Berimpak Tinggi <span class="text-red-500">*</span></label>
-                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
-                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Kolaborasi Industri" class="rounded text-blue-600 focus:ring-blue-500"><span>Kolaborasi Industri</span></label>
-                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Kolaborasi Komuniti" class="rounded text-blue-600 focus:ring-blue-500"><span>Kolaborasi Komuniti</span></label>
-                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Memenangi Pertandingan" class="rounded text-blue-600 focus:ring-blue-500"><span>Menang Pertandingan</span></label>
-                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Mendapat Geran" class="rounded text-blue-600 focus:ring-blue-500"><span>Dapat Geran</span></label>
-                                    <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Komersial" class="rounded text-blue-600 focus:ring-blue-500"><span>Komersial</span></label>
+                <!-- TAB 1: MODAL TAMBAH DATA MANUAL -->
+                <div id="tabKandunganManual">
+                    <div class="mb-4 p-3 bg-blue-50 text-blue-800 text-xs font-bold rounded-lg border border-blue-200">
+                        ℹ️ Projek ID tidak perlu dimasukkan. Ia akan dijana secara automatik berdasarkan format (Contoh: JKA-2025-1001).
+                    </div>
+                    <form id="borangTambah" onsubmit="simpanTambah(event)">
+                        
+                        <!-- MAKLUMAT PROJEK ASAS -->
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                            <h4 class="text-sm font-bold text-blue-700 mb-3 border-b pb-1">Maklumat Projek</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Sesi <span class="text-red-500">*</span></label>
+                                    <select id="tambah_sesi" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <option value="">-- SILA PILIH SESI --</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Tahun <span class="text-red-500">*</span></label>
+                                    <input type="number" id="tambah_tahun" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
+                                    <select id="tambah_jabatan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <option value="">-- SILA PILIH JABATAN --</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Nama Projek <span class="text-red-500">*</span></label>
+                                    <input type="text" id="tambah_nama_projek" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
+                                    <select id="tambah_kategori" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <option value="">-- SILA PILIH KATEGORI --</option>
+                                        <option value="TEKNIKAL">TEKNIKAL</option>
+                                        <option value="SAINS SOSIAL">SAINS SOSIAL</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Projek Berimpak Tinggi <span class="text-red-500">*</span></label>
+                                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                                        <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Kolaborasi Industri" class="rounded text-blue-600 focus:ring-blue-500"><span>Kolaborasi Industri</span></label>
+                                        <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Kolaborasi Komuniti" class="rounded text-blue-600 focus:ring-blue-500"><span>Kolaborasi Komuniti</span></label>
+                                        <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Memenangi Pertandingan" class="rounded text-blue-600 focus:ring-blue-500"><span>Menang Pertandingan</span></label>
+                                        <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Mendapat Geran" class="rounded text-blue-600 focus:ring-blue-500"><span>Dapat Geran</span></label>
+                                        <label class="flex items-center space-x-2"><input type="checkbox" name="tambah_impak" value="Komersial" class="rounded text-blue-600 focus:ring-blue-500"><span>Komersial</span></label>
+                                    </div>
+                                </div>
+                                <!-- Ringkasan Projek -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Ringkasan Projek <span class="text-red-500">*</span></label>
+                                    <textarea id="tambah_ringkasan_projek" required rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
                                 </div>
                             </div>
-                            <!-- Ringkasan Projek -->
-                            <div class="md:col-span-3">
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Ringkasan Projek <span class="text-red-500">*</span></label>
-                                <textarea id="tambah_ringkasan_projek" required rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                        </div>
+
+                        <!-- MAKLUMAT KETUA PROJEK -->
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                            <h4 class="text-sm font-bold text-blue-700 mb-3 border-b pb-1">Maklumat Ketua Projek</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua Projek <span class="text-red-500">*</span></label><input type="text" id="tambah_nama_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ketua) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_daftar_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ketua) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_ic_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- MAKLUMAT KETUA PROJEK -->
-                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
-                        <h4 class="text-sm font-bold text-blue-700 mb-3 border-b pb-1">Maklumat Ketua Projek</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ketua Projek <span class="text-red-500">*</span></label><input type="text" id="tambah_nama_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ketua) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_daftar_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ketua) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_ic_ketua" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
-                        </div>
-                    </div>
-
-                    <!-- MAKLUMAT AHLI KUMPULAN -->
-                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
-                        <h4 class="text-sm font-bold text-emerald-700 mb-3 border-b pb-1">Maklumat Ahli Kumpulan</h4>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Kedua</label><input type="text" id="tambah_nama_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 2)</label><input type="text" id="tambah_no_daftar_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 2)</label><input type="text" id="tambah_no_ic_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Ketiga</label><input type="text" id="tambah_nama_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 3)</label><input type="text" id="tambah_no_daftar_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 3)</label><input type="text" id="tambah_no_ic_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Keempat</label><input type="text" id="tambah_nama_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 4)</label><input type="text" id="tambah_no_daftar_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 4)</label><input type="text" id="tambah_no_ic_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
-                        </div>
-                    </div>
-
-                    <!-- MAKLUMAT PENYELIA (TAMBAH MANUAL) -->
-                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
-                        <h4 class="text-sm font-bold text-purple-700 mb-3 border-b pb-1">Maklumat Penyelia</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">Penyelia Projek <span class="text-red-500">*</span></label><input type="text" id="tambah_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC Penyelia <span class="text-red-500">*</span></label><input type="text" id="tambah_no_ic_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
-                            <div><label class="block text-xs font-bold text-gray-700 mb-1">No HP (Penyelia) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_hp_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Cth: 0123257824"></div>
-                        </div>
-                    </div>
-
-                    <!-- TARAF & MAKLUMAT PERTANDINGAN -->
-                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
-                        <h4 class="text-sm font-bold text-gray-800 mb-3 border-b pb-1">Taraf & Maklumat Pertandingan</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Nama Pertandingan <span class="text-red-500">*</span></label>
-                                <input type="text" id="tambah_nama_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                        <!-- MAKLUMAT AHLI KUMPULAN -->
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                            <h4 class="text-sm font-bold text-emerald-700 mb-3 border-b pb-1">Maklumat Ahli Kumpulan</h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Kedua</label><input type="text" id="tambah_nama_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 2)</label><input type="text" id="tambah_no_daftar_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 2)</label><input type="text" id="tambah_no_ic_ahli2" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
                             </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Ketiga</label><input type="text" id="tambah_nama_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 3)</label><input type="text" id="tambah_no_daftar_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 3)</label><input type="text" id="tambah_no_ic_ahli3" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Nama Ahli Keempat</label><input type="text" id="tambah_nama_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No Pendaftaran (Ahli 4)</label><input type="text" id="tambah_no_daftar_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC (Ahli 4)</label><input type="text" id="tambah_no_ic_ahli4" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            </div>
+                        </div>
+
+                        <!-- MAKLUMAT PENYELIA (TAMBAH MANUAL) -->
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                            <h4 class="text-sm font-bold text-purple-700 mb-3 border-b pb-1">Maklumat Penyelia</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Penyelia Projek <span class="text-red-500">*</span></label><input type="text" id="tambah_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No IC Penyelia <span class="text-red-500">*</span></label><input type="text" id="tambah_no_ic_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">No HP (Penyelia) <span class="text-red-500">*</span></label><input type="text" id="tambah_no_hp_penyelia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Cth: 0123257824"></div>
+                            </div>
+                        </div>
+
+                        <!-- TARAF & MAKLUMAT PERTANDINGAN -->
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+                            <h4 class="text-sm font-bold text-gray-800 mb-3 border-b pb-1">Taraf & Maklumat Pertandingan</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Nama Pertandingan <span class="text-red-500">*</span></label>
+                                    <input type="text" id="tambah_nama_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Tarikh Pertandingan <span class="text-red-500">*</span></label>
+                                    <input type="date" id="tambah_tarikh_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Peringkat Pertandingan <span class="text-red-500">*</span></label>
+                                    <select id="tambah_peringkat_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <option value="">-- SILA PILIH PERINGKAT --</option>
+                                        <option value="INSTITUSI">INSTITUSI</option>
+                                        <option value="KEBANGSAAN">KEBANGSAAN</option>
+                                        <option value="ANTARABANGSA">ANTARABANGSA</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Tarikh Pertandingan <span class="text-red-500">*</span></label>
-                                <input type="date" id="tambah_tarikh_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 mb-1">Peringkat Pertandingan <span class="text-red-500">*</span></label>
-                                <select id="tambah_peringkat_pertandingan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-                                    <option value="">-- SILA PILIH PERINGKAT --</option>
-                                    <option value="INSTITUSI">INSTITUSI</option>
-                                    <option value="KEBANGSAAN">KEBANGSAAN</option>
-                                    <option value="ANTARABANGSA">ANTARABANGSA</option>
+                                <label class="block text-sm font-bold text-blue-800 mb-2">🏅 Pencapaian <span class="text-red-500">*</span></label>
+                                <select id="tambah_pencapaian" required class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-900 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="">-- SILA PILIH PENCAPAIAN --</option>
+                                    <option value="EMAS">EMAS</option>
+                                    <option value="PERAK">PERAK</option>
+                                    <option value="GANGSA">GANGSA</option>
+                                    <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN</option>
+                                    <option value="TIADA">TIADA</option>
                                 </select>
                             </div>
+                            <div>
+                                <label class="block text-sm font-bold text-blue-800 mb-2">💯 Markah</label>
+                                <input type="number" id="tambah_markah" step="0.01" class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-900 bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan Markah">
+                            </div>
                         </div>
+
+                        <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+                            <button type="button" onclick="tutupModalTambahPencapaian()" class="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Batal</button>
+                            <button type="submit" id="btnSimpanTambah" class="px-8 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg">Simpan Rekod</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- TAB 2: MODAL MUAT NAIK PUKAL (BAHARU) -->
+                <div id="tabKandunganPukal" class="hidden">
+                    <div class="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                        <h4 class="font-bold text-purple-800 mb-2">Panduan Muat Naik Pukal:</h4>
+                        <ol class="list-decimal list-inside text-sm text-purple-700 space-y-1">
+                            <li>Muat turun template CSV yang disediakan.</li>
+                            <li>Jangan ubah tajuk lajur (Header) di dalam template.</li>
+                            <li>Projek ID dijana secara automatik. Jangan cipta lajur Projek ID.</li>
+                            <li>Simpan fail sebagai <strong>.csv</strong> dan muat naik di bawah.</li>
+                        </ol>
+                        <button onclick="muatTurunTemplatePukal()" class="mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-4 rounded text-xs shadow transition">
+                            ⬇️ Muat Turun Template CSV
+                        </button>
                     </div>
 
-                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-bold text-blue-800 mb-2">🏅 Pencapaian <span class="text-red-500">*</span></label>
-                            <select id="tambah_pencapaian" required class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-900 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-                                <option value="">-- SILA PILIH PENCAPAIAN --</option>
-                                <option value="EMAS">EMAS</option>
-                                <option value="PERAK">PERAK</option>
-                                <option value="GANGSA">GANGSA</option>
-                                <option value="SIJIL PENYERTAAN">SIJIL PENYERTAAN</option>
-                                <option value="TIADA">TIADA</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-blue-800 mb-2">💯 Markah</label>
-                            <input type="number" id="tambah_markah" step="0.01" class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-900 bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan Markah">
+                    <div class="mb-4 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Fail CSV Data Pencapaian</label>
+                        <input type="file" id="failPukal" accept=".csv" onchange="semakDataPukal(event)" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer">
+                    </div>
+
+                    <!-- Statistik Prebiu Pukal -->
+                    <div id="pukalStatistikAwal" class="hidden bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="font-bold text-gray-700 border-b pb-2 mb-2">📊 Semakan Statistik Data (Prebiu)</h4>
+                        <div id="pukalStatsKandungan" class="text-sm text-gray-600 space-y-1">
+                            <!-- Dimuatkan menerusi JS -->
                         </div>
                     </div>
 
                     <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-                        <button type="button" onclick="tutupModalTambah()" class="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Batal</button>
-                        <button type="submit" id="btnSimpanTambah" class="px-8 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg">Simpan Rekod</button>
+                        <button type="button" onclick="tutupModalTambahPencapaian()" class="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Batal</button>
+                        <button type="button" id="btnSimpanPukal" onclick="simpanPukal()" class="hidden px-8 py-2.5 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition shadow-lg">Muat Naik Data</button>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!-- MODAL MUAT NAIK PUKAL (BAHARU) -->
-    <div id="modalPukal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-y-auto">
-            <div class="bg-purple-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
-                <h3 class="font-bold text-lg">📤 Muat Naik Data Pukal</h3>
-                <button onclick="tutupModalPukal()" class="hover:text-purple-200 text-2xl font-bold leading-none">&times;</button>
-            </div>
-            
-            <div class="p-6">
-                <div class="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                    <h4 class="font-bold text-purple-800 mb-2">Panduan Muat Naik Pukal:</h4>
-                    <ol class="list-decimal list-inside text-sm text-purple-700 space-y-1">
-                        <li>Muat turun template CSV yang disediakan.</li>
-                        <li>Jangan ubah tajuk lajur (Header) di dalam template.</li>
-                        <li>Projek ID dijana secara automatik. Jangan cipta lajur Projek ID.</li>
-                        <li>Simpan fail sebagai <strong>.csv</strong> dan muat naik di bawah.</li>
-                    </ol>
-                    <button onclick="muatTurunTemplatePukal()" class="mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-4 rounded text-xs shadow transition">
-                        ⬇️ Muat Turun Template CSV
-                    </button>
-                </div>
-
-                <div class="mb-4 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Fail CSV Data Pencapaian</label>
-                    <input type="file" id="failPukal" accept=".csv" onchange="semakDataPukal(event)" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer">
-                </div>
-
-                <!-- Statistik Prebiu Pukal -->
-                <div id="pukalStatistikAwal" class="hidden bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
-                    <h4 class="font-bold text-gray-700 border-b pb-2 mb-2">📊 Semakan Statistik Data (Prebiu)</h4>
-                    <div id="pukalStatsKandungan" class="text-sm text-gray-600 space-y-1">
-                        <!-- Dimuatkan menerusi JS -->
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-                    <button type="button" onclick="tutupModalPukal()" class="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition">Batal</button>
-                    <button type="button" id="btnSimpanPukal" onclick="simpanPukal()" class="hidden px-8 py-2.5 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition shadow-lg">Muat Naik Data</button>
                 </div>
             </div>
         </div>
@@ -581,7 +611,7 @@
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh] overflow-y-auto">
             <div class="bg-emerald-600 p-4 text-white flex justify-between items-center rounded-t-2xl sticky top-0 z-10">
                 <h3 class="font-bold text-lg">📥 Muat Turun Laporan Data</h3>
-                <button onclick="tutupModalDownload()" class="hover:text-emerald-200 text-2xl font-bold leading-none">&times;</button>
+                <button type="button" onclick="tutupModalDownload()" class="hover:text-emerald-200 text-2xl font-bold leading-none">&times;</button>
             </div>
             
             <div class="p-6">
@@ -654,8 +684,12 @@
         const rowsPerPage = 10;
 
         window.onload = () => {
-            // 🌟 KOD BAHARU: Kawalan paparan butang khas untuk peranan STAF
-            if (userPeranan.toUpperCase() === "STAF") {
+            // 🌟 KOD BAHARU: Kawalan paparan UI khusus berdasarkan peranan
+            const isStafPenyelia = perananStafAtauPenyelia.includes(userPeranan.toUpperCase());
+            const dilarangMuatNaikPukal = ["STAF", "PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN"];
+            const isDilarangPukal = dilarangMuatNaikPukal.includes(userPeranan.toUpperCase());
+            
+            if (isStafPenyelia) {
                 const btnJuri = document.getElementById("btnJuri");
                 if (btnJuri) btnJuri.style.display = "none";
 
@@ -664,18 +698,46 @@
 
                 const btnDownloadLaporan = document.getElementById("btnDownloadLaporan");
                 if (btnDownloadLaporan) btnDownloadLaporan.style.display = "none";
+                
+                // Jadikan dropdown Status pada modal kemaskini terbatal (disabled) untuk STAF/PENYELIA (Perlindungan awal)
+                const inStatus = document.getElementById('in_status');
+                if (inStatus) {
+                    inStatus.disabled = true;
+                    inStatus.classList.add('bg-gray-200', 'cursor-not-allowed', 'opacity-70');
+                    const statusHint = document.getElementById('in_status_hint');
+                    if (statusHint) statusHint.innerHTML = "<span class='text-red-600 font-bold'>Anda tidak dibenarkan mengemaskini status ini. Pengesahan akan dibuat oleh Penyelaras Jabatan.</span>";
+                }
+            }
+
+            // Sembunyikan tab Muat Naik Pukal mengikut senarai peranan larangan (termasuk Penyelaras Jabatan)
+            const tabPukal = document.getElementById('tabHeaderPukal');
+            if (tabPukal && isDilarangPukal) {
+                tabPukal.style.display = 'none';
             }
 
             if(bolehEditPenuh) {
                 document.getElementById('amaranPeranan').classList.remove('hidden');
             }
-            if(bolehTambahPadam) {
-                document.getElementById('btnTambahData').classList.remove('hidden');
-                document.getElementById('btnMuatNaikPukal').classList.remove('hidden');
+            
+            // Tunjukkan butang Tambah Pencapaian (kerana STAF, PENYELIA, dan pengurusan lain dibenarkan tambah)
+            const btnTambahPencapaian = document.getElementById('btnTambahPencapaian');
+            if (btnTambahPencapaian) {
+                btnTambahPencapaian.classList.remove('hidden');
             }
+            
             muatDataPencapaian();
             muatPilihanJabatan(); // <-- FUNGSI BAHARU DIPANGGIL DI SINI
         };
+
+        // FUNGSI NOTIFIKASI TOAST UI
+        function paparToast(mesej, warna = 'green') {
+            const el = document.getElementById('paparMesejUI');
+            if (!el) return;
+            el.innerText = mesej;
+            el.className = `font-bold text-sm px-4 py-2 rounded-lg flex items-center text-white shadow-md ${warna === 'red' ? 'bg-red-600' : warna === 'blue' ? 'bg-blue-600' : 'bg-emerald-600'}`;
+            el.classList.remove('hidden');
+            setTimeout(() => { el.classList.add('hidden'); }, 4000);
+        }
 
         // ================= FUNGSI BAHARU: MUAT PILIHAN JABATAN =================
         function extractSingkatan(teks) {
@@ -699,8 +761,8 @@
                         optionsHTML += `<option value="${singkatan}">${singkatan}</option>`;
                     });
                     
-                    selTambah.innerHTML = optionsHTML;
-                    selKemaskini.innerHTML = optionsHTML;
+                    if (selTambah) selTambah.innerHTML = optionsHTML;
+                    if (selKemaskini) selKemaskini.innerHTML = optionsHTML;
                 }
             }).catch(err => console.error("Ralat memuat turun senarai jabatan", err));
         }
@@ -732,6 +794,25 @@
 			const jabatanUnik = [...new Set(dataGlobal.map(item => item.jabatan.toUpperCase()).filter(j => j !== ""))].sort();
 			selJabatan.innerHTML = '<option value="SEMUA">-- Semua Jabatan --</option>';
 			jabatanUnik.forEach(j => selJabatan.innerHTML += `<option value="${j}">${j}</option>`);
+
+            // KAWALAN BAHARU: Auto filter jabatan mengikut peranan
+            const perananAutoFilter = ["STAF", "PENYELARAS JABATAN", "PENYELIA PROJEK PELAJAR"];
+            if (perananAutoFilter.includes(userPeranan.toUpperCase()) && userJabatan) {
+                let singkatanJabatanUser = extractSingkatan(userJabatan.toUpperCase());
+                // Cuba padankan dengan pilihan yang ada (menggunakan singkatan atau nilai penuh)
+                let matchOption = Array.from(selJabatan.options).find(opt => opt.value === singkatanJabatanUser || opt.value === userJabatan.toUpperCase());
+                
+                if (matchOption) {
+                    selJabatan.value = matchOption.value;
+                } else {
+                    // Jika tiada dalam senarai unik lagi (cth belum ada data), paksa tambah
+                    selJabatan.innerHTML += `<option value="${singkatanJabatanUser}">${singkatanJabatanUser}</option>`;
+                    selJabatan.value = singkatanJabatanUser;
+                }
+                // Kunci dropdown (Pengguna tidak boleh menapis jabatan lain)
+                selJabatan.disabled = true;
+                selJabatan.classList.add("bg-gray-200", "cursor-not-allowed");
+            }
 		}
 
         function resetPageDanRender() {
@@ -740,86 +821,103 @@
         }
 
         function renderJadual() {
-			const tbody = document.getElementById('isiJadual');
-			const valTahun = document.getElementById('filterTahun').value.trim(); // Dapatkan value textbox
-			const valJabatan = document.getElementById('filterJabatan').value;
-			const valPencapaian = document.getElementById('filterPencapaian').value;
+    const tbody = document.getElementById('isiJadual');
+    const valTahun = document.getElementById('filterTahun').value.trim(); // Dapatkan value textbox
+    const valJabatan = document.getElementById('filterJabatan').value;
+    const valPencapaian = document.getElementById('filterPencapaian').value;
+    const valStatus = document.getElementById('filterStatus').value; // <-- Tambahan Filter Status
 
-			dataDitapisGlobal = dataGlobal.filter(item => {
-				let matchTahun = (valTahun === "" || String(item.tahun).includes(valTahun)); // Padanan textbox
-				let matchJabatan = (valJabatan === "SEMUA" || item.jabatan.toUpperCase() === valJabatan);
-				let matchPencapaian = (valPencapaian === "SEMUA" || (item.pencapaian || "").toUpperCase() === valPencapaian);
-				return matchTahun && matchJabatan && matchPencapaian;
-		});
+    dataDitapisGlobal = dataGlobal.filter(item => {
+        let matchTahun = (valTahun === "" || String(item.tahun).includes(valTahun)); // Padanan textbox
+        let matchJabatan = (valJabatan === "SEMUA" || item.jabatan.toUpperCase() === valJabatan);
+        let matchPencapaian = (valPencapaian === "SEMUA" || (item.pencapaian || "").toUpperCase() === valPencapaian);
+        
+        // 🌟 Logik filter status (anggap status kosong sebagai BELUM DISAHKAN)
+        let statusSemasa = (item.status || "BELUM DISAHKAN").toUpperCase();
+        let matchStatus = (valStatus === "SEMUA" || statusSemasa === valStatus);
 
-            KiraStatistik(dataDitapisGlobal);
+        return matchTahun && matchJabatan && matchPencapaian && matchStatus;
+    });
 
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            const dataPaginasi = dataDitapisGlobal.slice(startIndex, endIndex);
+    KiraStatistik(dataDitapisGlobal);
 
-            tbody.innerHTML = "";
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const dataPaginasi = dataDitapisGlobal.slice(startIndex, endIndex);
 
-            if (dataDitapisGlobal.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-gray-500 font-medium">Tiada rekod pencapaian dijumpai.</td></tr>`;
-                document.getElementById('paginationControls').classList.add('hidden');
-                return;
-            }
+    tbody.innerHTML = "";
 
-            dataPaginasi.forEach((row) => {
-                let badgeColor = "bg-gray-100 text-gray-600";
-                let badgeIkon = "";
-                let statusPencapaian = (row.pencapaian || "").toUpperCase();
-                
-                if(statusPencapaian === "EMAS") { badgeColor = "bg-amber-100 text-amber-800 border border-amber-300"; badgeIkon = "🥇"; }
-                else if(statusPencapaian === "PERAK") { badgeColor = "bg-slate-200 text-slate-700 border border-slate-400"; badgeIkon = "🥈"; }
-                else if(statusPencapaian === "GANGSA") { badgeColor = "bg-orange-100 text-orange-800 border border-orange-300"; badgeIkon = "🥉"; }
-                else if(statusPencapaian.includes("SIJIL")) { badgeColor = "bg-blue-50 text-blue-700 border border-blue-200"; badgeIkon = "📜"; }
+    if (dataDitapisGlobal.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-gray-500 font-medium">Tiada rekod pencapaian dijumpai.</td></tr>`;
+        document.getElementById('paginationControls').classList.add('hidden');
+        return;
+    }
 
-                let btnEdit = bolehEditMasingMasing ? `<button onclick="mulaKemaskini('${row.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition">Kemaskini</button>` : ``;
-                let btnPadam = bolehTambahPadam ? `<button onclick="padamRekodPencapaian('${row.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition mt-1">Padam</button>` : ``;
-                let aksiBtn = (btnEdit || btnPadam) ? `<div class="flex flex-col">${btnEdit}${btnPadam}</div>` : `<span class="text-xs text-gray-400 font-bold block text-center">-</span>`;
+    dataPaginasi.forEach((row) => {
+        let badgeColor = "bg-gray-100 text-gray-600";
+        let badgeIkon = "";
+        let statusPencapaian = (row.pencapaian || "").toUpperCase();
+        
+        if(statusPencapaian === "EMAS") { badgeColor = "bg-amber-100 text-amber-800 border border-amber-300"; badgeIkon = "🥇"; }
+        else if(statusPencapaian === "PERAK") { badgeColor = "bg-slate-200 text-slate-700 border border-slate-400"; badgeIkon = "🥈"; }
+        else if(statusPencapaian === "GANGSA") { badgeColor = "bg-orange-100 text-orange-800 border border-orange-300"; badgeIkon = "🥉"; }
+        else if(statusPencapaian.includes("SIJIL")) { badgeColor = "bg-blue-50 text-blue-700 border border-blue-200"; badgeIkon = "📜"; }
 
-                const tr = document.createElement('tr');
-                tr.className = "border-b hover:bg-amber-50/50 transition duration-150 text-xs";
-                
-                // --- PENAMBAHAN AHLI 2, 3 & 4 DALAM JADUAL ---
-                let htmlAhli2 = row.namaAhliKedua ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 2">👥 ${row.namaAhliKedua}</div>` : "";
-                let htmlAhli3 = row.namaAhliKetiga ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 3">👥 ${row.namaAhliKetiga}</div>` : "";
-                let htmlAhli4 = row.namaAhliKeempat ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 4">👥 ${row.namaAhliKeempat}</div>` : "";
+        // LOGIK BAHARU LAJUR STATUS & BUTANG PENGESAHAN
+        let statusTeks = (row.status || "BELUM DISAHKAN").toUpperCase();
+        let statusBadge = statusTeks === "DISAHKAN" 
+            ? `<span class="inline-block px-2.5 py-1 rounded-full font-bold text-[10px] uppercase shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300">✅ DISAHKAN</span>`
+            : `<span class="inline-block px-2.5 py-1 rounded-full font-bold text-[10px] uppercase shadow-sm bg-red-100 text-red-800 border border-red-300">⏳ BELUM DISAHKAN</span>`;
+        
+        let btnSahkan = (bolehSahkan && statusTeks !== "DISAHKAN") ? `<button onclick="sahkanRekod('${row.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition mt-1">Sahkan</button>` : ``;
 
-                tr.innerHTML = `
-                    <td class="p-3 text-center font-bold text-gray-500">${row.id}</td>
-                    <td class="p-3 text-center font-bold">${row.tahun}</td>
-                    <td class="p-3 text-center font-bold text-gray-700">${row.sesi || '-'}</td>
-                    <td class="p-3 text-center font-bold text-gray-700 uppercase">${row.jabatan}</td>
-                    <td class="p-3 font-semibold uppercase text-gray-600">${row.kategori}</td>
-                    <td class="p-3 font-bold text-gray-900 whitespace-normal min-w-[200px] uppercase">${row.namaProjek}</td>
-                    <td class="p-3 uppercase">
-                        <div class="font-bold text-blue-700" title="Penyelia">👨‍🏫 ${row.penyelia || '-'}</div>
-                        <div class="text-[10px] text-gray-600 mt-1 font-bold" title="Ketua Projek">👤 ${row.namaKetua || '-'}</div>
-                        ${htmlAhli2}
-                        ${htmlAhli3}
-                        ${htmlAhli4}
-                    </td>
-                    <td class="p-3 text-center font-bold text-gray-800">${row.markah || '-'}</td>
-                    <td class="p-3 text-left min-w-[220px] whitespace-normal">
-                        <div class="mb-1 text-center">
-                            <span class="inline-block px-2.5 py-1 rounded-full font-bold text-[10px] uppercase shadow-sm ${badgeColor}">
-                                ${badgeIkon} ${row.pencapaian || 'BELUM DIKEMASKINI'}
-                            </span>
-                        </div>
-                        <div class="font-bold text-gray-900 text-xs uppercase" title="Nama Pertandingan">🏆 ${row.namaPertandingan || '-'}</div>
-                        <div class="text-[10px] text-gray-600 mt-0.5 uppercase" title="Tarikh & Peringkat Pertandingan">
-                            📅 ${row.tarikhPertandingan || '-'} <span class="mx-1 text-gray-300">|</span> 🌐 ${row.peringkatPertandingan || '-'}
-                        </div>
-                    </td>
-                    <td class="p-3 text-center w-24 align-middle">${aksiBtn}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-            urusButangPagination();
-        }
+        let btnEdit = bolehEditMasingMasing ? `<button onclick="mulaKemaskini('${row.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition mt-1">Kemaskini</button>` : ``;
+        
+        // --- KOD YANG TELAH DIBAIKI: Tukar 'bolehTambahPadam' ke 'bolehPadam' ---
+        let btnPadam = bolehPadam ? `<button onclick="padamRekodPencapaian('${row.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full transition mt-1">Padam</button>` : ``;
+        
+        let aksiBtn = (btnSahkan || btnEdit || btnPadam) ? `<div class="flex flex-col">${btnSahkan}${btnEdit}${btnPadam}</div>` : `<span class="text-xs text-gray-400 font-bold block text-center">-</span>`;
+        const tr = document.createElement('tr');
+        tr.className = "border-b hover:bg-amber-50/50 transition duration-150 text-xs";
+        
+        // --- PENAMBAHAN AHLI 2, 3 & 4 DALAM JADUAL ---
+        let htmlAhli2 = row.namaAhliKedua ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 2">👥 ${row.namaAhliKedua}</div>` : "";
+        let htmlAhli3 = row.namaAhliKetiga ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 3">👥 ${row.namaAhliKetiga}</div>` : "";
+        let htmlAhli4 = row.namaAhliKeempat ? `<div class="text-[10px] text-gray-500 mt-0.5" title="Ahli 4">👥 ${row.namaAhliKeempat}</div>` : "";
+
+        tr.innerHTML = `
+            <td class="p-3 text-center font-bold text-gray-500">${row.id}</td>
+            <td class="p-3 text-center font-bold">${row.tahun}</td>
+            <td class="p-3 text-center font-bold text-gray-700">${row.sesi || '-'}</td>
+            <td class="p-3 text-center font-bold text-gray-700 uppercase">${row.jabatan}</td>
+            <td class="p-3 font-semibold uppercase text-gray-600">${row.kategori}</td>
+            <td class="p-3 font-bold text-gray-900 whitespace-normal min-w-[200px] uppercase">${row.namaProjek}</td>
+            <td class="p-3 uppercase">
+                <div class="font-bold text-blue-700" title="Penyelia">👨‍🏫 ${row.penyelia || '-'}</div>
+                <div class="text-[10px] text-gray-600 mt-1 font-bold" title="Ketua Projek">👤 ${row.namaKetua || '-'}</div>
+                ${htmlAhli2}
+                ${htmlAhli3}
+                ${htmlAhli4}
+            </td>
+            <td class="p-3 text-center font-bold text-gray-800">${row.markah || '-'}</td>
+            <td class="p-3 text-left min-w-[220px] whitespace-normal">
+                <div class="mb-1 text-center">
+                    <span class="inline-block px-2.5 py-1 rounded-full font-bold text-[10px] uppercase shadow-sm ${badgeColor}">
+                        ${badgeIkon} ${row.pencapaian || 'BELUM DIKEMASKINI'}
+                    </span>
+                </div>
+                <div class="font-bold text-gray-900 text-xs uppercase" title="Nama Pertandingan">🏆 ${row.namaPertandingan || '-'}</div>
+                <div class="text-[10px] text-gray-600 mt-0.5 uppercase" title="Tarikh & Peringkat Pertandingan">
+                    📅 ${row.tarikhPertandingan || '-'} <span class="mx-1 text-gray-300">|</span> 🌐 ${row.peringkatPertandingan || '-'}
+                </div>
+            </td>
+            <td class="p-3 text-center align-middle">${statusBadge}</td>
+            <td class="p-3 text-center w-24 align-middle">${aksiBtn}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+    urusButangPagination();
+}
 
         function urusButangPagination() {
             const ctrlDiv = document.getElementById('paginationControls');
@@ -977,48 +1075,90 @@
             bukaModalDownload();
         }
 
-        // ================= MUAT NAIK PUKAL (BAHARU) =================
-        function bukaModalPukal() {
-            if (!bolehTambahPadam) return;
+        // ================= KAWALAN MODAL TAMBAH PENCAPAIAN GABUNGAN (2 TAB) =================
+        function bukaModalTambahPencapaian(tab = 'manual') {
+            document.getElementById('borangTambah').reset();
             document.getElementById('failPukal').value = "";
             document.getElementById('pukalStatistikAwal').classList.add('hidden');
             document.getElementById('btnSimpanPukal').classList.add('hidden');
             parsedPukalData = [];
-            document.getElementById('modalPukal').classList.remove('hidden');
+            
+            // KAWALAN KHAS STAF, PENYELIA, & PENYELARAS: Sembunyi tab muat naik pukal
+            const tabHeaderPukal = document.getElementById('tabHeaderPukal');
+            const dilarangMuatNaikPukal = ["STAF", "PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN"];
+            
+            if (dilarangMuatNaikPukal.includes(userPeranan.toUpperCase())) {
+                tabHeaderPukal.style.display = 'none';
+                tab = 'manual'; // Paksa ke tab manual
+            } else {
+                tabHeaderPukal.style.display = 'block';
+            }
+
+            document.getElementById('modalTambahPencapaian').classList.remove('hidden');
+            tukarTabPencapaian(tab);
         }
 
-        function tutupModalPukal() { document.getElementById('modalPukal').classList.add('hidden'); }
+        function tutupModalTambahPencapaian() {
+            document.getElementById('modalTambahPencapaian').classList.add('hidden');
+        }
 
+        function tukarTabPencapaian(tab) {
+            const tabManual = document.getElementById('tabKandunganManual');
+            const tabPukal = document.getElementById('tabKandunganPukal');
+            const btnTabManual = document.getElementById('tabHeaderManual');
+            const btnTabPukal = document.getElementById('tabHeaderPukal');
+
+            if (tab === 'manual') {
+                tabManual.classList.remove('hidden');
+                tabPukal.classList.add('hidden');
+                btnTabManual.className = "px-5 py-2.5 font-bold text-sm text-blue-600 border-b-2 border-blue-600 focus:outline-none transition";
+                btnTabPukal.className = "px-5 py-2.5 font-bold text-sm text-gray-500 hover:text-purple-600 border-b-2 border-transparent focus:outline-none transition";
+            } else {
+                tabManual.classList.add('hidden');
+                tabPukal.classList.remove('hidden');
+                btnTabManual.className = "px-5 py-2.5 font-bold text-sm text-gray-500 hover:text-blue-600 border-b-2 border-transparent focus:outline-none transition";
+                btnTabPukal.className = "px-5 py-2.5 font-bold text-sm text-purple-600 border-b-2 border-purple-600 focus:outline-none transition";
+            }
+        }
+
+        // KESERASIAN FUNGSI ASAL
+        function bukaModalTambah() { bukaModalTambahPencapaian('manual'); }
+        function tutupModalTambah() { tutupModalTambahPencapaian(); }
+        function bukaModalPukal() { bukaModalTambahPencapaian('pukal'); }
+        function tutupModalPukal() { tutupModalTambahPencapaian(); }
+
+        // ================= MUAT NAIK PUKAL (BAHARU) =================
         function muatTurunTemplatePukal() {
-		let headers = [
-        "TAHUN", "SESI", "JABATAN", "KATEGORI", "NAMA PROJEK",
-        "KETUA PROJEK", "NO DAFTAR KETUA", "NO IC KETUA",
-        "NAMA AHLI KEDUA", "NO DAFTAR AHLI KEDUA", "NO IC AHLI KEDUA",
-        "NAMA AHLI KETIGA", "NO DAFTAR AHLI KETIGA", "NO IC AHLI KETIGA",
-        "NAMA AHLI KEEMPAT", "NO DAFTAR AHLI KEEMPAT", "NO IC AHLI KEEMPAT",
-        "PENYELIA", "NO IC PENYELIA", "NO HP PENYELIA",
-        "PENCAPAIAN", "MARKAH", "PROJEK BERIMPAK",
-        "NAMA PERTANDINGAN", "TARIKH PERTANDINGAN", "PERINGKAT PERTANDINGAN", "RINGKASAN PROJEK"
-		];
-    
-		let sampleRow = [
-        "2025", "1", "JKA", "TEKNIKAL", "SISTEM MONITORING PINTAR",
-        "ALI BIN AHMAD", "01DKA21F1001", "030101085000",
-        "MUTU A/L SAMY", "01DKA21F1002", "030202085000",
-        "", "", "",
-        "", "", "",
-        "DR ABU BIN OTHMAN", "750101085000", "0123456789",
-        "EMAS", "88.50", "Kolaborasi Industri, Menang Pertandingan",
-        "PERTANDINGAN INOVASI KEBANGSAAN", "2025-05-20", "KEBANGSAAN", "Ringkasan ringkas mengenai projek inovasi."
-		];
+            let headers = [
+                "TAHUN", "SESI", "JABATAN", "KATEGORI", "NAMA PROJEK",
+                "KETUA PROJEK", "NO DAFTAR KETUA", "NO IC KETUA",
+                "NAMA AHLI KEDUA", "NO DAFTAR AHLI KEDUA", "NO IC AHLI KEDUA",
+                "NAMA AHLI KETIGA", "NO DAFTAR AHLI KETIGA", "NO IC AHLI KETIGA",
+                "NAMA AHLI KEEMPAT", "NO DAFTAR AHLI KEEMPAT", "NO IC AHLI KEEMPAT",
+                "PENYELIA", "NO IC PENYELIA", "NO HP PENYELIA",
+                "PENCAPAIAN", "MARKAH", "PROJEK BERIMPAK",
+                "NAMA PERTANDINGAN", "TARIKH PERTANDINGAN", "PERINGKAT PERTANDINGAN", "RINGKASAN PROJEK"
+            ];
+            
+            let sampleRow = [
+                "2025", "1", "JKA", "TEKNIKAL", "SISTEM MONITORING PINTAR",
+                "ALI BIN AHMAD", "01DKA21F1001", "030101085000",
+                "MUTU A/L SAMY", "01DKA21F1002", "030202085000",
+                "", "", "",
+                "", "", "",
+                "DR ABU BIN OTHMAN", "750101085000", "0123456789",
+                "EMAS", "88.50", "Kolaborasi Industri, Menang Pertandingan",
+                "PERTANDINGAN INOVASI KEBANGSAAN", "2025-05-20", "KEBANGSAAN", "Ringkasan ringkas mengenai projek inovasi."
+            ];
 
-		let csv = headers.join(",") + "\n" + sampleRow.map(v => `"${v}"`).join(",") + "\n";
-		const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-		const link = document.createElement("a");
-		link.setAttribute("href", URL.createObjectURL(blob));
-		link.setAttribute("download", "Template_Upload_Pukal.csv");
-		document.body.appendChild(link); link.click(); document.body.removeChild(link);
-		}
+            let csv = headers.join(",") + "\n" + sampleRow.map(v => `"${v}"`).join(",") + "\n";
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", "Template_Upload_Pukal.csv");
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
         // Fungsi CSV Parser
         function csvToArr(strData) {
             const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\"\\,\\r\\n]*))"), "gi");
@@ -1106,7 +1246,7 @@
             .then(data => {
                 paparToast(data.status === "BERJAYA" ? `✅ ${data.mesej}` : `❌ ${data.mesej}`, data.status === "BERJAYA" ? "green" : "red");
                 if(data.status === "BERJAYA") { 
-                    tutupModalPukal(); 
+                    tutupModalTambahPencapaian(); 
                     muatDataPencapaian(); 
                 }
             }).catch(() => {
@@ -1117,15 +1257,7 @@
         }
 
         // ================= PENGURUSAN TAMBAH DATA MANUAL =================
-        function bukaModalTambah() {
-            if (!bolehTambahPadam) return; 
-            document.getElementById('borangTambah').reset();
-            document.getElementById('modalTambah').classList.remove('hidden');
-        }
-
-        function tutupModalTambah() { document.getElementById('modalTambah').classList.add('hidden'); }
-
-		// Dapatkan string gabungan untuk checkbox (Projek Berimpak)
+        // Dapatkan string gabungan untuk checkbox (Projek Berimpak)
         function dapatkanNilaiCheckbox(namaCheckbox) {
             let checkboxes = document.querySelectorAll(`input[name="${namaCheckbox}"]:checked`);
             let nilai = [];
@@ -1142,7 +1274,6 @@
         }
 
         // ================= PENGURUSAN TAMBAH DATA (LENGKAP) =================
-        // Sambungan dari fungsi simpanTambah(e) dari arahan anda
         function simpanTambah(e) {
             e.preventDefault();
 
@@ -1199,8 +1330,8 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === "BERJAYA") {
-                    alert(`✅ ${data.mesej}`);
-                    tutupModalTambah();
+                    paparToast(`✅ ${data.mesej}`, "green");
+                    tutupModalTambahPencapaian();
                     muatDataPencapaian();
                 } else {
                     alert(`❌ Ralat: ${data.mesej}`);
@@ -1212,7 +1343,8 @@
 
         // ================= PENGURUSAN PADAM & KEMASKINI =================
         function padamRekodPencapaian(id) {
-            if (!bolehTambahPadam) return;
+            // --- KOD YANG TELAH DIBAIKI: Tukar 'bolehTambahPadam' ke 'bolehPadam' ---
+            if (!bolehPadam) return; 
             if(!confirm(`Amaran: Anda pasti mahu memadam rekod pencapaian untuk Projek ID: ${id}?`)) return;
             paparToast("⏳ Sedang memadam rekod...", "blue");
 
@@ -1228,101 +1360,130 @@
         function mulaKemaskini(id) {
             const rowData = dataGlobal.find(d => d.id === id);
             if (!rowData) return;
+			
+			// CONTOH KAWALAN AKSES STATUS:
+            const statusDropdown = document.getElementById('in_status');
+            const dataProjek = dataGlobal.find(d => String(d.id) === String(id));
+            
+            if (statusDropdown && dataProjek) {
+                statusDropdown.value = dataProjek.status || "BELUM DISAHKAN";
+                
+                // Gunakan fungsi extractSingkatan supaya perbandingan "JABATAN KEJURUTERAAN AWAM (JKA)" dengan "JKA" tetap sepadan
+                let singkatanUserJabatan = extractSingkatan(userJabatan.toUpperCase());
+                let jabatanProjekSemasa = (dataProjek.jabatan || "").toUpperCase();
+                
+                // Semak jika peranan dibenarkan mengemaskini status (Pengesah Penuh atau Penyelaras Jabatan yang sepadan)
+                let bolehSahkan = perananPengesahPenuh.includes(userPeranan.toUpperCase()) || 
+                                 (userPeranan.toUpperCase() === "PENYELARAS JABATAN" && singkatanUserJabatan === jabatanProjekSemasa);
+                
+                // Jika peranan ialah STAF atau PENYELIA PROJEK PELAJAR, lumpuhkan sepenuhnya
+                if (perananStafAtauPenyelia.includes(userPeranan.toUpperCase()) || !bolehSahkan) {
+                    statusDropdown.disabled = true;
+                    statusDropdown.classList.add("bg-gray-200", "cursor-not-allowed");
+                } else {
+                    statusDropdown.disabled = false;
+                    statusDropdown.classList.remove("bg-gray-200", "cursor-not-allowed");
+                }
+            }
 
-            // Semak jika pengguna tertakluk kepada pengesahan sebelum buka modal
-            if (bolehEditDenganPengesahan && !bolehEditPenuh) {
-                document.getElementById('pengesahan_projek_id').value = id;
+            // Masukkan data asal ke dalam borang kemaskini
+            document.getElementById('in_projek_id').value = dataProjek.id || "";
+            document.getElementById('in_sesi').value = dataProjek.sesi || "";
+            document.getElementById('in_tahun').value = dataProjek.tahun || "";
+            document.getElementById('in_nama_projek').value = dataProjek.namaProjek || "";
+            document.getElementById('in_jabatan').value = dataProjek.jabatan || "";
+            document.getElementById('in_kategori').value = dataProjek.kategori || "";
+            
+            document.getElementById('in_nama_ketua').value = dataProjek.namaKetua || "";
+            document.getElementById('in_no_daftar_ketua').value = dataProjek.noDaftarKetua || "";
+            document.getElementById('in_no_ic_ketua').value = dataProjek.noIcKetua || "";
+            
+            document.getElementById('in_nama_ahli2').value = dataProjek.namaAhliKedua || "";
+            document.getElementById('in_no_daftar_ahli2').value = dataProjek.noDaftarAhliKedua || "";
+            document.getElementById('in_no_ic_ahli2').value = dataProjek.noIcAhliKedua || "";
+            
+            document.getElementById('in_nama_ahli3').value = dataProjek.namaAhliKetiga || "";
+            document.getElementById('in_no_daftar_ahli3').value = dataProjek.noDaftarAhliKetiga || "";
+            document.getElementById('in_no_ic_ahli3').value = dataProjek.noIcAhliKetiga || "";
+            
+            document.getElementById('in_nama_ahli4').value = dataProjek.namaAhliKeempat || "";
+            document.getElementById('in_no_daftar_ahli4').value = dataProjek.noDaftarAhliKeempat || "";
+            document.getElementById('in_no_ic_ahli4').value = dataProjek.noIcAhliKeempat || "";
+            
+            document.getElementById('in_penyelia').value = dataProjek.penyelia || "";
+            document.getElementById('in_no_ic_penyelia').value = dataProjek.noIcPenyelia || "";
+            document.getElementById('in_no_hp_penyelia').value = dataProjek.noHpPenyelia || "";
+            
+            document.getElementById('in_nama_pertandingan').value = dataProjek.namaPertandingan || "";
+            
+            // Format tarikh
+            let tarikhMatch = dataProjek.tarikhPertandingan ? dataProjek.tarikhPertandingan.match(/\d{4}-\d{2}-\d{2}/) : null;
+            document.getElementById('in_tarikh_pertandingan').value = tarikhMatch ? tarikhMatch[0] : "";
+            
+            document.getElementById('in_peringkat_pertandingan').value = dataProjek.peringkatPertandingan || "";
+            document.getElementById('in_pencapaian').value = dataProjek.pencapaian || "";
+            document.getElementById('in_markah').value = dataProjek.markah || "";
+            document.getElementById('in_ringkasan_projek').value = dataProjek.ringkasanProjek || "";
+            
+            tetapkanNilaiCheckbox("in_impak", dataProjek.projekBerimpakTinggi);
+            
+            document.getElementById('pengesahan_projek_id').value = id;
+
+            // Logik pemaparan borang (Edit penuh vs Edit dengan pengesahan)
+            if (bolehEditPenuh) {
+                document.getElementById('ruanganKatalaluan').classList.add('hidden');
+                document.getElementById('in_katalaluan_semakan').required = false;
+                document.getElementById('modalKemaskini').classList.remove('hidden');
+            } else if (bolehEditDenganPengesahan) {
+                document.getElementById('ruanganKatalaluan').classList.remove('hidden');
+                document.getElementById('in_katalaluan_semakan').required = true;
                 document.getElementById('input_katalaluan_ic').value = "";
                 document.getElementById('mesejRalatKatalaluan').classList.add('hidden');
                 document.getElementById('modalPengesahanKatalaluan').classList.remove('hidden');
-            } else {
-                bukaModalKemaskiniTerus(rowData);
             }
-        }
-
-
-        function tutupModalPengesahan() {
-            document.getElementById('modalPengesahanKatalaluan').classList.add('hidden');
         }
 
         function sahkanKatalaluanDanBukaModal(e) {
             e.preventDefault();
             const id = document.getElementById('pengesahan_projek_id').value;
-            let inputIC = document.getElementById('input_katalaluan_ic').value.trim();
+            const inputKatalaluan = document.getElementById('input_katalaluan_ic').value;
+            const dataProjek = dataGlobal.find(d => String(d.id) === String(id));
             
-            const rowData = dataGlobal.find(d => d.id === id);
-            if (!rowData) return;
-            
-            // Buang sengkang (-) untuk memastikan format seperti 750201-08-5788 atau 750201085788 diterima sama.
-            let cleanInputIC = inputIC.replace(/-/g, "");
-            let cleanDbIC = (rowData.noIcPenyelia || "").replace(/-/g, "");
-            
-            if (cleanInputIC === cleanDbIC && cleanDbIC !== "") {
-                document.getElementById('modalPengesahanKatalaluan').classList.add('hidden');
-                bukaModalKemaskiniTerus(rowData);
+            if (dataProjek && String(dataProjek.noIcPenyelia) === String(inputKatalaluan)) {
+                tutupModalPengesahan();
+                document.getElementById('in_katalaluan_semakan').value = inputKatalaluan; // auto fill untuk submit nanti
+                document.getElementById('modalKemaskini').classList.remove('hidden');
             } else {
                 document.getElementById('mesejRalatKatalaluan').classList.remove('hidden');
             }
         }
-
-        function bukaModalKemaskiniTerus(rowData) {
-            document.getElementById('borangKemaskini').reset();
-            document.getElementById('in_projek_id').value = rowData.id;
-            document.getElementById('in_sesi').value = rowData.sesi || "";
-            document.getElementById('in_tahun').value = rowData.tahun || "";
-            document.getElementById('in_nama_projek').value = rowData.namaProjek || "";
-            document.getElementById('in_jabatan').value = (rowData.jabatan || "").toUpperCase();
-            document.getElementById('in_kategori').value = (rowData.kategori || "").toUpperCase();
-            tetapkanNilaiCheckbox('in_impak', rowData.projekBerimpakTinggi);
-
-            document.getElementById('in_nama_ketua').value = rowData.namaKetua || "";
-            document.getElementById('in_no_daftar_ketua').value = rowData.noDaftarKetua || "";
-            document.getElementById('in_no_ic_ketua').value = rowData.noIcKetua || "";
-
-            document.getElementById('in_nama_ahli2').value = rowData.namaAhliKedua || "";
-            document.getElementById('in_no_daftar_ahli2').value = rowData.noDaftarAhliKedua || "";
-            document.getElementById('in_no_ic_ahli2').value = rowData.noIcAhliKedua || "";
-
-            document.getElementById('in_nama_ahli3').value = rowData.namaAhliKetiga || "";
-            document.getElementById('in_no_daftar_ahli3').value = rowData.noDaftarAhliKetiga || "";
-            document.getElementById('in_no_ic_ahli3').value = rowData.noIcAhliKetiga || "";
-
-            document.getElementById('in_nama_ahli4').value = rowData.namaAhliKeempat || "";
-            document.getElementById('in_no_daftar_ahli4').value = rowData.noDaftarAhliKeempat || "";
-            document.getElementById('in_no_ic_ahli4').value = rowData.noIcAhliKeempat || "";
-
-            document.getElementById('in_penyelia').value = rowData.penyelia || "";
-            document.getElementById('in_no_ic_penyelia').value = rowData.noIcPenyelia || "";
-            document.getElementById('in_no_hp_penyelia').value = rowData.noHpPenyelia || ""; // SET NO HP KEMASKINI
-
-            document.getElementById('in_nama_pertandingan').value = rowData.namaPertandingan || "";
-            document.getElementById('in_tarikh_pertandingan').value = rowData.tarikhPertandingan || "";
-            document.getElementById('in_peringkat_pertandingan').value = (rowData.peringkatPertandingan || "").toUpperCase();
-            document.getElementById('in_ringkasan_projek').value = rowData.ringkasanProjek || "";
-
-            let pencapaianTerkini = (rowData.pencapaian || "").toUpperCase();
-            let selectPencapaian = document.getElementById('in_pencapaian');
-            let optionExists = Array.from(selectPencapaian.options).some(opt => opt.value === pencapaianTerkini);
-            if (!optionExists && pencapaianTerkini) selectPencapaian.innerHTML += `<option value="${pencapaianTerkini}">${pencapaianTerkini}</option>`;
-            selectPencapaian.value = pencapaianTerkini || "";
-            
-            document.getElementById('in_markah').value = rowData.markah || "";
-
-            document.getElementById('modalKemaskini').classList.remove('hidden');
+        
+        function tutupModalPengesahan() {
+            document.getElementById('modalPengesahanKatalaluan').classList.add('hidden');
         }
 
         function tutupModal() {
             document.getElementById('modalKemaskini').classList.add('hidden');
         }
-        
 
         function simpanKemaskini(e) {
             e.preventDefault();
-
+            const id = document.getElementById('in_projek_id').value;
+            
             const impakGabungan = dapatkanNilaiCheckbox("in_impak");
             if (!impakGabungan) {
                 alert("Sila pilih sekurang-kurangnya satu pilihan bagi Projek Berimpak Tinggi.");
                 return;
+            }
+
+            // Validasi kata laluan sekali lagi sebelum simpan untuk peranan bukan admin
+            if (!bolehEditPenuh) {
+                const inputSemakan = document.getElementById('in_katalaluan_semakan').value;
+                const dataProjek = dataGlobal.find(d => String(d.id) === String(id));
+                if (!dataProjek || String(dataProjek.noIcPenyelia) !== String(inputSemakan)) {
+                    alert("Pengesahan Keselamatan Gagal! No IC Penyelia tidak bertepatan.");
+                    return;
+                }
             }
 
             const btn = document.getElementById('btnSimpan');
@@ -1330,34 +1491,40 @@
 
             const payload = {
                 action: "kemaskiniPencapaianPelajar",
-                PROJEK_ID: document.getElementById('in_projek_id').value,
+                PROJEK_ID: id,
                 SESI: document.getElementById('in_sesi').value,
-                TAHUN: document.getElementById('in_tahun').value,
-                NAMA_PROJEK: document.getElementById('in_nama_projek').value,
-                JABATAN: document.getElementById('in_jabatan').value,
-                KATEGORI: document.getElementById('in_kategori').value,
-                PROJEK_BERIMPAK: impakGabungan,
-                NAMA_KETUA: document.getElementById('in_nama_ketua').value,
-                NO_DAFTAR_KETUA: document.getElementById('in_no_daftar_ketua').value,
-                NO_IC_KETUA: document.getElementById('in_no_ic_ketua').value,
-                NAMA_AHLI_KEDUA: document.getElementById('in_nama_ahli2').value,
-                NO_DAFTAR_AHLI_KEDUA: document.getElementById('in_no_daftar_ahli2').value,
-                NO_IC_AHLI_KEDUA: document.getElementById('in_no_ic_ahli2').value,
-                NAMA_AHLI_KETIGA: document.getElementById('in_nama_ahli3').value,
-                NO_DAFTAR_AHLI_KETIGA: document.getElementById('in_no_daftar_ahli3').value,
-                NO_IC_AHLI_KETIGA: document.getElementById('in_no_ic_ahli3').value,
-                NAMA_AHLI_KEEMPAT: document.getElementById('in_nama_ahli4').value,
-                NO_DAFTAR_AHLI_KEEMPAT: document.getElementById('in_no_daftar_ahli4').value,
-                NO_IC_AHLI_KEEMPAT: document.getElementById('in_no_ic_ahli4').value,
-                PENYELIA: document.getElementById('in_penyelia').value,
-                NO_IC_PENYELIA: document.getElementById('in_no_ic_penyelia').value,
-                NO_HP_PENYELIA: document.getElementById('in_no_hp_penyelia').value, // HANTAR NO HP KEMASKINI
-                NAMA_PERTANDINGAN: document.getElementById('in_nama_pertandingan').value,
-                TARIKH_PERTANDINGAN: document.getElementById('in_tarikh_pertandingan').value,
-                PERINGKAT_PERTANDINGAN: document.getElementById('in_peringkat_pertandingan').value,
-                RINGKASAN_PROJEK: document.getElementById('in_ringkasan_projek').value,
                 PENCAPAIAN: document.getElementById('in_pencapaian').value,
-                MARKAH: document.getElementById('in_markah').value
+                MARKAH: document.getElementById('in_markah').value,
+                NAMA_PROJEK: document.getElementById('in_nama_projek').value.toUpperCase(),
+                JABATAN: document.getElementById('in_jabatan').value.toUpperCase(),
+                KATEGORI: document.getElementById('in_kategori').value.toUpperCase(),
+                
+                NAMA_KETUA: document.getElementById('in_nama_ketua').value.toUpperCase(),
+                NO_DAFTAR_KETUA: document.getElementById('in_no_daftar_ketua').value.toUpperCase(),
+                NO_IC_KETUA: document.getElementById('in_no_ic_ketua').value,
+                
+                NAMA_AHLI_KEDUA: document.getElementById('in_nama_ahli2').value.toUpperCase(),
+                NO_DAFTAR_AHLI_KEDUA: document.getElementById('in_no_daftar_ahli2').value.toUpperCase(),
+                NO_IC_AHLI_KEDUA: document.getElementById('in_no_ic_ahli2').value,
+                
+                NAMA_AHLI_KETIGA: document.getElementById('in_nama_ahli3').value.toUpperCase(),
+                NO_DAFTAR_AHLI_KETIGA: document.getElementById('in_no_daftar_ahli3').value.toUpperCase(),
+                NO_IC_AHLI_KETIGA: document.getElementById('in_no_ic_ahli3').value,
+                
+                NAMA_AHLI_KEEMPAT: document.getElementById('in_nama_ahli4').value.toUpperCase(),
+                NO_DAFTAR_AHLI_KEEMPAT: document.getElementById('in_no_daftar_ahli4').value.toUpperCase(),
+                NO_IC_AHLI_KEEMPAT: document.getElementById('in_no_ic_ahli4').value,
+                
+                PENYELIA: document.getElementById('in_penyelia').value.toUpperCase(),
+                NO_IC_PENYELIA: document.getElementById('in_no_ic_penyelia').value,
+                NO_HP_PENYELIA: document.getElementById('in_no_hp_penyelia').value,
+                
+                PROJEK_BERIMPAK: impakGabungan,
+                NAMA_PERTANDINGAN: document.getElementById('in_nama_pertandingan').value.toUpperCase(),
+                TARIKH_PERTANDINGAN: document.getElementById('in_tarikh_pertandingan').value,
+                PERINGKAT_PERTANDINGAN: document.getElementById('in_peringkat_pertandingan').value.toUpperCase(),
+                RINGKASAN_PROJEK: document.getElementById('in_ringkasan_projek').value,
+                STATUS: document.getElementById('in_status') ? document.getElementById('in_status').value : "BELUM DISAHKAN"
             };
 
             fetch(SCRIPT_URL, {
@@ -1367,24 +1534,45 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === "BERJAYA") {
-                    alert("✅ Rekod berjaya dikemaskini.");
+                    paparToast(`✅ ${data.mesej}`, "green");
                     tutupModal();
                     muatDataPencapaian();
                 } else {
-                    alert("❌ Gagal mengemaskini: " + data.mesej);
+                    alert(`❌ Ralat: ${data.mesej}`);
                 }
             })
-            .catch(() => alert("Ralat Server. Sila cuba lagi."))
+            .catch(() => alert("❌ Ralat Server."))
             .finally(() => { btn.disabled = false; btn.innerText = "Simpan Kemaskini"; });
         }
-        function paparToast(teks, warna) {
-            const msgBox = document.getElementById('paparMesejUI');
-            msgBox.className = `mb-4 p-4 rounded-xl text-center text-sm font-bold shadow-md text-white fixed top-5 right-5 z-[100] transition-opacity ` + 
-                               (warna === 'green' ? 'bg-emerald-500' : (warna === 'blue' ? 'bg-blue-500' : 'bg-red-500'));
-            msgBox.innerText = teks;
-            msgBox.classList.remove('hidden');
-            setTimeout(() => msgBox.classList.add('hidden'), 4000);
+		
+		// ================= FUNGSI PENGESAHAN REKOD =================
+	function sahkanRekod(id) {
+    // Beri amaran keselamatan ringkas sebelum mengesahkan
+    if (!confirm("Adakah anda pasti mahu mengesahkan rekod pencapaian ini?")) {
+        return;
+    }
+
+    // Menggunakan UI toast sedia ada untuk status pemprosesan
+    paparToast("⏳ Sedang mengesahkan rekod...", "blue");
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: "sahkanPencapaian", id: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "BERJAYA") {
+            paparToast("✅ " + data.mesej, "green");
+            muatDataPencapaian(); // Automatik refresh jadual supaya status tukar menjadi DISAHKAN
+        } else {
+            paparToast("❌ Gagal: " + data.mesej, "red");
         }
+    })
+    .catch(err => {
+        console.error("Ralat Pengesahan:", err);
+        paparToast("❌ Ralat menyambung ke pelayan.", "red");
+    });
+}
     </script>
 </body>
 </html>
