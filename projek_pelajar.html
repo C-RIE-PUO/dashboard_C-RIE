@@ -73,9 +73,10 @@
     <div class="w-full md:w-auto ml-auto flex gap-2">
         <div id="paparMesejUI" class="hidden font-bold text-sm px-4 py-2 rounded-lg flex items-center text-white shadow-md"></div>
         <!-- 🌟 ID ditambah pada butang untuk kawalan akses STAF/PENYELIA -->
-        <button id="btnDownloadCSV" onclick="downloadCSV()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2">
-            📥 Download CSV
-        </button>
+        <!-- Pada butang Download CSV, tukar fungsi onclick kepada bukaModalCSV() -->
+		<button id="btnDownloadCSV" onclick="bukaModalCSV()" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 shadow-md transition flex items-center gap-2">
+		📥 Download CSV
+		</button>
         <button onclick="muatDataProjek()" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 shadow-md transition">🔄 Refresh</button>
     </div>
 </div>
@@ -88,7 +89,7 @@
                             <th class="p-3 text-center">ID</th>
                             <th class="p-3">NAMA PROJEK</th>
                             <th class="p-3">KATEGORI</th>
-                            <th class="p-3">KETUA KUMPULAN</th>
+                            <th class="p-3">AHLI KUMPULAN</th>
                             <th class="p-3 text-center">JABATAN</th>
                             <th class="p-3">PENYELIA</th>
                             <th class="p-3 text-center">TAHUN</th>
@@ -310,15 +311,71 @@
             </div>
         </div>
     </div>
+	
+	<!-- 🌟 MODAL PILIH LAJUR CSV DITAMBAH -->
+<div id="modalPilihCSV" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh]">
+        <div class="p-5 border-b flex justify-between items-center bg-emerald-700 text-white rounded-t-xl">
+            <h3 class="font-bold text-lg flex items-center gap-2">📥 Muat Turun CSV (Pilih Lajur)</h3>
+            <button onclick="tutupModalCSV()" class="hover:text-emerald-200 text-2xl font-bold leading-none focus:outline-none">&times;</button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto">
+            <div class="flex items-center mb-4 pb-3 border-b">
+                <input type="checkbox" id="checkSemuaLajur" checked onchange="toggleSemuaLajur(this)" class="w-5 h-5 text-emerald-600 rounded cursor-pointer">
+                <label for="checkSemuaLajur" class="ml-3 font-bold text-gray-800 cursor-pointer">Pilih Semua Lajur</label>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="senaraiCheckboxLajur">
+                <!-- Checkbox akan digenerate dari JavaScript -->
+            </div>
+        </div>
+        
+        <div class="p-4 border-t flex justify-end gap-3 bg-gray-50 rounded-b-xl">
+            <button type="button" onclick="tutupModalCSV()" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition text-sm">Batal</button>
+            <button type="button" onclick="prosesDownloadCSV()" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition shadow text-sm">Muat Turun Excel (CSV)</button>
+        </div>
+    </div>
+</div>
+<!-- TAMAT MODAL CSV -->
+
+    <!-- 🌟 MODAL PENGESAHAN KATA LALUAN KEMASKINI BAHARU DITAMBAH -->
+    <div id="modalSahkanLaluan" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col">
+            <div class="p-5 border-b flex justify-between items-center">
+                <h3 class="font-bold text-lg text-amber-700 flex items-center gap-2">
+                    🔒 Pengesahan Kata Laluan
+                </h3>
+                <button onclick="tutupModalSahkanLaluan()" class="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none focus:outline-none">&times;</button>
+            </div>
+            
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-6">
+                    Sila masukkan <span class="font-bold">NO IC PENYELIA</span> untuk pengesahan keselamatan sebelum mengemaskini maklumat projek ini.
+                </p>
+                
+                <label class="block text-xs font-bold text-gray-700 mb-2 uppercase">NO IC PENYELIA</label>
+                <input type="password" id="inputSahkanLaluan" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white outline-none transition" placeholder="Masukkan No IC Penyelia" onkeypress="handleEnterLaluan(event)">
+                <p id="mesejRalatLaluan" class="text-xs text-red-500 mt-2 font-bold hidden">❌ Kata laluan tidak sah.</p>
+            </div>
+            
+            <div class="p-4 border-t flex justify-end gap-3 bg-gray-50 rounded-b-xl">
+                <button type="button" onclick="tutupModalSahkanLaluan()" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg font-bold hover:bg-gray-300 transition text-sm">Batal</button>
+                <button type="button" onclick="prosesSahkanLaluan()" class="px-5 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 transition shadow text-sm">Sahkan & Mula Kemaskini</button>
+            </div>
+        </div>
+    </div>
+    <!-- TAMAT MODAL PENGESAHAN KATA LALUAN -->
 
     <script>
-        // ⚠️ MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
+// ⚠️ MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec'; 
 
-		let dataGlobal = [];
+        let dataGlobal = [];
         let dataDitapisGlobal = []; // Disimpan untuk ekspot CSV
         let senaraiDokumenBase64 = []; // Untuk simpan data file
         let senaraiProgramGlobal = []; // 🌟 KEMASKINI: Simpan senarai program secara global
+        let idProjekEditSemasa = null; // 🌟 KEMASKINI: Menyimpan ID projek sewaktu pengesahan kata laluan
 
         // 🌟 VARIABEL PAGINATION
         let currentPage = 1;
@@ -343,23 +400,21 @@
         const isEditor = rolesRequirePassword.includes(userPeranan) || rolesBypassPassword.includes(userPeranan);
 
         window.onload = () => {
+            // TAMBAHBAIK: Panggil elemen DOM sekali sahaja di awal fungsi untuk prestasi yang lebih lancar
+            const btnJuri = document.getElementById("btnJuri");
+            const btnDownloadCSV = document.getElementById("btnDownloadCSV");
+            const btnDaftarProjek = document.getElementById("btnDaftarProjek");
+
             // 🌟 KOD BAHARU: Sembunyikan elemen khas untuk peranan STAF ATAU PENYELIA PROJEK PELAJAR
             if (userPeranan === "STAF" || userPeranan === "PENYELIA PROJEK PELAJAR") {
-                const btnJuri = document.getElementById("btnJuri");
                 if (btnJuri) btnJuri.style.display = "none";
-
-                const btnDownloadCSV = document.getElementById("btnDownloadCSV");
                 if (btnDownloadCSV) btnDownloadCSV.style.display = "none";
             }
             
-            // Khas hanya untuk peranan STAF menyembunyikan butang Daftar Projek
-            if (userPeranan === "STAF") {
-                const btnDaftarProjek = document.getElementById("btnDaftarProjek");
-                if (btnDaftarProjek) btnDaftarProjek.style.display = "none";
-            }
-
-            muatDropdownJabatan();
-            muatDataProjek();
+            
+            // TAMBAHBAIK: Semak sama ada fungsi ini wujud sebelum dipanggil bagi mengelakkan ralat console
+            if (typeof muatDropdownJabatan === "function") muatDropdownJabatan();
+            if (typeof muatDataProjek === "function") muatDataProjek();
         };
 
         function muatDropdownJabatan() {
@@ -483,25 +538,24 @@
             renderJadual();
         }
 		
-        // ================= FUNGSI SEMAK AKSES EDIT (DIKEMASKINI) =================
+        // ================= FUNGSI SEMAK AKSES EDIT (DIKEMASKINI DENGAN MODAL BAHARU) =================
         function semakAksesEdit(id) {
             const r = dataGlobal.find(item => item.id === id);
             if (!r) return;
 
             if (rolesRequirePassword.includes(userPeranan)) {
-                // Buang sebarang simbol untuk memastikan pemadanan hanya guna nombor (Cth: 750201-08-5788 -> 750201085788)
-                let icPenyeliaAsal = (r.icPenyelia || "").replace(/[^0-9]/g, ''); 
-                let inputDiberi = prompt("Sila masukkan No. IC Penyelia untuk mengemaskini rekod ini:");
+                // Simpan ID ke pembolehubah global sementara
+                idProjekEditSemasa = id;
                 
-                if (inputDiberi !== null) { 
-                    let inputClean = inputDiberi.replace(/[^0-9]/g, ''); 
-                    
-                    if (inputClean === icPenyeliaAsal && inputClean !== "") {
-                        bukaModalEdit(id);
-                    } else {
-                        alert("❌ Akses Ditolak: Kata laluan (No. IC Penyelia) tidak sah.");
-                    }
-                }
+                // Tetapkan semula paparan modal
+                document.getElementById('inputSahkanLaluan').value = "";
+                document.getElementById('mesejRalatLaluan').classList.add('hidden');
+                
+                // Buka modal custom password
+                document.getElementById('modalSahkanLaluan').classList.remove('hidden');
+                
+                // Fokus pada input box selepas modal dipaparkan
+                setTimeout(() => document.getElementById('inputSahkanLaluan').focus(), 100);
             } else if (rolesBypassPassword.includes(userPeranan)) {
                 bukaModalEdit(id);
             } else {
@@ -509,94 +563,124 @@
             }
         }
 
-        function renderJadual() {
-    const tbody = document.getElementById('isiJadual');
-    const valTahun = document.getElementById('filterTahun').value;
-    const valJabatan = document.getElementById('filterJabatan').value;
-    const valStatus = document.getElementById('filterStatus').value; // <-- Nilai filter status
+        // ================= FUNGSI SOKONGAN MODAL PENGESAHAN KATA LALUAN =================
+        function tutupModalSahkanLaluan() {
+            document.getElementById('modalSahkanLaluan').classList.add('hidden');
+            idProjekEditSemasa = null; // Reset ID
+        }
 
-    // Simpan data ditapis ke variabel global untuk kegunaan Download CSV
-    dataDitapisGlobal = dataGlobal.filter(item => {
-        let matchTahun = (valTahun === "SEMUA" || item.tahun == valTahun);
-        let matchJabatan = (valJabatan === "SEMUA" || item.jabatan.toUpperCase() === valJabatan);
-        
-        // 🌟 Logik filter status (anggap status kosong sebagai MENUNGGU PENGESAHAN)
-        let statusSemasa = (item.status === "DISAHKAN" || item.status === "DITOLAK") ? item.status : "MENUNGGU PENGESAHAN";
-        let matchStatus = (valStatus === "SEMUA" || statusSemasa === valStatus);
-
-        return matchTahun && matchJabatan && matchStatus;
-    });
-
-    tbody.innerHTML = "";
-
-    if (dataDitapisGlobal.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai.</td></tr>`;
-        kemaskiniPagination(0, 0, 0, 0);
-        return;
+        function prosesSahkanLaluan() {
+    if (!idProjekEditSemasa) return;
+    
+    const r = dataGlobal.find(item => item.id === idProjekEditSemasa);
+    if (!r) return;
+    
+    // Buang sebarang simbol untuk memastikan pemadanan hanya guna nombor
+    let icPenyeliaAsal = (r.icPenyelia || "").replace(/[^0-9]/g, ''); 
+    let inputDiberi = document.getElementById('inputSahkanLaluan').value;
+    let inputClean = inputDiberi.replace(/[^0-9]/g, ''); 
+    
+    if (inputClean === icPenyeliaAsal && inputClean !== "") {
+        // Berjaya: Panggil bukaModalEdit sebelum ID di-reset oleh tutupModalSahkanLaluan
+        bukaModalEdit(idProjekEditSemasa);
+        tutupModalSahkanLaluan();
+    } else {
+        // Gagal: Papar teks ralat
+        document.getElementById('mesejRalatLaluan').classList.remove('hidden');
     }
-
-    // --- LOGIK POTONGAN HALAMAN (PAGINATION) ---
-    const totalRecords = dataDitapisGlobal.length;
-    const totalPages = Math.ceil(totalRecords / rowsPerPage);
-    
-    if (currentPage < 1) currentPage = 1;
-    if (currentPage > totalPages) currentPage = totalPages;
-
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = Math.min(startIndex + rowsPerPage, totalRecords);
-    
-    const currentData = dataDitapisGlobal.slice(startIndex, endIndex);
-
-    let canEdit = isEditor;
-    let canDelete = isApprover;
-
-    currentData.forEach((row) => {
-        let btnEdit = canEdit ? `<button onclick="semakAksesEdit('${row.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full mb-1">Edit</button>` : ``;
-        let btnPadam = canDelete ? `<button onclick="padamRekod('${row.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full mb-1">Padam</button>` : ``;
-        
-        // 🌟 LOGIK BUTANG SAHKAN DITAMBAH
-        let btnSahkan = "";
-        const rolesSahkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS JABATAN", "PENYELARAS PROJEK (C-RIE)", "PENYELARAS PROJEK (CRIE)"];
-        
-        if (rolesSahkan.includes(userPeranan) && row.status !== "DISAHKAN") {
-            btnSahkan = `<button onclick="sahkanRekod('${row.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full mb-1">Sahkan</button>`;
-        }
-        
-        let aksiBtn = `<div class="flex flex-col gap-1">${btnSahkan}${btnEdit}${btnPadam}</div>`;
-        if (!canEdit && !canDelete && btnSahkan === "") {
-            aksiBtn = `<span class="text-[10px] text-gray-400 italic block text-center mt-2">Tiada Akses</span>`;
-        }
-
-        // Tambahan badge status
-        let badgeStatus = `<span class="inline-block bg-yellow-100 text-yellow-800 text-[9px] font-bold px-2 py-0.5 rounded border border-yellow-300">MENUNGGU PENGESAHAN</span>`;
-        if (row.status === "DISAHKAN") {
-            badgeStatus = `<span class="inline-block bg-green-100 text-green-800 text-[9px] font-bold px-2 py-0.5 rounded border border-green-300">DISAHKAN</span>`;
-        } else if (row.status === "DITOLAK") {
-            badgeStatus = `<span class="inline-block bg-red-100 text-red-800 text-[9px] font-bold px-2 py-0.5 rounded border border-red-300">DITOLAK</span>`;
-        }
-
-        const tr = document.createElement('tr');
-        tr.className = "border-b hover:bg-indigo-50 transition duration-150 text-xs";
-        tr.innerHTML = `
-            <td class="p-3 text-center font-bold text-gray-500">${row.id}</td>
-            <td class="p-3 font-bold text-indigo-900 whitespace-normal min-w-[200px] uppercase">${row.tajuk}</td>
-            <td class="p-3 font-semibold uppercase text-gray-600">${row.kategori}</td>
-            <td class="p-3 uppercase">
-                <div class="font-bold">${row.namaKetua}</div>
-                <div class="text-[10px] text-gray-500">${row.matrikKetua}</div>
-            </td>
-            <td class="p-3 text-center font-bold text-gray-700 uppercase">${row.jabatan}</td>
-            <td class="p-3 uppercase text-blue-700 font-semibold">${row.penyelia}</td>
-            <td class="p-3 text-center font-bold">${row.tahun}</td>
-            <td class="p-3 text-center font-bold text-gray-700">${row.sesi || "-"}</td>
-            <td class="p-3 text-center whitespace-normal">${badgeStatus}</td>
-            <td class="p-3 text-center w-24 align-middle">${aksiBtn}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    kemaskiniPagination(startIndex + 1, endIndex, totalRecords, totalPages);
 }
+
+        // Benarkan tekan "Enter" untuk terus simpan/sahkan
+        function handleEnterLaluan(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                prosesSahkanLaluan();
+            }
+        }
+
+        function renderJadual() {
+            const tbody = document.getElementById('isiJadual');
+            const valTahun = document.getElementById('filterTahun').value;
+            const valJabatan = document.getElementById('filterJabatan').value;
+            const valStatus = document.getElementById('filterStatus').value; 
+
+            dataDitapisGlobal = dataGlobal.filter(item => {
+                let matchTahun = (valTahun === "SEMUA" || item.tahun == valTahun);
+                let matchJabatan = (valJabatan === "SEMUA" || item.jabatan.toUpperCase() === valJabatan);
+                let statusSemasa = (item.status === "DISAHKAN" || item.status === "DITOLAK") ? item.status : "MENUNGGU PENGESAHAN";
+                let matchStatus = (valStatus === "SEMUA" || statusSemasa === valStatus);
+                return matchTahun && matchJabatan && matchStatus;
+            });
+
+            tbody.innerHTML = "";
+
+            if (dataDitapisGlobal.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-gray-500 font-medium">Tiada rekod dijumpai.</td></tr>`;
+                kemaskiniPagination(0, 0, 0, 0);
+                return;
+            }
+
+            const totalRecords = dataDitapisGlobal.length;
+            const totalPages = Math.ceil(totalRecords / rowsPerPage);
+            
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, totalRecords);
+            const currentData = dataDitapisGlobal.slice(startIndex, endIndex);
+
+            let canEdit = isEditor;
+            let canDelete = isApprover;
+
+            currentData.forEach((row) => {
+                let btnEdit = canEdit ? `<button onclick="semakAksesEdit('${row.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full mb-1">Kemaskini</button>` : ``;
+                let btnPadam = canDelete ? `<button onclick="padamRekod('${row.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full mb-1">Padam</button>` : ``;
+                
+                let btnSahkan = "";
+                const rolesSahkan = ["ADMIN", "KUPIK", "PENYELARAS INOVASI (C-RIE)", "PENYELARAS JABATAN", "PENYELARAS PROJEK (C-RIE)", "PENYELARAS PROJEK (CRIE)"];
+                if (rolesSahkan.includes(userPeranan) && row.status !== "DISAHKAN") {
+                    btnSahkan = `<button onclick="sahkanRekod('${row.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow text-xs font-bold w-full mb-1">Sahkan</button>`;
+                }
+                
+                let aksiBtn = `<div class="flex flex-col gap-1">${btnSahkan}${btnEdit}${btnPadam}</div>`;
+                if (!canEdit && !canDelete && btnSahkan === "") {
+                    aksiBtn = `<span class="text-[10px] text-gray-400 italic block text-center mt-2">Tiada Akses</span>`;
+                }
+
+                let badgeStatus = `<span class="inline-block bg-yellow-100 text-yellow-800 text-[9px] font-bold px-2 py-0.5 rounded border border-yellow-300">MENUNGGU PENGESAHAN</span>`;
+                if (row.status === "DISAHKAN") {
+                    badgeStatus = `<span class="inline-block bg-green-100 text-green-800 text-[9px] font-bold px-2 py-0.5 rounded border border-green-300">DISAHKAN</span>`;
+                } else if (row.status === "DITOLAK") {
+                    badgeStatus = `<span class="inline-block bg-red-100 text-red-800 text-[9px] font-bold px-2 py-0.5 rounded border border-red-300">DITOLAK</span>`;
+                }
+
+                // 🌟 GABUNGAN AHLI KUMPULAN MENJADI SATU LAJUR
+                let htmlAhli = `<div class="mb-1.5 leading-tight"><span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-1 rounded border border-indigo-200">KETUA</span> <span class="font-bold text-gray-800">${row.namaKetua}</span> <br><span class="text-[10px] text-gray-500">${row.matrikKetua}</span></div>`;
+                if (row.nama2) htmlAhli += `<div class="mb-1.5 leading-tight"><span class="text-[10px] font-bold text-gray-600 bg-gray-100 px-1 rounded border border-gray-200">AHLI 2</span> <span class="font-semibold text-gray-700">${row.nama2}</span> <br><span class="text-[10px] text-gray-500">${row.matrik2}</span></div>`;
+                if (row.nama3) htmlAhli += `<div class="mb-1.5 leading-tight"><span class="text-[10px] font-bold text-gray-600 bg-gray-100 px-1 rounded border border-gray-200">AHLI 3</span> <span class="font-semibold text-gray-700">${row.nama3}</span> <br><span class="text-[10px] text-gray-500">${row.matrik3}</span></div>`;
+                if (row.nama4) htmlAhli += `<div class="mb-1.5 leading-tight"><span class="text-[10px] font-bold text-gray-600 bg-gray-100 px-1 rounded border border-gray-200">AHLI 4</span> <span class="font-semibold text-gray-700">${row.nama4}</span> <br><span class="text-[10px] text-gray-500">${row.matrik4}</span></div>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-indigo-50 transition duration-150 text-xs";
+                tr.innerHTML = `
+                    <td class="p-3 text-center font-bold text-gray-500">${row.id}</td>
+                    <td class="p-3 font-bold text-indigo-900 whitespace-normal min-w-[200px] uppercase">${row.tajuk}</td>
+                    <td class="p-3 font-semibold uppercase text-gray-600">${row.kategori}</td>
+                    <td class="p-3 uppercase min-w-[220px] whitespace-normal">${htmlAhli}</td>
+                    <td class="p-3 text-center font-bold text-gray-700 uppercase">${row.jabatan}</td>
+                    <td class="p-3 uppercase text-blue-700 font-semibold whitespace-normal min-w-[150px]">${row.penyelia}</td>
+                    <td class="p-3 text-center font-bold">${row.tahun}</td>
+                    <td class="p-3 text-center font-bold text-gray-700">${row.sesi || "-"}</td>
+                    <td class="p-3 text-center whitespace-normal">${badgeStatus}</td>
+                    <td class="p-3 text-center w-24 align-middle">${aksiBtn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            kemaskiniPagination(startIndex + 1, endIndex, totalRecords, totalPages);
+        }
+
         function kemaskiniPagination(start, end, total, totalPages) {
             const info = document.getElementById('infoHalaman');
             const btnPrev = document.getElementById('btnPrev');
@@ -638,32 +722,85 @@
             link.click();
             document.body.removeChild(link);
         }
+		
+		// ================= KEMASKINI MODAL MUAT TURUN CSV PILIHAN LAJUR =================
+        const senaraiLajurCSV = [
+            { id: "id", label: "PROJEK ID" }, { id: "jabatan", label: "JABATAN" }, { id: "kategori", label: "KATEGORI" },
+            { id: "tajuk", label: "NAMA PROJEK" }, { id: "program", label: "NAMA PROGRAM" }, { id: "sesi", label: "SESI" },
+            { id: "status", label: "STATUS" }, { id: "emailKetua", label: "EMAIL KETUA" }, 
+            { id: "namaKetua", label: "NAMA KETUA" }, { id: "matrikKetua", label: "MATRIK KETUA" }, { id: "icKetua", label: "IC KETUA" },
+            { id: "nama2", label: "NAMA AHLI 2" }, { id: "ic2", label: "IC AHLI 2" }, { id: "matrik2", label: "MATRIK AHLI 2" },
+            { id: "nama3", label: "NAMA AHLI 3" }, { id: "ic3", label: "IC AHLI 3" }, { id: "matrik3", label: "MATRIK AHLI 3" },
+            { id: "nama4", label: "NAMA AHLI 4" }, { id: "ic4", label: "IC AHLI 4" }, { id: "matrik4", label: "MATRIK AHLI 4" },
+            { id: "penyelia", label: "PENYELIA" }, { id: "icPenyelia", label: "IC PENYELIA" }, { id: "hpPenyelia", label: "HP PENYELIA" },
+            { id: "emailPenyelia", label: "EMAIL PENYELIA" }, { id: "tahun", label: "TAHUN" }, { id: "pencapaianJabatan", label: "PENCAPAIAN JABATAN" },
+            { id: "markah", label: "MARKAH" }, { id: "namaPertandingan", label: "NAMA PERTANDINGAN" }, 
+            { id: "tarikhPertandingan", label: "TARIKH PERTANDINGAN" }, { id: "peringkatPertandingan", label: "PERINGKAT PERTANDINGAN" }
+        ];
 
-        // ================= FUNGSI DOWNLOAD CSV =================
-        function downloadCSV() {
+        function bukaModalCSV() {
+            const container = document.getElementById('senaraiCheckboxLajur');
+            container.innerHTML = "";
+            senaraiLajurCSV.forEach(col => {
+                container.innerHTML += `
+                    <div class="flex items-center p-2 rounded hover:bg-emerald-50 transition border border-transparent hover:border-emerald-100">
+                        <input type="checkbox" id="col_${col.id}" value="${col.id}" checked class="w-4 h-4 text-emerald-600 rounded lajur-checkbox cursor-pointer border-gray-300">
+                        <label for="col_${col.id}" class="ml-2 text-xs font-bold text-gray-700 cursor-pointer w-full uppercase">${col.label}</label>
+                    </div>
+                `;
+            });
+            document.getElementById('checkSemuaLajur').checked = true;
+            document.getElementById('modalPilihCSV').classList.remove('hidden');
+        }
+
+        function tutupModalCSV() {
+            document.getElementById('modalPilihCSV').classList.add('hidden');
+        }
+
+        function toggleSemuaLajur(checkbox) {
+            const checkboxes = document.querySelectorAll('.lajur-checkbox');
+            checkboxes.forEach(cb => cb.checked = checkbox.checked);
+        }
+
+        function prosesDownloadCSV() {
             if (!dataDitapisGlobal || dataDitapisGlobal.length === 0) {
                 alert("Tiada rekod untuk dieksport.");
                 return;
             }
 
+            const selectedCheckboxes = document.querySelectorAll('.lajur-checkbox:checked');
+            if (selectedCheckboxes.length === 0) {
+                alert("Sila pilih sekurang-kurangnya satu lajur untuk dimuat turun.");
+                return;
+            }
+
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+            const selectedLabels = Array.from(selectedCheckboxes).map(cb => senaraiLajurCSV.find(col => col.id === cb.value).label);
+
             paparToast("⏳ Menyediakan fail untuk dimuat turun...", "blue");
 
-            let csvContent = "PROJEK ID,JABATAN,KATEGORI,NAMA PROJEK,NAMA PROGRAM,SESI,STATUS,EMAIL KETUA,NAMA KETUA,MATRIK KETUA,IC KETUA,NAMA AHLI 2,IC AHLI 2,MATRIK AHLI 2,NAMA AHLI 3,IC AHLI 3,MATRIK AHLI 3,NAMA AHLI 4,IC AHLI 4,MATRIK AHLI 4,PENYELIA,IC PENYELIA,HP PENYELIA,EMAIL PENYELIA,TAHUN,PENCAPAIAN JABATAN,MARKAH,NAMA PERTANDINGAN,TARIKH PERTANDINGAN,PERINGKAT PERTANDINGAN\n";
+            let csvContent = selectedLabels.map(l => `"${l}"`).join(",") + "\n";
+            const lajurIC = ["icKetua", "ic2", "ic3", "ic4", "icPenyelia"];
+
             dataDitapisGlobal.forEach(r => {
-                let clean = (str) => `"${(str || "").replace(/"/g, '""')}"`;
-                
-                // Fungsi khas untuk memaksa Excel/Google Sheets mengekalkan sifar di hadapan
-                let cleanPhone = (str) => {
-                    let val = String(str || "").trim();
-                    // Tambah sifar di hadapan jika data asal memang kehilangan sifar
-                    if (val !== "" && !val.startsWith("0")) {
-                        val = "0" + val; 
+                let rowData = selectedIds.map(id => {
+                    let val = String(r[id] || "").trim();
+                    
+                    // 🌟 Format Khas Nombor IC & HP (Menambah ="..." agar Excel kekalkan sifar di hadapan & tidak rosakkan paparan)
+                    if (lajurIC.includes(id)) {
+                        val = val.replace(/[^0-9]/g, ""); // Pastikan hanya angka
+                        return val ? `="${val}"` : `""`;
                     }
-                    // Format sebagai ="012..." agar Excel tidak membuang sifar
-                    return val ? `="${val}"` : `""`; 
-                };
-                
-                csvContent += `${clean(r.id)},${clean(r.jabatan)},${clean(r.kategori)},${clean(r.tajuk)},${clean(r.program)},${clean(r.sesi)},${clean(r.status)},${clean(r.emailKetua)},${clean(r.namaKetua)},${clean(r.matrikKetua)},${clean(r.icKetua)},${clean(r.nama2)},${clean(r.ic2)},${clean(r.matrik2)},${clean(r.nama3)},${clean(r.ic3)},${clean(r.matrik3)},${clean(r.nama4)},${clean(r.ic4)},${clean(r.matrik4)},${clean(r.penyelia)},${clean(r.icPenyelia)},${cleanPhone(r.hpPenyelia)},${clean(r.emailPenyelia)},${clean(r.tahun)},${clean(r.pencapaianJabatan)},${clean(r.markah)},${clean(r.namaPertandingan)},${clean(r.tarikhPertandingan)},${clean(r.peringkatPertandingan)}\n`;
+                    if (id === "hpPenyelia") {
+                        val = val.replace(/[^0-9+]/g, ""); // Pastikan angka/plus sahaja
+                        if (val !== "" && !val.startsWith("0") && !val.startsWith("+")) val = "0" + val;
+                        return val ? `="${val}"` : `""`;
+                    }
+                    
+                    // Format Teks Biasa (Bersihkan tanda " untuk elakkan fail CSV rosak)
+                    return `"${val.replace(/"/g, '""')}"`;
+                });
+                csvContent += rowData.join(",") + "\n";
             });
 
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -671,11 +808,12 @@
             const link = document.createElement("a");
             
             link.setAttribute("href", url);
-            link.setAttribute("download", "Senarai_Pendaftaran_Projek_Pelajar.csv");
+            link.setAttribute("download", "Data_Projek_Pilihan.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
+            tutupModalCSV();
             setTimeout(() => { paparToast("✅ Berjaya dimuat turun!", "green"); }, 1000);
         }
 		
