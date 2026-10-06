@@ -128,10 +128,28 @@
                     </div>
                 </div>
 
+                <!-- Bar Alat Pengurusan (Butang Cetak & Lulus Pukal) -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                        <button onclick="lulusPukalPilihan()" id="btnLulusPukal" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg transition-all flex items-center justify-center shadow-sm text-xs sm:text-sm">
+                            <i class="fa-solid fa-check-double mr-2"></i> Lulus Pukal (Pilihan)
+                        </button>
+                        <button onclick="cetakRekodLulus()" id="btnCetakLulus" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all flex items-center justify-center shadow-sm text-xs sm:text-sm">
+                            <i class="fa-solid fa-print mr-2"></i> Cetak Rekod Lulus
+                        </button>
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium text-center sm:text-right w-full sm:w-auto">
+                        Pilih rekod melalui kotak semakan (checkbox) di jadual untuk kelulusan pukal.
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm mt-4">
                     <table class="w-full text-sm text-left whitespace-nowrap">
                         <thead class="text-xs text-slate-700 uppercase bg-slate-200">
                             <tr>
+                                <th class="px-3 py-3 text-center w-10">
+                                    <input type="checkbox" id="pilihSemuaAdmin" onclick="pilihSemuaRekodAdmin(this)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer" title="Pilih Semua">
+                                </th>
                                 <th class="px-4 py-3">Nama Pemohon</th>
                                 <th class="px-4 py-3">No. Telefon & Jabatan</th>
                                 <th class="px-4 py-3 text-center">Pinjam (Kuantiti/Hari)</th>
@@ -143,7 +161,7 @@
                         </thead>
                         <tbody id="jadualAdmin" class="divide-y divide-slate-200 bg-white">
                             <tr>
-                                <td colspan="7" class="px-4 py-8 text-center text-slate-500">
+                                <td colspan="8" class="px-4 py-8 text-center text-slate-500">
                                     <i class="fa-solid fa-inbox text-3xl mb-2 opacity-50 block"></i>
                                     Sila klik "Muat Data Tempahan" untuk memaparkan rekod.
                                 </td>
@@ -541,7 +559,7 @@
                 
                 const jadualAdmin = document.getElementById('jadualAdmin');
                 if (jadualAdmin) {
-                    jadualAdmin.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-500"><i class="fa-solid fa-inbox text-3xl mb-2 opacity-50 block"></i>Sila log masuk untuk memaparkan rekod.</td></tr>`;
+                    jadualAdmin.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-500"><i class="fa-solid fa-inbox text-3xl mb-2 opacity-50 block"></i>Sila log masuk untuk memaparkan rekod.</td></tr>`;
                 }
                 
                 tukarTab('tabBorang'); 
@@ -891,7 +909,7 @@
             
             btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Memuat...';
             btn.disabled = true;
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-500"><i class="fa-solid fa-spinner animate-spin text-2xl"></i> Memuatkan rekod...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-500"><i class="fa-solid fa-spinner animate-spin text-2xl"></i> Memuatkan rekod...</td></tr>';
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -905,12 +923,12 @@
                     halamanSemasaAdmin = 1;
                     paparJadualAdmin();
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-500">Tiada rekod dijumpai.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-500">Tiada rekod dijumpai.</td></tr>';
                 }
                 btn.innerHTML = '<i class="fa-solid fa-rotate mr-2"></i> Muat Data Tempahan';
                 btn.disabled = false;
             }).catch(err => {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-red-500">Ralat menyambung ke pangkalan data. Sila semak konsol (F12).</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-red-500">Ralat menyambung ke pangkalan data. Sila semak konsol (F12).</td></tr>';
                 btn.innerHTML = '<i class="fa-solid fa-rotate mr-2"></i> Muat Data Tempahan';
                 btn.disabled = false;
             });
@@ -924,6 +942,10 @@
             let akhir = mula + rekodPerHalaman;
             let dataPapar = rekodAdminGlobal.slice(mula, akhir);
 
+            // Reset checkbox pilih semua
+            const cbPilihSemua = document.getElementById('pilihSemuaAdmin');
+            if (cbPilihSemua) cbPilihSemua.checked = false;
+
             dataPapar.forEach(r => {
                 let badge = "bg-yellow-100 text-yellow-800 border-yellow-300"; 
                 if (r.status === "LULUS") badge = "bg-green-100 text-green-800 border-green-300";
@@ -935,6 +957,9 @@
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 text-xs sm:text-sm">
+                        <td class="px-3 py-3 text-center">
+                            <input type="checkbox" class="pilih-rekod-admin w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer" value="${r.row_index}">
+                        </td>
                         <td class="px-4 py-3 font-medium text-slate-800">${r.nama}</td>
                         <td class="px-4 py-3 text-slate-600">${r.no_hp}<br><span class="text-xs text-slate-400 font-semibold">${r.jabatan}</span></td>
                         <td class="px-4 py-3 text-center">Qty: <span class="font-bold">${r.bilangan}</span><br>Hr: <span class="font-bold">${r.bil_hari}</span></td>
@@ -962,7 +987,7 @@
             if (jumlahHalaman > 1) {
                 tbody.innerHTML += `
                     <tr class="bg-slate-100">
-                        <td colspan="7" class="px-4 py-3 border-t border-slate-200">
+                        <td colspan="8" class="px-4 py-3 border-t border-slate-200">
                             <div class="flex flex-col sm:flex-row justify-between items-center text-sm font-semibold text-slate-600 gap-2">
                                 <button onclick="tukarHalamanAdmin(-1)" class="${halamanSemasaAdmin === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white border-indigo-300'} px-4 py-1.5 bg-white border shadow-sm rounded transition" ${halamanSemasaAdmin === 1 ? 'disabled' : ''}>
                                     <i class="fa-solid fa-chevron-left mr-1"></i> Previous
@@ -1111,6 +1136,162 @@
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-save mr-2"></i> Simpan';
             });
+        }
+
+        // --- FUNGSI TAMBAHAN: LULUS PUKAL & CETAK REKOD LULUS ---
+        function pilihSemuaRekodAdmin(elem) {
+            const checkboxes = document.querySelectorAll('.pilih-rekod-admin');
+            checkboxes.forEach(cb => cb.checked = elem.checked);
+        }
+
+        async function lulusPukalPilihan() {
+            const checkboxes = document.querySelectorAll('.pilih-rekod-admin:checked');
+            if (checkboxes.length === 0) {
+                alert("Sila pilih sekurang-kurangnya satu rekod untuk diluluskan secara pukal.");
+                return;
+            }
+
+            if (!confirm(`Adakah anda pasti mahu meluluskan ${checkboxes.length} rekod yang dipilih?\n\nStatus Tempahan akan ditukar kepada 'LULUS' dan Status Pemulangan kepada 'BELUM AMBIL'.`)) {
+                return;
+            }
+
+            const btn = document.getElementById('btnLulusPukal');
+            const teksAsal = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-2"></i> Memproses...`;
+
+            const peranan = sessionStorage.getItem("log_peranan") || "";
+            let berjaya = 0;
+            let gagal = 0;
+
+            for (let i = 0; i < checkboxes.length; i++) {
+                const rowIndex = checkboxes[i].value;
+                const r = rekodAdminGlobal.find(item => String(item.row_index) === String(rowIndex));
+
+                if (r) {
+                    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-2"></i> Memproses (${i + 1}/${checkboxes.length})...`;
+                    
+                    let dString = r.tarikh_majlis;
+                    if (dString && dString.includes("/")) {
+                        let p = dString.split("/");
+                        if (p.length === 3) dString = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+                    } else if (dString && dString.includes("T")) {
+                        dString = dString.split("T")[0];
+                    }
+
+                    const payload = {
+                        action: "kemaskiniTempahan",
+                        ROW: rowIndex,
+                        NAMA: r.nama,
+                        NO_HP: r.no_hp,
+                        TARIKH_MAJLIS: dString,
+                        BIL_HARI: r.bil_hari !== "-" ? r.bil_hari : "1",
+                        BILANGAN: r.bilangan,
+                        STATUS: "LULUS",
+                        STATUS_PEMULANGAN: "BELUM AMBIL",
+                        DIKEMASKINI_OLEH: peranan
+                    };
+
+                    try {
+                        const res = await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify(payload)
+                        });
+                        const data = await res.json();
+                        if (data.status === 'BERJAYA') {
+                            berjaya++;
+                        } else {
+                            gagal++;
+                        }
+                    } catch (err) {
+                        gagal++;
+                    }
+                }
+            }
+
+            alert(`Proses Kelulusan Pukal Selesai!\n\nBerjaya: ${berjaya}\nGagal: ${gagal}`);
+            btn.disabled = false;
+            btn.innerHTML = teksAsal;
+            
+            muatSemuaTempahan();
+        }
+
+        function cetakRekodLulus() {
+            const rekodLulus = rekodAdminGlobal.filter(r => r.status && r.status.toUpperCase().includes("LULUS"));
+            if (rekodLulus.length === 0) {
+                alert("Tiada rekod dengan Status Tempahan 'LULUS' untuk dicetak.");
+                return;
+            }
+
+            let kandungan = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Senarai Tempahan Lulus</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                    h2 { text-align: center; margin-bottom: 5px; text-transform: uppercase; }
+                    p.sub { text-align: center; color: #666; font-size: 13px; margin-bottom: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+                    th, td { border: 1px solid #999; padding: 8px; text-align: left; }
+                    th { background-color: #e2e8f0; font-weight: bold; text-transform: uppercase; }
+                    .text-center { text-align: center; }
+                    @media print {
+                        @page { margin: 1cm; size: landscape; }
+                    }
+                </style>
+            </head>
+            <body>
+                <h2>Senarai Rekod Tempahan Peralatan (Status: LULUS)</h2>
+                <p class="sub">Tarikh Cetakan: ${new Date().toLocaleDateString('ms-MY')} | Jumlah Rekod: ${rekodLulus.length}</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 40px;">Bil</th>
+                            <th>Nama Pemohon</th>
+                            <th>No. Telefon</th>
+                            <th>Jabatan</th>
+                            <th class="text-center">Kuantiti</th>
+                            <th class="text-center">Bil Hari</th>
+                            <th class="text-center">Tarikh Majlis</th>
+                            <th class="text-center">Status Tempahan</th>
+                            <th class="text-center">Status Pulang</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            rekodLulus.forEach((r, idx) => {
+                kandungan += `
+                    <tr>
+                        <td class="text-center">${idx + 1}</td>
+                        <td>${r.nama}</td>
+                        <td>${r.no_hp}</td>
+                        <td>${r.jabatan}</td>
+                        <td class="text-center">${r.bilangan}</td>
+                        <td class="text-center">${r.bil_hari}</td>
+                        <td class="text-center">${r.tarikh_majlis}</td>
+                        <td class="text-center">${r.status}</td>
+                        <td class="text-center">${r.status_pemulangan || 'BELUM AMBIL'}</td>
+                    </tr>
+                `;
+            });
+
+            kandungan += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+            `;
+
+            const win = window.open('', '_blank');
+            win.document.write(kandungan);
+            win.document.close();
+            win.focus();
+            setTimeout(() => {
+                win.print();
+            }, 500);
         }
     </script>
 </body>
