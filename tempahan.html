@@ -51,7 +51,8 @@
                 <form id="formTempahan" class="space-y-4 max-w-2xl mx-auto">
                     <div>
                         <label class="block text-sm font-medium mb-1">Nama Penuh <span class="text-red-500">*</span></label>
-                        <input type="text" id="tempah_nama" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all" placeholder="Masukkan nama penuh anda">
+                        <!-- Penambahbaikan: Input auto huruf besar -->
+                        <input type="text" id="tempah_nama" required style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all uppercase" placeholder="Masukkan nama penuh anda">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -61,7 +62,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-1">Jabatan <span class="text-red-500">*</span></label>
-                            <select id="tempah_jabatan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all">
+                            <select id="tempah_jabatan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all uppercase">
                                 <option value="">-- Memuat Turun Senarai... --</option>
                             </select>
                         </div>
@@ -113,9 +114,9 @@
                     <div class="flex-1 w-full space-y-2">
                         <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider"><i class="fa-solid fa-circle-user mr-1"></i> Maklumat Akaun Semasa</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-white p-3 rounded-lg border border-indigo-100 text-sm">
-                            <p><span class="text-slate-400 font-semibold block text-xs uppercase">Nama</span> <span id="papar_nama" class="font-bold text-slate-700">-</span></p>
-                            <p><span class="text-slate-400 font-semibold block text-xs uppercase">Peranan</span> <span id="papar_peranan" class="font-bold text-slate-700">-</span></p>
-                            <p><span class="text-slate-400 font-semibold block text-xs uppercase">Jabatan</span> <span id="papar_jabatan" class="font-bold text-slate-700">-</span></p>
+                            <p><span class="text-slate-400 font-semibold block text-xs uppercase">Nama</span> <span id="papar_nama" class="font-bold text-slate-700 uppercase">-</span></p>
+                            <p><span class="text-slate-400 font-semibold block text-xs uppercase">Peranan</span> <span id="papar_peranan" class="font-bold text-slate-700 uppercase">-</span></p>
+                            <p><span class="text-slate-400 font-semibold block text-xs uppercase">Jabatan</span> <span id="papar_jabatan" class="font-bold text-slate-700 uppercase">-</span></p>
                         </div>
                     </div>
                     <div class="w-full lg:w-auto flex sm:flex-row flex-col gap-2">
@@ -128,23 +129,27 @@
                     </div>
                 </div>
 
-                <!-- Bar Alat Pengurusan (Butang Cetak & Lulus Pukal) -->
+                <!-- Bar Alat Pengurusan (Butang Cetak, Lulus Pukal & Padam Pilihan) -->
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
                     <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                         <button onclick="lulusPukalPilihan()" id="btnLulusPukal" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg transition-all flex items-center justify-center shadow-sm text-xs sm:text-sm">
                             <i class="fa-solid fa-check-double mr-2"></i> Lulus Pukal (Pilihan)
+                        </button>
+                        <!-- Penambahbaikan: Butang Padam Rekod Pilihan -->
+                        <button onclick="padamPilihanAdmin()" id="btnPadamPilihan" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-all flex items-center justify-center shadow-sm text-xs sm:text-sm">
+                            <i class="fa-solid fa-trash-can mr-2"></i> Padam Pilihan
                         </button>
                         <button onclick="cetakRekodLulus()" id="btnCetakLulus" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all flex items-center justify-center shadow-sm text-xs sm:text-sm">
                             <i class="fa-solid fa-print mr-2"></i> Cetak Rekod Lulus
                         </button>
                     </div>
                     <div class="text-xs text-slate-500 font-medium text-center sm:text-right w-full sm:w-auto">
-                        Pilih rekod melalui kotak semakan (checkbox) di jadual untuk kelulusan pukal.
+                        Pilih rekod melalui kotak semakan (checkbox) untuk kelulusan atau pemadaman pukal.
                     </div>
                 </div>
 
                 <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm mt-4">
-                    <table class="w-full text-sm text-left whitespace-nowrap">
+                    <table class="w-full text-sm text-left whitespace-nowrap uppercase">
                         <thead class="text-xs text-slate-700 uppercase bg-slate-200">
                             <tr>
                                 <th class="px-3 py-3 text-center w-10">
@@ -159,9 +164,9 @@
                                 <th class="px-4 py-3 text-center">Tindakan</th>
                             </tr>
                         </thead>
-                        <tbody id="jadualAdmin" class="divide-y divide-slate-200 bg-white">
+                        <tbody id="jadualAdmin" class="divide-y divide-slate-200 bg-white uppercase">
                             <tr>
-                                <td colspan="8" class="px-4 py-8 text-center text-slate-500">
+                                <td colspan="8" class="px-4 py-8 text-center text-slate-500 capitalize">
                                     <i class="fa-solid fa-inbox text-3xl mb-2 opacity-50 block"></i>
                                     Sila klik "Muat Data Tempahan" untuk memaparkan rekod.
                                 </td>
@@ -218,7 +223,7 @@
                 
                 <div>
                     <label class="block text-sm font-medium mb-1 text-slate-700">Nama Penuh</label>
-                    <input type="text" id="edit_nama" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="text" id="edit_nama" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none uppercase">
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -283,7 +288,7 @@
                 <input type="hidden" id="edit_pengguna_row"> 
                 <div>
                     <label class="block text-sm font-medium mb-1 text-slate-700">Nama Penuh</label>
-                    <input type="text" id="edit_pengguna_nama" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <input type="text" id="edit_pengguna_nama" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -293,7 +298,7 @@
                     <div>
                         <label class="block text-sm font-medium mb-1 text-slate-700">Jabatan</label>
                         <!-- Biarkan select manual/dinamik mengikut senarai sedia ada anda -->
-                        <input type="text" id="edit_pengguna_jabatan" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="text" id="edit_pengguna_jabatan" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
@@ -346,11 +351,11 @@
                 
                 // Set kembali untuk kegunaan dalaman tempahan.html
                 sessionStorage.setItem("log_peranan", sesiPeranan.trim().toUpperCase());
-                sessionStorage.setItem("log_nama", sesiNama || "Pengguna");
-                sessionStorage.setItem("log_jabatan", sesiJabatan || "Tiada Maklumat");
+                sessionStorage.setItem("log_nama", (sesiNama || "Pengguna").toUpperCase());
+                sessionStorage.setItem("log_jabatan", (sesiJabatan || "Tiada Maklumat").toUpperCase());
 
                 if (typeof kemaskiniPaparanProfil === 'function') {
-                    kemaskiniPaparanProfil(sesiNama || "Pengguna", sesiPeranan.trim().toUpperCase(), sesiJabatan || "Tiada Maklumat");
+                    kemaskiniPaparanProfil((sesiNama || "Pengguna").toUpperCase(), sesiPeranan.trim().toUpperCase(), (sesiJabatan || "Tiada Maklumat").toUpperCase());
                 }
 
                 // --- TAMBAHAN KOD: Autofill borang tempahan dengan logik khas STAF ---
@@ -361,7 +366,7 @@
                         inputNamaBorang.value = "";
                     } else if (sesiNama && sesiNama !== "Pengguna") {
                         // Jika peranan lain (contoh: ADMIN, PENYELARAS), isikan nama secara automatik
-                        inputNamaBorang.value = sesiNama;
+                        inputNamaBorang.value = sesiNama.toUpperCase();
                     }
                 }
             } else {
@@ -449,13 +454,13 @@
             const headerJabatan = document.getElementById('header_jabatan');
 
             if (nama && peranan && nama !== "-" && peranan !== "-") {
-                if (paparNamaLama) paparNamaLama.innerText = nama;
-                if (paparPerananLama) paparPerananLama.innerText = peranan;
-                if (paparJabatanLama) paparJabatanLama.innerText = jabatan || "Tiada Maklumat";
+                if (paparNamaLama) paparNamaLama.innerText = nama.toUpperCase();
+                if (paparPerananLama) paparPerananLama.innerText = peranan.toUpperCase();
+                if (paparJabatanLama) paparJabatanLama.innerText = (jabatan || "Tiada Maklumat").toUpperCase();
                 
-                if (headerNama) headerNama.innerText = nama;
-                if (headerPeranan) headerPeranan.innerText = peranan;
-                if (headerJabatan) headerJabatan.innerText = jabatan || "Tiada Maklumat";
+                if (headerNama) headerNama.innerText = nama.toUpperCase();
+                if (headerPeranan) headerPeranan.innerText = peranan.toUpperCase();
+                if (headerJabatan) headerJabatan.innerText = (jabatan || "Tiada Maklumat").toUpperCase();
 
                 if (kotakProfil) kotakProfil.classList.remove('hidden');
                 if (headerInfo) headerInfo.classList.remove('hidden');
@@ -499,9 +504,9 @@
                     if (penggunaSah) {
                         statusLogMasuk = true;
                         
-                        sessionStorage.setItem("log_peranan", penggunaSah.peranan || peranan);
-                        sessionStorage.setItem("log_nama", penggunaSah.nama || "-");
-                        sessionStorage.setItem("log_jabatan", penggunaSah.jabatan || "-");
+                        sessionStorage.setItem("log_peranan", (penggunaSah.peranan || peranan).toUpperCase());
+                        sessionStorage.setItem("log_nama", (penggunaSah.nama || "-").toUpperCase());
+                        sessionStorage.setItem("log_jabatan", (penggunaSah.jabatan || "-").toUpperCase());
                         
                         kemaskiniPaparanProfil(penggunaSah.nama, penggunaSah.peranan, penggunaSah.jabatan);
                         
@@ -559,7 +564,7 @@
                 
                 const jadualAdmin = document.getElementById('jadualAdmin');
                 if (jadualAdmin) {
-                    jadualAdmin.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-500"><i class="fa-solid fa-inbox text-3xl mb-2 opacity-50 block"></i>Sila log masuk untuk memaparkan rekod.</td></tr>`;
+                    jadualAdmin.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-500 capitalize"><i class="fa-solid fa-inbox text-3xl mb-2 opacity-50 block"></i>Sila log masuk untuk memaparkan rekod.</td></tr>`;
                 }
                 
                 tukarTab('tabBorang'); 
@@ -577,28 +582,25 @@
             .then(response => {
                 if(response.status === "BERJAYA" && response.JABATAN) {
                     let html = '<option value="">-- PILIH JABATAN --</option>';
-                    response.JABATAN.forEach(j => { html += `<option value="${j}">${j}</option>`; });
+                    response.JABATAN.forEach(j => { html += `<option value="${j.toUpperCase()}">${j.toUpperCase()}</option>`; });
                     
                     const elJabatan = document.getElementById('tempah_jabatan');
                     elJabatan.innerHTML = html;
 
                     // --- TAMBAHAN KOD: Tetapkan Jabatan Semasa Pengguna Secara Automatik ---
-                    // Hanya set nilai jika ada pengguna yang sah sedang log masuk
                     if (statusLogMasuk) {
                         const sesiJabatan = sessionStorage.getItem("jabatan") || sessionStorage.getItem("log_jabatan") || sessionStorage.getItem("user_jabatan") || sessionStorage.getItem("sesi_jabatan") || localStorage.getItem("log_jabatan") || localStorage.getItem("jabatan");
                         
                         if (sesiJabatan && sesiJabatan !== "Tiada Maklumat") {
-                            // Semak jika jabatan pengguna memang wujud di dalam senarai dropdown pelayan
                             let padananJabatan = response.JABATAN.find(j => j.toUpperCase() === sesiJabatan.toUpperCase());
                             if (!padananJabatan) {
-                                // Pemadanan fleksibel jika mengandungi singkatan (cth: JKA) atau nama penuh
                                 padananJabatan = response.JABATAN.find(j => 
                                     j.toUpperCase().includes(sesiJabatan.toUpperCase()) || 
                                     sesiJabatan.toUpperCase().includes(j.toUpperCase())
                                 );
                             }
                             if (padananJabatan) {
-                                elJabatan.value = padananJabatan;
+                                elJabatan.value = padananJabatan.toUpperCase();
                             } else {
                                 elJabatan.value = "";
                             }
@@ -606,10 +608,8 @@
                             elJabatan.value = "";
                         }
                     } else {
-                        // Jika tiada maklumat pengguna log masuk, tetapkan secara automatik kepada PILIH JABATAN
                         elJabatan.value = "";
                     }
-                    // -----------------------------------------------------------------------
                 }
             }).catch(() => {});
         }
@@ -635,12 +635,11 @@
             msgBorang.classList.add('hidden');
 
             const timestampTerkini = new Date();
-            // Format Tarikh Pinjam (DD/MM/YYYY)
             const d = String(timestampTerkini.getDate()).padStart(2, '0');
             const m = String(timestampTerkini.getMonth() + 1).padStart(2, '0');
             const y = timestampTerkini.getFullYear();
             const strTarikhPinjam = `${d}/${m}/${y}`;
-            // Format Masa (HH:MM:SS)
+            
             const h = String(timestampTerkini.getHours()).padStart(2, '0');
             const min = String(timestampTerkini.getMinutes()).padStart(2, '0');
             const s = String(timestampTerkini.getSeconds()).padStart(2, '0');
@@ -651,14 +650,14 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
                     action: "tambahTempahan",
-                    NAMA: document.getElementById('tempah_nama').value.trim(),
+                    NAMA: document.getElementById('tempah_nama').value.trim().toUpperCase(),
                     NO_HP: inputNoHp,
-                    JABATAN: document.getElementById('tempah_jabatan').value,
+                    JABATAN: document.getElementById('tempah_jabatan').value.toUpperCase(),
                     BILANGAN: document.getElementById('tempah_bilangan').value,
                     TARIKH_MAJLIS: document.getElementById('tempah_tarikh').value,
-                    BIL_HARI: document.getElementById('tempah_bilhari').value, // Rekod lajur I
-                    TARIKH_PINJAM: strTarikhPinjam, // Automatik set Rekod lajur G
-                    MASA_PINJAM: strMasaPinjam      // Automatik set Rekod lajur H
+                    BIL_HARI: document.getElementById('tempah_bilhari').value,
+                    TARIKH_PINJAM: strTarikhPinjam,
+                    MASA_PINJAM: strMasaPinjam
                 })
             })
             .then(res => res.json())
@@ -671,12 +670,11 @@
                     document.getElementById('formTempahan').reset();
                     document.getElementById('semak_nohp').value = inputNoHp;
                     
-                    // PENAMBAHBAIKAN: Jika pengguna tadi log masuk sebagai bukan STAF, isikan semula nama supaya tak hilang
                     const sesiPeranan = sessionStorage.getItem("peranan") || sessionStorage.getItem("log_peranan") || "";
                     const sesiNama = sessionStorage.getItem("namaPengguna") || sessionStorage.getItem("log_nama") || "";
                     if(sesiPeranan.trim().toUpperCase() !== "STAF" && sesiNama) {
                         const inNama = document.getElementById('tempah_nama');
-                        if(inNama) inNama.value = sesiNama;
+                        if(inNama) inNama.value = sesiNama.toUpperCase();
                     }
                     
                     tukarTab('tabSemak');
@@ -744,7 +742,7 @@
             
             let jadualHTML = `
             <div class="overflow-x-auto w-full rounded-2xl border border-slate-200 shadow-md mt-4">
-                <table class="w-full text-sm sm:text-base text-left text-slate-700">
+                <table class="w-full text-sm sm:text-base text-left text-slate-700 uppercase">
                     <thead class="text-xs sm:text-sm text-slate-800 uppercase bg-slate-100 border-b-2 border-slate-200">
                         <tr>
                             <th scope="col" class="px-4 py-4 min-w-[200px]">Maklumat Tempahan</th>
@@ -754,7 +752,7 @@
                             <th scope="col" class="px-4 py-4 text-center whitespace-nowrap">Tindakan</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200">
+                    <tbody class="divide-y divide-slate-200 uppercase">
             `;
 
             let mula = (halamanSemasaSemakan - 1) * rekodPerHalaman;
@@ -773,14 +771,14 @@
                 let btnEdit = "";
                 if (rekod.status === "MENUNGGU PENGESAHAN") {
                     let rekodStr = encodeURIComponent(JSON.stringify(rekod));
-                    btnEdit = `<button onclick="bukaModalEditPengguna('${rekodStr}')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold transition" title="Kemaskini Rekod"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</button>`;
+                    btnEdit = `<button onclick="bukaModalEditPengguna('${rekodStr}')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold transition capitalize" title="Kemaskini Rekod"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</button>`;
                 }
 
                 jadualHTML += `
                         <tr class="bg-white hover:bg-slate-50 transition-colors">
                             <td class="px-4 py-4">
-                                <div class="font-bold text-base sm:text-lg text-slate-900">${rekod.nama}</div>
-                                <div class="text-xs text-slate-500 font-semibold mt-1">${rekod.jabatan} | Kuantiti: ${rekod.bilangan} Unit</div>
+                                <div class="font-bold text-base sm:text-lg text-slate-900">${(rekod.nama || '').toUpperCase()}</div>
+                                <div class="text-xs text-slate-500 font-semibold mt-1">${(rekod.jabatan || '').toUpperCase()} | Kuantiti: ${rekod.bilangan} Unit</div>
                                 <div class="text-xs text-slate-500 font-semibold">T.Majlis: ${rekod.tarikh_majlis}</div>
                             </td>
                             <td class="px-4 py-4 text-center whitespace-nowrap text-xs">
@@ -828,13 +826,12 @@
             let rekod = JSON.parse(decodeURIComponent(rekodStr));
             
             document.getElementById('edit_pengguna_row').value = rekod.row_index;
-            document.getElementById('edit_pengguna_nama').value = rekod.nama;
+            document.getElementById('edit_pengguna_nama').value = (rekod.nama || '').toUpperCase();
             document.getElementById('edit_pengguna_nohp').value = rekod.no_hp;
-            document.getElementById('edit_pengguna_jabatan').value = rekod.jabatan;
+            document.getElementById('edit_pengguna_jabatan').value = (rekod.jabatan || '').toUpperCase();
             document.getElementById('edit_pengguna_bilangan').value = rekod.bilangan;
             document.getElementById('edit_pengguna_bilhari').value = rekod.bil_hari !== "-" ? rekod.bil_hari : "1";
             
-            // Reformat Date untuk input Date field jika ia dd/mm/yyyy kepada yyyy-mm-dd
             let dString = rekod.tarikh_majlis;
             if(dString && dString.includes("/")) {
                 let p = dString.split("/");
@@ -863,9 +860,9 @@
             const payload = {
                 action: "editOlehPengguna",
                 ROW: document.getElementById('edit_pengguna_row').value,
-                NAMA: document.getElementById('edit_pengguna_nama').value,
+                NAMA: document.getElementById('edit_pengguna_nama').value.toUpperCase(),
                 NO_HP: document.getElementById('edit_pengguna_nohp').value,
-                JABATAN: document.getElementById('edit_pengguna_jabatan').value,
+                JABATAN: document.getElementById('edit_pengguna_jabatan').value.toUpperCase(),
                 BILANGAN: document.getElementById('edit_pengguna_bilangan').value,
                 BIL_HARI: document.getElementById('edit_pengguna_bilhari').value,
                 TARIKH_MAJLIS: document.getElementById('edit_pengguna_tarikh').value
@@ -884,7 +881,7 @@
                     msg.innerText = "Rekod permohonan berjaya dikemaskini!";
                     setTimeout(() => {
                         tutupModalPengguna();
-                        semakStatus(); // Refresh carian untuk lihat data terkini
+                        semakStatus(); 
                     }, 1500);
                 } else {
                     msg.className = "block bg-red-100 text-red-800 p-2 rounded text-sm font-bold mt-2";
@@ -909,7 +906,7 @@
             
             btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Memuat...';
             btn.disabled = true;
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-500"><i class="fa-solid fa-spinner animate-spin text-2xl"></i> Memuatkan rekod...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-500 capitalize"><i class="fa-solid fa-spinner animate-spin text-2xl"></i> Memuatkan rekod...</td></tr>';
 
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -923,12 +920,12 @@
                     halamanSemasaAdmin = 1;
                     paparJadualAdmin();
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-500">Tiada rekod dijumpai.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-500 capitalize">Tiada rekod dijumpai.</td></tr>';
                 }
                 btn.innerHTML = '<i class="fa-solid fa-rotate mr-2"></i> Muat Data Tempahan';
                 btn.disabled = false;
             }).catch(err => {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-red-500">Ralat menyambung ke pangkalan data. Sila semak konsol (F12).</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-red-500 capitalize">Ralat menyambung ke pangkalan data. Sila semak konsol (F12).</td></tr>';
                 btn.innerHTML = '<i class="fa-solid fa-rotate mr-2"></i> Muat Data Tempahan';
                 btn.disabled = false;
             });
@@ -942,7 +939,6 @@
             let akhir = mula + rekodPerHalaman;
             let dataPapar = rekodAdminGlobal.slice(mula, akhir);
 
-            // Reset checkbox pilih semua
             const cbPilihSemua = document.getElementById('pilihSemuaAdmin');
             if (cbPilihSemua) cbPilihSemua.checked = false;
 
@@ -955,24 +951,25 @@
                 let bPulang = "bg-slate-100 text-slate-600 border-slate-300";
                 if (r.status_pemulangan === "DIKEMBALIKAN") bPulang = "bg-green-100 text-green-800 border-green-300";
 
+                // Paparan data dijadikan HURUF BESAR secara automatik
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 text-xs sm:text-sm">
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 text-xs sm:text-sm uppercase">
                         <td class="px-3 py-3 text-center">
                             <input type="checkbox" class="pilih-rekod-admin w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer" value="${r.row_index}">
                         </td>
-                        <td class="px-4 py-3 font-medium text-slate-800">${r.nama}</td>
-                        <td class="px-4 py-3 text-slate-600">${r.no_hp}<br><span class="text-xs text-slate-400 font-semibold">${r.jabatan}</span></td>
+                        <td class="px-4 py-3 font-medium text-slate-800">${(r.nama || '').toUpperCase()}</td>
+                        <td class="px-4 py-3 text-slate-600">${r.no_hp}<br><span class="text-xs text-slate-400 font-semibold">${(r.jabatan || '').toUpperCase()}</span></td>
                         <td class="px-4 py-3 text-center">Qty: <span class="font-bold">${r.bilangan}</span><br>Hr: <span class="font-bold">${r.bil_hari}</span></td>
                         <td class="px-4 py-3 text-slate-600">${r.tarikh_majlis}</td>
                         <td class="px-4 py-3 text-center">
-                            <span class="px-2 py-1 rounded text-[10px] font-bold border uppercase tracking-wide ${badge}">${r.status}</span>
+                            <span class="px-2 py-1 rounded text-[10px] font-bold border uppercase tracking-wide ${badge}">${(r.status || '').toUpperCase()}</span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="px-2 py-1 rounded text-[10px] font-bold border uppercase tracking-wide ${bPulang}">${r.status_pemulangan}</span><br>
+                            <span class="px-2 py-1 rounded text-[10px] font-bold border uppercase tracking-wide ${bPulang}">${(r.status_pemulangan || '').toUpperCase()}</span><br>
                             <span class="text-[10px] text-slate-500 font-semibold">${r.tarikh_pulang}</span>
                         </td>
                         <td class="px-4 py-3 text-center space-x-2 whitespace-nowrap">
-                            <button onclick="bukaModalEdit('${r.row_index}', '${r.nama}', '${r.no_hp}', '${r.bilangan}', '${r.bil_hari}', '${r.tarikh_majlis}', '${r.status}', '${r.status_pemulangan}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 p-2 rounded shadow-sm transition" title="Kemaskini">
+                            <button onclick="bukaModalEdit('${r.row_index}', '${(r.nama || '').toUpperCase()}', '${r.no_hp}', '${r.bilangan}', '${r.bil_hari}', '${r.tarikh_majlis}', '${r.status}', '${r.status_pemulangan}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 p-2 rounded shadow-sm transition" title="Kemaskini">
 							<i class="fa-solid fa-pen-to-square"></i>
 							</button>
                             <button onclick="padamRekod('${r.row_index}')" class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded shadow-sm transition" title="Padam Rekod">
@@ -986,7 +983,7 @@
             let jumlahHalaman = Math.ceil(rekodAdminGlobal.length / rekodPerHalaman);
             if (jumlahHalaman > 1) {
                 tbody.innerHTML += `
-                    <tr class="bg-slate-100">
+                    <tr class="bg-slate-100 capitalize">
                         <td colspan="8" class="px-4 py-3 border-t border-slate-200">
                             <div class="flex flex-col sm:flex-row justify-between items-center text-sm font-semibold text-slate-600 gap-2">
                                 <button onclick="tukarHalamanAdmin(-1)" class="${halamanSemasaAdmin === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-600 hover:text-white border-indigo-300'} px-4 py-1.5 bg-white border shadow-sm rounded transition" ${halamanSemasaAdmin === 1 ? 'disabled' : ''}>
@@ -1045,12 +1042,11 @@
 
         function bukaModalEdit(rowIndex, nama, no_hp, bilangan, bil_hari, tarikh_majlis, status, status_pemulangan) {
             document.getElementById('edit_row').value = rowIndex;
-            document.getElementById('edit_nama').value = nama;
+            document.getElementById('edit_nama').value = nama.toUpperCase();
             document.getElementById('edit_nohp').value = no_hp;
             document.getElementById('edit_bilangan').value = bilangan;
             document.getElementById('edit_bil_hari').value = bil_hari !== "-" ? bil_hari : "1";
             
-            // Format Tarikh untuk HTML Date Input
             let dString = tarikh_majlis;
             if(dString && dString.includes("/")) {
                 let p = dString.split("/");
@@ -1062,10 +1058,9 @@
 
             document.getElementById('edit_status').value = status;
             
-            // Default "BELUM PULANG" jika tiada nilai
             const sPemulangan = document.getElementById('edit_status_pemulangan');
             if (sPemulangan) {
-                sPemulangan.value = (status_pemulangan && status_pemulangan !== "-") ? status_pemulangan : "BELUM PULANG";
+                sPemulangan.value = (status_pemulangan && status_pemulangan !== "-") ? status_pemulangan : "BELUM AMBIL";
             }
             
             document.getElementById('msgEdit').classList.add('hidden');
@@ -1081,7 +1076,7 @@
             const msg = document.getElementById('msgEdit');
             
             const rowIndex = document.getElementById('edit_row').value;
-            const nama = document.getElementById('edit_nama').value;
+            const nama = document.getElementById('edit_nama').value.toUpperCase();
             const noHp = document.getElementById('edit_nohp').value;
             const bilangan = document.getElementById('edit_bilangan').value;
             const bilHari = document.getElementById('edit_bil_hari').value;
@@ -1138,10 +1133,55 @@
             });
         }
 
-        // --- FUNGSI TAMBAHAN: LULUS PUKAL & CETAK REKOD LULUS ---
+        // --- FUNGSI TAMBAHAN: LULUS PUKAL, PADAM PILIHAN & CETAK REKOD LULUS ---
         function pilihSemuaRekodAdmin(elem) {
             const checkboxes = document.querySelectorAll('.pilih-rekod-admin');
             checkboxes.forEach(cb => cb.checked = elem.checked);
+        }
+
+        // PENAMBAHBAIKAN: Padam rekod yang dipilih melalui checkbox secara pukal
+        async function padamPilihanAdmin() {
+            const checkboxes = document.querySelectorAll('.pilih-rekod-admin:checked');
+            if (checkboxes.length === 0) {
+                alert("Sila pilih sekurang-kurangnya satu rekod untuk dipadam.");
+                return;
+            }
+
+            if (!confirm(`Adakah anda pasti mahu memadam ${checkboxes.length} rekod yang dipilih?\n\nTindakan ini tidak boleh dipulihkan.`)) {
+                return;
+            }
+
+            const btn = document.getElementById('btnPadamPilihan');
+            const teksAsal = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-2"></i> Memadam...`;
+
+            const peranan = sessionStorage.getItem("log_peranan") || "";
+            let berjaya = 0;
+            let gagal = 0;
+
+            for (let i = 0; i < checkboxes.length; i++) {
+                const rowIndex = checkboxes[i].value;
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-2"></i> Memadam (${i + 1}/${checkboxes.length})...`;
+
+                try {
+                    const res = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: "padamTempahan", ROW: rowIndex, DIKEMASKINI_OLEH: peranan })
+                    });
+                    const data = await res.json();
+                    if (data.status === 'BERJAYA') berjaya++;
+                    else gagal++;
+                } catch (err) {
+                    gagal++;
+                }
+            }
+
+            alert(`Proses Memadam Pukal Selesai!\n\nBerjaya Dipadam: ${berjaya}\nGagal: ${gagal}`);
+            btn.disabled = false;
+            btn.innerHTML = teksAsal;
+            muatSemuaTempahan();
         }
 
         async function lulusPukalPilihan() {
@@ -1182,7 +1222,7 @@
                     const payload = {
                         action: "kemaskiniTempahan",
                         ROW: rowIndex,
-                        NAMA: r.nama,
+                        NAMA: (r.nama || '').toUpperCase(),
                         NO_HP: r.no_hp,
                         TARIKH_MAJLIS: dString,
                         BIL_HARI: r.bil_hari !== "-" ? r.bil_hari : "1",
@@ -1217,6 +1257,7 @@
             muatSemuaTempahan();
         }
 
+        // PENAMBAHBAIKAN: Fungsi cetak rekod lulus dengan CSS cetakan yang dikemaskini kemas & margin kertas seimbang
         function cetakRekodLulus() {
             const rekodLulus = rekodAdminGlobal.filter(r => r.status && r.status.toUpperCase().includes("LULUS"));
             if (rekodLulus.length === 0) {
@@ -1230,33 +1271,116 @@
             <head>
                 <title>Senarai Tempahan Lulus</title>
                 <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
-                    h2 { text-align: center; margin-bottom: 5px; text-transform: uppercase; }
-                    p.sub { text-align: center; color: #666; font-size: 13px; margin-bottom: 20px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-                    th, td { border: 1px solid #999; padding: 8px; text-align: left; }
-                    th { background-color: #e2e8f0; font-weight: bold; text-transform: uppercase; }
+                    /* Tetapan Muka Surat Cetakan & Margin Kertas (28mm atas, 20mm kanan, 20mm bawah, 20mm kiri) */
+                    @page { 
+                        size: A4 landscape; 
+                        margin: 5mm 15mm 5mm 15mm; 
+                    }
+                    
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 0; 
+                        color: #1e293b; 
+                        background-color: #ffffff;
+                    }
+
+                    .tajuk-bekas {
+                        text-align: center;
+                        margin-bottom: 16px;
+                        padding-top: 8px;
+                        padding-bottom: 8px;
+                    }
+
+                    h2 { 
+                        margin: 0 0 6px 0; 
+                        text-transform: uppercase; 
+                        font-size: 16px; 
+                        letter-spacing: 0.5px;
+                        color: #0f172a;
+                        font-weight: bold;
+                    }
+
+                    p.sub { 
+                        margin: 0; 
+                        color: #64748b; 
+                        font-size: 11px; 
+                        font-weight: normal;
+                    }
+
+                    /* Pelarasan Jadual Cetakan Supaya Kemas */
+                    table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        font-size: 11px; 
+                        page-break-inside: auto;
+                    }
+
+                    thead {
+                        display: table-header-group; /* Memastikan header tajuk & lajur diulang pada setiap muka surat baharu */
+                    }
+
+                    tbody {
+                        display: table-row-group;
+                    }
+
+                    /* Elakkan pemotongan baris rekod di tengah-tengah muka surat */
+                    tr { 
+                        page-break-inside: avoid; 
+                        page-break-after: auto; 
+                    }
+
+                    th, td { 
+                        border: 1px solid #cbd5e1; 
+                        padding: 7px 8px; 
+                        text-align: left; 
+                        vertical-align: middle;
+                        text-transform: uppercase;
+                    }
+
+                    th { 
+                        background-color: #f1f5f9 !important; 
+                        color: #334155;
+                        font-weight: bold; 
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+
+                    .header-tajuk-cell {
+                        border: none !important;
+                        background: transparent !important;
+                        padding: 0 0 10px 0 !important;
+                        text-align: center;
+                    }
+
                     .text-center { text-align: center; }
+
                     @media print {
-                        @page { margin: 1cm; size: landscape; }
+                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                     }
                 </style>
             </head>
             <body>
-                <h2>Senarai Rekod Tempahan Peralatan (Status: LULUS)</h2>
-                <p class="sub">Tarikh Cetakan: ${new Date().toLocaleDateString('ms-MY')} | Jumlah Rekod: ${rekodLulus.length}</p>
                 <table>
                     <thead>
                         <tr>
-                            <th class="text-center" style="width: 40px;">Bil</th>
+                            <th colspan="9" class="header-tajuk-cell">
+                                <div class="tajuk-bekas">
+                                    <h2>Senarai Rekod Tempahan Peralatan (Status: LULUS)</h2>
+                                    <p class="sub">Tarikh Cetakan: ${new Date().toLocaleDateString('ms-MY')} | Bilangan Rekod: ${rekodLulus.length}</p>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="text-center" style="width: 35px;">Bil</th>
                             <th>Nama Pemohon</th>
                             <th>No. Telefon</th>
                             <th>Jabatan</th>
-                            <th class="text-center">Kuantiti</th>
-                            <th class="text-center">Bil Hari</th>
-                            <th class="text-center">Tarikh Majlis</th>
-                            <th class="text-center">Status Tempahan</th>
-                            <th class="text-center">Status Pulang</th>
+                            <th class="text-center" style="width: 60px;">Kuantiti</th>
+                            <th class="text-center" style="width: 60px;">Bil Hari</th>
+                            <th class="text-center" style="width: 90px;">Tarikh Majlis</th>
+                            <th class="text-center" style="width: 100px;">Status Tempahan</th>
+                            <th class="text-center" style="width: 100px;">Status Pulang</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1266,14 +1390,14 @@
                 kandungan += `
                     <tr>
                         <td class="text-center">${idx + 1}</td>
-                        <td>${r.nama}</td>
+                        <td>${(r.nama || '').toUpperCase()}</td>
                         <td>${r.no_hp}</td>
-                        <td>${r.jabatan}</td>
+                        <td>${(r.jabatan || '').toUpperCase()}</td>
                         <td class="text-center">${r.bilangan}</td>
                         <td class="text-center">${r.bil_hari}</td>
                         <td class="text-center">${r.tarikh_majlis}</td>
-                        <td class="text-center">${r.status}</td>
-                        <td class="text-center">${r.status_pemulangan || 'BELUM AMBIL'}</td>
+                        <td class="text-center">${(r.status || '').toUpperCase()}</td>
+                        <td class="text-center">${(r.status_pemulangan || 'BELUM AMBIL').toUpperCase()}</td>
                     </tr>
                 `;
             });
