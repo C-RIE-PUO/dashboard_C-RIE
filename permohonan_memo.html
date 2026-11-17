@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permohonan Nombor Memo/Surat C-RIE</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- jsPDF & jsPDF-AutoTable (Untuk Penjanaan Laporan PDF Berkualiti Tinggi) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1e40af;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Navbar / Header -->
+    <header class="bg-blue-900 text-white shadow-lg border-b-4 border-yellow-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col lg:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 text-center sm:text-left">
+                <div class="bg-white text-blue-900 p-2.5 rounded-xl shadow flex-shrink-0">
+                    <i class="fa-solid fa-file-signature text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Sistem Permohonan No. Rujukan</h1>
+                    <p class="text-blue-200 text-xs sm:text-sm">Memo & Surat Rasmi C-RIE | <span id="headerBaseRef" class="font-mono font-semibold text-white">PUO/PA/363 JLD 3</span></p>
+                </div>
+            </div>
+            
+            <!-- Butang Navigasi & Mod Pentadbir -->
+            <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+                <a href="paparan.html" title="Kembali ke Dashboard Utama C-RIE"
+                   class="bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold px-4 py-2 rounded-lg text-sm transition flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Dashboard Utama C-RIE</span>
+                </a>
+
+                <span class="hidden xl:inline-flex items-center gap-1.5 text-xs bg-blue-950/60 text-blue-200 px-3 py-1.5 rounded-full border border-blue-700">
+                    <i class="fa-solid fa-lock text-emerald-400"></i> Sambungan Terkawal
+                </span>
+
+                <button id="btnAdminToggle" onclick="toggleAdminMode()" class="bg-blue-800 hover:bg-blue-700 border border-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span id="adminBtnText">Log Masuk Pentadbir</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Status Bar Pentadbir -->
+    <div id="adminBanner" class="hidden bg-amber-500 text-white text-center py-2 px-4 text-sm font-semibold shadow-inner">
+        <i class="fa-solid fa-unlock-keyhole mr-1"></i> MOD PENTADBIR AKTIF: Anda boleh mengemaskini Ketetapan No. Rujukan, menyunting/memadam rekod, dan memuat turun laporan PDF.
+    </div>
+
+    <!-- Kandungan Utama -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Panel Tetapan No Rujukan (Hanya Dipaparkan Apabila Pentadbir Log Masuk - Tab: KETETAPAN NO) -->
+        <section id="adminSettingsSection" class="hidden bg-amber-50 rounded-xl shadow-md border-2 border-amber-300 overflow-hidden">
+            <div class="bg-amber-100/80 px-6 py-3.5 border-b border-amber-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <h2 class="text-base font-bold text-amber-950 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-amber-700"></i> Tetapan Format No. Rujukan (Tab: KETETAPAN NO)
+                </h2>
+                <span class="text-xs font-medium bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full">Akses Pentadbir Sahaja</span>
+            </div>
+
+            <form id="settingsForm" class="p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <!-- Pilih Rekod Sedia Ada dalam Tab KETETAPAN NO -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-amber-900 mb-1">Pilih Rekod Ketetapan</label>
+                        <select id="settingRowSelect" onchange="onSelectSettingRow()" class="w-full rounded-lg border-amber-300 border px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+                            <option value="2">Memuatkan...</option>
+                        </select>
+                    </div>
+
+                    <!-- Lajur A: Ketetapan -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-amber-900 mb-1">Ketetapan (Lajur A)</label>
+                        <input type="text" id="settingKetetapan" required placeholder="Contoh: No Rujukan Aktif"
+                            class="w-full rounded-lg border-amber-300 border px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+
+                    <!-- Lajur B: No Rujukan -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-amber-900 mb-1">No. Rujukan Asas (Lajur B)</label>
+                        <input type="text" id="settingNoRujukan" required placeholder="Contoh: PUO/PA/363 JLD 3"
+                            class="w-full rounded-lg border-amber-300 border px-3 py-2 text-sm font-mono font-bold bg-white text-blue-950 focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2 border-t border-amber-200/70">
+                    <p class="text-xs text-amber-800">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Perubahan pada <b>Lajur B</b> akan mengemaskini format automatik bagi semua permohonan baharu.
+                    </p>
+                    <button type="submit" id="btnSaveSettings" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white font-semibold px-5 py-2 rounded-lg text-sm shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Simpan Ketetapan No. Rujukan</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Borang Permohonan -->
+        <section class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-blue-700"></i> Borang Permohonan Baharu
+                </h2>
+                <span class="text-xs font-medium bg-blue-100 text-blue-800 px-3 py-1 rounded-full">Tab: NO RUJUKAN</span>
+            </div>
+
+            <form id="permohonanForm" class="p-6 space-y-6">
+                <!-- BAHAGIAN A -->
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-blue-800 border-b-2 border-blue-100 pb-2 mb-4">
+                        Bahagian A : Maklumat Pemohon
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <!-- Lajur A: Nama Pemohon -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Pemohon <span class="text-red-500">*</span></label>
+                            <input type="text" id="namaPemohon" required placeholder="Contoh: Ahmad bin Ali"
+                                class="w-full rounded-lg border-gray-300 border px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                        <!-- Lajur B: No. Telefon -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">No. Telefon <span class="text-red-500">*</span></label>
+                            <input type="tel" id="noTelefon" required placeholder="Contoh: 0123456789"
+                                class="w-full rounded-lg border-gray-300 border px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            <p class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-key text-amber-500"></i> Disulitkan & digunakan sebagai kata laluan kemaskini.</p>
+                        </div>
+                        <!-- Lajur C: Email Pemohon -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Pemohon <span class="text-red-500">*</span></label>
+                            <input type="email" id="emailPemohon" required placeholder="Contoh: ahmad@puo.edu.my"
+                                class="w-full rounded-lg border-gray-300 border px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            <p class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-envelope text-blue-600"></i> Notifikasi No. Rujukan akan dihantar ke e-mel ini.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAHAGIAN B -->
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-blue-800 border-b-2 border-blue-100 pb-2 mb-4">
+                        Bahagian B : Butiran Surat / Memo
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <!-- Lajur D: Butiran Surat/Memo -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Butiran Surat/Memo <span class="text-red-500">*</span></label>
+                            <select id="butiranSurat" required
+                                class="w-full rounded-lg border-gray-300 border px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                                <option value="">-- Pilih Jenis Dokumen --</option>
+                                <option value="SURAT RASMI">SURAT RASMI</option>
+                                <option value="MEMO DALAMAN">MEMO DALAMAN</option>
+                                <option value="MEMO PANGGILAN MESYUARAT">MEMO PANGGILAN MESYUARAT</option>
+                                <option value="SURAT JEMPUTAN / LANTIKAN">SURAT JEMPUTAN / LANTIKAN</option>
+                                <option value="LAIN-LAIN">LAIN-LAIN</option>
+                            </select>
+                        </div>
+
+                        <!-- Lajur E: Nama Fail Keluar (Dropdown Combo) -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Fail Keluar <span class="text-red-500">*</span></label>
+                            <select id="namaFail" required
+                                class="w-full rounded-lg border-gray-300 border px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                                <option value="">-- Pilih Nama Fail Keluar --</option>
+                                <option value="Penyelidikan">Penyelidikan</option>
+                                <option value="Inovasi">Inovasi</option>
+                                <option value="Harta Intelek">Harta Intelek</option>
+                                <option value="Projek Pelajar">Projek Pelajar</option>
+                                <option value="KIK">KIK</option>
+                                <option value="Komersialan">Komersialan</option>
+                                <option value="Penerbitan">Penerbitan</option>
+                                <option value="Umum">Umum</option>
+                            </select>
+                        </div>
+
+                        <!-- Lajur G: Tarikh Surat/Memo -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tarikh Surat/Memo <span class="text-red-500">*</span></label>
+                            <input type="date" id="tarikhSurat" required
+                                class="w-full rounded-lg border-gray-300 border px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+
+                        <!-- Lajur F: Tajuk Surat/Memo -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tajuk Surat/Memo <span class="text-red-500">*</span></label>
+                            <input type="text" id="tajukSurat" required placeholder="Masukkan tajuk penuh surat atau memo"
+                                class="w-full rounded-lg border-gray-300 border px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+
+                        <!-- Lajur H: Nama Penerima -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Penerima <span class="text-red-500">*</span></label>
+                            <input type="text" id="namaPenerima" required placeholder="Contoh: Pengarah / Ketua Jabatan"
+                                class="w-full rounded-lg border-gray-300 border px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <!-- Pratonton Lajur I: No Rujukan Auto -->
+                    <div class="mt-5 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="text-xs font-semibold text-blue-800 uppercase">Anggaran No. Rujukan Seterusnya:</span>
+                            <p id="previewNoRujukan" class="text-lg font-mono font-bold text-blue-950 mt-0.5">Memuatkan ketetapan...</p>
+                        </div>
+                        <span class="text-xs text-blue-600"><i class="fa-solid fa-shield-halved"></i> Dijana automatik mengikut Tab KETETAPAN NO.</span>
+                    </div>
+                </div>
+
+                <!-- Butang Hantar -->
+                <div class="flex justify-end pt-2 border-t border-gray-100">
+                    <button type="submit" id="btnSubmit" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-2.5 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Hantar & Jana No. Rujukan</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Senarai Rekod Permohonan -->
+        <section id="recordsSection" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex flex-col gap-4">
+                <!-- Baris Atas: Tajuk Seksyen + Butang Laporan PDF (Pentadbir Sahaja) -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <i class="fa-solid fa-table-list text-blue-700"></i> Rekod Permohonan No. Rujukan
+                            </h2>
+                            <span id="totalBadge" class="text-xs font-semibold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full">0 Rekod</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-0.5">Memaparkan <b>10 rekod terkini</b> setiap halaman. Klik butang <b>Edit</b> pada rekod anda untuk menyunting.</p>
+                    </div>
+
+                    <!-- Butang Muat Turun Laporan PDF (Hanya Dipaparkan Apabila Pentadbir Log Masuk) -->
+                    <button type="button" id="btnDownloadReport" onclick="openReportModal()"
+                        class="hidden bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-4 py-2 rounded-lg text-sm shadow transition flex items-center gap-2 border border-emerald-600">
+                        <i class="fa-solid fa-file-pdf text-base"></i>
+                        <span>Muat Turun Laporan PDF</span>
+                    </button>
+                </div>
+
+                <!-- Baris Bawah: Penapis, Carian & Muat Semula -->
+                <div class="flex flex-wrap items-center gap-2 w-full">
+                    <select id="filterJenis" onchange="filterTable(true)" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="">Semua Jenis Dokumen</option>
+                        <option value="SURAT RASMI">SURAT RASMI</option>
+                        <option value="MEMO DALAMAN">MEMO DALAMAN</option>
+                        <option value="MEMO PANGGILAN MESYUARAT">MEMO PANGGILAN MESYUARAT</option>
+                        <option value="SURAT JEMPUTAN / LANTIKAN">SURAT JEMPUTAN / LANTIKAN</option>
+                        <option value="LAIN-LAIN">LAIN-LAIN</option>
+                    </select>
+
+                    <select id="filterFail" onchange="filterTable(true)" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="">Semua Nama Fail</option>
+                        <option value="Penyelidikan">Penyelidikan</option>
+                        <option value="Inovasi">Inovasi</option>
+                        <option value="Harta Intelek">Harta Intelek</option>
+                        <option value="Projek Pelajar">Projek Pelajar</option>
+                        <option value="KIK">KIK</option>
+                        <option value="Komersialan">Komersialan</option>
+                        <option value="Penerbitan">Penerbitan</option>
+                        <option value="Umum">Umum</option>
+                    </select>
+
+                    <!-- Kotak Carian (Termasuk Carian Nama Pemohon) -->
+                    <div class="relative flex-grow sm:min-w-[260px]">
+                        <input type="text" id="searchInput" onkeyup="filterTable(true)" placeholder="Cari nama pemohon, tajuk, no rujukan..."
+                            class="w-full pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <i class="fa-solid fa-search text-gray-400 absolute left-3 top-2.5 text-sm"></i>
+                        <button type="button" id="btnClearSearch" onclick="clearSearch()" title="Kosongkan Carian" class="hidden text-gray-400 hover:text-gray-600 absolute right-2.5 top-2 text-sm">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <button type="button" onclick="fetchRecords(true)" title="Muat Semula Data" class="bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3.5 py-2 rounded-lg transition text-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Muat Semula</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Jadual Responsif (10 Rekod Terkini, Tiada Paparan No. Telefon & Tarikh Format 17-11-2026) -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-blue-900 text-white">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-semibold whitespace-nowrap">No. Rujukan (I)</th>
+                            <th class="px-4 py-3 text-left font-semibold whitespace-nowrap">Tarikh (G)</th>
+                            <th class="px-4 py-3 text-left font-semibold">Tajuk Surat/Memo (F)</th>
+                            <th class="px-4 py-3 text-left font-semibold">Butiran & Fail (D & E)</th>
+                            <th class="px-4 py-3 text-left font-semibold">Penerima (H)</th>
+                            <th class="px-4 py-3 text-left font-semibold">Pemohon (A & C)</th>
+                            <th class="px-4 py-3 text-center font-semibold whitespace-nowrap">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTableBody" class="divide-y divide-gray-200 bg-white">
+                        <tr>
+                            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                                <div class="loader mb-2"></div>
+                                <p>Sedang memuat turun rekod dari pelayan...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Kawalan Halaman (Previous / Next - 10 Rekod Setiap Halaman) -->
+            <div id="paginationFooter" class="bg-gray-50 px-6 py-3.5 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-600">
+                <div id="paginationInfo">
+                    Memaparkan 0 rekod
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btnPrevPage" onclick="changePage(-1)" disabled
+                        class="px-3.5 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-chevron-left text-[11px]"></i>
+                        <span>Previous</span>
+                    </button>
+
+                    <span id="pageIndicator" class="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-900 font-semibold rounded-lg">
+                        Halaman 1 / 1
+                    </span>
+
+                    <button type="button" id="btnNextPage" onclick="changePage(1)" disabled
+                        class="px-3.5 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5 shadow-sm">
+                        <span>Next</span>
+                        <i class="fa-solid fa-chevron-right text-[11px]"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-4 px-4 text-center text-xs text-gray-500 mt-auto">
+        &copy; <span id="footerYear">2026</span> Centre of Research & Innovation Excellence (C-RIE) &bull; Politeknik Ungku Omar
+    </footer>
+
+    <!-- Modal Pilih Lajur & Muat Turun Laporan PDF (PENTADBIR SAHAJA) -->
+    <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-200">
+            <div class="bg-emerald-800 text-white px-6 py-4 flex justify-between items-center border-b-2 border-yellow-400">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Muat Turun Laporan PDF (Pentadbir)</span>
+                </h3>
+                <button type="button" onclick="closeReportModal()" class="text-emerald-200 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+
+            <form id="reportForm" class="p-6 space-y-5 max-h-[85vh] overflow-y-auto">
+                <!-- Tajuk Laporan -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Tajuk Laporan PDF</label>
+                    <input type="text" id="reportTitleInput" required
+                        value="LAPORAN REKOD PERMOHONAN NO. RUJUKAN MEMO / SURAT C-RIE"
+                        class="w-full rounded-lg border-gray-300 border px-3.5 py-2 text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-emerald-600 outline-none">
+                </div>
+
+                <!-- Pilihan Lajur Laporan -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
+                    <div class="flex flex-wrap justify-between items-center gap-2 border-b border-gray-200 pb-2.5">
+                        <span class="text-xs font-bold uppercase text-blue-900">
+                            <i class="fa-solid fa-table-columns mr-1"></i> Pilih Lajur Untuk Dipaparkan Dalam Laporan:
+                        </span>
+                        <div class="flex items-center gap-2 text-xs">
+                            <button type="button" onclick="setReportColumnsPreset('all')" class="text-blue-700 hover:underline font-medium">Pilih Semua</button>
+                            <span class="text-gray-300">|</span>
+                            <button type="button" onclick="setReportColumnsPreset('default')" class="text-emerald-700 hover:underline font-medium">Lajur Utama</button>
+                            <span class="text-gray-300">|</span>
+                            <button type="button" onclick="setReportColumnsPreset('none')" class="text-red-600 hover:underline font-medium">Kosongkan</button>
+                        </div>
+                    </div>
+
+                    <div id="reportColumnsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-sm">
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="bil" checked onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">Bil. <span class="text-gray-400">(Turutan)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="noRujukan" checked onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">No. Rujukan <span class="text-blue-700 font-mono">(Lajur I)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="tarikhSurat" checked onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">Tarikh Surat/Memo <span class="text-blue-700 font-mono">(Lajur G)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="tajukSurat" checked onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">Tajuk Surat/Memo <span class="text-blue-700 font-mono">(Lajur F)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="butiranSurat" checked onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">Butiran Surat/Memo <span class="text-blue-700 font-mono">(Lajur D)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="namaFail" checked onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">Nama Fail Keluar <span class="text-blue-700 font-mono">(Lajur E)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="namaPenerima" checked onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">Nama Penerima <span class="text-blue-700 font-mono">(Lajur H)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="namaPemohon" checked onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">Nama Pemohon <span class="text-blue-700 font-mono">(Lajur A)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="emailPemohon" onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">Email Pemohon <span class="text-blue-700 font-mono">(Lajur C)</span></span>
+                        </label>
+
+                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-gray-200 hover:border-emerald-400 cursor-pointer transition">
+                            <input type="checkbox" name="reportCol" value="noTelefon" onchange="updateReportSummary()" class="w-4 h-4 text-emerald-700 rounded focus:ring-emerald-600">
+                            <span class="text-gray-800 font-medium text-xs">No. Telefon <span class="text-blue-700 font-mono">(Lajur B)</span></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Pilihan Skop Rekod, Susunan & Orientasi Kertas -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Skop Data</label>
+                        <select id="reportScope" onchange="updateReportSummary()" class="w-full rounded-lg border-gray-300 border px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-emerald-600 outline-none">
+                            <option value="all">Semua Rekod Keseluruhan</option>
+                            <option value="filtered">Rekod Ditapis / Carian Semasa</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Susunan Rekod</label>
+                        <select id="reportSortOrder" class="w-full rounded-lg border-gray-300 border px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-emerald-600 outline-none">
+                            <option value="asc">Terdahulu ke Terkini (1, 2, 3...)</option>
+                            <option value="desc">Terkini ke Terdahulu (Terbaharu)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Orientasi Kertas (A4)</label>
+                        <select id="reportOrientation" class="w-full rounded-lg border-gray-300 border px-3 py-2 text-xs bg-white focus:ring-2 focus:ring-emerald-600 outline-none">
+                            <option value="auto">Automatik (Disyorkan)</option>
+                            <option value="landscape">Lanskap (Melintang)</option>
+                            <option value="portrait">Potret (Menegak)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Ringkasan & Jaminan Format -->
+                <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 text-xs text-emerald-900 space-y-1">
+                    <p id="reportSummaryText" class="font-semibold">Ringkasan: 8 lajur dipilih &bull; 0 rekod akan dijana.</p>
+                    <p class="text-emerald-700 text-[11px]">
+                        <i class="fa-solid fa-circle-check mr-1"></i> Setiap halaman baharu akan memaparkan kepala lajur secara automatik dan baris rekod tidak akan terpotong.
+                    </p>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-gray-200">
+                    <button type="button" onclick="closeReportModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Batal</button>
+                    <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg shadow flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Jana & Muat Turun PDF</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Kemaskini Rekod -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden">
+            <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-pen-to-square mr-2"></i>Kemaskini Rekod Permohonan</h3>
+                <button type="button" onclick="closeEditModal()" class="text-blue-200 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <form id="editForm" class="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+                <input type="hidden" id="editRowIndex">
+                <input type="hidden" id="editAuthPhone">
+                
+                <!-- No Rujukan (Hanya boleh diedit oleh Pentadbir) -->
+                <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-lg">
+                    <label class="block text-xs font-bold uppercase text-amber-800 mb-1">
+                        No. Rujukan (Lajur I) 
+                        <span id="refLockBadge" class="ml-1 text-[10px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded">Dikunci (Pentadbir Sahaja)</span>
+                    </label>
+                    <input type="text" id="editNoRujukan" readonly
+                        class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm font-mono font-bold bg-gray-100 text-gray-600 outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Pemohon (A)</label>
+                        <input type="text" id="editNamaPemohon" required class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">No. Telefon (B)</label>
+                        <input type="tel" id="editNoTelefon" required class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Email Pemohon (C)</label>
+                        <input type="email" id="editEmailPemohon" required class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Butiran Surat/Memo (D)</label>
+                        <select id="editButiranSurat" required class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm bg-white">
+                            <option value="SURAT RASMI">SURAT RASMI</option>
+                            <option value="MEMO DALAMAN">MEMO DALAMAN</option>
+                            <option value="MEMO PANGGILAN MESYUARAT">MEMO PANGGILAN MESYUARAT</option>
+                            <option value="SURAT JEMPUTAN / LANTIKAN">SURAT JEMPUTAN / LANTIKAN</option>
+                            <option value="LAIN-LAIN">LAIN-LAIN</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Fail Keluar (E)</label>
+                        <select id="editNamaFail" required class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm bg-white">
+                            <option value="Penyelidikan">Penyelidikan</option>
+                            <option value="Inovasi">Inovasi</option>
+                            <option value="Harta Intelek">Harta Intelek</option>
+                            <option value="Projek Pelajar">Projek Pelajar</option>
+                            <option value="KIK">KIK</option>
+                            <option value="Komersialan">Komersialan</option>
+                            <option value="Penerbitan">Penerbitan</option>
+                            <option value="Umum">Umum</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Tarikh Surat/Memo (G)</label>
+                        <input type="date" id="editTarikhSurat" required class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Tajuk Surat/Memo (F)</label>
+                    <input type="text" id="editTajukSurat" required class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Penerima (H)</label>
+                    <input type="text" id="editNamaPenerima" required class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">Batal</button>
+                    <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-blue-700 hover:bg-blue-800 rounded-lg shadow">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // KONFIGURASI API (TIADA KATA LALUAN ATAU PAUTAN SHEET DI SINI)
+        // ==========================================
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvZ4jjPT810DhubfS18OBw4rO3Mbyq7HK4DII_ARGDhFmUOGVL_pDoWANY96xGzjsE/exec";
+
+        let allRecords = [];
+        let filteredRecords = [];
+        let settingsList = [];
+        let currentBaseRef = "PUO/PA/363 JLD 3";
+        let isAdmin = false;
+        let adminSessionPassword = "";
+
+        // Pemboleh ubah halaman (10 rekod terkini per halaman)
+        let currentPage = 1;
+        const RECORDS_PER_PAGE = 10;
+
+        // Dapatkan tarikh hari ini mengikut zon waktu tempatan (YYYY-MM-DD)
+        function getTodayLocalISO() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("footerYear").textContent = new Date().getFullYear();
+            document.getElementById("tarikhSurat").value = getTodayLocalISO();
+            fetchRecords(true);
+        });
+
+        // Tutup modal apabila kekunci Escape ditekan atau ruang luar diklik
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                if (!document.getElementById("editModal").classList.contains("hidden")) {
+                    closeEditModal();
+                }
+                if (!document.getElementById("reportModal").classList.contains("hidden")) {
+                    closeReportModal();
+                }
+            }
+        });
+
+        document.getElementById("editModal").addEventListener("click", (e) => {
+            if (e.target.id === "editModal") closeEditModal();
+        });
+
+        document.getElementById("reportModal").addEventListener("click", (e) => {
+            if (e.target.id === "reportModal") closeReportModal();
+        });
+
+        // ==========================================
+        // PENUKARAN FORMAT TARIKH: 2026-11-17 <-> 17-11-2026
+        // ==========================================
+        function toDisplayDate(dateStr) {
+            if (!dateStr) return "";
+            const str = String(dateStr).trim();
+            const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (isoMatch) {
+                return `${isoMatch[3]}-${isoMatch[2]}-${isoMatch[1]}`;
+            }
+            return str;
+        }
+
+        function toInputDate(dateStr) {
+            if (!dateStr) return "";
+            const str = String(dateStr).trim();
+            const dmyMatch = str.match(/^(\d{2})-(\d{2})-(\d{4})/);
+            if (dmyMatch) {
+                return `${dmyMatch[3]}-${dmyMatch[2]}-${dmyMatch[1]}`;
+            }
+            const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (isoMatch) {
+                return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+            }
+            return str;
+        }
+
+        // ==========================================
+        // KOMUNIKASI TERUS KE GOOGLE APPS SCRIPT
+        // ==========================================
+        async function callApi(payload) {
+            const response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify(payload)
+            });
+            return await response.json();
+        }
+
+        // ==========================================
+        // 1. MUAT TURUN REKOD & KETETAPAN DARI PELAYAN
+        // ==========================================
+        async function fetchRecords(resetPage = true) {
+            const tbody = document.getElementById("recordsTableBody");
+            tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500"><div class="loader mb-2"></div><p>Memuat turun rekod terkini...</p></td></tr>`;
+
+            try {
+                const res = await callApi({
+                    action: "getRecords",
+                    adminPassword: isAdmin ? adminSessionPassword : ""
+                });
+                if (res.status !== "success") {
+                    throw new Error(res.message || "Gagal mendapatkan data.");
+                }
+
+                allRecords = res.records || [];
+                settingsList = res.settingsList || [];
+                currentBaseRef = res.baseNoRujukan || "PUO/PA/363 JLD 3";
+
+                document.getElementById("headerBaseRef").textContent = currentBaseRef;
+                document.getElementById("previewNoRujukan").textContent = `${currentBaseRef} ( ${res.nextRefNumber} )`;
+                document.getElementById("totalBadge").textContent = `${allRecords.length} Rekod`;
+
+                populateSettingsUI(res.activeSetting);
+                filterTable(resetPage);
+            } catch (error) {
+                console.error("Ralat:", error);
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-red-600"><i class="fa-solid fa-triangle-exclamation text-2xl mb-2"></i><p>${escapeHTML(error.message)}</p></td></tr>`;
+                updatePaginationUI(0, 1);
+            }
+        }
+
+        // ==========================================
+        // 2. PENGURUSAN TETAPAN NO RUJUKAN (KETETAPAN NO)
+        // ==========================================
+        function populateSettingsUI(activeSetting) {
+            const select = document.getElementById("settingRowSelect");
+            if (!select) return;
+
+            let optionsHtml = settingsList.map(item => `
+                <option value="${item.rowIndex}">Baris ${item.rowIndex}: ${escapeHTML(item.ketetapan)} (${escapeHTML(item.noRujukan)})</option>
+            `).join('');
+            optionsHtml += `<option value="new">+ Tambah Baris Ketetapan Baharu</option>`;
+            select.innerHTML = optionsHtml;
+
+            if (activeSetting) {
+                select.value = String(activeSetting.rowIndex);
+                document.getElementById("settingKetetapan").value = activeSetting.ketetapan;
+                document.getElementById("settingNoRujukan").value = activeSetting.noRujukan;
+            }
+        }
+
+        function onSelectSettingRow() {
+            const val = document.getElementById("settingRowSelect").value;
+            if (val === "new") {
+                document.getElementById("settingKetetapan").value = "No Rujukan Aktif";
+                document.getElementById("settingNoRujukan").value = "";
+                document.getElementById("settingNoRujukan").focus();
+                return;
+            }
+            const found = settingsList.find(s => String(s.rowIndex) === val);
+            if (found) {
+                document.getElementById("settingKetetapan").value = found.ketetapan;
+                document.getElementById("settingNoRujukan").value = found.noRujukan;
+            }
+        }
+
+        document.getElementById("settingsForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            if (!isAdmin) return;
+
+            const selectVal = document.getElementById("settingRowSelect").value;
+            const ketetapan = document.getElementById("settingKetetapan").value.trim();
+            const noRujukan = document.getElementById("settingNoRujukan").value.trim();
+
+            const btn = document.getElementById("btnSaveSettings");
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loader w-4 h-4 border-2"></div> <span>Menyimpan...</span>`;
+
+            try {
+                const res = await callApi({
+                    action: "updateSettings",
+                    adminPassword: adminSessionPassword,
+                    mode: selectVal === "new" ? "create" : "update",
+                    rowIndex: selectVal === "new" ? null : parseInt(selectVal, 10),
+                    ketetapan: ketetapan,
+                    noRujukan: noRujukan
+                });
+
+                if (res.status !== "success") {
+                    throw new Error(res.message || "Gagal menyimpan ketetapan.");
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Ketetapan Dikemaskini!',
+                    text: `Format No. Rujukan baharu (${noRujukan}) telah disimpan dalam Tab KETETAPAN NO.`,
+                    confirmButtonColor: '#1e40af'
+                });
+
+                fetchRecords(false);
+            } catch (err) {
+                Swal.fire('Ralat', err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Simpan Ketetapan No. Rujukan</span>`;
+            }
+        });
+
+        // ==========================================
+        // 3. PAPAR, TAPIS & KAWALAN HALAMAN (10 REKOD TERKINI)
+        // ==========================================
+        function renderTable() {
+            const tbody = document.getElementById("recordsTableBody");
+            const totalItems = filteredRecords.length;
+
+            if (totalItems === 0) {
+                const hasActiveFilter = document.getElementById("searchInput").value.trim() !== "" ||
+                                        document.getElementById("filterJenis").value !== "" ||
+                                        document.getElementById("filterFail").value !== "";
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                            <p class="mb-2">Tiada rekod permohonan ditemui.</p>
+                            ${hasActiveFilter ? `
+                                <button type="button" onclick="resetAllFilters()" class="inline-flex items-center gap-1.5 text-xs font-semibold bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1.5 rounded-lg transition">
+                                    <i class="fa-solid fa-filter-circle-xmark"></i> Set Semula Penapis
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>`;
+                updatePaginationUI(0, 1);
+                return;
+            }
+
+            // Susun rekod daripada yang paling terkini
+            const reversed = [...filteredRecords].reverse();
+            const totalPages = Math.max(1, Math.ceil(totalItems / RECORDS_PER_PAGE));
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * RECORDS_PER_PAGE;
+            const endIndex = Math.min(startIndex + RECORDS_PER_PAGE, totalItems);
+            const paginatedItems = reversed.slice(startIndex, endIndex);
+
+            tbody.innerHTML = paginatedItems.map(rec => {
+                const formattedDate = toDisplayDate(rec.tarikhSurat);
+                return `
+                <tr class="hover:bg-blue-50/50 transition">
+                    <td class="px-4 py-3.5 whitespace-nowrap">
+                        <div class="inline-flex items-center gap-1.5 bg-blue-100 border border-blue-200 rounded px-2.5 py-1">
+                            <span class="font-mono font-bold text-blue-900 text-xs">${escapeHTML(rec.noRujukan)}</span>
+                            <button type="button" data-ref="${escapeHTML(rec.noRujukan)}" onclick="copyRef(this.dataset.ref)" title="Salin No. Rujukan" class="text-blue-600 hover:text-blue-900 text-xs">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3.5 whitespace-nowrap text-gray-700 font-medium text-xs">
+                        ${escapeHTML(formattedDate)}
+                    </td>
+                    <td class="px-4 py-3.5 font-medium text-gray-900 max-w-xs">
+                        ${escapeHTML(rec.tajukSurat)}
+                    </td>
+                    <td class="px-4 py-3.5 text-xs">
+                        <span class="font-semibold text-gray-700 block">${escapeHTML(rec.butiranSurat)}</span>
+                        <span class="inline-flex items-center text-blue-800 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded mt-1">
+                            <i class="fa-regular fa-folder mr-1"></i>${escapeHTML(rec.namaFail)}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3.5 text-gray-700 text-xs">
+                        ${escapeHTML(rec.namaPenerima)}
+                    </td>
+                    <td class="px-4 py-3.5 text-xs">
+                        <div class="font-semibold text-gray-800">${escapeHTML(rec.namaPemohon)}</div>
+                        <div class="text-gray-500">${escapeHTML(rec.emailPemohon)}</div>
+                    </td>
+                    <td class="px-4 py-3.5 whitespace-nowrap text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button type="button" onclick="requestEdit(${rec.rowIndex})" title="Kemaskini Rekod" 
+                                class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1">
+                                <i class="fa-solid fa-pen"></i> Edit
+                            </button>
+                            ${isAdmin ? `
+                            <button type="button" onclick="deleteRecord(${rec.rowIndex})" title="Padam Rekod (Pentadbir)" 
+                                class="bg-red-100 hover:bg-red-200 text-red-700 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1">
+                                <i class="fa-solid fa-trash"></i> Padam
+                            </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+
+            updatePaginationUI(totalItems, totalPages, startIndex + 1, endIndex);
+        }
+
+        function updatePaginationUI(totalItems, totalPages, startNum = 0, endNum = 0) {
+            const infoEl = document.getElementById("paginationInfo");
+            const indicatorEl = document.getElementById("pageIndicator");
+            const btnPrev = document.getElementById("btnPrevPage");
+            const btnNext = document.getElementById("btnNextPage");
+
+            if (totalItems === 0) {
+                infoEl.innerHTML = `Memaparkan <b>0</b> rekod`;
+                indicatorEl.textContent = `Halaman 1 / 1`;
+                btnPrev.disabled = true;
+                btnNext.disabled = true;
+                return;
+            }
+
+            infoEl.innerHTML = `Memaparkan <b>${startNum} - ${endNum}</b> daripada <b>${totalItems}</b> rekod terkini`;
+            indicatorEl.textContent = `Halaman ${currentPage} / ${totalPages}`;
+            btnPrev.disabled = currentPage <= 1;
+            btnNext.disabled = currentPage >= totalPages;
+        }
+
+        function changePage(step) {
+            const totalPages = Math.max(1, Math.ceil(filteredRecords.length / RECORDS_PER_PAGE));
+            const nextPage = currentPage + step;
+            if (nextPage < 1 || nextPage > totalPages) return;
+
+            currentPage = nextPage;
+            renderTable();
+
+            const section = document.getElementById("recordsSection");
+            if (section) {
+                section.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+        }
+
+        function filterTable(resetPage = true) {
+            const searchInput = document.getElementById("searchInput");
+            const rawQuery = searchInput.value;
+            const query = rawQuery.toLowerCase().trim();
+            const jenis = document.getElementById("filterJenis").value;
+            const fail = document.getElementById("filterFail").value;
+
+            const btnClear = document.getElementById("btnClearSearch");
+            if (btnClear) {
+                btnClear.classList.toggle("hidden", rawQuery.length === 0);
+            }
+
+            filteredRecords = allRecords.filter(r => {
+                const displayTarikh = toDisplayDate(r.tarikhSurat).toLowerCase();
+                const matchText =
+                    r.namaPemohon.toLowerCase().includes(query) ||
+                    r.emailPemohon.toLowerCase().includes(query) ||
+                    r.noRujukan.toLowerCase().includes(query) ||
+                    displayTarikh.includes(query) ||
+                    r.tajukSurat.toLowerCase().includes(query) ||
+                    r.namaPenerima.toLowerCase().includes(query) ||
+                    r.namaFail.toLowerCase().includes(query);
+                const matchJenis = jenis === "" || r.butiranSurat === jenis;
+                const matchFail = fail === "" || r.namaFail === fail;
+                return matchText && matchJenis && matchFail;
+            });
+
+            if (resetPage) {
+                currentPage = 1;
+            }
+
+            renderTable();
+        }
+
+        function clearSearch() {
+            const searchInput = document.getElementById("searchInput");
+            searchInput.value = "";
+            filterTable(true);
+            searchInput.focus();
+        }
+
+        function resetAllFilters() {
+            document.getElementById("searchInput").value = "";
+            document.getElementById("filterJenis").value = "";
+            document.getElementById("filterFail").value = "";
+            filterTable(true);
+        }
+
+        function copyRef(text) {
+            navigator.clipboard.writeText(text);
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `Disalin: ${text}`,
+                showConfirmButton: false,
+                timer: 1800
+            });
+        }
+
+        // ==========================================
+        // 4. HANTAR PERMOHONAN BAHARU & NOTIFIKASI E-MEL
+        // ==========================================
+        document.getElementById("permohonanForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById("btnSubmit");
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loader w-4 h-4 border-2"></div> <span>Menjana No. Rujukan & Menghantar E-mel...</span>`;
+
+            const tarikhFormatted = toDisplayDate(document.getElementById("tarikhSurat").value);
+
+            const payload = {
+                action: "create",
+                namaPemohon: document.getElementById("namaPemohon").value.trim(),
+                noTelefon: document.getElementById("noTelefon").value.trim(),
+                emailPemohon: document.getElementById("emailPemohon").value.trim(),
+                butiranSurat: document.getElementById("butiranSurat").value,
+                namaFail: document.getElementById("namaFail").value,
+                tajukSurat: document.getElementById("tajukSurat").value.trim(),
+                tarikhSurat: tarikhFormatted,
+                namaPenerima: document.getElementById("namaPenerima").value.trim()
+            };
+
+            try {
+                const res = await callApi(payload);
+                if (res.status !== "success") {
+                    throw new Error(res.message || "Gagal menyimpan rekod.");
+                }
+
+                const emailStatusHtml = res.emailSent
+                    ? `<p class="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md py-1.5 px-3 mt-3">
+                         <i class="fa-solid fa-envelope-circle-check mr-1"></i> Notifikasi e-mel telah berjaya dihantar ke <b>${escapeHTML(payload.emailPemohon)}</b>.
+                       </p>`
+                    : `<div class="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-md py-2 px-3 mt-3 text-left">
+                         <p class="font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Rekod disimpan, namun e-mel notifikasi gagal dihantar.</p>
+                         ${res.emailError ? `<p class="text-[11px] text-red-600 mt-1 font-mono break-words">Sebab: ${escapeHTML(res.emailError)}</p>` : ''}
+                       </div>`;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Permohonan Berjaya!',
+                    html: `No. Rujukan anda telah dijana dan direkodkan:<br><br>
+                           <div class="bg-blue-50 border border-blue-300 text-blue-900 font-mono font-bold text-lg py-2 px-4 rounded-lg select-all">
+                           ${escapeHTML(res.noRujukan)}
+                           </div>
+                           ${emailStatusHtml}
+                           <p class="text-xs text-gray-500 mt-3">Sila simpan No. Telefon anda sekiranya perlu mengemaskini rekod ini.</p>`,
+                    confirmButtonColor: '#1e40af'
+                });
+
+                document.getElementById("permohonanForm").reset();
+                document.getElementById("tarikhSurat").value = getTodayLocalISO();
+                fetchRecords(true);
+            } catch (err) {
+                Swal.fire('Ralat', err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Hantar & Jana No. Rujukan</span>`;
+            }
+        });
+
+        // ==========================================
+        // 5. KEMASKINI REKOD (PENGESAHAN DI PELAYAN)
+        // ==========================================
+        async function requestEdit(rowIndex) {
+            let inputPhone = "";
+
+            if (!isAdmin) {
+                const { value: phone } = await Swal.fire({
+                    title: 'Pengesahan Pemohon',
+                    text: 'Sila masukkan No. Telefon yang didaftarkan pada rekod ini sebagai kata laluan:',
+                    input: 'password',
+                    inputPlaceholder: 'Masukkan No. Telefon...',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sahkan',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#1e40af'
+                });
+
+                if (!phone) return;
+                inputPhone = phone;
+            }
+
+            Swal.fire({ title: 'Mengesahkan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await callApi({
+                    action: "verifyEdit",
+                    rowIndex: rowIndex,
+                    phone: inputPhone,
+                    adminPassword: isAdmin ? adminSessionPassword : ""
+                });
+
+                Swal.close();
+
+                if (res.status !== "success") {
+                    Swal.fire('Akses Ditolak', res.message || 'Pengesahan gagal.', 'error');
+                    return;
+                }
+
+                openEditModal(res.record, inputPhone);
+            } catch (err) {
+                Swal.fire('Ralat', 'Gagal berhubung dengan pelayan.', 'error');
+            }
+        }
+
+        function openEditModal(record, authPhone) {
+            document.getElementById("editRowIndex").value = record.rowIndex;
+            document.getElementById("editAuthPhone").value = authPhone || record.noTelefon;
+            document.getElementById("editNoRujukan").value = record.noRujukan;
+            document.getElementById("editNamaPemohon").value = record.namaPemohon;
+            document.getElementById("editNoTelefon").value = record.noTelefon;
+            document.getElementById("editEmailPemohon").value = record.emailPemohon;
+            document.getElementById("editButiranSurat").value = record.butiranSurat;
+
+            const editFailSelect = document.getElementById("editNamaFail");
+            const hasOption = Array.from(editFailSelect.options).some(opt => opt.value === record.namaFail);
+            if (!hasOption && record.namaFail) {
+                const extraOpt = new Option(record.namaFail, record.namaFail);
+                editFailSelect.add(extraOpt);
+            }
+            editFailSelect.value = record.namaFail;
+
+            document.getElementById("editTajukSurat").value = record.tajukSurat;
+            document.getElementById("editTarikhSurat").value = toInputDate(record.tarikhSurat);
+            document.getElementById("editNamaPenerima").value = record.namaPenerima;
+
+            const refInput = document.getElementById("editNoRujukan");
+            const refBadge = document.getElementById("refLockBadge");
+            if (isAdmin) {
+                refInput.removeAttribute("readonly");
+                refInput.classList.remove("bg-gray-100", "text-gray-600");
+                refInput.classList.add("bg-white", "text-blue-900", "border-amber-400");
+                refBadge.textContent = "Boleh Diedit (Mod Pentadbir)";
+                refBadge.className = "ml-1 text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded";
+            } else {
+                refInput.setAttribute("readonly", true);
+                refInput.classList.add("bg-gray-100", "text-gray-600");
+                refInput.classList.remove("bg-white", "text-blue-900", "border-amber-400");
+                refBadge.textContent = "Dikunci (Pentadbir Sahaja)";
+                refBadge.className = "ml-1 text-[10px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded";
+            }
+
+            document.getElementById("editModal").classList.remove("hidden");
+        }
+
+        function closeEditModal() {
+            document.getElementById("editModal").classList.add("hidden");
+        }
+
+        document.getElementById("editForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const tarikhFormatted = toDisplayDate(document.getElementById("editTarikhSurat").value);
+
+            const payload = {
+                action: "update",
+                rowIndex: parseInt(document.getElementById("editRowIndex").value, 10),
+                authPhone: document.getElementById("editAuthPhone").value,
+                adminPassword: isAdmin ? adminSessionPassword : "",
+                namaPemohon: document.getElementById("editNamaPemohon").value.trim(),
+                noTelefon: document.getElementById("editNoTelefon").value.trim(),
+                emailPemohon: document.getElementById("editEmailPemohon").value.trim(),
+                butiranSurat: document.getElementById("editButiranSurat").value,
+                namaFail: document.getElementById("editNamaFail").value,
+                tajukSurat: document.getElementById("editTajukSurat").value.trim(),
+                tarikhSurat: tarikhFormatted,
+                namaPenerima: document.getElementById("editNamaPenerima").value.trim(),
+                noRujukan: document.getElementById("editNoRujukan").value.trim()
+            };
+
+            closeEditModal();
+            Swal.fire({ title: 'Mengemaskini...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await callApi(payload);
+                if (res.status !== "success") {
+                    throw new Error(res.message || "Gagal mengemaskini rekod.");
+                }
+                Swal.fire('Berjaya!', 'Rekod telah berjaya dikemaskini.', 'success');
+                fetchRecords(false);
+            } catch (err) {
+                Swal.fire('Ralat', err.message, 'error');
+            }
+        });
+
+        // ==========================================
+        // 6. MOD PENTADBIR & PADAM REKOD
+        // ==========================================
+        async function toggleAdminMode() {
+            if (isAdmin) {
+                isAdmin = false;
+                adminSessionPassword = "";
+                document.getElementById("adminBanner").classList.add("hidden");
+                document.getElementById("adminSettingsSection").classList.add("hidden");
+                document.getElementById("btnDownloadReport").classList.add("hidden");
+                document.getElementById("adminBtnText").textContent = "Log Masuk Pentadbir";
+                closeReportModal();
+                filterTable(false);
+                Swal.fire('Log Keluar', 'Anda telah keluar dari Mod Pentadbir.', 'info');
+                return;
+            }
+
+            const { value: password } = await Swal.fire({
+                title: 'Log Masuk Pentadbir',
+                input: 'password',
+                inputLabel: 'Masukkan Kata Laluan Pentadbir',
+                inputPlaceholder: 'Kata laluan...',
+                showCancelButton: true,
+                confirmButtonText: 'Masuk',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#1e40af'
+            });
+
+            if (!password) return;
+
+            Swal.fire({ title: 'Mengesahkan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await callApi({ action: "verifyAdmin", password: password });
+                if (res.status === "success") {
+                    isAdmin = true;
+                    adminSessionPassword = password;
+                    document.getElementById("adminBanner").classList.remove("hidden");
+                    document.getElementById("adminSettingsSection").classList.remove("hidden");
+                    document.getElementById("btnDownloadReport").classList.remove("hidden");
+                    document.getElementById("adminBtnText").textContent = "Keluar Mod Pentadbir";
+                    await fetchRecords(false);
+                    Swal.fire('Berjaya', 'Mod Pentadbir diaktifkan.', 'success');
+                } else {
+                    Swal.fire('Ralat', res.message || 'Kata laluan pentadbir tidak sah.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Ralat', 'Gagal mengesahkan kata laluan dengan pelayan.', 'error');
+            }
+        }
+
+        async function deleteRecord(rowIndex) {
+            if (!isAdmin) return;
+
+            const record = allRecords.find(r => r.rowIndex === rowIndex);
+            const confirm = await Swal.fire({
+                title: 'Padam Rekod Ini?',
+                html: `Adakah anda pasti mahu memadam rekod <b>${escapeHTML(record ? record.noRujukan : '')}</b>?<br><span class="text-xs text-red-600">Tindakan ini tidak boleh dikembalikan.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Padam',
+                cancelButtonText: 'Batal'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            Swal.fire({ title: 'Memadam rekod...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await callApi({
+                    action: "delete",
+                    rowIndex: rowIndex,
+                    adminPassword: adminSessionPassword
+                });
+                if (res.status !== "success") {
+                    throw new Error(res.message || "Gagal memadam rekod.");
+                }
+                Swal.fire('Dipadam!', 'Rekod telah berjaya dipadam.', 'success');
+                fetchRecords(false);
+            } catch (err) {
+                Swal.fire('Ralat', err.message, 'error');
+            }
+        }
+
+        // ==========================================
+        // 7. MODUL LAPORAN PDF PENTADBIR (PILIH LAJUR, KEPALA SETIAP HALAMAN & REKOD TIDAK TERPOTONG)
+        // ==========================================
+        const REPORT_COLUMN_CONFIG = {
+            bil:          { label: "Bil.", weight: 1.0, align: "center" },
+            noRujukan:    { label: "No. Rujukan", weight: 3.2, align: "left" },
+            tarikhSurat:  { label: "Tarikh", weight: 2.0, align: "center" },
+            tajukSurat:   { label: "Tajuk Surat / Memo", weight: 5.5, align: "left" },
+            butiranSurat: { label: "Jenis Dokumen", weight: 2.7, align: "left" },
+            namaFail:     { label: "Nama Fail", weight: 2.3, align: "left" },
+            namaPenerima: { label: "Nama Penerima", weight: 3.0, align: "left" },
+            namaPemohon:  { label: "Nama Pemohon", weight: 3.0, align: "left" },
+            emailPemohon: { label: "Email Pemohon", weight: 3.3, align: "left" },
+            noTelefon:    { label: "No. Telefon", weight: 2.2, align: "center" }
+        };
+
+        const DEFAULT_REPORT_COLS = [
+            "bil", "noRujukan", "tarikhSurat", "tajukSurat",
+            "butiranSurat", "namaFail", "namaPenerima", "namaPemohon"
+        ];
+
+        function openReportModal() {
+            if (!isAdmin) return;
+            updateReportSummary();
+            document.getElementById("reportModal").classList.remove("hidden");
+        }
+
+        function closeReportModal() {
+            document.getElementById("reportModal").classList.add("hidden");
+        }
+
+        function setReportColumnsPreset(preset) {
+            const checkboxes = document.querySelectorAll('input[name="reportCol"]');
+            checkboxes.forEach(cb => {
+                if (preset === "all") {
+                    cb.checked = true;
+                } else if (preset === "none") {
+                    cb.checked = false;
+                } else {
+                    cb.checked = DEFAULT_REPORT_COLS.includes(cb.value);
+                }
+            });
+            updateReportSummary();
+        }
+
+        function getSelectedReportColumns() {
+            return Array.from(document.querySelectorAll('input[name="reportCol"]:checked')).map(cb => cb.value);
+        }
+
+        function updateReportSummary() {
+            const selectedCols = getSelectedReportColumns();
+            const scope = document.getElementById("reportScope").value;
+            const targetRecords = scope === "filtered" ? filteredRecords : allRecords;
+            const summaryEl = document.getElementById("reportSummaryText");
+
+            if (summaryEl) {
+                summaryEl.innerHTML = `Ringkasan: <b>${selectedCols.length} lajur</b> dipilih &bull; <b>${targetRecords.length} rekod</b> akan dijana ke PDF.`;
+            }
+        }
+
+        document.getElementById("reportForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            if (!isAdmin) return;
+
+            const selectedKeys = getSelectedReportColumns();
+            if (selectedKeys.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tiada Lajur Dipilih',
+                    text: 'Sila tandakan sekurang-kurangnya satu lajur untuk dimuat turun.',
+                    confirmButtonColor: '#1e40af'
+                });
+                return;
+            }
+
+            const scope = document.getElementById("reportScope").value;
+            const sourceRecords = scope === "filtered" ? [...filteredRecords] : [...allRecords];
+
+            if (sourceRecords.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tiada Rekod',
+                    text: 'Tiada rekod tersedia untuk dijana dalam laporan PDF.',
+                    confirmButtonColor: '#1e40af'
+                });
+                return;
+            }
+
+            const sortOrder = document.getElementById("reportSortOrder").value;
+            if (sortOrder === "desc") {
+                sourceRecords.reverse();
+            }
+
+            const reportTitle = document.getElementById("reportTitleInput").value.trim() || "LAPORAN REKOD PERMOHONAN NO. RUJUKAN C-RIE";
+            const orientationPref = document.getElementById("reportOrientation").value;
+
+            generatePdfReport({
+                title: reportTitle,
+                columnKeys: selectedKeys,
+                records: sourceRecords,
+                scope: scope,
+                orientationPref: orientationPref
+            });
+        });
+
+        function generatePdfReport({ title, columnKeys, records, scope, orientationPref }) {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                Swal.fire('Ralat', 'Pustaka penjana PDF gagal dimuatkan. Sila semak sambungan internet dan muat semula halaman.', 'error');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+
+            // Tentukan orientasi kertas secara automatik jika dipilih 'auto'
+            let orientation = orientationPref;
+            if (orientation === "auto") {
+                orientation = columnKeys.length >= 6 ? "landscape" : "portrait";
+            }
+
+            const doc = new jsPDF({
+                orientation: orientation,
+                unit: "mm",
+                format: "a4"
+            });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const marginX = 12;
+            const printableWidth = pageWidth - marginX * 2;
+            const totalPagesExp = "{total_pages_count_string}";
+
+            // Masa & tarikh cetakan
+            const now = new Date();
+            const dateStr = toDisplayDate(getTodayLocalISO());
+            const timeStr = now.toLocaleTimeString("ms-MY", { hour: "2-digit", minute: "2-digit" });
+            const timestampStr = `${dateStr}, ${timeStr}`;
+
+            // Bina label tapisan (jika skop tapisan dipilih)
+            let filterDesc = "Semua Rekod Keseluruhan";
+            if (scope === "filtered") {
+                const activeFilters = [];
+                const jenisVal = document.getElementById("filterJenis").value;
+                const failVal = document.getElementById("filterFail").value;
+                const searchVal = document.getElementById("searchInput").value.trim();
+                if (jenisVal) activeFilters.push(`Jenis: ${jenisVal}`);
+                if (failVal) activeFilters.push(`Fail: ${failVal}`);
+                if (searchVal) activeFilters.push(`Carian: "${searchVal}"`);
+                filterDesc = activeFilters.length > 0
+                    ? `Rekod Ditapis (${activeFilters.join(" | ")})`
+                    : "Rekod Ditapis (Semua)";
+            }
+
+            // ==========================================
+            // KEPALA HALAMAN PERTAMA (BANNER RASMI C-RIE)
+            // ==========================================
+            doc.setFillColor(30, 58, 138); // Biru Korporat (#1e3a8a)
+            doc.rect(marginX, 10, printableWidth, 20, "F");
+
+            // Garis aksen kuning di bawah banner
+            doc.setFillColor(250, 204, 21); // Kuning (#facc15)
+            doc.rect(marginX, 30, printableWidth, 1.3, "F");
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.text("POLITEKNIK UNGKU OMAR  |  CENTRE OF RESEARCH & INNOVATION EXCELLENCE (C-RIE)", marginX + 4, 16.5);
+
+            doc.setFontSize(11.5);
+            const wrappedTitle = doc.splitTextToSize(title.toUpperCase(), printableWidth - 8);
+            doc.text(wrappedTitle[0], marginX + 4, 24);
+
+            // Kotak Maklumat Ringkas Laporan di Bawah Banner
+            doc.setFillColor(248, 250, 252);
+            doc.setDrawColor(203, 213, 225);
+            doc.setLineWidth(0.25);
+            doc.rect(marginX, 33, printableWidth, 13, "FD");
+
+            doc.setTextColor(51, 65, 85);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.text(`No. Rujukan Asas Semasa: ${currentBaseRef}`, marginX + 3, 38.2);
+            doc.text(`Skop Data: ${filterDesc}`, marginX + 3, 43.2);
+
+            doc.setFont("helvetica", "bold");
+            doc.text(`Tarikh Cetakan: ${timestampStr}`, pageWidth - marginX - 3, 38.2, { align: "right" });
+            doc.text(`Jumlah Rekod: ${records.length} Rekod`, pageWidth - marginX - 3, 43.2, { align: "right" });
+
+            // ==========================================
+            // PENYEDIAAN LAJUR, LEBAR BERKADAR & DATA BARIS
+            // ==========================================
+            const headers = [columnKeys.map(key => REPORT_COLUMN_CONFIG[key].label)];
+
+            const totalWeight = columnKeys.reduce((sum, key) => sum + REPORT_COLUMN_CONFIG[key].weight, 0);
+            const columnStyles = {};
+            columnKeys.forEach((key, idx) => {
+                const cfg = REPORT_COLUMN_CONFIG[key];
+                columnStyles[idx] = {
+                    cellWidth: (cfg.weight / totalWeight) * printableWidth,
+                    halign: cfg.align
+                };
+            });
+
+            const bodyRows = records.map((rec, index) => {
+                return columnKeys.map(key => {
+                    if (key === "bil") return String(index + 1);
+                    if (key === "tarikhSurat") return toDisplayDate(rec.tarikhSurat) || "-";
+                    const val = rec[key];
+                    return val && String(val).trim() !== "" ? String(val).trim() : "-";
+                });
+            });
+
+            const fontSize = columnKeys.length >= 9 ? 7.5 : (columnKeys.length >= 7 ? 8 : 8.5);
+
+            // ==========================================
+            // JANA JADUAL PDF (KEPALA LAJUR SETIAP HALAMAN & REKOD TIDAK TERPOTONG)
+            // ==========================================
+            doc.autoTable({
+                head: headers,
+                body: bodyRows,
+                startY: 49,
+                margin: { top: 20, right: marginX, bottom: 16, left: marginX },
+                tableWidth: printableWidth,
+                showHead: "everyPage",       // Wajib: Nama column dipaparkan pada setiap halaman baharu
+                rowPageBreak: "avoid",       // Wajib: Baris rekod tidak akan terpotong merentasi halaman
+                theme: "grid",
+                styles: {
+                    font: "helvetica",
+                    fontSize: fontSize,
+                    textColor: [30, 41, 59],
+                    lineColor: [203, 213, 225],
+                    lineWidth: 0.2,
+                    cellPadding: { top: 2.6, right: 2.5, bottom: 2.6, left: 2.5 },
+                    overflow: "linebreak",
+                    valign: "middle"
+                },
+                headStyles: {
+                    fillColor: [30, 58, 138],
+                    textColor: [255, 255, 255],
+                    fontStyle: "bold",
+                    fontSize: fontSize,
+                    halign: "center",
+                    valign: "middle",
+                    cellPadding: { top: 3.2, right: 2.5, bottom: 3.2, left: 2.5 }
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 250, 252]
+                },
+                columnStyles: columnStyles,
+                didDrawPage: function(data) {
+                    const currentPageNum = doc.internal.getNumberOfPages();
+
+                    // Pada halaman ke-2 dan seterusnya, paparkan tajuk ringkas di bahagian atas sebelum kepala jadual
+                    if (currentPageNum > 1) {
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(8.5);
+                        doc.setTextColor(30, 58, 138);
+                        doc.text(`${title.toUpperCase()} (SAMBUNGAN)`, marginX, 12);
+
+                        doc.setFont("helvetica", "normal");
+                        doc.setFontSize(7.5);
+                        doc.setTextColor(100, 116, 139);
+                        doc.text(`Dicetak pada: ${timestampStr}`, pageWidth - marginX, 12, { align: "right" });
+
+                        doc.setDrawColor(203, 213, 225);
+                        doc.setLineWidth(0.25);
+                        doc.line(marginX, 14.2, pageWidth - marginX, 14.2);
+                    }
+
+                    // Footer pada setiap halaman (Kiri: Sistem, Kanan: Nombor Muka Surat)
+                    const footerY = pageHeight - 9;
+                    doc.setDrawColor(203, 213, 225);
+                    doc.setLineWidth(0.25);
+                    doc.line(marginX, footerY - 3.5, pageWidth - marginX, footerY - 3.5);
+
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(100, 116, 139);
+                    doc.text("Sistem Permohonan No. Rujukan Memo/Surat Rasmi C-RIE • Politeknik Ungku Omar", marginX, footerY);
+
+                    const pageLabel = `Muka Surat ${currentPageNum} daripada ${totalPagesExp}`;
+                    doc.setFont("helvetica", "bold");
+                    doc.text(pageLabel, pageWidth - marginX, footerY, { align: "right" });
+                }
+            });
+
+            if (typeof doc.putTotalPages === "function") {
+                doc.putTotalPages(totalPagesExp);
+            }
+
+            const safeFileDate = dateStr.replace(/[^0-9\-]/g, "");
+            doc.save(`Laporan_No_Rujukan_CRIE_${safeFileDate}.pdf`);
+
+            closeReportModal();
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Laporan PDF berjaya dimuat turun!',
+                showConfirmButton: false,
+                timer: 2500
+            });
+        }
+
+        function escapeHTML(str) {
+            if (!str) return "";
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag]));
+        }
+    </script>
+</body>
+</html>
