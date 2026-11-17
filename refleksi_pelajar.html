@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <title>Refleksi Pelajar Kluster 2</title>
+  <!-- Tailwind CSS & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+  <!-- Navigasi Utama -->
+  <nav class="bg-blue-900 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-file-signature text-2xl text-yellow-400"></i>
+        <span class="font-bold text-lg hidden sm:inline">Borang Refleksi Pelajar</span>
+        <span class="font-bold text-sm sm:hidden">Refleksi K2</span>
+      </div>
+      <div class="space-x-2 flex items-center">
+        <button onclick="switchTab('pelajar')" id="tabPelajarBtn" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition">
+          <i class="fa-solid fa-pen-to-square"></i> Borang Pelajar
+        </button>
+        <button onclick="switchTab('admin')" id="tabAdminBtn" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition">
+          <i class="fa-solid fa-user-shield"></i> Mod Pentadbir
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-5xl mx-auto p-4 md:p-6">
+
+    <!-- Banner Amaran Jika Maklum Balas Ditutup -->
+    <div id="closedNoticeBanner" class="hidden mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow text-sm font-bold flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+        <span>PENTING: Maklum balas telah ditutup oleh pentadbir. Borang tidak boleh dihantar pada masa ini.</span>
+      </div>
+    </div>
+
+    <!-- ================= TAB BORANG PELAJAR ================= -->
+    <div id="sectionPelajar" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+      
+      <!-- Header Borang -->
+      <!-- Header Borang -->
+      <div class="text-center border-b pb-4 mb-6">
+        <h1 class="text-lg md:text-xl font-bold text-blue-900 uppercase">Kementerian Pendidikan Tinggi</h1>
+        <h2 class="text-sm md:text-md font-semibold text-gray-700">Jabatan Pendidikan Politeknik dan Kolej Komuniti</h2>
+        <div id="headerKlusterBadge" class="mt-3 bg-blue-50 text-blue-900 py-2 px-4 rounded-lg inline-block font-bold text-xs md:text-sm uppercase">
+          REFLEKSI PELAJAR KLUSTER 2: PENJURIAN DAN PERTANDINGAN
+        </div>
+        <p class="text-xs text-gray-500 mt-1">(Dilengkapkan oleh pelajar dalam tempoh SATU minggu selepas tamat aktiviti)</p>
+      </div>
+
+      <form id="refleksiForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
+        <!-- Maklumat Pelajar -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg border">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">1. NAMA PELAJAR *</label>
+            <input type="text" id="namaPelajar" required class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Nama Penuh Pelajar">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">2. NO. PENDAFTARAN *</label>
+            <input type="text" id="noPendaftaran" required class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Contoh: 01DIT21F1001">
+          </div>
+          <div>
+            <label id="lblNamaIEEP" class="block text-xs font-bold text-gray-700 mb-1">3. NAMA IEEP * <span class="text-gray-400 font-normal">(Auto Tetap)</span></label>
+            <input type="text" id="namaIEEP" required readonly class="w-full border rounded-lg p-2 text-sm bg-gray-100 text-gray-700 font-bold cursor-not-allowed" placeholder="Memuatkan nama IEEP...">
+          </div>
+          <div>
+            <label id="lblTarikhIEEP" class="block text-xs font-bold text-gray-700 mb-1">4. TARIKH IEEP * <span class="text-gray-400 font-normal">(Auto Tetap)</span></label>
+            <input type="date" id="tarikhIEEP" required readonly class="w-full border rounded-lg p-2 text-sm bg-gray-100 text-gray-700 font-bold cursor-not-allowed">
+          </div>
+        </div>
+		
+		<!-- Medan Khusus KLUSTER 3 (Lampiran 3C) -->
+        <div id="kluster3ExtraFields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-indigo-900 mb-1">TAJUK PENYELIDIKAN / PROJEK / INOVASI *</label>
+            <input type="text" id="tajukProjek" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Masukkan tajuk penyelidikan / projek / inovasi">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-indigo-900 mb-1">NAMA PENYELIA INDUSTRI *</label>
+            <input type="text" id="namaPenyeliaIndustri" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Nama penuh penyelia industri">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-indigo-900 mb-1">NAMA INDUSTRI *</label>
+            <input type="text" id="namaIndustri" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Nama syarikat / organisasi industri">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-indigo-900 mb-1">TARIKH & TEMPOH MASA *</label>
+            <input type="text" id="tarikhTempohMasa" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Contoh: 15 Oktober 2026 (3 Bulan / 8.00 pagi - 5.00 petang)">
+          </div>
+        </div>
+
+        <!-- Panduan Skala -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-xs text-yellow-800 rounded">
+          <b>Skala Penilaian:</b> 4 = Sangat Baik | 3 = Baik | 2 = Sederhana | 1 = Lemah
+        </div>
+
+        <!-- Bahagian Soalan (A1 - D3) -->
+        <div id="questionsContainer" class="space-y-6"></div>
+
+<!-- Nota Asterisk Dinamik Mengikut Kluster -->
+        <div id="asteriskNoteBox" class="text-[11px] text-gray-600 bg-gray-50 p-3 rounded-lg border leading-relaxed"></div>
+
+        <!-- Soalan Subjektif (T6 & T7) -->
+        <div class="space-y-4">
+          <div>
+            <label id="lblT6" class="block text-xs font-bold text-gray-700 mb-1">6. Dapatan/komen daripada panel/juri terhadap hasil kerja (T6):</label>
+            <textarea id="T6" rows="3" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Masukkan maklum balas anda..."></textarea>
+          </div>
+          <div>
+            <label id="lblT7" class="block text-xs font-bold text-gray-700 mb-1">7. Secara keseluruhannya saya berpandangan (T7):</label>
+            <textarea id="T7" rows="3" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Pandangan keseluruhan anda..."></textarea>
+          </div>
+        </div>
+
+        <!-- Butang Hantar -->
+        <div class="text-right">
+          <button type="submit" id="btnSubmit" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-6 py-2.5 rounded-lg shadow-md transition flex items-center justify-center space-x-2 float-right">
+            <span>Hantar Maklum Balas</span>
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= TAB ADMIN DASHBOARD ================= -->
+    <div id="sectionAdmin" class="hidden space-y-6">
+      
+      <!-- Panel Kawalan Admin Utama -->
+      <div class="bg-white rounded-xl shadow p-6 flex flex-wrap justify-between items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">Portal Pentadbir (Admin Dashboard)</h2>
+          <p class="text-xs text-gray-500">Analisis peratusan, ketetapan IEEP, pengurusan rekod individu & muat turun laporan PDF</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button id="btnDownloadSummary" onclick="openIeepConfirmModal()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-2 rounded-lg font-bold text-xs shadow flex items-center space-x-1.5 transition">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span>Muat Turun Laporan PDF Keseluruhan</span>
+          </button>
+          <button id="toggleStatusBtn" onclick="toggleStatus()" class="px-3.5 py-2 rounded-lg font-bold text-xs text-white shadow transition">
+            Memuatkan...
+          </button>
+          <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">
+            <i class="fa-solid fa-right-from-bracket"></i> Keluar
+          </button>
+        </div>
+      </div>
+
+      <!-- KAD KETETAPAN PROGRAM IEEP (TAB KETETAPAN SPREADSHEET) -->
+      <div class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-900">
+        <div class="flex items-center space-x-2 text-blue-900 mb-2">
+          <i class="fa-solid fa-sliders text-lg"></i>
+          <h3 class="font-bold text-base">Ketetapan Program IEEP (Tab KETETAPAN)</h3>
+        </div>
+        <p class="text-xs text-gray-600 mb-4">Kemaskini Nama, Tarikh IEEP & Kluster di bawah untuk menyelaraskan maklumat pada borang pelajar secara automatik. Rekod disimpan pada tab <b>KETETAPAN</b> (Lajur A, B & C) dalam Google Spreadsheet.</p>
+        
+        <form onsubmit="handleSaveKetetapan(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 items-end">
+          <div class="lg:col-span-2">
+            <label class="block text-xs font-bold text-gray-700 mb-1">NAMA IEEP (Lajur A):</label>
+            <input type="text" id="adminNamaIEEP" required class="w-full border rounded-lg p-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500" placeholder="Contoh: PERTANDINGAN INOVASI (IEEP) 2026">
+          </div>
+          <div class="lg:col-span-2">
+            <label class="block text-xs font-bold text-gray-700 mb-1">TARIKH IEEP (Lajur B):</label>
+            <input type="date" id="adminTarikhIEEP" required class="w-full border rounded-lg p-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div class="lg:col-span-2">
+            <label class="block text-xs font-bold text-gray-700 mb-1">KLUSTER (Lajur C):</label>
+            <select id="adminKluster" required class="w-full border rounded-lg p-2 text-xs font-semibold bg-white focus:ring-2 focus:ring-blue-500">
+              <option value="">-- Pilih Kluster --</option>
+            </select>
+          </div>
+          <div class="lg:col-span-1">
+            <button type="submit" id="btnSaveKetetapan" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-3 rounded-lg text-xs shadow transition flex items-center justify-center space-x-1.5">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Simpan Ketetapan</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- KAD PENAPIS / CARIAN PANTAS NAMA IEEP (LAJUR C) & KLUSTER (LAJUR V) -->
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 shadow-sm space-y-3">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="flex items-center space-x-2 text-blue-900">
+            <i class="fa-solid fa-magnifying-glass text-lg"></i>
+            <div>
+              <h4 class="font-bold text-sm">Penapis / Carian Pantas NAMA IEEP (Lajur C) & KLUSTER (Lajur V)</h4>
+              <p class="text-xs text-blue-700">Pilih Kluster (tab <b>REFLEKSI-KLUSTER-1 / 2 / 3</b>) serta taip atau pilih Nama IEEP untuk mengemaskini Analisis Carta Bar, Purata Skor, dan Laporan PDF secara automatik.</p>
+            </div>
+          </div>
+          <button onclick="clearIeepFilter()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 self-start md:self-auto">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Sifar Penapis (Paparkan Semua)</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-4xl">
+          <!-- Dropdown Combo Box Kluster (Lajur V) -->
+          <div class="md:col-span-1">
+            <label for="filterKluster" class="block text-[11px] font-bold text-blue-900 mb-1">PILIH KLUSTER (Lajur V):</label>
+            <select id="filterKluster" onchange="onFilterKlusterChange()" class="w-full border rounded-lg px-3 py-2 text-xs font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 bg-white shadow-sm">
+              <option value="">-- Semua Kluster --</option>
+              <option value="KLUSTER 1">KLUSTER 1</option>
+              <option value="KLUSTER 2">KLUSTER 2</option>
+              <option value="KLUSTER 3">KLUSTER 3</option>
+            </select>
+          </div>
+
+          <!-- Carian Pantas Nama IEEP (Lajur C) -->
+          <div class="md:col-span-2">
+            <label for="searchNamaIEEP" class="block text-[11px] font-bold text-blue-900 mb-1">NAMA IEEP (Lajur C):</label>
+            <input type="text" id="searchNamaIEEP" list="ieepDatalist" oninput="onFilterIeepChange()" placeholder="Ketik atau pilih Nama IEEP daripada Lajur C untuk tapis..." class="w-full border rounded-lg px-3.5 py-2 text-xs font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 bg-white shadow-sm">
+            <datalist id="ieepDatalist"></datalist>
+          </div>
+        </div>
+        
+        <div id="filterStatusBadge" class="text-xs font-bold text-blue-800 flex items-center space-x-1">
+          <i class="fa-solid fa-filter text-blue-600"></i>
+          <span id="filterStatusText">Memaparkan kesemua rekod maklum balas.</span>
+        </div>
+      </div>
+
+      <!-- Analisis Carta Bar Dinamik -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
+          <h3 class="font-bold text-gray-700"><i class="fa-solid fa-chart-column text-blue-600"></i> Analisis Taburan Carta Bar Soalan</h3>
+          <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-1 border rounded-lg p-1 bg-gray-50 text-xs font-bold">
+              <span class="text-gray-500 px-1">Mod:</span>
+              <button id="modeCountBtn" onclick="setChartMode('count')" class="px-2 py-0.5 rounded bg-blue-800 text-white shadow">Bilangan</button>
+              <button id="modePercentBtn" onclick="setChartMode('percent')" class="px-2 py-0.5 rounded text-gray-700 hover:bg-gray-200">Peratusan (%)</button>
+            </div>
+            <div class="flex items-center space-x-2">
+              <label class="text-xs font-bold text-gray-600">Soalan:</label>
+              <select id="questionFilter" onchange="updateChart()" class="border rounded-lg p-1.5 text-xs font-bold bg-gray-50 focus:ring-2 focus:ring-blue-500">
+                <!-- Opsyen A1-D3 -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Petunjuk Soalan Dinamik & Analisis Peratusan -->
+        <div id="questionLegend" class="bg-blue-50 border border-blue-200 text-blue-900 p-3 rounded-lg text-xs font-medium mb-4 space-y-1">
+          Petunjuk soalan akan muncul di sini...
+        </div>
+
+        <!-- Carta Bar -->
+        <div class="relative h-64 w-full">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Navigasi Rekod Individu -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+          <h3 class="font-bold text-gray-700"><i class="fa-solid fa-address-card text-green-600"></i> Paparan Rekod Individu</h3>
+          <div class="flex items-center space-x-2">
+            <button onclick="prevRecord()" class="bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-xs font-bold transition"><i class="fa-solid fa-chevron-left"></i> Sebelum</button>
+            <span id="recordIndicator" class="text-xs font-bold text-gray-600">0 / 0</span>
+            <button onclick="nextRecord()" class="bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-xs font-bold transition">Selepas <i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Kad Rekod Individu -->
+        <div id="individualRecordCard" class="text-sm space-y-3">
+          <p class="text-gray-500 italic text-center">Tiada rekod disimpan lagi.</p>
+        </div>
+      </div>
+
+      <!-- Muat Turun Pukal PDF & Butang Gabung PDF (DENGAN PAGINATION 10 REKOD PER HALAMAN) -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="flex flex-wrap justify-between items-center mb-4 gap-3 border-b pb-3">
+          <div>
+            <h3 class="font-bold text-gray-700"><i class="fa-solid fa-folder-open text-amber-600"></i> Senarai Rekod & Muat Turun PDF Pukal</h3>
+            <span id="bulkPaginationInfo" class="text-xs text-gray-500 font-semibold block mt-0.5">Memuatkan rekod...</span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Navigasi Halaman Sebelum / Selepas -->
+            <div class="flex items-center space-x-1 border rounded-lg p-1 bg-gray-50 shadow-sm">
+              <button onclick="prevBulkPage()" id="btnPrevBulk" class="bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-gray-800 px-2.5 py-1 rounded text-xs font-bold transition">
+                <i class="fa-solid fa-chevron-left"></i> Sebelum
+              </button>
+              <span id="bulkPageIndicator" class="text-xs font-bold px-2 text-blue-900 min-w-[50px] text-center">1 / 1</span>
+              <button onclick="nextBulkPage()" id="btnNextBulk" class="bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-gray-800 px-2.5 py-1 rounded text-xs font-bold transition">
+                Selepas <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+
+            <button id="btnMergePdfs" onclick="downloadMergedIndividualPdfs()" class="bg-purple-700 hover:bg-purple-800 text-white px-3.5 py-2 rounded-lg font-bold text-xs shadow flex items-center space-x-1.5 transition">
+              <i class="fa-solid fa-file-zipper"></i>
+              <span>Muat Turun Gabungan PDF Individu</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-gray-100 border-b">
+                <th class="p-2 border text-center">Bil</th>
+                <th class="p-2 border">Nama Pelajar</th>
+                <th class="p-2 border">No. Pendaftaran</th>
+                <th class="p-2 border">Nama IEEP</th>
+                <th class="p-2 border">Tarikh</th>
+                <th class="p-2 border text-center">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="bulkTableBody">
+              <!-- Senarai Pukal (10 Rekod Per Halaman) -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Pop-up Log Masuk Admin -->
+  <div id="adminAuthModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 text-center space-y-4">
+      <div class="text-4xl text-blue-900"><i class="fa-solid fa-user-lock"></i></div>
+      <h3 class="font-bold text-lg text-gray-800">Akses Pentadbir</h3>
+      <p class="text-xs text-gray-500">Sila masukkan kata laluan untuk mengakses modul pentadbir.</p>
+      
+      <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+        <input type="password" id="adminPasswordInput" required class="w-full border rounded-lg p-2 text-sm text-center focus:ring-2 focus:ring-blue-500" placeholder="Kata Laluan Admin">
+        <p id="adminAuthError" class="text-xs text-red-600 font-bold hidden">Kata laluan tidak sah!</p>
+        
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeAdminAuthModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-1.5 rounded-lg text-xs font-bold">Batal</button>
+          <button type="submit" id="adminLoginBtn" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold">Log Masuk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Pop-up Pengesahan/Pemilihan Kluster, Nama & Tarikh IEEP Laporan Keseluruhan -->
+  <div id="ieepConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center space-x-2 text-blue-900 border-b pb-2">
+        <i class="fa-solid fa-pen-to-square text-xl"></i>
+        <h3 class="font-bold text-base">Sahkan Maklumat IEEP Laporan Keseluruhan</h3>
+      </div>
+      <p class="text-xs text-gray-600">Pilih <b>KLUSTER</b> daripada tab <b>KETETAPAN KLUSTER</b> untuk memuatkan senarai <b>NAMA IEEP (Lajur C)</b> dan <b>TARIKH IEEP (Lajur D)</b> secara automatik daripada tab rekod refleksi berkaitan.</p>
+      
+      <form onsubmit="executeDownloadSummaryPdf(event)" class="space-y-3">
+        <!-- 1. Combo Box KLUSTER (Populate dari tab KETETAPAN KLUSTER) -->
+        <div>
+          <label for="modalKluster" class="block text-xs font-bold text-gray-700 mb-1">PILIH KLUSTER (Tab KETETAPAN KLUSTER):</label>
+          <select id="modalKluster" onchange="onModalKlusterChange()" required class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 font-bold text-blue-900 bg-white">
+            <option value="">-- Memuatkan Senarai Kluster... --</option>
+          </select>
+        </div>
+
+        <!-- 2. Combo Box NAMA IEEP (Lajur C mengikut Kluster dipilih) -->
+        <div>
+          <label for="modalNamaIEEP" class="block text-xs font-bold text-gray-700 mb-1">NAMA IEEP (Lajur C):</label>
+          <select id="modalNamaIEEP" onchange="onModalNamaIeepChange()" required class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 font-semibold bg-white">
+            <option value="">-- Pilih Nama IEEP --</option>
+          </select>
+        </div>
+
+        <!-- 3. Combo Box TARIKH IEEP (Lajur D mengikut Kluster & Nama IEEP dipilih) -->
+        <div>
+          <label for="modalTarikhIEEP" class="block text-xs font-bold text-gray-700 mb-1">TARIKH IEEP (Lajur D):</label>
+          <select id="modalTarikhIEEP" onchange="updateModalSummaryPreview()" required class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 font-semibold bg-white">
+            <option value="">-- Pilih Tarikh IEEP --</option>
+          </select>
+        </div>
+
+        <!-- Petunjuk Jumlah Responden & Templat Lampiran -->
+        <div id="modalSelectionSummary" class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs text-blue-900 font-semibold">
+          Sila pilih Kluster untuk menyemak rekod responden.
+        </div>
+        
+        <div class="flex justify-end space-x-2 pt-3 border-t">
+          <button type="button" onclick="closeIeepConfirmModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg text-xs font-bold">Batal</button>
+          <button type="submit" id="btnSubmitIeepModal" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center space-x-1 shadow disabled:opacity-50">
+            <i class="fa-solid fa-gear"></i>
+            <span>Jana & Muat Turun Laporan PDF</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Pop-up Kejayaan -->
+  <div id="successPdfModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+      <div class="text-5xl text-emerald-600 flex justify-center">
+        <i class="fa-solid fa-file-pdf"></i>
+      </div>
+      <h3 class="font-bold text-xl text-gray-800">Laporan PDF Berjaya Dijana!</h3>
+      <p class="text-xs text-gray-600 leading-relaxed">Laporan PDF Rumusan Analisis Keseluruhan Taburan Soalan telah disediakan dan disimpan di Google Drive anda.</p>
+      
+      <div class="pt-2 space-y-2">
+        <a id="successPdfLink" href="#" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-xs font-bold inline-flex items-center justify-center space-x-2 shadow-md w-full transition">
+          <i class="fa-solid fa-download"></i>
+          <span>Buka / Muat Turun Laporan PDF</span>
+        </a>
+        <button onclick="closeSuccessPdfModal()" class="text-xs text-gray-500 hover:text-gray-700 underline block mx-auto pt-1 font-semibold">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Pop-up Umum -->
+  <div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 text-center space-y-4">
+      <div id="modalIcon" class="text-4xl"></div>
+      <h3 id="modalTitle" class="font-bold text-lg text-gray-800"></h3>
+      <p id="modalBody" class="text-sm text-gray-600"></p>
+      <div id="modalFooter" class="pt-2"></div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsq-U4327rxS5cxG5jGWvcjPuiLcj0b1lQ-7DRBpN2vrDHmGelTnkUCyMN2WDIJqIpjQ/exec";
+    const KLUSTER_TEMPLATES = {
+      'KLUSTER 1': {
+        lampiran: 'Lampiran 3A',
+        desc: 'PERKONGSIAN UMUM, KURSUS, LATIHAN, EXPERIENTIAL LEARNING DAN LAWATAN',
+        lblNamaIEEP: '3. NAMA AKTIVITI IEEP * <span class="text-gray-400 font-normal">(Auto Tetap)</span>',
+        lblTarikhIEEP: '4. TARIKH AKTIVITI IEEP * <span class="text-gray-400 font-normal">(Auto Tetap)</span>',
+        lblT6: '6. Cadangan penambahbaikan untuk aktiviti bersama industri pada masa akan datang (T6):',
+        lblT7: '7. Secara keseluruhannya saya berpandangan (T7):',
+        asteriskHtml: '',
+        questions: {
+          'A1': { section: 'BAHAGIAN A: AKADEMIK', text: 'Meningkatkan pengetahuan terhadap hasil pembelajaran.' },
+          'A2': { section: 'BAHAGIAN A: AKADEMIK', text: 'Membuat perkaitan dengan bidang pengajian yang diikuti.' },
+          'A3': { section: 'BAHAGIAN A: AKADEMIK', text: 'Memahami hubungkait di antara pembelajaran teori dan amali.' },
+          'B1': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Berkeyakinan dalam memberi pendapat.' },
+          'B2': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Berkongsi idea secara terbuka.' },
+          'B3': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Meningkatkan keinginan untuk meneroka bidang pengajian yang dipelajari.' },
+          'C1': { section: 'BAHAGIAN C: PERSONALITI', text: 'Meningkatkan motivasi diri.' },
+          'C2': { section: 'BAHAGIAN C: PERSONALITI', text: 'Membantu diri menjadi lebih fokus dan produktif terhadap bidang pengajian yang dipelajari.' },
+          'C3': { section: 'BAHAGIAN C: PERSONALITI', text: 'Memahami tanggungjawab yang perlu dipraktikkan.' },
+          'D1': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Mempamerkan kemahiran berinteraksi dengan pihak industri.' },
+          'D2': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Memahami kepentingan hubungan dengan pihak industri.' },
+          'D3': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Menyediakan diri untuk melangkah ke alam pekerjaan.' }
+        }
+      },
+      'KLUSTER 2': {
+        lampiran: 'Lampiran 3B',
+        desc: 'PENJURIAN DAN PERTANDINGAN',
+        lblNamaIEEP: '3. NAMA IEEP * <span class="text-gray-400 font-normal">(Auto Tetap)</span>',
+        lblTarikhIEEP: '4. TARIKH IEEP * <span class="text-gray-400 font-normal">(Auto Tetap)</span>',
+        lblT6: '6. Dapatan/komen daripada panel/juri terhadap hasil kerja (T6):',
+        lblT7: '7. Secara keseluruhannya saya berpandangan (T7):',
+        asteriskHtml: '*Hasil kerja merujuk kepada persembahan, pidato, syarahan, produk inovasi, projek akhir pelajar, penyelidikan, pitching, hasil kreatif dan lain-lain yang seumpamanya.<br>**Komunikasi yang efektif merujuk kepada komunikasi dua hala antara panel penilai/juri dengan pelajar.',
+        questions: {
+          'A1': { section: 'BAHAGIAN A: AKADEMIK', text: 'Mengaplikasikan pembelajaran teori dan amali yang pelbagai.' },
+          'A2': { section: 'BAHAGIAN A: AKADEMIK', text: 'Meningkatkan pengetahuan dan kefahaman berkaitan hasil kerja*.' },
+          'A3': { section: 'BAHAGIAN A: AKADEMIK', text: 'Membuat perkaitan dengan bidang pengajian yang diikuti.' },
+          'B1': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Meningkatkan tahap keyakinan dalam menyuarakan idea dan pendapat semasa sesi pembentangan/persembahan.' },
+          'B2': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Mencari ruang dan peluang untuk penambahbaikan hasil kerja* daripada maklum balas pihak panel/juri.' },
+          'B3': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Meningkatkan keinginan untuk meneroka bidang yang dipelajari.' },
+          'C1': { section: 'BAHAGIAN C: PERSONALITI', text: 'Mempamerkan personaliti positif kepada pihak panel/juri.' },
+          'C2': { section: 'BAHAGIAN C: PERSONALITI', text: 'Menampilkan gaya bahasa badan/pertuturan yang baik kepada panel/juri.' },
+          'C3': { section: 'BAHAGIAN C: PERSONALITI', text: 'Meningkatkan kemahiran mengorganisasi sesi pembentangan/persembahan.' },
+          'D1': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Mempamerkan kemahiran komunikasi yang efektif** (berkesan) semasa sesi pembentangan/persembahan.' },
+          'D2': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Memahami kepentingan jalinan hubungan dengan pihak industri.' },
+          'D3': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Pendedahan terhadap teknologi/amalan terkini yang digunakan daripada pihak industri.' }
+        }
+      },
+      'KLUSTER 3': {
+        lampiran: 'Lampiran 3C',
+        desc: 'PROJEK KOLABORATIF DAN INOVASI INDUSTRI',
+        lblNamaIEEP: '3. NAMA PROGRAM / IEEP * <span class="text-gray-400 font-normal">(Auto Tetap)</span>',
+        lblTarikhIEEP: '4. TARIKH IEEP * <span class="text-gray-400 font-normal">(Auto Tetap)</span>',
+        lblT6: '7. Cadangan penambahbaikan untuk aktiviti bersama industri pada masa akan datang (T6):',
+        lblT7: '8. Secara keseluruhannya saya berpandangan (T7):',
+        asteriskHtml: '*kemahiran berinteraksi secara efektif ditakrifkan sebagai komunikasi dua hala sama ada melalui proses pertukaran idea, pendapat, pengetahuan dan data supaya mesej boleh disampaikan, diterima dan difahami dengan jelas.',
+        questions: {
+          'A1': { section: 'BAHAGIAN A: AKADEMIK', text: 'Menghasilkan tajuk penyelidikan/ projek/ inovasi yang relevan dengan industri.' },
+          'A2': { section: 'BAHAGIAN A: AKADEMIK', text: 'Melaksanakan penyelidikan/ projek/ inovasi yang memenuhi keperluan industri.' },
+          'A3': { section: 'BAHAGIAN A: AKADEMIK', text: 'Menangani masalah yang wujud dalam penghasilan penyelidikan/projek/ inovasi.' },
+          'B1': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Meningkatkan kemahiran berkaitan aktiviti penyelidikan/projek/inovasi bersama industri.' },
+          'B2': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Meningkatkan keinginan untuk meneroka aktiviti dalam penyelidikan /projek/ inovasi yang dilaksanakan.' },
+          'B3': { section: 'BAHAGIAN B: EKSPLORASI', text: 'Berkongsi hasil penyelidikan/ projek/ inovasi secara terbuka.' },
+          'C1': { section: 'BAHAGIAN C: PERSONALITI', text: 'Meningkatkan motivasi diri untuk melaksanakan penyelidikan/projek/inovasi hasil daripada galakan dan nasihat pihak industri.' },
+          'C2': { section: 'BAHAGIAN C: PERSONALITI', text: 'Memahami tanggungjawab dalam penyediaan dan pelaksanaan penyelidikan/ projek/inovasi.' },
+          'C3': { section: 'BAHAGIAN C: PERSONALITI', text: 'Meningkatkan tahap keyakinan diri untuk menyiapkan aktiviti penyelidikan/ projek/inovasi.' },
+          'D1': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Mempamerkan kemahiran berinteraksi secara efektif bersama pihak industri.' },
+          'D2': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Mewujudkan cara pemikiran yang kreatif bersama pihak industri.' },
+          'D3': { section: 'BAHAGIAN D: KETERKAITAN/CONNECTIVITY', text: 'Menambah baik idea penyelidikan/projek/ inovasi dengan berkesan bersama pihak industri.' }
+        }
+      }
+    };
+
+    // 1. Kemas kini nilai lalai objek adminData:
+    let adminData = { 
+      records: [], 
+      questionsSummary: {}, 
+      totalResponses: 0, 
+      formOpen: true, 
+      namaIEEP: '', 
+      tarikhIEEP: '', 
+      kluster: '', 
+      keterangan: '', 
+      klusterList: [], 
+      uniqueIeepList: [] 
+    };
+    let activeRecords = [];
+    let activeQuestionsSummary = {};
+    let activeTotalResponses = 0;
+
+    let currentRecordIdx = 0;
+    let chartInstance = null;
+    let authenticatedPassword = null;
+    let chartDisplayMode = 'count';
+
+    // Pembolehubah Pagination Jadual Pukal
+    let bulkCurrentPage = 1;
+    const bulkPerPage = 10;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      buildFormQuestions();
+      checkInitialFormStatus();
+    });
+	
+	let currentActiveKluster = 'KLUSTER 2';
+    let questionsMeta = KLUSTER_TEMPLATES['KLUSTER 2'].questions;
+	function normalizeKlusterClient(kluster) {
+      const k = (kluster || '').toString().trim().toUpperCase();
+      if (k === 'KLUSTER 1' || k === '1') return 'KLUSTER 1';
+      if (k === 'KLUSTER 3' || k === '3') return 'KLUSTER 3';
+      return 'KLUSTER 2';
+    }
+	
+	// Kemas kini paparan borang web secara dinamik mengikut KLUSTER yang ditetapkan pentadbir
+    function updateKlusterDisplay(kluster, keterangan) {
+      const normKluster = normalizeKlusterClient(kluster);
+      currentActiveKluster = normKluster;
+      const tpl = KLUSTER_TEMPLATES[normKluster];
+      questionsMeta = tpl.questions;
+
+      const badge = document.getElementById('headerKlusterBadge');
+      const formattedDesc = (keterangan || tpl.desc).toString().trim().toUpperCase();
+      if (badge) {
+        badge.textContent = `REFLEKSI PELAJAR ${normKluster}: ${formattedDesc} (${tpl.lampiran.toUpperCase()})`;
+      }
+
+      document.getElementById('lblNamaIEEP').innerHTML = tpl.lblNamaIEEP;
+      document.getElementById('lblTarikhIEEP').innerHTML = tpl.lblTarikhIEEP;
+      document.getElementById('lblT6').textContent = tpl.lblT6;
+      document.getElementById('lblT7').textContent = tpl.lblT7;
+
+      const asteriskBox = document.getElementById('asteriskNoteBox');
+      if (tpl.asteriskHtml) {
+        asteriskBox.innerHTML = tpl.asteriskHtml;
+        asteriskBox.classList.remove('hidden');
+      } else {
+        asteriskBox.innerHTML = '';
+        asteriskBox.classList.add('hidden');
+      }
+
+      // Papar atau sembunyikan medan khusus KLUSTER 3
+      const k3Box = document.getElementById('kluster3ExtraFields');
+      const k3InputIds = ['tajukProjek', 'namaPenyeliaIndustri', 'namaIndustri', 'tarikhTempohMasa'];
+      if (normKluster === 'KLUSTER 3') {
+        k3Box.classList.remove('hidden');
+        k3InputIds.forEach(id => document.getElementById(id).setAttribute('required', 'required'));
+      } else {
+        k3Box.classList.add('hidden');
+        k3InputIds.forEach(id => document.getElementById(id).removeAttribute('required'));
+      }
+
+      buildFormQuestions();
+    }
+
+    // 3. Fungsi baharu untuk populate combo box Kluster dari tab KETETAPAN KLUSTER (Lajur B):
+    function populateKlusterDropdown(klusterList, selectedKluster) {
+      const select = document.getElementById('adminKluster');
+      if (!select) return;
+
+      const list = klusterList || [];
+      let optionsHtml = `<option value="">-- Pilih Kluster --</option>`;
+      optionsHtml += list.map(item => {
+        const label = item.keterangan ? `${item.kluster} - ${item.keterangan}` : item.kluster;
+        return `<option value="${item.kluster}">${label}</option>`;
+      }).join('');
+
+      select.innerHTML = optionsHtml;
+      if (selectedKluster) {
+        select.value = selectedKluster;
+      }
+    }
+
+    // 4. Kemas kini checkInitialFormStatus():
+    function checkInitialFormStatus() {
+      fetch(`${SCRIPT_URL}?action=getStatus`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.formOpen) {
+            disableFormAndShowBanner();
+          }
+          if (data.namaIEEP) {
+            document.getElementById('namaIEEP').value = data.namaIEEP;
+          }
+          if (data.tarikhIEEP) {
+            document.getElementById('tarikhIEEP').value = data.tarikhIEEP;
+          }
+          updateKlusterDisplay(data.kluster, data.keterangan);
+        })
+        .catch(err => console.error("Ralat semakan status & ketetapan:", err));
+    }
+
+    function disableFormAndShowBanner() {
+      document.getElementById('closedNoticeBanner').classList.remove('hidden');
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.className = 'bg-gray-400 text-white font-bold px-6 py-2.5 rounded-lg cursor-not-allowed float-right';
+      btn.innerHTML = `<span>Maklum Balas Ditutup</span> <i class="fa-solid fa-lock"></i>`;
+    }
+
+    function enableFormAndHideBanner() {
+      document.getElementById('closedNoticeBanner').classList.add('hidden');
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = false;
+      btn.className = 'bg-blue-800 hover:bg-blue-900 text-white font-bold px-6 py-2.5 rounded-lg shadow-md transition flex items-center justify-center space-x-2 float-right';
+      btn.innerHTML = `<span>Hantar Maklum Balas</span> <i class="fa-solid fa-paper-plane"></i>`;
+    }
+
+    function buildFormQuestions() {
+      const container = document.getElementById('questionsContainer');
+      let currentSec = '';
+      let html = '';
+
+      Object.keys(questionsMeta).forEach(code => {
+        const q = questionsMeta[code];
+        if (q.section !== currentSec) {
+          currentSec = q.section;
+          html += `<div class="bg-blue-900 text-white font-bold px-3 py-1.5 rounded-md text-xs mt-4">${currentSec}</div>`;
+        }
+
+        html += `
+        <div class="border-b pb-3 pt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div class="text-xs font-semibold text-gray-800 md:w-2/3">
+            <span class="font-bold text-blue-800">${code}.</span> ${q.text}
+          </div>
+          <div class="flex space-x-4 md:w-1/3 justify-end">
+            ${[4, 3, 2, 1].map(val => `
+              <label class="flex items-center space-x-1 cursor-pointer text-xs font-bold hover:text-blue-600">
+                <input type="radio" name="${code}" value="${val}" required class="text-blue-600 focus:ring-blue-500">
+                <span>` + val + `</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function switchTab(tab) {
+      if (tab === 'pelajar') {
+        document.getElementById('sectionPelajar').classList.remove('hidden');
+        document.getElementById('sectionAdmin').classList.add('hidden');
+        document.getElementById('tabPelajarBtn').className = 'bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition';
+        document.getElementById('tabAdminBtn').className = 'bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition';
+        checkInitialFormStatus();
+      } else {
+        if (authenticatedPassword) {
+          openAdminSection();
+        } else {
+          document.getElementById('adminAuthError').classList.add('hidden');
+          document.getElementById('adminPasswordInput').value = '';
+          document.getElementById('adminAuthModal').classList.remove('hidden');
+        }
+      }
+    }
+
+    function closeAdminAuthModal() {
+      document.getElementById('adminAuthModal').classList.add('hidden');
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const pwdInput = document.getElementById('adminPasswordInput').value;
+      const btn = document.getElementById('adminLoginBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Semak...`;
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'verifyPassword', password: pwdInput })
+      })
+      .then(res => res.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = `Log Masuk`;
+        if (data.valid) {
+          authenticatedPassword = pwdInput;
+          closeAdminAuthModal();
+          openAdminSection();
+        } else {
+          document.getElementById('adminAuthError').classList.remove('hidden');
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = `Log Masuk`;
+        alert('Ralat ketersambungan: ' + err.message);
+      });
+    }
+
+    function openAdminSection() {
+      document.getElementById('sectionPelajar').classList.add('hidden');
+      document.getElementById('sectionAdmin').classList.remove('hidden');
+      document.getElementById('tabAdminBtn').className = 'bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition';
+      document.getElementById('tabPelajarBtn').className = 'bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition';
+      fetchAdminData();
+    }
+
+    function logoutAdmin() {
+      authenticatedPassword = null;
+      switchTab('pelajar');
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Menghantar & Menjana PDF...</span>`;
+
+      const formData = {
+        kluster: currentActiveKluster,
+        namaPelajar: document.getElementById('namaPelajar').value,
+        noPendaftaran: document.getElementById('noPendaftaran').value,
+        namaIEEP: document.getElementById('namaIEEP').value,
+        tarikhIEEP: document.getElementById('tarikhIEEP').value,
+        tajukProjek: document.getElementById('tajukProjek').value,
+        namaPenyeliaIndustri: document.getElementById('namaPenyeliaIndustri').value,
+        namaIndustri: document.getElementById('namaIndustri').value,
+        tarikhTempohMasa: document.getElementById('tarikhTempohMasa').value,
+        T6: document.getElementById('T6').value,
+        T7: document.getElementById('T7').value
+      };
+
+      Object.keys(questionsMeta).forEach(code => {
+        const selected = document.querySelector(`input[name="${code}"]:checked`);
+        formData[code] = selected ? selected.value : '';
+      });
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'submitRefleksi', data: formData })
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Hantar Maklum Balas</span> <i class="fa-solid fa-paper-plane"></i>`;
+
+        if (res.isClosed) {
+          disableFormAndShowBanner();
+          showModal('text-red-500', '<i class="fa-solid fa-lock"></i>', 'Maklum Balas Ditutup', res.message, `<button onclick="closeModal()" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-xs">Tutup</button>`);
+        } else if (res.success) {
+          showModal('text-green-500', '<i class="fa-solid fa-circle-check"></i>', 'Penyerahan Berjaya!', 
+            'Data refleksi anda telah berjaya disimpan ke tab <b>REFLEKSI</b>. Anda boleh memuat turun dokumen PDF refleksi di bawah.',
+            `<a href="${res.pdfUrl}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold inline-block shadow"><i class="fa-solid fa-file-pdf"></i> Muat Turun Dokumen PDF</a>
+             <br><button onclick="closeModal(); document.getElementById('refleksiForm').reset(); checkInitialFormStatus();" class="mt-3 text-xs text-gray-500 underline">Tutup</button>`
+          );
+        } else {
+          alert('Ralat: ' + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Hantar Maklum Balas</span> <i class="fa-solid fa-paper-plane"></i>`;
+        alert('Ralat berlaku semasa hantaran: ' + err.message);
+      });
+    }
+
+    // Kemas kini fetchAdminData() supaya menghantar parameter kluster yang dipilih ke Google Spreadsheet
+    function fetchAdminData() {
+      if (!authenticatedPassword) return;
+
+      const selectedKluster = document.getElementById('filterKluster') ? document.getElementById('filterKluster').value : '';
+      const statusBadge = document.getElementById('filterStatusText');
+      if (statusBadge) {
+        statusBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Memuatkan rekod daripada Google Spreadsheet...`;
+      }
+
+      fetch(`${SCRIPT_URL}?action=getAdminData&password=${encodeURIComponent(authenticatedPassword)}&kluster=${encodeURIComponent(selectedKluster)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+            logoutAdmin();
+            return;
+          }
+          adminData = data;
+          updateStatusBtn(data.formOpen);
+
+          if (data.namaIEEP) document.getElementById('adminNamaIEEP').value = data.namaIEEP;
+          if (data.tarikhIEEP) document.getElementById('adminTarikhIEEP').value = data.tarikhIEEP;
+          
+          populateKlusterDropdown(data.klusterList, data.kluster);
+          updateKlusterDisplay(data.kluster, data.keterangan);
+
+          populateIeepDatalist();
+          populateFilterOptions();
+          applyIeepFilter();
+        })
+        .catch(err => alert("Ralat mengambil data admin: " + err.message));
+    }
+	// Dipanggil apabila dropdown KLUSTER ditukar (membaca tab REFLEKSI-KLUSTER-1 / 2 / 3)
+    function onFilterKlusterChange() {
+      currentRecordIdx = 0;
+      fetchAdminData();
+    }
+
+    function populateIeepDatalist() {
+      const datalist = document.getElementById('ieepDatalist');
+      const list = adminData.uniqueIeepList || [];
+      datalist.innerHTML = list.map(item => `<option value="${item}">`).join('');
+    }
+
+    function onFilterIeepChange() {
+      currentRecordIdx = 0;
+      applyIeepFilter();
+    }
+
+    function clearIeepFilter() {
+      document.getElementById('searchNamaIEEP').value = '';
+      currentRecordIdx = 0;
+      applyIeepFilter();
+    }
+
+    // PENAPISAN MENGIKUT NAMA IEEP (LAJUR C) & KLUSTER (LAJUR V)
+    function applyIeepFilter() {
+      const query = document.getElementById('searchNamaIEEP').value.trim();
+      const selectedKluster = document.getElementById('filterKluster').value.trim().toUpperCase();
+      const statusBadge = document.getElementById('filterStatusText');
+      bulkCurrentPage = 1;
+
+      let filtered = adminData.records || [];
+
+      // 1. Tapis mengikut KLUSTER (Lajur V)
+      if (selectedKluster) {
+        filtered = filtered.filter(r => (r.kluster || '').toString().trim().toUpperCase() === selectedKluster);
+      }
+
+      // 2. Tapis mengikut NAMA IEEP (Lajur C)
+      if (query) {
+        const queryLower = query.toLowerCase();
+        const exactMatchExists = (adminData.uniqueIeepList || []).some(item => item.toLowerCase() === queryLower);
+
+        if (exactMatchExists) {
+          filtered = filtered.filter(r => r.namaIEEP.toLowerCase() === queryLower);
+        } else {
+          filtered = filtered.filter(r => r.namaIEEP.toLowerCase().includes(queryLower));
+        }
+      }
+
+      activeRecords = filtered;
+
+      if (!query && !selectedKluster) {
+        statusBadge.innerHTML = `Memaparkan kesemua <b>${activeRecords.length}</b> rekod maklum balas (Semua Kluster).`;
+      } else {
+        const klusterLabel = selectedKluster ? `Kluster: <b>${selectedKluster}</b>` : `<b>Semua Kluster</b>`;
+        const ieepLabel = query ? ` | Nama IEEP: <b>${query}</b>` : ``;
+        statusBadge.innerHTML = `Berjaya menapis <b>${activeRecords.length}</b> rekod (${klusterLabel}${ieepLabel}).`;
+      }
+
+      const qKeys = ['A1','A2','A3','B1','B2','B3','C1','C2','C3','D1','D2','D3'];
+      activeQuestionsSummary = {};
+      activeTotalResponses = activeRecords.length;
+
+      qKeys.forEach(q => {
+        activeQuestionsSummary[q] = { 1: 0, 2: 0, 3: 0, 4: 0 };
+        activeRecords.forEach(r => {
+          const val = parseInt(r[q]);
+          if (val >= 1 && val <= 4) {
+            activeQuestionsSummary[q][val]++;
+          }
+        });
+      });
+
+      initOrUpdateChart();
+      renderIndividualRecord();
+      renderBulkTable();
+    }
+
+    // 6. Kemas kini handleSaveKetetapan(e):
+    function handleSaveKetetapan(e) {
+      e.preventDefault();
+      if (!authenticatedPassword) return;
+
+      const namaInput = document.getElementById('adminNamaIEEP').value;
+      const tarikhInput = document.getElementById('adminTarikhIEEP').value;
+      const klusterInput = document.getElementById('adminKluster').value;
+      const btn = document.getElementById('btnSaveKetetapan');
+
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Menyimpan...`;
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'saveKetetapan',
+          password: authenticatedPassword,
+          namaIEEP: namaInput,
+          tarikhIEEP: tarikhInput,
+          kluster: klusterInput
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+
+        if (res.success) {
+          adminData.namaIEEP = res.namaIEEP || namaInput;
+          adminData.tarikhIEEP = res.tarikhIEEP || tarikhInput;
+          adminData.kluster = res.kluster || klusterInput;
+          adminData.keterangan = res.keterangan || '';
+
+          document.getElementById('namaIEEP').value = adminData.namaIEEP;
+          document.getElementById('tarikhIEEP').value = adminData.tarikhIEEP;
+
+          // Kemas kini paparan tajuk kluster pada borang pelajar secara real-time
+          updateKlusterDisplay(adminData.kluster, adminData.keterangan);
+
+          showModal(
+            'text-blue-600',
+            '<i class="fa-solid fa-circle-check"></i>',
+            'Ketetapan Disimpan!',
+            'Nama IEEP, Tarikh IEEP dan Kluster telah berjaya dikemas kini pada tab <b>KETETAPAN</b> dalam Google Spreadsheet.',
+            `<button onclick="closeModal()" class="bg-blue-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold">OK</button>`
+          );
+        } else {
+          alert('Ralat: ' + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        alert('Ralat menyimpan ketetapan: ' + err.message);
+      });
+    }
+    function updateStatusBtn(isOpen) {
+      const btn = document.getElementById('toggleStatusBtn');
+      if (isOpen) {
+        btn.className = 'bg-green-600 hover:bg-green-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold shadow';
+        btn.innerHTML = `<i class="fa-solid fa-door-open me-1"></i> Maklum Balas DIBUKA`;
+      } else {
+        btn.className = 'bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold shadow';
+        btn.innerHTML = `<i class="fa-solid fa-lock me-1"></i> Maklum Balas DITUTUP`;
+      }
+    }
+
+    function toggleStatus() {
+      const newStatus = !adminData.formOpen;
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'toggleStatus', status: newStatus })
+      })
+      .then(res => res.json())
+      .then(res => {
+        adminData.formOpen = res.formOpen;
+        updateStatusBtn(res.formOpen);
+        if (res.formOpen) enableFormAndHideBanner(); else disableFormAndShowBanner();
+      })
+      .catch(err => alert("Ralat menukar status: " + err.message));
+    }
+
+    function populateFilterOptions() {
+      const select = document.getElementById('questionFilter');
+      if (select.children.length === 0) {
+        select.innerHTML = Object.keys(questionsMeta).map(q => `<option value="${q}">${q} - ${questionsMeta[q].section.replace('BAHAGIAN ','')}</option>`).join('');
+      }
+    }
+
+    function setChartMode(mode) {
+      chartDisplayMode = mode;
+      const countBtn = document.getElementById('modeCountBtn');
+      const percentBtn = document.getElementById('modePercentBtn');
+
+      if (mode === 'count') {
+        countBtn.className = "px-2 py-0.5 rounded bg-blue-800 text-white shadow";
+        percentBtn.className = "px-2 py-0.5 rounded text-gray-700 hover:bg-gray-200";
+      } else {
+        percentBtn.className = "px-2 py-0.5 rounded bg-blue-800 text-white shadow";
+        countBtn.className = "px-2 py-0.5 rounded text-gray-700 hover:bg-gray-200";
+      }
+      initOrUpdateChart();
+    }
+
+    function initOrUpdateChart() {
+      const qCode = document.getElementById('questionFilter').value || 'A1';
+      const selectedFilterKluster = document.getElementById('filterKluster') ? document.getElementById('filterKluster').value : '';
+      const chartKlusterKey = selectedFilterKluster ? normalizeKlusterClient(selectedFilterKluster) : currentActiveKluster;
+      const activeQuestionsSet = (KLUSTER_TEMPLATES[chartKlusterKey] || KLUSTER_TEMPLATES['KLUSTER 2']).questions;
+      const qInfo = activeQuestionsSet[qCode];
+      const counts = activeQuestionsSummary[qCode] || { 1: 0, 2: 0, 3: 0, 4: 0 };
+      const total = activeTotalResponses || 0;
+
+      const p1 = total ? ((counts[1] / total) * 100).toFixed(1) : 0;
+      const p2 = total ? ((counts[2] / total) * 100).toFixed(1) : 0;
+      const p3 = total ? ((counts[3] / total) * 100).toFixed(1) : 0;
+      const p4 = total ? ((counts[4] / total) * 100).toFixed(1) : 0;
+
+      const meanScore = total ? ((counts[1]*1 + counts[2]*2 + counts[3]*3 + counts[4]*4) / total).toFixed(2) : '0.00';
+
+      document.getElementById('questionLegend').innerHTML = `
+        <div><b>[${qCode}] ${qInfo.section}:</b> ${qInfo.text}</div>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 text-gray-700">
+          <div><b>Jumlah Responden:</b> ${total} orang</div>
+          <div><b>Skala 4:</b> ${counts[4]} (${p4}%)</div>
+          <div><b>Skala 3:</b> ${counts[3]} (${p3}%)</div>
+          <div><b>Skala 2:</b> ${counts[2]} (${p2}%)</div>
+          <div><b>Skala 1:</b> ${counts[1]} (${p1}%)</div>
+        </div>
+        <div class="pt-1 text-blue-900 font-bold">Purata Skor Item (${qCode}): ${meanScore} / 4.00</div>
+      `;
+
+      const ctx = document.getElementById('barChart').getContext('2d');
+      const isPercent = chartDisplayMode === 'percent';
+
+      const chartData = {
+        labels: ['1 (Lemah)', '2 (Sederhana)', '3 (Baik)', '4 (Sangat Baik)'],
+        datasets: [{
+          label: isPercent ? `Peratusan (%) - ${qCode}` : `Bilangan Pelajar (${qCode})`,
+          data: isPercent ? [p1, p2, p3, p4] : [counts[1], counts[2], counts[3], counts[4]],
+          backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+          borderWidth: 1
+        }]
+      };
+
+      if (chartInstance) {
+        chartInstance.data = chartData;
+        chartInstance.options.scales.y.title = {
+          display: true,
+          text: isPercent ? 'Peratusan (%)' : 'Bilangan Pelajar'
+        };
+        chartInstance.update();
+      } else {
+        chartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: chartData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { 
+              y: { 
+                beginAtZero: true, 
+                title: { display: true, text: isPercent ? 'Peratusan (%)' : 'Bilangan Pelajar' } 
+              } 
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const idx = context.dataIndex + 1;
+                    const val = context.raw;
+                    if (isPercent) {
+                      return ` ${val}% (${counts[idx]} orang)`;
+                    } else {
+                      const pct = total ? ((counts[idx] / total) * 100).toFixed(1) : 0;
+                      return ` ${val} orang (${pct}%)`;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function updateChart() {
+      initOrUpdateChart();
+    }
+
+    let modalKlusterRecords = [];
+
+    function formatDisplayDateDMY(ymdStr) {
+      if (!ymdStr) return '-';
+      const parts = ymdStr.toString().trim().split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return ymdStr;
+    }
+
+    function openIeepConfirmModal() {
+      if (!authenticatedPassword) return;
+
+      const modalKlusterSelect = document.getElementById('modalKluster');
+      const list = (adminData.klusterList && adminData.klusterList.length > 0)
+        ? adminData.klusterList
+        : [
+            { kluster: 'KLUSTER 1', keterangan: 'PERKONGSIAN UMUM, KURSUS, LATIHAN, EXPERIENTIAL LEARNING DAN LAWATAN' },
+            { kluster: 'KLUSTER 2', keterangan: 'PENJURIAN DAN PERTANDINGAN' },
+            { kluster: 'KLUSTER 3', keterangan: 'PROJEK KOLABORATIF DAN INOVASI INDUSTRI' }
+          ];
+
+      modalKlusterSelect.innerHTML = list.map(item => {
+        const label = item.keterangan ? `${item.kluster} - ${item.keterangan}` : item.kluster;
+        return `<option value="${item.kluster}">${label}</option>`;
+      }).join('');
+
+      // Tetapkan pilihan lalai Kluster berdasarkan penapis aktif atau tab KETETAPAN
+      const activeFilterKluster = document.getElementById('filterKluster') ? document.getElementById('filterKluster').value : '';
+      const defaultKluster = activeFilterKluster || adminData.kluster || list[0].kluster;
+      if (defaultKluster) {
+        modalKlusterSelect.value = normalizeKlusterClient(defaultKluster);
+      }
+
+      document.getElementById('ieepConfirmModal').classList.remove('hidden');
+      onModalKlusterChange();
+    }
+
+    function closeIeepConfirmModal() {
+      document.getElementById('ieepConfirmModal').classList.add('hidden');
+    }
+	
+	// Apabila KLUSTER dipilih, cari rekod dalam tab REFLEKSI-KLUSTER-1 / 2 / 3 mengikut KLUSTER
+    function onModalKlusterChange() {
+      const selectedKluster = document.getElementById('modalKluster').value;
+      const namaSelect = document.getElementById('modalNamaIEEP');
+      const tarikhSelect = document.getElementById('modalTarikhIEEP');
+      const summaryBox = document.getElementById('modalSelectionSummary');
+      const submitBtn = document.getElementById('btnSubmitIeepModal');
+
+      namaSelect.innerHTML = `<option value="">Memuatkan Nama IEEP...</option>`;
+      tarikhSelect.innerHTML = `<option value="">Memuatkan Tarikh IEEP...</option>`;
+      submitBtn.disabled = true;
+      summaryBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Mencari rekod dalam tab <b>REFLEKSI-${selectedKluster.replace(/\s+/g, '-')}</b>...`;
+
+      fetch(`${SCRIPT_URL}?action=getAdminData&password=${encodeURIComponent(authenticatedPassword)}&kluster=${encodeURIComponent(selectedKluster)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+            return;
+          }
+
+          // Kemas kini senarai Kluster jika ada perubahan terkini dari tab KETETAPAN KLUSTER
+          if (data.klusterList && data.klusterList.length > 0) {
+            const modalKlusterSelect = document.getElementById('modalKluster');
+            modalKlusterSelect.innerHTML = data.klusterList.map(item => {
+              const label = item.keterangan ? `${item.kluster} - ${item.keterangan}` : item.kluster;
+              return `<option value="${item.kluster}">${label}</option>`;
+            }).join('');
+            modalKlusterSelect.value = selectedKluster;
+          }
+
+          modalKlusterRecords = data.records || [];
+          const uniqueIeepNames = [...new Set(modalKlusterRecords.map(r => (r.namaIEEP || '').trim()).filter(Boolean))];
+
+          if (uniqueIeepNames.length === 0) {
+            namaSelect.innerHTML = `<option value="">-- Tiada Rekod Nama IEEP dalam ${selectedKluster} --</option>`;
+            tarikhSelect.innerHTML = `<option value="">-- Tiada Tarikh IEEP --</option>`;
+            summaryBox.innerHTML = `<span class="text-red-600"><i class="fa-solid fa-circle-exclamation me-1"></i> Tiada rekod maklum balas ditemui dalam tab <b>REFLEKSI-${selectedKluster.replace(/\s+/g, '-')}</b>.</span>`;
+            submitBtn.disabled = true;
+            return;
+          }
+
+          namaSelect.innerHTML = uniqueIeepNames.map(nama => `<option value="${nama}">${nama}</option>`).join('');
+
+          // Jika pengguna sedang menapis Nama IEEP pada papan pemuka dan wujud dalam kluster ini, pilih secara automatik
+          const activeSearch = document.getElementById('searchNamaIEEP') ? document.getElementById('searchNamaIEEP').value.trim() : '';
+          const matchedSearch = uniqueIeepNames.find(n => n.toLowerCase() === activeSearch.toLowerCase());
+          if (matchedSearch) {
+            namaSelect.value = matchedSearch;
+          }
+
+          onModalNamaIeepChange();
+        })
+        .catch(err => {
+          summaryBox.innerHTML = `<span class="text-red-600">Ralat memuatkan rekod kluster: ${err.message}</span>`;
+        });
+    }
+
+    // Apabila NAMA IEEP (Lajur C) dipilih, tapis dan papar TARIKH IEEP (Lajur D) yang sepadan
+    function onModalNamaIeepChange() {
+      const selectedNama = document.getElementById('modalNamaIEEP').value;
+      const tarikhSelect = document.getElementById('modalTarikhIEEP');
+
+      const matchedRecords = modalKlusterRecords.filter(r => (r.namaIEEP || '').trim() === selectedNama);
+      const uniqueDates = [...new Set(matchedRecords.map(r => (r.tarikhIEEP || '').trim()).filter(Boolean))];
+
+      if (uniqueDates.length === 0) {
+        tarikhSelect.innerHTML = `<option value="">-- Tiada Tarikh IEEP --</option>`;
+      } else {
+        tarikhSelect.innerHTML = uniqueDates.map(tgl => `<option value="${tgl}">${formatDisplayDateDMY(tgl)}</option>`).join('');
+      }
+
+      updateModalSummaryPreview();
+    }
+	
+	// Papar pratonton jumlah responden & templat rasmi yang akan dijana
+    function updateModalSummaryPreview() {
+      const selectedKluster = normalizeKlusterClient(document.getElementById('modalKluster').value);
+      const selectedNama = document.getElementById('modalNamaIEEP').value;
+      const selectedTarikh = document.getElementById('modalTarikhIEEP').value;
+      const summaryBox = document.getElementById('modalSelectionSummary');
+      const submitBtn = document.getElementById('btnSubmitIeepModal');
+
+      const matchedCount = modalKlusterRecords.filter(r =>
+        (r.namaIEEP || '').trim() === selectedNama &&
+        (!selectedTarikh || (r.tarikhIEEP || '').trim() === selectedTarikh)
+      ).length;
+
+      const tpl = KLUSTER_TEMPLATES[selectedKluster] || KLUSTER_TEMPLATES['KLUSTER 2'];
+
+      if (matchedCount > 0) {
+        submitBtn.disabled = false;
+        summaryBox.innerHTML = `
+          <div><i class="fa-solid fa-file-lines me-1"></i> Templat Laporan: <b>${selectedKluster} (${tpl.lampiran})</b></div>
+          <div class="mt-0.5"><i class="fa-solid fa-users me-1"></i> Jumlah Responden / Maklum Balas: <b>${matchedCount} Pelajar</b></div>
+        `;
+      } else {
+        submitBtn.disabled = true;
+        summaryBox.innerHTML = `<span class="text-red-600">Tiada responden ditemui untuk kombinasi Nama IEEP dan Tarikh IEEP ini.</span>`;
+      }
+    }
+
+    function executeDownloadSummaryPdf(e) {
+      e.preventDefault();
+      
+      const klusterInput = document.getElementById('modalKluster').value;
+      const namaIEEPInput = document.getElementById('modalNamaIEEP').value;
+      const tarikhIEEPInput = document.getElementById('modalTarikhIEEP').value;
+
+      const btn = document.getElementById('btnSubmitIeepModal');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Menjana Laporan...</span>`;
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          action: 'generateSummaryReport', 
+          password: authenticatedPassword,
+          kluster: klusterInput,
+          namaIEEP: namaIEEPInput,
+          tarikhIEEP: tarikhIEEPInput
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        closeIeepConfirmModal();
+
+        if (res.success) {
+          document.getElementById('successPdfLink').href = res.pdfUrl;
+          document.getElementById('successPdfModal').classList.remove('hidden');
+        } else {
+          alert('Ralat: ' + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        alert('Ralat semasa menjana laporan: ' + err.message);
+      });
+    }
+    function downloadMergedIndividualPdfs() {
+      if (!authenticatedPassword) return;
+
+      if (!activeRecords || activeRecords.length === 0) {
+        alert("Tiada rekod maklum balas individu untuk digabungkan.");
+        return;
+      }
+
+      const activeSearchValue = document.getElementById('searchNamaIEEP').value.trim();
+      const btn = document.getElementById('btnMergePdfs');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> <span>Menggabungkan PDF...</span>`;
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          action: 'mergeAllIndividualPdfs', 
+          password: authenticatedPassword,
+          namaIEEP: activeSearchValue,
+          kluster: document.getElementById('filterKluster').value
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+
+        if (res.success) {
+          showModal(
+            'text-purple-600', 
+            '<i class="fa-solid fa-file-circle-check"></i>', 
+            'PDF Gabungan Berjaya Dijana!', 
+            'Fail maklum balas refleksi individu yang ditapis telah berjaya digabungkan menjadi satu fail PDF keseluruhan dan disimpan di Google Drive anda.',
+            `<a href="${res.pdfUrl}" target="_blank" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded-lg text-xs font-bold inline-block shadow"><i class="fa-solid fa-download me-1"></i> Buka / Muat Turun PDF Gabungan</a>
+             <br><button onclick="closeModal()" class="mt-3 text-xs text-gray-500 underline">Tutup</button>`
+          );
+        } else {
+          alert('Ralat: ' + res.message);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        alert('Ralat semasa menggabungkan PDF: ' + err.message);
+      });
+    }
+
+    function closeSuccessPdfModal() {
+      document.getElementById('successPdfModal').classList.add('hidden');
+    }
+
+    // -------------------------------------------------------------
+    // FUNGSI PENGESAHAN & PEMADAMAN REKOD INDIVIDU & PDF DRIVE
+    // -------------------------------------------------------------
+    function confirmDeleteRecord(noPendaftaran, namaPelajar) {
+      if (!authenticatedPassword) return;
+
+      showModal(
+        'text-red-600',
+        '<i class="fa-solid fa-triangle-exclamation"></i>',
+        'Pengesahan Padam RekOD',
+        `Adakah anda pasti mahu memadam rekod refleksi bagi <b>${namaPelajar} (${noPendaftaran})</b>?<br><br><span class="text-xs text-red-600 font-bold">Tindakan ini akan memadam baris rekod dalam tab REFLEKSI dan membuang fail PDF berkenaan ke Tong Sampah Google Drive!</span>`,
+        `<div class="flex justify-center space-x-2 pt-2">
+           <button onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-1.5 rounded-lg text-xs font-bold">Batal</button>
+           <button onclick="executeDeleteRecord('${noPendaftaran}')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 shadow">
+             <i class="fa-solid fa-trash-can"></i> <span>Ya, Padam Rekod</span>
+           </button>
+         </div>`
+      );
+    }
+
+    function executeDeleteRecord(noPendaftaran) {
+      if (!authenticatedPassword) return;
+
+      showModal(
+        'text-gray-600',
+        '<i class="fa-solid fa-spinner fa-spin"></i>',
+        'Memadam Rekod...',
+        'Sistem sedang memadam rekod dan fail PDF berkaitan daripada Google Drive. Sila tunggu...',
+        ''
+      );
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'deleteRefleksiRecord',
+          password: authenticatedPassword,
+          noPendaftaran: noPendaftaran,
+          kluster: document.getElementById('filterKluster').value
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          showModal(
+            'text-green-600',
+            '<i class="fa-solid fa-circle-check"></i>',
+            'Rekod Berjaya Dipadam!',
+            res.message,
+            `<button onclick="closeModal(); fetchAdminData();" class="bg-blue-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold">OK</button>`
+          );
+        } else {
+          showModal(
+            'text-red-600',
+            '<i class="fa-solid fa-circle-xmark"></i>',
+            'Ralat Memadam Rekod',
+            res.message,
+            `<button onclick="closeModal()" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-xs font-bold">Tutup</button>`
+          );
+        }
+      })
+      .catch(err => {
+        showModal(
+          'text-red-600',
+          '<i class="fa-solid fa-circle-xmark"></i>',
+          'Ralat Ketersambungan',
+          'Ralat sistem: ' + err.message,
+          `<button onclick="closeModal()" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-xs font-bold">Tutup</button>`
+        );
+      });
+    }
+
+    function renderIndividualRecord() {
+      const container = document.getElementById('individualRecordCard');
+      const indicator = document.getElementById('recordIndicator');
+      const records = activeRecords;
+
+      if (!records || records.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 italic text-center">Tiada rekod ditemui mengikut carian ini.</p>`;
+        indicator.innerText = `0 / 0`;
+        return;
+      }
+
+      if (currentRecordIdx < 0) currentRecordIdx = 0;
+      if (currentRecordIdx >= records.length) currentRecordIdx = records.length - 1;
+
+      indicator.innerText = `${currentRecordIdx + 1} / ${records.length}`;
+      const r = records[currentRecordIdx];
+      const safeNama = (r.namaPelajar || '').replace(/'/g, "\\'");
+
+      // 1. Pengisytiharan pembolehubah Kluster & blok maklumat khusus KLUSTER 3
+      const recKluster = normalizeKlusterClient(r.kluster);
+      const kluster3InfoHtml = recKluster === 'KLUSTER 3' ? `
+        <div class="bg-indigo-50 border border-indigo-200 rounded p-2.5 text-xs space-y-1 text-indigo-950">
+          <p><b>Tajuk Penyelidikan/Projek/Inovasi:</b> ${r.tajukProjek || '-'}</p>
+          <p><b>Nama Penyelia Industri:</b> ${r.namaPenyeliaIndustri || '-'} | <b>Nama Industri:</b> ${r.namaIndustri || '-'}</p>
+          <p><b>Tarikh & Tempoh Masa:</b> ${r.tarikhTempohMasa || '-'}</p>
+        </div>
+      ` : '';
+
+      container.innerHTML = `
+        <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
+          <div class="flex flex-col sm:flex-row justify-between items-start gap-2">
+            <div>
+              <!-- 2. Paparan lencana Kluster di sebelah r.namaPelajar -->
+              <p class="font-bold text-base text-blue-900 flex items-center flex-wrap gap-2">
+                <span>${r.namaPelajar}</span>
+                <span class="bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-bold text-[10px]">${recKluster}</span>
+              </p>
+              <p class="text-xs text-gray-600">No. Pendaftaran: <b>${r.noPendaftaran}</b> | IEEP: <b>${r.namaIEEP}</b> (${r.tarikhIEEP})</p>
+              <p class="text-xs text-gray-400">Tarikh Hantar: ${r.timestamp}</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <a href="${r.pdfUrl}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold flex items-center space-x-1 shadow">
+                <i class="fa-solid fa-file-pdf"></i> <span>Muat Turun PDF</span>
+              </a>
+              <button onclick="confirmDeleteRecord('${r.noPendaftaran}', '${safeNama}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-bold flex items-center space-x-1 shadow">
+                <i class="fa-solid fa-trash-can"></i> <span>Padam Rekod</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Selitan maklumat tambahan Kluster 3 di bawah maklumat asas pelajar -->
+          ${kluster3InfoHtml}
+
+          <hr>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            ${Object.keys(questionsMeta).map(q => `
+              <div class="bg-white p-2 border rounded shadow-sm">
+                <span class="font-bold text-gray-700">` + q + `:</span> <span class="text-blue-800 font-bold float-right">` + (r[q] || '') + `</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="text-xs space-y-1 bg-white p-3 border rounded">
+            <p><b>Dapatan/Komen Juri (T6):</b> ${r.T6 || '-'}</p>
+            <p><b>Pandangan Keseluruhan (T7):</b> ${r.T7 || '-'}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function prevRecord() {
+      if (currentRecordIdx > 0) {
+        currentRecordIdx--;
+        renderIndividualRecord();
+      }
+    }
+
+    function nextRecord() {
+      if (currentRecordIdx < activeRecords.length - 1) {
+        currentRecordIdx++;
+        renderIndividualRecord();
+      }
+    }
+
+    // FUNGSI PAPARAN JADUAL PUKAL DENGAN PAGINATION (10 REKOD PER HALAMAN)
+    function renderBulkTable() {
+      const tbody = document.getElementById('bulkTableBody');
+      const records = activeRecords;
+      const totalRecords = records.length;
+
+      if (!records || totalRecords === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-gray-400">Tiada rekod data ditemui mengikut carian.</td></tr>`;
+        document.getElementById('bulkPageIndicator').innerText = `0 / 0`;
+        document.getElementById('bulkPaginationInfo').innerText = `Menunjukkan 0 rekod`;
+        document.getElementById('btnPrevBulk').disabled = true;
+        document.getElementById('btnNextBulk').disabled = true;
+        return;
+      }
+
+      const totalPages = Math.ceil(totalRecords / bulkPerPage);
+      if (bulkCurrentPage < 1) bulkCurrentPage = 1;
+      if (bulkCurrentPage > totalPages) bulkCurrentPage = totalPages;
+
+      const startIndex = (bulkCurrentPage - 1) * bulkPerPage;
+      const endIndex = Math.min(startIndex + bulkPerPage, totalRecords);
+      const pageRecords = records.slice(startIndex, endIndex);
+
+      document.getElementById('bulkPageIndicator').innerText = `${bulkCurrentPage} / ${totalPages}`;
+      document.getElementById('bulkPaginationInfo').innerText = `Menunjukkan ${startIndex + 1} hingga ${endIndex} daripada ${totalRecords} rekod`;
+
+      document.getElementById('btnPrevBulk').disabled = (bulkCurrentPage === 1);
+      document.getElementById('btnNextBulk').disabled = (bulkCurrentPage === totalPages);
+
+      tbody.innerHTML = pageRecords.map((r, i) => {
+        const globalIndex = startIndex + i + 1;
+        const safeNama = (r.namaPelajar || '').replace(/'/g, "\\'");
+        return `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-2 border text-center font-bold text-gray-600">${globalIndex}</td>
+          <td class="p-2 border font-medium">${r.namaPelajar}</td>
+          <td class="p-2 border font-mono">${r.noPendaftaran}</td>
+          <td class="p-2 border">${r.namaIEEP}</td>
+          <td class="p-2 border">${r.tarikhIEEP}</td>
+          <td class="p-2 border text-center space-x-2">
+            <a href="${r.pdfUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 font-bold underline inline-flex items-center space-x-1">
+              <i class="fa-solid fa-download"></i> <span>PDF</span>
+            </a>
+            <button onclick="confirmDeleteRecord('${r.noPendaftaran}', '${safeNama}')" class="text-red-600 hover:text-red-800 font-bold underline inline-flex items-center space-x-1">
+              <i class="fa-solid fa-trash-can"></i> <span>Padam</span>
+            </button>
+          </td>
+        </tr>
+      `}).join('');
+    }
+
+    function prevBulkPage() {
+      if (bulkCurrentPage > 1) {
+        bulkCurrentPage--;
+        renderBulkTable();
+      }
+    }
+
+    function nextBulkPage() {
+      const totalPages = Math.ceil(activeRecords.length / bulkPerPage);
+      if (bulkCurrentPage < totalPages) {
+        bulkCurrentPage++;
+        renderBulkTable();
+      }
+    }
+
+    function showModal(iconColorClass, iconHtml, title, bodyHtml, footerHtml) {
+      document.getElementById('modalIcon').className = `text-4xl ${iconColorClass}`;
+      document.getElementById('modalIcon').innerHTML = iconHtml;
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalBody').innerHTML = bodyHtml;
+      document.getElementById('modalFooter').innerHTML = footerHtml;
+      document.getElementById('customModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('customModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

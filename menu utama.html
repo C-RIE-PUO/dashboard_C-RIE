@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Industry Expert Enrichment Program (IEEP) — Portal Interaktif</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-page: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-hover: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #e2e8f0;
+      --hero-bg: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0369a1 100%);
+      --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      --shadow-hover: 0 22px 40px -10px rgba(30, 58, 138, 0.18);
+      --pill-bg: #e2e8f0;
+      --pill-text: #334155;
+    }
+
+    body.dark-mode {
+      --bg-page: #0b1120;
+      --bg-card: #1e293b;
+      --bg-card-hover: #243147;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --hero-bg: linear-gradient(135deg, #020617 0%, #172554 55%, #0c4a6e 100%);
+      --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+      --shadow-hover: 0 22px 40px -10px rgba(14, 165, 233, 0.22);
+      --pill-bg: #1e293b;
+      --pill-text: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    [role="button"]:focus-visible {
+      outline: 3px solid #38bdf8;
+      outline-offset: 2px;
+    }
+
+    /* =====================================================================
+       PAPARAN MENU UTAMA
+       ===================================================================== */
+    #mainMenuWrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #mainMenuWrapper.hidden {
+      display: none;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: var(--hero-bg);
+      color: #ffffff;
+      padding: 2.25rem 1.5rem 4.75rem;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.35;
+      pointer-events: none;
+      animation: floatOrb 9s ease-in-out infinite alternate;
+    }
+
+    .hero::before {
+      width: 320px;
+      height: 320px;
+      background: #38bdf8;
+      top: -90px;
+      left: -60px;
+    }
+
+    .hero::after {
+      width: 360px;
+      height: 360px;
+      background: #f59e0b;
+      bottom: -120px;
+      right: -80px;
+      animation-delay: 2s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(25px, 20px) scale(1.08); }
+    }
+
+    .hero-top-bar {
+      max-width: 1120px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .top-left-group,
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-program {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      padding: 0.42rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+
+    .top-pill-btn {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      padding: 0.45rem 0.95rem;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      backdrop-filter: blur(8px);
+      transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .top-pill-btn:hover {
+      background: rgba(255, 255, 255, 0.24);
+      transform: translateY(-1px);
+    }
+
+    /* Butang Khas Kembali ke Dashboard C-RIE */
+    .btn-crie-dashboard {
+      background: #facc15;
+      border-color: #fde047;
+      color: #0f172a;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(250, 204, 21, 0.28);
+    }
+
+    .btn-crie-dashboard:hover {
+      background: #fde047;
+      color: #0f172a;
+      box-shadow: 0 6px 18px rgba(250, 204, 21, 0.4);
+    }
+
+    .top-pill-btn.admin-active {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #34d399;
+      color: #ecfdf5;
+    }
+
+    .hero-logo-box {
+      display: inline-block;
+      background: #ffffff;
+      padding: 0.55rem 1.25rem;
+      border-radius: 0.9rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-logo-box img {
+      height: 54px;
+      width: auto;
+      display: block;
+    }
+
+    .hero-content {
+      max-width: 780px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero h1 span {
+      color: #38bdf8;
+    }
+
+    .hero p {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: #cbd5e1;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1120px;
+      width: 100%;
+      margin: -2.4rem auto 3rem;
+      padding: 0 1.25rem;
+      position: relative;
+      z-index: 3;
+      flex: 1;
+    }
+
+    /* Filter & Search Bar */
+    .filter-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-card);
+      border-radius: 1rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .filter-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-btn {
+      background: var(--pill-bg);
+      color: var(--pill-text);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.65rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .filter-btn.active {
+      background: #1d4ed8;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+    }
+
+    .filter-bottom-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .search-box-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+      max-width: 340px;
+    }
+
+    .search-box-wrap span {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.45rem 0.85rem 0.45rem 2.1rem;
+      border-radius: 0.6rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.84rem;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .quick-hint {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .ieep-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.28s ease,
+                  border-color 0.28s ease;
+      animation: fadeUp 0.5s ease backwards;
+    }
+
+    .ieep-card:nth-child(1) { animation-delay: 0.05s; }
+    .ieep-card:nth-child(2) { animation-delay: 0.10s; }
+    .ieep-card:nth-child(3) { animation-delay: 0.15s; }
+    .ieep-card:nth-child(4) { animation-delay: 0.20s; }
+    .ieep-card:nth-child(5) { animation-delay: 0.25s; }
+    .ieep-card:nth-child(6) { animation-delay: 0.30s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ieep-card.hidden {
+      display: none;
+    }
+
+    .ieep-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: var(--accent-color, #2563eb);
+      transition: height 0.25s ease;
+    }
+
+    .ieep-card:hover {
+      transform: translateY(-7px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--accent-color, #2563eb);
+    }
+
+    .ieep-card:hover::before {
+      height: 7px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .icon-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-soft, rgba(37, 99, 235, 0.12));
+      color: var(--accent-color, #2563eb);
+      transition: transform 0.3s ease;
+    }
+
+    .ieep-card:hover .icon-box {
+      transform: scale(1.08) rotate(-3deg);
+    }
+
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+    }
+
+    .step-number {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .role-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-color);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .role-tag.locked {
+      background: rgba(220, 38, 38, 0.12);
+      color: #dc2626;
+    }
+
+    .role-tag.unlocked {
+      background: rgba(5, 150, 105, 0.14);
+      color: #059669;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 0.6rem;
+      color: var(--text-main);
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-action {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 1.1rem;
+      border-radius: 0.85rem;
+      background: var(--accent-color, #2563eb);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: filter 0.2s ease;
+    }
+
+    .card-action.locked-btn {
+      background: #475569;
+    }
+
+    .ieep-card:hover .card-action {
+      filter: brightness(1.08);
+    }
+
+    .arrow-icon {
+      transition: transform 0.25s ease;
+    }
+
+    .ieep-card:hover .arrow-icon {
+      transform: translateX(4px);
+    }
+
+    .empty-search-msg {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: var(--bg-card);
+      border: 1px dashed var(--border-color);
+      border-radius: 1rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .empty-search-msg.show {
+      display: block;
+    }
+
+    .btn-reset-filter {
+      margin-top: 0.85rem;
+      background: #1d4ed8;
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1.1rem;
+      border-radius: 0.6rem;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Warna Tema Setiap Butang Mengikut Susunan 1 hingga 6 */
+    .card-pengesahan { --accent-color: #4f46e5; --accent-soft: rgba(79, 70, 229, 0.12); }
+    .card-juri       { --accent-color: #2563eb; --accent-soft: rgba(37, 99, 235, 0.12); }
+    .card-refleksi   { --accent-color: #059669; --accent-soft: rgba(5, 150, 105, 0.12); }
+    .card-laporan    { --accent-color: #0284c7; --accent-soft: rgba(2, 132, 199, 0.12); }
+    .card-sijil      { --accent-color: #d97706; --accent-soft: rgba(217, 119, 6, 0.14); }
+    .card-admin      { --accent-color: #dc2626; --accent-soft: rgba(220, 38, 38, 0.12); }
+
+    body.admin-logged-in .card-admin {
+      --accent-color: #059669;
+      --accent-soft: rgba(5, 150, 105, 0.14);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-card);
+    }
+
+    /* =====================================================================
+       PAPARAN HALAMAN TERBENAM (SAME-PAGE VIEW + BUTANG KEMBALI)
+       ===================================================================== */
+    #pageViewerWrapper {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+      background: #ffffff;
+    }
+
+    #pageViewerWrapper.active {
+      display: flex;
+    }
+
+    .viewer-topbar {
+      background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 0.7rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+      z-index: 50;
+    }
+
+    .viewer-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-back-menu {
+      background: #ffffff;
+      color: #0f172a;
+      border: none;
+      padding: 0.55rem 1.05rem;
+      border-radius: 0.65rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .btn-back-menu:hover {
+      background: #e0f2fe;
+      transform: translateX(-2px);
+    }
+
+    .viewer-title-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .viewer-subtitle {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .viewer-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .viewer-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .viewer-admin-pill {
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.22);
+      border: 1px solid #34d399;
+      color: #ecfdf5;
+    }
+
+    .btn-open-newtab {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 0.45rem 0.85rem;
+      border-radius: 0.6rem;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: background 0.2s ease;
+    }
+
+    .btn-open-newtab:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    .btn-viewer-crie {
+      background: #facc15;
+      color: #0f172a;
+      border-color: #fde047;
+      font-weight: 800;
+    }
+
+    .btn-viewer-crie:hover {
+      background: #fde047;
+      color: #0f172a;
+    }
+
+    .frame-container {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .frame-loader {
+      position: absolute;
+      inset: 0;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 0.92rem;
+      z-index: 10;
+      transition: opacity 0.25s ease;
+    }
+
+    .frame-loader.hidden {
+      display: none;
+    }
+
+    .spinner-ring {
+      width: 38px;
+      height: 38px;
+      border: 4px solid #cbd5e1;
+      border-top-color: #1d4ed8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #subPageFrame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #f8fafc;
+    }
+
+    /* =====================================================================
+       MODAL LOG MASUK & PENGURUSAN PENTADBIR (GOOGLE APPS SCRIPT)
+       ===================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.68);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 90;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      max-width: 440px;
+      width: 100%;
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      animation: fadeUp 0.25s ease;
+    }
+
+    .modal-header-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 1rem;
+      background: rgba(37, 99, 235, 0.12);
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .modal-box h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+    }
+
+    .modal-box p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 1.1rem;
+    }
+
+    .modal-alert {
+      padding: 0.65rem 0.85rem;
+      border-radius: 0.65rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .modal-alert.error {
+      display: block;
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .modal-alert.info {
+      display: block;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .modal-alert.success {
+      display: block;
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .form-group {
+      margin-bottom: 0.9rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: var(--text-main);
+    }
+
+    .password-field-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 0.75rem 2.75rem 0.75rem 0.95rem;
+      border-radius: 0.65rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.92rem;
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .toggle-pwd-btn {
+      position: absolute;
+      right: 0.65rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.25rem;
+      color: var(--text-muted);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary,
+    .btn-primary,
+    .btn-danger {
+      padding: 0.65rem 1.15rem;
+      border-radius: 0.65rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn-secondary {
+      background: var(--pill-bg);
+      color: var(--pill-text);
+    }
+
+    .btn-primary {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.9rem 1.25rem;
+      border-radius: 0.85rem;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      z-index: 120;
+      transform: translateY(140%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =======================================================================
+       1. PAPARAN MENU UTAMA
+       ======================================================================= -->
+  <div id="mainMenuWrapper">
+    <header class="hero">
+      <div class="hero-top-bar">
+        <div class="top-left-group">
+          <a href="paparan.html" class="top-pill-btn btn-crie-dashboard" title="Kembali ke Dashboard Utama C-RIE">
+            <span>←</span>
+            <span>Dashboard Utama C-RIE</span>
+          </a>
+          <div class="badge-program">
+            <span class="pulse-dot"></span>
+            Portal Rasmi Program
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="top-pill-btn" id="topAdminBtn" type="button" onclick="handleAdminButtonClick()">
+            <span id="topAdminIcon">🔐</span>
+            <span id="topAdminLabel">Log Masuk Pentadbir</span>
+          </button>
+          <button class="top-pill-btn" id="themeToggle" type="button" aria-label="Tukar Mod Paparan">
+            <span id="themeIcon">🌙</span>
+            <span id="themeLabel">Mod Gelap</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-content">
+        <div class="hero-logo-box">
+          <img src="Poli_Logo.png" alt="Logo Politeknik Ungku Omar" onerror="this.parentElement.style.display='none'" />
+        </div>
+        <h1>Industry Expert Enrichment Program <span>(IEEP)</span></h1>
+        <p>Hab pautan interaktif bersepadu bagi pengesahan industri, penilaian juri, refleksi pelajar, pelaporan program dan muat turun sijil.</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- Bar Penapis & Carian Pantas Interaktif -->
+      <div class="filter-bar">
+        <div class="filter-top-row">
+          <div class="filter-buttons" role="tablist" aria-label="Tapis Kategori Pautan">
+            <button class="filter-btn active" data-filter="all" type="button">Semua Butang (6)</button>
+            <button class="filter-btn" data-filter="industri" type="button">Panel Industri / Juri</button>
+            <button class="filter-btn" data-filter="pelajar" type="button">Pelajar</button>
+            <button class="filter-btn" data-filter="dokumen" type="button">Laporan &amp; Sijil</button>
+            <button class="filter-btn" data-filter="pentadbir" type="button">Pentadbir</button>
+          </div>
+          <div class="search-box-wrap">
+            <span>🔍</span>
+            <input type="search" id="cardSearchInput" class="search-input" placeholder="Cari borang atau modul..." aria-label="Cari borang atau modul" />
+          </div>
+        </div>
+        <div class="filter-bottom-row">
+          <div class="quick-hint" id="adminStatusHint">Status: Paparan Awam (Laporan IEEP dikunci)</div>
+          <div class="quick-hint" id="visibleCountHint">Memaparkan 6 daripada 6 modul</div>
+        </div>
+      </div>
+
+      <!-- Grid 6 Butang Interaktif (Susunan 1 hingga 6) -->
+      <section class="cards-grid" id="cardsGrid">
+
+        <!-- 1. BORANG PENGESAHAN INDUSTRI -> Maklum_Balas_Kehadiran.html -->
+        <div role="button" tabindex="0" class="ieep-card card-pengesahan" data-id="1" data-category="industri"
+             onclick="openModulePage(PAUTAN_MODUL[1], '1. BORANG PENGESAHAN INDUSTRI', false)">
+          <div>
+            <div class="card-header">
+              <div class="icon-box" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+              </div>
+              <div class="card-meta">
+                <span class="step-number">BUTANG 01</span>
+                <span class="role-tag">Pengesahan Rasmi</span>
+              </div>
+            </div>
+            <h2 class="card-title">1. BORANG PENGESAHAN INDUSTRI</h2>
+            <p class="card-desc">Rekod pengesahan kehadiran, penglibatan dan penyampaian perkongsian kepakaran oleh wakil atau pakar industri.</p>
+          </div>
+          <div class="card-action">
+            <span>Buka Borang Pengesahan</span>
+            <span class="arrow-icon">➔</span>
+          </div>
+        </div>
+
+        <!-- 2. BORANG MAKLUMBALAS INDUSTRI (JURI) -> ieep_juri.html -->
+        <div role="button" tabindex="0" class="ieep-card card-juri" data-id="2" data-category="industri"
+             onclick="openModulePage(PAUTAN_MODUL[2], '2. BORANG MAKLUMBALAS INDUSTRI (JURI)', false)">
+          <div>
+            <div class="card-header">
+              <div class="icon-box" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                  <path d="M9 14l2 2 4-4"/>
+                </svg>
+              </div>
+              <div class="card-meta">
+                <span class="step-number">BUTANG 02</span>
+                <span class="role-tag">Panel Industri / Juri</span>
+              </div>
+            </div>
+            <h2 class="card-title">2. BORANG MAKLUMBALAS INDUSTRI (JURI)</h2>
+            <p class="card-desc">Penilaian kualiti pelaksanaan program, kesesuaian kurikulum serta cadangan penambahbaikan daripada pakar industri / juri.</p>
+          </div>
+          <div class="card-action">
+            <span>Buka Borang Maklum Balas Juri</span>
+            <span class="arrow-icon">➔</span>
+          </div>
+        </div>
+
+        <!-- 3. BORANG REFLEKSI PELAJAR -> refleksi_pelajar.html -->
+        <div role="button" tabindex="0" class="ieep-card card-refleksi" data-id="3" data-category="pelajar"
+             onclick="openModulePage(PAUTAN_MODUL[3], '3. BORANG REFLEKSI PELAJAR', false)">
+          <div>
+            <div class="card-header">
+              <div class="icon-box" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+              </div>
+              <div class="card-meta">
+                <span class="step-number">BUTANG 03</span>
+                <span class="role-tag">Pelajar</span>
+              </div>
+            </div>
+            <h2 class="card-title">3. BORANG REFLEKSI PELAJAR</h2>
+            <p class="card-desc">Perkongsian impak pembelajaran, kemahiran baharu dan pendedahan kerjaya yang diperoleh pelajar sepanjang sesi IEEP.</p>
+          </div>
+          <div class="card-action">
+            <span>Buka Borang Refleksi Pelajar</span>
+            <span class="arrow-icon">➔</span>
+          </div>
+        </div>
+
+        <!-- 4. LAPORAN IEEP -> laporan ieep.html (KHAS PENTADBIR SAHAJA) -->
+        <div role="button" tabindex="0" class="ieep-card card-laporan" id="cardLaporanIeep" data-id="4" data-category="dokumen pentadbir"
+             onclick="openModulePage(PAUTAN_MODUL[4], '4. LAPORAN IEEP (AKSES PENTADBIR)', true)">
+          <div>
+            <div class="card-header">
+              <div class="icon-box" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+              </div>
+              <div class="card-meta">
+                <span class="step-number">BUTANG 04</span>
+                <span class="role-tag locked" id="laporanAccessBadge">🔒 Khas Pentadbir</span>
+              </div>
+            </div>
+            <h2 class="card-title">4. LAPORAN IEEP</h2>
+            <p class="card-desc">Penyediaan laporan lengkap aktiviti PPI/IEEP, muat naik dokumentasi bergambar serta penjanaan PDF rasmi (Akses Pentadbir sahaja).</p>
+          </div>
+          <div class="card-action locked-btn" id="laporanActionBtn">
+            <span id="laporanActionText">Log Masuk Pentadbir Untuk Akses</span>
+            <span class="arrow-icon" id="laporanActionIcon">🔒</span>
+          </div>
+        </div>
+
+        <!-- 5. SIJIL PENYERTAAN / PENCAPAIAN PELAJAR -> sijil.html -->
+        <div role="button" tabindex="0" class="ieep-card card-sijil" data-id="5" data-category="pelajar dokumen"
+             onclick="openModulePage(PAUTAN_MODUL[5], '5. PENDAFTARAN / SIJIL PENYERTAAN / PENCAPAIAN PELAJAR', false)">
+          <div>
+            <div class="card-header">
+              <div class="icon-box" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="6"/>
+                  <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+                </svg>
+              </div>
+              <div class="card-meta">
+                <span class="step-number">BUTANG 05</span>
+                <span class="role-tag">Sijil Digital</span>
+              </div>
+            </div>
+            <h2 class="card-title">5. PENDAFTARAN / SIJIL PENYERTAAN / PENCAPAIAN PELAJAR</h2>
+            <p class="card-desc">Pendaftaran kehadiran, pengesahan urusetia serta semakan dan muat turun e-Sijil penyertaan atau pencapaian pelajar.</p>
+          </div>
+          <div class="card-action">
+            <span>Buka Portal Sijil Pelajar</span>
+            <span class="arrow-icon">➔</span>
+          </div>
+        </div>
+
+        <!-- 6. LOG MASUK PENTADBIR (GOOGLE SCRIPT) -->
+        <div role="button" tabindex="0" class="ieep-card card-admin" id="cardPentadbir" data-id="6" data-category="pentadbir"
+             onclick="handleAdminButtonClick()">
+          <div>
+            <div class="card-header">
+              <div class="icon-box" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <div class="card-meta">
+                <span class="step-number">BUTANG 06</span>
+                <span class="role-tag" id="adminCardBadge">Pentadbir Sistem</span>
+              </div>
+            </div>
+            <h2 class="card-title" id="adminCardTitle">6. LOG MASUK PENTADBIR</h2>
+            <p class="card-desc" id="adminCardDesc">Pengesahan log masuk pentadbir melalui Google Script bagi membuka akses Laporan IEEP serta pengurusan kata laluan pentadbir.</p>
+          </div>
+          <div class="card-action" id="adminCardAction">
+            <span id="adminCardActionText">Log Masuk Pentadbir</span>
+            <span class="arrow-icon">➔</span>
+          </div>
+        </div>
+
+      </section>
+
+      <div class="empty-search-msg" id="emptySearchMsg">
+        <div>Tiada modul sepadan dengan carian anda. Sila cuba kata kunci lain atau pilih tab <strong>Semua Butang</strong>.</div>
+        <button type="button" class="btn-reset-filter" onclick="resetAllFilters()">Set Semula Penapis</button>
+      </div>
+    </main>
+
+    <footer>
+      &copy; <span id="yearNow"></span> Industry Expert Enrichment Program (IEEP) &bull; Portal Interaktif Bersepadu
+    </footer>
+  </div>
+
+  <!-- =======================================================================
+       2. PAPARAN HALAMAN TERBENAM (DALAM PAPARAN YANG SAMA + KEMBALI KE MENU)
+       ======================================================================= -->
+  <div id="pageViewerWrapper">
+    <div class="viewer-topbar">
+      <div class="viewer-left">
+        <button type="button" class="btn-back-menu" onclick="returnToMainMenu()">
+          <span>←</span>
+          <span>Menu Utama IEEP</span>
+        </button>
+        <div class="viewer-title-group">
+          <span class="viewer-subtitle">Industry Expert Enrichment Program (IEEP)</span>
+          <span class="viewer-title" id="activeViewerTitle">Paparan Modul</span>
+        </div>
+      </div>
+      <div class="viewer-right">
+        <span class="viewer-admin-pill" id="viewerAdminBadge" style="display: none;">✅ Pentadbir Aktif</span>
+        <a id="openNewTabLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-open-newtab" title="Buka halaman ini dalam tab baharu">
+          <span>↗</span>
+          <span>Tab Baharu</span>
+        </a>
+        <a href="paparan.html" class="btn-open-newtab btn-viewer-crie" title="Kembali ke Dashboard Utama C-RIE">
+          <span>🏠</span>
+          <span>Dashboard C-RIE</span>
+        </a>
+      </div>
+    </div>
+    <div class="frame-container">
+      <div class="frame-loader" id="frameLoader">
+        <div class="spinner-ring"></div>
+        <span>Sedang memuatkan paparan...</span>
+      </div>
+      <iframe id="subPageFrame" title="Paparan Modul IEEP"></iframe>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       3. MODAL LOG MASUK PENTADBIR (DISIMPAN DALAM GOOGLE APPS SCRIPT)
+       ======================================================================= -->
+  <div class="modal-backdrop" id="adminLoginModal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+    <div class="modal-box">
+      <div class="modal-header-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h3 id="loginModalTitle">Log Masuk Pentadbir</h3>
+      <p id="loginModalSubtitle">Masukkan kata laluan pentadbir yang disimpan dalam Google Script untuk membuka akses penuh.</p>
+
+      <div class="modal-alert" id="loginAlertBox"></div>
+
+      <form id="adminLoginForm" onsubmit="submitAdminLogin(event)">
+        <div class="form-group">
+          <label for="adminPasswordField">Kata Laluan Pentadbir</label>
+          <div class="password-field-wrap">
+            <input type="password" id="adminPasswordField" class="modal-input" placeholder="Masukkan kata laluan pentadbir..." required />
+            <button type="button" id="toggleLoginPwdBtn" class="toggle-pwd-btn" onclick="togglePasswordVisibility('adminPasswordField', this)" aria-label="Tunjuk atau sembunyi kata laluan">👁️</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeAdminLoginModal()">Batal</button>
+          <button type="submit" class="btn-primary" id="btnVerifyAdmin">Sahkan &amp; Log Masuk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       4. MODAL PANEL PENTADBIR (TUKAR KATA LALUAN GOOGLE SCRIPT / LOG KELUAR)
+       ======================================================================= -->
+  <div class="modal-backdrop" id="adminManageModal" role="dialog" aria-modal="true" aria-labelledby="manageModalTitle">
+    <div class="modal-box">
+      <h3 id="manageModalTitle">Panel Kawalan Pentadbir</h3>
+      <p>Anda telah log masuk sebagai Pentadbir. Anda boleh terus mengakses <strong>4. LAPORAN IEEP</strong>, menukar kata laluan dalam Google Script, atau log keluar.</p>
+
+      <div class="modal-alert" id="manageAlertBox"></div>
+
+      <form id="changePasswordForm" onsubmit="submitChangeAdminPassword(event)">
+        <div class="form-group">
+          <label for="oldAdminPass">Kata Laluan Semasa</label>
+          <div class="password-field-wrap">
+            <input type="password" id="oldAdminPass" class="modal-input" placeholder="Kata laluan semasa" required />
+            <button type="button" id="toggleOldPwdBtn" class="toggle-pwd-btn" onclick="togglePasswordVisibility('oldAdminPass', this)" aria-label="Tunjuk atau sembunyi kata laluan">👁️</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newAdminPass">Kata Laluan Baharu (Simpan ke Google Script)</label>
+          <div class="password-field-wrap">
+            <input type="password" id="newAdminPass" class="modal-input" placeholder="Kata laluan baharu" required />
+            <button type="button" id="toggleNewPwdBtn" class="toggle-pwd-btn" onclick="togglePasswordVisibility('newAdminPass', this)" aria-label="Tunjuk atau sembunyi kata laluan">👁️</button>
+          </div>
+        </div>
+        <div class="modal-actions" style="justify-content: space-between;">
+          <button type="button" class="btn-danger" onclick="logoutAdmin()">Log Keluar</button>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn-secondary" onclick="closeAdminManageModal()">Tutup</button>
+            <button type="submit" class="btn-primary" id="btnUpdatePass">Simpan Kata Laluan</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notifikasi Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toastIcon">ℹ️</span>
+    <span id="toastText">Notifikasi</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // KONFIGURASI URL GOOGLE APPS SCRIPT UNTUK LOGIN PENTADBIR (KEKAL ASAL)
+    // =========================================================================
+    const ADMIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydY_AEji47yepcAznQJXUUPhoJZAiU4IBeb_Ca3fZ3Inrm-lICipM5Vrhg283dIP2_/exec";
+
+    // Pautan fail HTML mengikut susunan 1 hingga 5
+    const PAUTAN_MODUL = {
+      1: "Maklum_Balas_Kehadiran.html",
+      2: "ieep_juri.html",
+      3: "refleksi_pelajar.html",
+      4: "laporan ieep.html",
+      5: "sijil.html"
+    };
+
+    document.getElementById("yearNow").textContent = new Date().getFullYear();
+
+    // Bersihkan hash #paparan jika halaman dimuat semula secara terus
+    if (window.location.hash === "#paparan" && window.history && window.history.replaceState) {
+      window.history.replaceState({ view: "menu" }, "", window.location.pathname + window.location.search);
+    }
+
+    let isAdminAuthenticated = sessionStorage.getItem("ieep_admin_logged_in") === "true";
+    let pendingAdminTarget = null;
+    let loaderFallbackTimer = null;
+
+    // Kemaskini UI mengikut status log masuk pentadbir semasa
+    function refreshAdminUI() {
+      const topBtn = document.getElementById("topAdminBtn");
+      const topIcon = document.getElementById("topAdminIcon");
+      const topLabel = document.getElementById("topAdminLabel");
+      const statusHint = document.getElementById("adminStatusHint");
+
+      const laporanBadge = document.getElementById("laporanAccessBadge");
+      const laporanActionBtn = document.getElementById("laporanActionBtn");
+      const laporanActionText = document.getElementById("laporanActionText");
+      const laporanActionIcon = document.getElementById("laporanActionIcon");
+
+      const adminCardBadge = document.getElementById("adminCardBadge");
+      const adminCardTitle = document.getElementById("adminCardTitle");
+      const adminCardDesc = document.getElementById("adminCardDesc");
+      const adminCardActionText = document.getElementById("adminCardActionText");
+      const viewerAdminBadge = document.getElementById("viewerAdminBadge");
+
+      if (isAdminAuthenticated) {
+        document.body.classList.add("admin-logged-in");
+        topBtn.classList.add("admin-active");
+        topIcon.textContent = "✅";
+        topLabel.textContent = "Pentadbir Aktif";
+        statusHint.textContent = "Status: Mod Pentadbir Aktif (Akses Laporan IEEP Dibuka)";
+
+        laporanBadge.className = "role-tag unlocked";
+        laporanBadge.textContent = "🔓 Akses Dibuka";
+        laporanActionBtn.classList.remove("locked-btn");
+        laporanActionText.textContent = "Buka Laporan IEEP";
+        laporanActionIcon.textContent = "➔";
+
+        adminCardBadge.textContent = "Mod Pentadbir Aktif";
+        adminCardTitle.textContent = "6. PANEL KAWALAN PENTADBIR";
+        adminCardDesc.textContent = "Anda telah log masuk. Klik di sini untuk mengurus kata laluan pentadbir dalam Google Script atau log keluar.";
+        adminCardActionText.textContent = "Urus Akaun / Log Keluar";
+
+        viewerAdminBadge.style.display = "inline-block";
+      } else {
+        document.body.classList.remove("admin-logged-in");
+        topBtn.classList.remove("admin-active");
+        topIcon.textContent = "🔐";
+        topLabel.textContent = "Log Masuk Pentadbir";
+        statusHint.textContent = "Status: Paparan Awam (Laporan IEEP dikunci)";
+
+        laporanBadge.className = "role-tag locked";
+        laporanBadge.textContent = "🔒 Khas Pentadbir";
+        laporanActionBtn.classList.add("locked-btn");
+        laporanActionText.textContent = "Log Masuk Pentadbir Untuk Akses";
+        laporanActionIcon.textContent = "🔒";
+
+        adminCardBadge.textContent = "Pentadbir Sistem";
+        adminCardTitle.textContent = "6. LOG MASUK PENTADBIR";
+        adminCardDesc.textContent = "Pengesahan log masuk pentadbir melalui Google Script bagi membuka akses Laporan IEEP serta pengurusan kata laluan pentadbir.";
+        adminCardActionText.textContent = "Log Masuk Pentadbir";
+
+        viewerAdminBadge.style.display = "none";
+      }
+    }
+
+    // =========================================================================
+    // FUNGSI MEMBUKA PAUTAN TERUS DALAM PAPARAN YANG SAMA
+    // =========================================================================
+    const subPageFrame = document.getElementById("subPageFrame");
+    const frameLoader = document.getElementById("frameLoader");
+
+    function hideFrameLoader() {
+      clearTimeout(loaderFallbackTimer);
+      frameLoader.classList.add("hidden");
+    }
+
+    subPageFrame.addEventListener("load", hideFrameLoader);
+    subPageFrame.addEventListener("error", hideFrameLoader);
+
+    function openModulePage(fileUrl, title, requiresAdmin) {
+      if (requiresAdmin && !isAdminAuthenticated) {
+        pendingAdminTarget = { fileUrl, title };
+        openAdminLoginModal("Akses <strong>4. LAPORAN IEEP</strong> dikhaskan untuk Pentadbir sahaja. Sila log masuk terlebih dahulu.");
+        return;
+      }
+
+      const safeUrl = encodeURI(fileUrl);
+      const mainWrapper = document.getElementById("mainMenuWrapper");
+      const viewerWrapper = document.getElementById("pageViewerWrapper");
+      const viewerTitle = document.getElementById("activeViewerTitle");
+      const newTabLink = document.getElementById("openNewTabLink");
+
+      viewerTitle.textContent = title;
+      newTabLink.href = safeUrl;
+
+      frameLoader.classList.remove("hidden");
+      clearTimeout(loaderFallbackTimer);
+      loaderFallbackTimer = setTimeout(hideFrameLoader, 5000);
+
+      subPageFrame.src = safeUrl;
+
+      mainWrapper.classList.add("hidden");
+      viewerWrapper.classList.add("active");
+      window.scrollTo(0, 0);
+
+      if (window.history && window.history.pushState) {
+        window.history.pushState({ view: "module", fileUrl: safeUrl, title }, "", "#paparan");
+      }
+    }
+
+    // Kembali ke Menu Utama IEEP
+    function returnToMainMenu(fromPopState = false) {
+      const mainWrapper = document.getElementById("mainMenuWrapper");
+      const viewerWrapper = document.getElementById("pageViewerWrapper");
+
+      viewerWrapper.classList.remove("active");
+      mainWrapper.classList.remove("hidden");
+      subPageFrame.src = "about:blank";
+      hideFrameLoader();
+
+      if (!fromPopState && window.location.hash === "#paparan" && window.history && window.history.pushState) {
+        window.history.pushState({ view: "menu" }, "", window.location.pathname + window.location.search);
+      }
+    }
+
+    window.addEventListener("popstate", () => {
+      const viewerWrapper = document.getElementById("pageViewerWrapper");
+      if (viewerWrapper.classList.contains("active")) {
+        returnToMainMenu(true);
+      }
+    });
+
+    // =========================================================================
+    // LOG MASUK & PENGURUSAN PENTADBIR (GOOGLE APPS SCRIPT)
+    // =========================================================================
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isHidden = input.type === "password";
+      input.type = isHidden ? "text" : "password";
+      btn.textContent = isHidden ? "🙈" : "👁️";
+    }
+
+    function handleAdminButtonClick() {
+      if (isAdminAuthenticated) {
+        openAdminManageModal();
+      } else {
+        pendingAdminTarget = null;
+        openAdminLoginModal();
+      }
+    }
+
+    function openAdminLoginModal(infoMessage = "") {
+      const alertBox = document.getElementById("loginAlertBox");
+      const pwdInput = document.getElementById("adminPasswordField");
+      const toggleBtn = document.getElementById("toggleLoginPwdBtn");
+
+      pwdInput.value = "";
+      pwdInput.type = "password";
+      if (toggleBtn) toggleBtn.textContent = "👁️";
+
+      if (infoMessage) {
+        alertBox.className = "modal-alert info";
+        alertBox.innerHTML = infoMessage;
+      } else {
+        alertBox.className = "modal-alert";
+        alertBox.innerHTML = "";
+      }
+
+      document.getElementById("adminLoginModal").classList.add("open");
+      setTimeout(() => pwdInput.focus(), 100);
+    }
+
+    function closeAdminLoginModal() {
+      document.getElementById("adminLoginModal").classList.remove("open");
+      pendingAdminTarget = null;
+    }
+
+    async function submitAdminLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById("adminPasswordField").value.trim();
+      const btn = document.getElementById("btnVerifyAdmin");
+      const alertBox = document.getElementById("loginAlertBox");
+
+      if (!password) return;
+
+      if (ADMIN_SCRIPT_URL.includes("TAMPAL_ID_DEPLOYMENT")) {
+        alertBox.className = "modal-alert error";
+        alertBox.innerHTML = "Sila masukkan URL Google Apps Script sebenar pada pemboleh ubah <code>ADMIN_SCRIPT_URL</code> dalam kod HTML ini terlebih dahulu.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Mengesahkan...";
+      alertBox.className = "modal-alert";
+
+      try {
+        const response = await fetch(ADMIN_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "verifyAdmin",
+            password: password
+          })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          isAdminAuthenticated = true;
+          sessionStorage.setItem("ieep_admin_logged_in", "true");
+          refreshAdminUI();
+
+          const targetToOpen = pendingAdminTarget;
+          closeAdminLoginModal();
+          showToast("✅", "Log masuk pentadbir berjaya!");
+
+          if (targetToOpen) {
+            openModulePage(targetToOpen.fileUrl, targetToOpen.title, true);
+          }
+        } else {
+          alertBox.className = "modal-alert error";
+          alertBox.textContent = result.message || "Kata laluan pentadbir tidak sah!";
+        }
+      } catch (err) {
+        alertBox.className = "modal-alert error";
+        alertBox.textContent = "Ralat sambungan ke Google Script: " + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Sahkan & Log Masuk";
+      }
+    }
+
+    function openAdminManageModal() {
+      const oldInput = document.getElementById("oldAdminPass");
+      const newInput = document.getElementById("newAdminPass");
+      const toggleOldBtn = document.getElementById("toggleOldPwdBtn");
+      const toggleNewBtn = document.getElementById("toggleNewPwdBtn");
+
+      oldInput.value = "";
+      newInput.value = "";
+      oldInput.type = "password";
+      newInput.type = "password";
+      if (toggleOldBtn) toggleOldBtn.textContent = "👁️";
+      if (toggleNewBtn) toggleNewBtn.textContent = "👁️";
+
+      const alertBox = document.getElementById("manageAlertBox");
+      alertBox.className = "modal-alert";
+      alertBox.textContent = "";
+      document.getElementById("adminManageModal").classList.add("open");
+    }
+
+    function closeAdminManageModal() {
+      document.getElementById("adminManageModal").classList.remove("open");
+    }
+
+    async function submitChangeAdminPassword(e) {
+      e.preventDefault();
+      const oldPassword = document.getElementById("oldAdminPass").value.trim();
+      const newPassword = document.getElementById("newAdminPass").value.trim();
+      const btn = document.getElementById("btnUpdatePass");
+      const alertBox = document.getElementById("manageAlertBox");
+
+      btn.disabled = true;
+      btn.textContent = "Menyimpan...";
+
+      try {
+        const response = await fetch(ADMIN_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "updateAdminPassword",
+            oldPassword: oldPassword,
+            newPassword: newPassword
+          })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alertBox.className = "modal-alert success";
+          alertBox.textContent = result.message || "Kata laluan baharu berjaya disimpan dalam Google Script!";
+          document.getElementById("changePasswordForm").reset();
+        } else {
+          alertBox.className = "modal-alert error";
+          alertBox.textContent = result.message || "Gagal menukar kata laluan.";
+        }
+      } catch (err) {
+        alertBox.className = "modal-alert error";
+        alertBox.textContent = "Ralat sambungan: " + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Simpan Kata Laluan";
+      }
+    }
+
+    function logoutAdmin() {
+      isAdminAuthenticated = false;
+      sessionStorage.removeItem("ieep_admin_logged_in");
+      refreshAdminUI();
+      closeAdminManageModal();
+      showToast("🔒", "Anda telah log keluar daripada mod pentadbir.");
+    }
+
+    document.getElementById("adminLoginModal").addEventListener("click", (e) => {
+      if (e.target.id === "adminLoginModal") closeAdminLoginModal();
+    });
+
+    document.getElementById("adminManageModal").addEventListener("click", (e) => {
+      if (e.target.id === "adminManageModal") closeAdminManageModal();
+    });
+
+    // Tutup modal menggunakan kekunci Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (document.getElementById("adminLoginModal").classList.contains("open")) {
+          closeAdminLoginModal();
+        }
+        if (document.getElementById("adminManageModal").classList.contains("open")) {
+          closeAdminManageModal();
+        }
+      }
+    });
+
+    // =========================================================================
+    // PENAPIS KATEGORI, CARIAN MODUL, MOD GELAP & TOAST
+    // =========================================================================
+    const cards = document.querySelectorAll(".ieep-card");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const searchInput = document.getElementById("cardSearchInput");
+    const visibleCountHint = document.getElementById("visibleCountHint");
+    const emptySearchMsg = document.getElementById("emptySearchMsg");
+    let activeCategoryFilter = "all";
+
+    function applyCardFilters() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const categories = card.getAttribute("data-category").split(" ");
+        const matchesCategory = activeCategoryFilter === "all" || categories.includes(activeCategoryFilter);
+        const cardText = card.textContent.toLowerCase();
+        const matchesKeyword = !keyword || cardText.includes(keyword);
+
+        if (matchesCategory && matchesKeyword) {
+          card.classList.remove("hidden");
+          visibleCount++;
+        } else {
+          card.classList.add("hidden");
+        }
+      });
+
+      visibleCountHint.textContent = `Memaparkan ${visibleCount} daripada ${cards.length} modul`;
+      emptySearchMsg.classList.toggle("show", visibleCount === 0);
+    }
+
+    function resetAllFilters() {
+      searchInput.value = "";
+      activeCategoryFilter = "all";
+      filterButtons.forEach((b) => {
+        b.classList.toggle("active", b.getAttribute("data-filter") === "all");
+      });
+      applyCardFilters();
+    }
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeCategoryFilter = btn.getAttribute("data-filter");
+        applyCardFilters();
+      });
+    });
+
+    searchInput.addEventListener("input", applyCardFilters);
+
+    cards.forEach((card) => {
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          card.click();
+        }
+      });
+    });
+
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const themeLabel = document.getElementById("themeLabel");
+
+    function applySavedTheme() {
+      const savedTheme = localStorage.getItem("ieep_theme_mode");
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        themeIcon.textContent = "☀️";
+        themeLabel.textContent = "Mod Cerah";
+      }
+    }
+
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      themeIcon.textContent = isDark ? "☀️" : "🌙";
+      themeLabel.textContent = isDark ? "Mod Cerah" : "Mod Gelap";
+      localStorage.setItem("ieep_theme_mode", isDark ? "dark" : "light");
+    });
+
+    function showToast(icon, message) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastIcon").textContent = icon;
+      document.getElementById("toastText").textContent = message;
+      toast.classList.add("show");
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3200);
+    }
+
+    // Inisialisasi tema dan status pentadbir semasa halaman dimuatkan
+    applySavedTheme();
+    refreshAdminUI();
+  </script>
+</body>
+</html>

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Borang Laporan Aktiviti PPI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f0f2f5; font-family: 'Segoe UI', Arial, sans-serif; }
+    .form-container { max-width: 960px; margin: 30px auto; background: #ffffff; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .section-header { background: #003366; color: white; padding: 10px 15px; font-weight: 600; border-radius: 5px; margin-top: 25px; margin-bottom: 15px; }
+    .btn-custom { background-color: #003366; color: white; }
+    .btn-custom:hover { background-color: #002244; color: white; }
+    .loading-spinner { display: none; }
+    .paste-box { border: 2px dashed #003366; background-color: #f8f9fa; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s ease-in-out; }
+    .paste-box:focus, .paste-box:hover { background-color: #e9ecef; border-color: #002244; outline: none; }
+    .poster-card { border: 1px solid #003366; background: #fff; padding: 8px; border-radius: 6px; }
+    .pdf-preview-box { background-color: #eef4fc; border: 1px solid #b6d4fe; border-radius: 6px; padding: 8px 12px; margin-top: 6px; user-select: none; }
+    .pdf-preview-box:hover { background-color: #e2edfd; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="form-container">
+    <div class="text-center mb-4">
+      <h3 class="fw-bold text-primary">LAPORAN AKTIVITI PENSYARAH PELAWAT INDUSTRI (PPI)</h3>
+      <p class="text-muted">Dilengkapkan oleh pensyarah dalam tempoh SATU (1) minggu selepas tamat aktiviti</p>
+    </div>
+
+    <form id="ppiForm" onsubmit="submitForm(event)">
+
+      <!-- BAHAGIAN 1 -->
+      <div class="section-header">1. Maklumat Umum</div>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">Jabatan</label><input type="text" class="form-control" name="jabatan" required placeholder="Contoh: JKE"></div>
+        <div class="col-md-6"><label class="form-label">Program</label><input type="text" class="form-control" name="program" required placeholder="Contoh: DTK dan DEE"></div>
+        <div class="col-md-4"><label class="form-label">Jumlah Jam Interaksi PPI (A+B)</label><input type="text" class="form-control" name="jamAandB" required placeholder="3"></div>
+        <div class="col-md-4"><label class="form-label">Kursus Bidang Pengajian (A)</label><input type="text" class="form-control" name="kursusA" placeholder="3"></div>
+        <div class="col-md-4"><label class="form-label">Kursus Wajib (B)</label><input type="text" class="form-control" name="kursusB"></div>
+        <div class="col-md-12"><label class="form-label">Kod Kursus / Nama Kursus</label><input type="text" class="form-control" name="kodNamaKursus" required placeholder="DUW10022/Occupational Safety and Health for Engineering"></div>
+      </div>
+
+      <!-- BAHAGIAN 2 -->
+      <div class="section-header">2. Nama Aktiviti PPI</div>
+      <div class="mb-3"><label class="form-label">Nama Aktiviti PPI</label><input type="text" class="form-control" name="namaAktiviti" required></div>
+
+      <!-- BAHAGIAN 3 -->
+      <div class="section-header">3. Kaedah Pelaksanaan</div>
+      <div class="mb-3"><label class="form-label">Kaedah Pelaksanaan</label><input type="text" class="form-control" name="kaedah" placeholder="Secara bersemuka / Secara Dalam Talian" required></div>
+
+      <!-- BAHAGIAN 4 -->
+      <div class="section-header">4. Latar Belakang / Rasional</div>
+      <div class="mb-3"><label class="form-label">Latar Belakang / Rasional</label><textarea class="form-control" name="latarBelakang" rows="3" required></textarea></div>
+
+      <!-- BAHAGIAN 5: OBJEKTIF DINAMIK -->
+      <div class="section-header d-flex justify-content-between align-items-center">
+        <span>5. Objektif / Outcome</span>
+        <button type="button" class="btn btn-sm btn-light" onclick="addObjektifRow()">+ Tambah Objektif</button>
+      </div>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th width="70px" class="text-center">No.</th>
+              <th>Keterangan Objektif / Outcome</th>
+              <th width="80px" class="text-center">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="objektifBody"></tbody>
+        </table>
+      </div>
+
+      <!-- BAHAGIAN 6 -->
+      <div class="section-header d-flex justify-content-between align-items-center">
+        <span>6. Butiran Aktiviti & Tentatif</span>
+        <button type="button" class="btn btn-sm btn-light" onclick="addTentatifRow()">+ Tambah Tentatif</button>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-3"><label class="form-label">Tarikh</label><input type="date" class="form-control" name="tarikhAktiviti" required></div>
+        <div class="col-md-3"><label class="form-label">Hari</label><input type="text" class="form-control" name="hariAktiviti" placeholder="Selasa"></div>
+        <div class="col-md-3"><label class="form-label">Jumlah Jam Interaksi</label><input type="text" class="form-control" name="jamAktiviti" placeholder="3 jam"></div>
+        <div class="col-md-3"><label class="form-label">Anjuran</label><input type="text" class="form-control" name="anjuran" required></div>
+        <div class="col-md-12"><label class="form-label">Tempat</label><input type="text" class="form-control" name="tempat" required></div>
+      </div>
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr><th>Masa</th><th>Tarikh</th><th>Aktiviti</th><th width="80px">Tindakan</th></tr>
+        </thead>
+        <tbody id="tentatifBody"></tbody>
+      </table>
+
+      <!-- RUANG COPY PASTE SCREENSHOT TENTATIF -->
+      <div class="mb-4">
+        <div class="paste-box" id="tentatifPasteBox" tabindex="0">
+          <p class="mb-1 text-primary fw-bold">📋 ATAU Klik di sini & tekan Ctrl + V untuk tampal (Paste) Screenshot Tentatif Aktiviti</p>
+          <small class="text-muted">(Gunakan pilihan ini jika anda mahu memasukkan imej screenshot terus ke laporan PDF)</small>
+          <div id="tentatifImagePreview"></div>
+        </div>
+      </div>
+
+      <!-- BAHAGIAN 7 -->
+      <div class="section-header d-flex justify-content-between align-items-center">
+        <span>7. BUTIRAN PPI (PANEL JURI)</span>
+        <button type="button" class="btn btn-sm btn-light" onclick="addJuriRow()">+ Tambah Panel Juri</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Nama Juri</th>
+              <th>Organisasi / Firma</th>
+              <th>Jawatan</th>
+              <th>Badan Pengiktirafan</th>
+              <th>E-mel</th>
+              <th width="80px">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="juriBody"></tbody>
+        </table>
+      </div>
+
+      <!-- RUANG COPY PASTE SCREENSHOT PANEL JURI -->
+      <div class="mb-3">
+        <div class="paste-box" id="juriPasteBox" tabindex="0">
+          <p class="mb-1 text-primary fw-bold">📋 ATAU Klik di sini & tekan Ctrl + V untuk tampal (Paste) Screenshot Panel Juri</p>
+          <small class="text-muted">(Gunakan pilihan ini jika anda mahu memasukkan imej screenshot terus ke laporan PDF)</small>
+          <div id="juriImagePreview"></div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label font-weight-bold">Muat Naik PDF Senarai Nama Juri (Jika Ada)</label>
+        <input type="file" class="form-control" id="fileSenaraiJuri" accept="application/pdf" onchange="renderPdfPreview('fileSenaraiJuri', 'previewSenaraiJuri')">
+        <div id="previewSenaraiJuri"></div>
+      </div>
+
+      <!-- BAHAGIAN 8 -->
+      <div class="section-header d-flex justify-content-between align-items-center">
+        <span>8. Kos Perbelanjaan</span>
+        <button type="button" class="btn btn-sm btn-light" onclick="addKosRow()">+ Tambah Item Kos</button>
+      </div>
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr><th width="30%">Pecahan</th><th>Perkara</th><th width="20%">Jumlah (RM)</th><th width="80px">Tindakan</th></tr>
+        </thead>
+        <tbody id="kosBody"></tbody>
+      </table>
+
+      <!-- BAHAGIAN 9 -->
+      <div class="section-header">9. Rumusan Pelaksanaan Aktiviti DAN Pencapaian Terhadap Objektif/Outcome</div>
+      <div class="mb-3"><label class="form-label">Rumusan Pelaksanaan Aktiviti & Pencapaian Objektif</label><textarea class="form-control" name="rumusan" rows="3" required></textarea></div>
+
+      <!-- BAHAGIAN 10: CQI DINAMIK -->
+      <div class="section-header d-flex justify-content-between align-items-center">
+        <span>10. Cadangan Penambahbaikan Kualiti Berterusan (CQI) / Amalan Baik / Isu / Cabaran</span>
+        <button type="button" class="btn btn-sm btn-light" onclick="addCqiRow()">+ Tambah Cadangan CQI</button>
+      </div>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th width="70px" class="text-center">No.</th>
+              <th>Cadangan Penambahbaikan (CQI) / Amalan Baik / Isu / Cabaran</th>
+              <th width="80px" class="text-center">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="cqiBody"></tbody>
+        </table>
+      </div>
+
+      <!-- BAHAGIAN 11 -->
+      <div class="section-header">11. Analisis Refleksi Pelajar</div>
+      <div class="mb-3">
+        <label class="form-label">Analisis Keseluruhan Laporan Refleksi Pelajar</label>
+        <textarea class="form-control" name="ulasanRefleksi" rows="4" placeholder="Masukkan analisis/rumusan dapatan refleksi pelajar di sini..." required></textarea>
+      </div>
+
+      <!-- RUANG COPY PASTE SCREENSHOT REFLEKSI -->
+      <div class="mb-3">
+        <div class="paste-box" id="refleksiPasteBox" tabindex="0">
+          <p class="mb-1 text-primary fw-bold">📋 ATAU Klik di sini & tekan Ctrl + V untuk tampal (Paste) Screenshot Refleksi Pelajar</p>
+          <small class="text-muted">(Gunakan pilihan ini jika anda mahu memasukkan imej screenshot refleksi/graf terus ke laporan PDF)</small>
+          <div id="refleksiImagePreview"></div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Muat Naik PDF Rumusan dari Lampiran 4 Refleksi Pelajar</label>
+        <input type="file" class="form-control" id="fileRumusanRefleksi" accept="application/pdf" multiple onchange="renderPdfPreview('fileRumusanRefleksi', 'previewRumusanRefleksi')">
+        <div id="previewRumusanRefleksi"></div>
+      </div>
+
+      <!-- BAHAGIAN 12 -->
+      <div class="section-header">12. Lampiran & Muat Naik Dokumen Bukti</div>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">a) Kertas Cadangan / Kertas Kerja (PDF)</label>
+          <input type="file" class="form-control" id="fileKertasCadangan" accept="application/pdf" onchange="renderPdfPreview('fileKertasCadangan', 'previewKertasCadangan')">
+          <div id="previewKertasCadangan"></div>
+        </div>
+        
+        <!-- b) POSTER PDF & SCREENSHOT COPY PASTE (MAX 3) -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">b) Poster / Hebahan (Max 3 PDF / Screenshot)</label>
+          <input type="file" class="form-control mb-2" id="filePoster" accept="application/pdf" multiple onchange="renderPdfPreview('filePoster', 'previewPoster')">
+          <div id="previewPoster"></div>
+          
+          <div class="paste-box mt-2" id="posterPasteBox" tabindex="0">
+            <p class="mb-1 text-primary fw-bold" style="font-size: 0.9rem;">📋 ATAU Klik di sini & tekan Ctrl + V untuk tampal Screenshot Poster (Maksimum 3)</p>
+            <small class="text-muted" id="posterCountNote">0 daripada 3 screenshot ditampal</small>
+            <div id="posterImagePreview" class="row g-2 mt-2"></div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">c) Senarai Kehadiran Peserta (Max 3 PDF)</label>
+          <input type="file" class="form-control" id="fileKehadiran" accept="application/pdf" multiple onchange="renderPdfPreview('fileKehadiran', 'previewKehadiran')">
+          <div id="previewKehadiran"></div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">d) 3 Salinan Refleksi Pelajar - Lampiran 4 (PDF)</label>
+          <input type="file" class="form-control" id="fileSalinanRefleksi" accept="application/pdf" multiple onchange="renderPdfPreview('fileSalinanRefleksi', 'previewSalinanRefleksi')">
+          <div id="previewSalinanRefleksi"></div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">e) Maklum Balas Juri / Dokumen Lain (Max 5 PDF)</label>
+          <input type="file" class="form-control" id="fileJuri" accept="application/pdf" multiple onchange="renderPdfPreview('fileJuri', 'previewJuri')">
+          <div id="previewJuri"></div>
+        </div>
+        
+        <!-- f) GAMBAR AKTIVITI DENGAN TAJUK MANUAL -->
+        <div class="col-md-12">
+          <label class="form-label fw-bold">f) Gambar Aktiviti beserta Tajuk / Penerangan Manual (Max 20 Gambar)</label>
+          <input type="file" class="form-control" id="fileGambarInput" accept="image/*" multiple onchange="handleGambarSelect(this)">
+          <small class="text-muted">Setiap gambar yang dimuat naik boleh diletakkan tajuk secara manual. Gambar akan dijana secara kemas dalam 1 Fail PDF Gambar Aktiviti (Grid 2x3 per m/s).</small>
+          
+          <div id="gambarPreviewContainer" class="row g-3 mt-2"></div>
+        </div>
+      </div>
+
+      <!-- PENGESAHAN & TANDATANGAN -->
+      <div class="section-header">Pengesahan & Tandatangan</div>
+      <div class="row g-3">
+        <div class="col-md-6 border-end">
+          <h6 class="fw-bold">Disediakan Oleh:</h6>
+          <div class="mb-2"><label class="form-label">Nama</label><input type="text" class="form-control" name="disediakanNama" required></div>
+          <div class="mb-2"><label class="form-label">Jawatan & Cop</label><input type="text" class="form-control" name="disediakanCop" placeholder="Pensyarah JKE"></div>
+          <div class="mb-2"><label class="form-label">Tarikh</label><input type="date" class="form-control" name="disediakanTarikh" required></div>
+        </div>
+        <div class="col-md-6">
+          <h6 class="fw-bold">Disahkan Oleh:</h6>
+          <div class="mb-2"><label class="form-label">Nama</label><input type="text" class="form-control" name="disahkanNama" required></div>
+          <div class="mb-2"><label class="form-label">Jawatan & Cop</label><input type="text" class="form-control" name="disahkanCop" placeholder="Ketua Jabatan JKE"></div>
+          <div class="mb-2"><label class="form-label">Tarikh</label><input type="date" class="form-control" name="disahkanTarikh" required></div>
+        </div>
+      </div>
+
+      <!-- BUTANG HANTAR -->
+      <div class="mt-4 text-center">
+        <button type="submit" class="btn btn-custom btn-lg w-100" id="submitBtn">
+          <span class="spinner-border spinner-border-sm loading-spinner" id="spinner"></span>
+          Jana Laporan PDF & Simpan ke Drive
+        </button>
+      </div>
+
+    </form>
+
+    <div id="resultAlert" class="alert mt-4 d-none"></div>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxA36bna02oBDIRJBMETdpgHsrOTLhmIIy3zP1EmcIQHNn42336E6JF1jdtaLikGaH9/exec';
+
+  var tentatifImageBase64 = "";
+  var juriImageBase64 = "";
+  var refleksiImageBase64 = "";
+  var posterImagesArray = [];
+  var selectedGambarItems = [];
+
+  window.onload = function() {
+    addObjektifRow("Membina hubungan yang erat dengan politeknik dan industri (KPI PPI)");
+    addObjektifRow("Meningkatkan kefahaman pelajar berkaitan Hazard Identification Risk Assessment & Risk Control (HIRARC)");
+    addCqiRow("Memperluaskan penyertaan pelajar secara bersemuka bagi sesi praktikal akan datang.");
+    addTentatifRow();
+    addJuriRow();
+    addKosRow();
+
+    setupPasteListener('tentatifPasteBox', 'tentatifImagePreview', function(data) {
+      tentatifImageBase64 = data;
+    });
+
+    setupPasteListener('juriPasteBox', 'juriImagePreview', function(data) {
+      juriImageBase64 = data;
+    });
+
+    setupPasteListener('refleksiPasteBox', 'refleksiImagePreview', function(data) {
+      refleksiImageBase64 = data;
+    });
+
+    setupPosterPasteListener();
+  };
+
+  // FUNGSI PAPARAN PDF & BUTTON CLEAR & DWIKLIK (DOUBLE CLICK TO CLEAR)
+  function renderPdfPreview(inputId, previewId) {
+    var input = document.getElementById(inputId);
+    var container = document.getElementById(previewId);
+    container.innerHTML = "";
+
+    if (!input || !input.files || input.files.length === 0) return;
+
+    var fileListHtml = "";
+    for (var i = 0; i < input.files.length; i++) {
+      fileListHtml += `<span class="badge bg-primary me-1 mb-1">📄 ${escapeHtml(input.files[i].name)}</span>`;
+    }
+
+    container.innerHTML = `
+      <div class="pdf-preview-box d-flex justify-content-between align-items-center mt-2" 
+           title="Dwiklik (Double click) di sini untuk memadam fail PDF ini"
+           ondblclick="clearPdfInput('${inputId}', '${previewId}')">
+        <div>
+          <small class="fw-bold text-dark d-block">Fail PDF Dipilih (Dwiklik untuk Padam):</small>
+          <div>${fileListHtml}</div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger ms-2 py-1 px-2" onclick="clearPdfInput('${inputId}', '${previewId}')">
+          🗑️ Kosongkan Fail PDF
+        </button>
+      </div>
+    `;
+  }
+
+  function clearPdfInput(inputId, previewId) {
+    var input = document.getElementById(inputId);
+    if (input) input.value = "";
+    var container = document.getElementById(previewId);
+    if (container) container.innerHTML = "";
+  }
+
+  // FUNGSI COPY-PASTE SCREENSHOT TUNGGAL BERASASKAN CANVAS COMPRESSION
+  function setupPasteListener(boxId, previewId, callback) {
+    var box = document.getElementById(boxId);
+    box.addEventListener('paste', function(e) {
+      var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          var blob = items[i].getAsFile();
+          compressImageFile(blob, 1200, 0.8, function(b64) {
+            callback(b64);
+            document.getElementById(previewId).innerHTML = `
+              <div class="mt-2 text-center position-relative">
+                <img src="${b64}" style="max-width:100%; max-height:280px; border:1px solid #003366; padding:4px; border-radius:5px;" />
+                <br><button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="removePastedImage('${previewId}', '${boxId}')">Padam Gambar Tangkap Layar</button>
+              </div>`;
+          });
+          e.preventDefault();
+          break;
+        }
+      }
+    });
+  }
+
+  function removePastedImage(previewId, boxId) {
+    document.getElementById(previewId).innerHTML = '';
+    if (boxId === 'tentatifPasteBox') tentatifImageBase64 = "";
+    if (boxId === 'juriPasteBox') juriImageBase64 = "";
+    if (boxId === 'refleksiPasteBox') refleksiImageBase64 = "";
+  }
+
+  // FUNGSI COPY-PASTE SCREENSHOT POSTER (MAX 3)
+  function setupPosterPasteListener() {
+    var box = document.getElementById('posterPasteBox');
+    box.addEventListener('paste', function(e) {
+      if (posterImagesArray.length >= 3) {
+        alert("Maksimum 3 screenshot poster sahaja dibenarkan.");
+        e.preventDefault();
+        return;
+      }
+      var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          var blob = items[i].getAsFile();
+          compressImageFile(blob, 1200, 0.8, function(b64) {
+            posterImagesArray.push(b64);
+            renderPosterPreviews();
+          });
+          e.preventDefault();
+          break;
+        }
+      }
+    });
+  }
+
+  function renderPosterPreviews() {
+    var container = document.getElementById('posterImagePreview');
+    var note = document.getElementById('posterCountNote');
+    note.textContent = posterImagesArray.length + " daripada 3 screenshot ditampal";
+    container.innerHTML = "";
+    
+    posterImagesArray.forEach((b64, index) => {
+      var col = document.createElement('div');
+      col.className = 'col-4 text-center position-relative';
+      col.innerHTML = `
+        <div class="poster-card">
+          <img src="${b64}" style="width:100%; height:100px; object-fit:contain;" />
+          <button type="button" class="btn btn-sm btn-danger w-100 mt-1 py-0" style="font-size:0.75rem;" onclick="removePosterImage(${index})">Padam</button>
+        </div>
+      `;
+      container.appendChild(col);
+    });
+  }
+
+  function removePosterImage(index) {
+    posterImagesArray.splice(index, 1);
+    renderPosterPreviews();
+  }
+
+  // FUNGSI PENGENDALIAN MUAT NAIK GAMBAR AKTIVITI DENGAN COMPRESSION
+  async function handleGambarSelect(input) {
+    var files = input.files;
+    if (!files || files.length === 0) return;
+    var limit = Math.min(files.length, 20);
+    selectedGambarItems = [];
+
+    for (var i = 0; i < limit; i++) {
+      const file = files[i];
+      const b64 = await compressImagePromise(file, 1200, 0.8);
+      selectedGambarItems.push({
+        fileObj: file,
+        data: b64,
+        title: "Gambar " + (i + 1) + ": " + (file.name.split('.')[0] || "Aktiviti PPI")
+      });
+    }
+    renderGambarPreviews();
+  }
+
+  function renderGambarPreviews() {
+    var container = document.getElementById('gambarPreviewContainer');
+    container.innerHTML = "";
+
+    selectedGambarItems.forEach((item, idx) => {
+      var col = document.createElement('div');
+      col.className = "col-md-6 col-lg-4";
+      col.innerHTML = `
+        <div class="card h-100 shadow-sm border p-2 text-center">
+          <img src="${item.data}" style="height: 140px; object-fit: contain;" class="card-img-top mb-2 border rounded" />
+          <div class="card-body p-1">
+            <label class="form-label small fw-bold mb-1">Tajuk / Penerangan Gambar ${idx + 1}:</label>
+            <input type="text" class="form-control form-control-sm text-center" value="${escapeQuotes(item.title)}" onchange="updateGambarTitle(${idx}, this.value)">
+            <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-2 py-0" onclick="removeGambarItem(${idx})">Padam Gambar Ini</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(col);
+    });
+  }
+
+  function updateGambarTitle(idx, val) {
+    if (selectedGambarItems[idx]) {
+      selectedGambarItems[idx].title = val;
+    }
+  }
+
+  function removeGambarItem(idx) {
+    selectedGambarItems.splice(idx, 1);
+    renderGambarPreviews();
+  }
+
+  // PEMAMPATAN IMEJ BERASASKAN CANVAS SISI KLIEN UNTUK MENGELAKKAN "FAILED TO FETCH"
+  function compressImageFile(file, maxWidth, quality, callback) {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function(event) {
+      var img = new Image();
+      img.src = event.target.result;
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var width = img.width;
+        var height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        var dataUrl = canvas.toDataURL('image/jpeg', quality);
+        callback(dataUrl);
+      };
+    };
+  }
+
+  function compressImagePromise(file, maxWidth, quality) {
+    return new Promise((resolve) => {
+      compressImageFile(file, maxWidth, quality, resolve);
+    });
+  }
+
+  // MENAMBAH OBJEKTIF DINAMIK (BAHAGIAN 5)
+  function addObjektifRow(text = '') {
+    var tbody = document.getElementById('objektifBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="text-center align-middle fw-bold obj-number">5.1</td>
+      <td><input type="text" class="form-control objText" placeholder="Masukkan objektif program..." value="${escapeQuotes(text)}" required></td>
+      <td class="text-center align-middle"><button type="button" class="btn btn-sm btn-danger" onclick="deleteObjektifRow(this)">Padam</button></td>
+    `;
+    tbody.appendChild(tr);
+    renumberObjektif();
+  }
+
+  function deleteObjektifRow(btn) {
+    var tbody = document.getElementById('objektifBody');
+    if (tbody.rows.length > 1) {
+      var row = btn.parentNode.parentNode;
+      row.parentNode.removeChild(row);
+      renumberObjektif();
+    } else {
+      alert("Sekurang-kurangnya satu objektif perlu kekal.");
+    }
+  }
+
+  function renumberObjektif() {
+    var rows = document.querySelectorAll('#objektifBody tr');
+    rows.forEach((row, index) => {
+      var numTd = row.querySelector('.obj-number');
+      if (numTd) {
+        numTd.textContent = '5.' + (index + 1);
+      }
+    });
+  }
+
+  // MENAMBAH CQI DINAMIK (BAHAGIAN 10)
+  function addCqiRow(text = '') {
+    var tbody = document.getElementById('cqiBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="text-center align-middle fw-bold cqi-number">10.1</td>
+      <td><input type="text" class="form-control cqiText" placeholder="Masukkan cadangan CQI / amalan baik / isu..." value="${escapeQuotes(text)}" required></td>
+      <td class="text-center align-middle"><button type="button" class="btn btn-sm btn-danger" onclick="deleteCqiRow(this)">Padam</button></td>
+    `;
+    tbody.appendChild(tr);
+    renumberCqi();
+  }
+
+  function deleteCqiRow(btn) {
+    var tbody = document.getElementById('cqiBody');
+    if (tbody.rows.length > 1) {
+      var row = btn.parentNode.parentNode;
+      row.parentNode.removeChild(row);
+      renumberCqi();
+    } else {
+      alert("Sekurang-kurangnya satu cadangan CQI perlu kekal.");
+    }
+  }
+
+  function renumberCqi() {
+    var rows = document.querySelectorAll('#cqiBody tr');
+    rows.forEach((row, index) => {
+      var numTd = row.querySelector('.cqi-number');
+      if (numTd) {
+        numTd.textContent = '10.' + (index + 1);
+      }
+    });
+  }
+
+  function escapeQuotes(str) {
+    if (!str) return '';
+    return String(str).replace(/"/g, '&quot;');
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function addJuriRow() {
+    var tbody = document.getElementById('juriBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" class="form-control juriNama" placeholder="En. Ahmad"></td>
+      <td><input type="text" class="form-control juriOrganisasi" placeholder="NIOSH / Syarikat"></td>
+      <td><input type="text" class="form-control juriJawatan" placeholder="Pengarah / Juri"></td>
+      <td><input type="text" class="form-control juriBadan" placeholder="Train The Trainer"></td>
+      <td><input type="email" class="form-control juriEmail" placeholder="juri@email.com"></td>
+      <td class="text-center"><button type="button" class="btn btn-sm btn-danger" onclick="deleteRow(this)">Padam</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function addTentatifRow() {
+    var tbody = document.getElementById('tentatifBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" class="form-control masa" placeholder="2.00 ptg"></td>
+      <td><input type="date" class="form-control tarikhTentatif"></td>
+      <td><input type="text" class="form-control aktiviti" placeholder="Sesi ceramah"></td>
+      <td class="text-center"><button type="button" class="btn btn-sm btn-danger" onclick="deleteRow(this)">Padam</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function addKosRow() {
+    var tbody = document.getElementById('kosBody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <select class="form-select pecahan">
+          <option value="OS24 SEWAAN">OS24 SEWAAN</option>
+          <option value="OS25 BAHAN MAKANAN">OS25 BAHAN MAKANAN</option>
+          <option value="OS26 BAHAN MENTAH">OS26 BAHAN MENTAH</option>
+          <option value="OS29 PERKHIDMATAN">OS29 PERKHIDMATAN</option>
+          <option value="OS42 AKTIVITI PELAJAR">OS42 AKTIVITI PELAJAR</option>
+          <option value="Lain-lain">Lain-lain</option>
+        </select>
+      </td>
+      <td><input type="text" class="form-control perkara" placeholder="Perincian kos"></td>
+      <td><input type="number" step="0.01" class="form-control jumlah" placeholder="0.00"></td>
+      <td class="text-center"><button type="button" class="btn btn-sm btn-danger" onclick="deleteRow(this)">Padam</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function deleteRow(btn) {
+    var row = btn.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+  }
+
+  async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve({ name: file.name, data: reader.result });
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  async function submitForm(e) {
+    e.preventDefault();
+    var submitBtn = document.getElementById('submitBtn');
+    var spinner = document.getElementById('spinner');
+    var alertBox = document.getElementById('resultAlert');
+
+    submitBtn.disabled = true;
+    spinner.style.display = 'inline-block';
+    alertBox.className = 'alert mt-4 d-none';
+
+    var form = document.getElementById('ppiForm');
+
+    var formData = {
+      jabatan: form.jabatan.value,
+      program: form.program.value,
+      jamAandB: form.jamAandB.value,
+      kursusA: form.kursusA.value,
+      kursusB: form.kursusB.value,
+      kodNamaKursus: form.kodNamaKursus.value,
+      namaAktiviti: form.namaAktiviti.value,
+      kaedah: form.kaedah.value,
+      latarBelakang: form.latarBelakang.value,
+      tarikhAktiviti: form.tarikhAktiviti.value,
+      hariAktiviti: form.hariAktiviti.value,
+      jamAktiviti: form.jamAktiviti.value,
+      anjuran: form.anjuran.value,
+      tempat: form.tempat.value,
+      rumusan: form.rumusan.value,
+      ulasanRefleksi: form.ulasanRefleksi.value,
+      disediakanNama: form.disediakanNama.value,
+      disediakanCop: form.disediakanCop.value,
+      disediakanTarikh: form.disediakanTarikh.value,
+      disahkanNama: form.disahkanNama.value,
+      disahkanCop: form.disahkanCop.value,
+      disahkanTarikh: form.disahkanTarikh.value,
+      tentatifImage: tentatifImageBase64,
+      juriImage: juriImageBase64,
+      refleksiImage: refleksiImageBase64,
+      posterImages: posterImagesArray,
+      gambarList: selectedGambarItems.map(item => ({ title: item.title, data: item.data })),
+      objektifList: [],
+      cqiList: [],
+      juriList: [],
+      tentatif: [],
+      kosItems: [],
+      files: {}
+    };
+
+    // KUMPUL OBJEKTIF
+    document.querySelectorAll('#objektifBody tr').forEach(row => {
+      var val = row.querySelector('.objText').value;
+      if (val) {
+        formData.objektifList.push(val);
+      }
+    });
+
+    // KUMPUL CQI
+    document.querySelectorAll('#cqiBody tr').forEach(row => {
+      var val = row.querySelector('.cqiText').value;
+      if (val) {
+        formData.cqiList.push(val);
+      }
+    });
+
+    // KUMPUL PANEL JURI
+    document.querySelectorAll('#juriBody tr').forEach(row => {
+      var nama = row.querySelector('.juriNama').value;
+      if (nama) {
+        formData.juriList.push({
+          nama: nama,
+          organisasi: row.querySelector('.juriOrganisasi').value,
+          jawatan: row.querySelector('.juriJawatan').value,
+          badan: row.querySelector('.juriBadan').value,
+          email: row.querySelector('.juriEmail').value
+        });
+      }
+    });
+
+    // KUMPUL TENTATIF
+    document.querySelectorAll('#tentatifBody tr').forEach(row => {
+      formData.tentatif.push({
+        masa: row.querySelector('.masa').value,
+        tarikh: row.querySelector('.tarikhTentatif').value,
+        aktiviti: row.querySelector('.aktiviti').value
+      });
+    });
+
+    // KUMPUL KOS
+    document.querySelectorAll('#kosBody tr').forEach(row => {
+      formData.kosItems.push({
+        pecahan: row.querySelector('.pecahan').value,
+        perkara: row.querySelector('.perkara').value,
+        jumlah: row.querySelector('.jumlah').value
+      });
+    });
+
+    // BACA FAIL-FAIL UPLOAD (PDF)
+    try {
+      formData.files.senaraiJuriPdf = await readFileInput(document.getElementById('fileSenaraiJuri'), 1);
+      formData.files.kertasCadangan = await readFileInput(document.getElementById('fileKertasCadangan'), 1);
+      formData.files.poster = await readFileInput(document.getElementById('filePoster'), 3);
+      formData.files.kehadiran = await readFileInput(document.getElementById('fileKehadiran'), 3);
+      formData.files.rumusanRefleksi = await readFileInput(document.getElementById('fileRumusanRefleksi'), 5);
+      formData.files.salinanRefleksi = await readFileInput(document.getElementById('fileSalinanRefleksi'), 3);
+      formData.files.juri = await readFileInput(document.getElementById('fileJuri'), 5);
+    } catch(err) {
+      alert("Ralat semasa membaca fail: " + err);
+      submitBtn.disabled = false;
+      spinner.style.display = 'none';
+      return;
+    }
+
+    // PENGHANTARAN DATA (DENGAN REDIRECT FOLLOW UNTUK MENGELAKKAN CATCH FAILED TO FETCH)
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(handleSuccess)
+        .withFailureHandler(handleFailure)
+        .processForm(formData);
+    } else {
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(formData),
+        redirect: 'follow'
+      })
+      .then(res => res.json())
+      .then(handleSuccess)
+      .catch(handleFailure);
+    }
+
+    function handleSuccess(response) {
+      submitBtn.disabled = false;
+      spinner.style.display = 'none';
+      if (response.success) {
+        alertBox.className = 'alert alert-success mt-4';
+        alertBox.innerHTML = '<strong>Berjaya!</strong> Laporan PDF Lampiran 3 telah dijana.<br><a href="' + response.url + '" target="_blank" class="alert-link">Klik di sini untuk membuka PDF Laporan Utama</a>';
+        form.reset();
+        tentatifImageBase64 = "";
+        juriImageBase64 = "";
+        refleksiImageBase64 = "";
+        posterImagesArray = [];
+        selectedGambarItems = [];
+        document.getElementById('tentatifImagePreview').innerHTML = '';
+        document.getElementById('juriImagePreview').innerHTML = '';
+        document.getElementById('refleksiImagePreview').innerHTML = '';
+        document.getElementById('posterImagePreview').innerHTML = '';
+        document.getElementById('gambarPreviewContainer').innerHTML = '';
+        document.getElementById('objektifBody').innerHTML = '';
+        document.getElementById('cqiBody').innerHTML = '';
+        document.getElementById('juriBody').innerHTML = '';
+        document.getElementById('tentatifBody').innerHTML = '';
+        document.getElementById('kosBody').innerHTML = '';
+        
+        ['previewSenaraiJuri', 'previewRumusanRefleksi', 'previewKertasCadangan', 'previewPoster', 'previewKehadiran', 'previewSalinanRefleksi', 'previewJuri'].forEach(id => {
+          var el = document.getElementById(id);
+          if (el) el.innerHTML = '';
+        });
+
+        addObjektifRow("Membina hubungan yang erat dengan politeknik dan industri (KPI PPI)");
+        addCqiRow("Memperluaskan penyertaan pelajar secara bersemuka bagi sesi praktikal akan datang.");
+        addTentatifRow();
+        addJuriRow();
+        addKosRow();
+      } else {
+        alertBox.className = 'alert alert-danger mt-4';
+        alertBox.innerHTML = '<strong>Ralat:</strong> ' + response.message;
+      }
+    }
+
+    function handleFailure(err) {
+      submitBtn.disabled = false;
+      spinner.style.display = 'none';
+      alertBox.className = 'alert alert-danger mt-4';
+      alertBox.innerHTML = '<strong>Ralat Sistem:</strong> ' + (err.message || err);
+    }
+  }
+
+  async function readFileInput(inputElement, maxFiles) {
+    if (!inputElement) return [];
+    var files = inputElement.files;
+    var result = [];
+    if (!files || files.length === 0) return result;
+    var limit = Math.min(files.length, maxFiles);
+    for (var i = 0; i < limit; i++) {
+      var fObj = await fileToBase64(files[i]);
+      result.push(fObj);
+    }
+    return result;
+  }
+</script>
+
+</body>
+</html>

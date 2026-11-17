@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Borang Maklum Balas Industri Kluster 1/2/3</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js untuk Dashboard Admin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .circled-num {
+            border: 2.5px solid #1d4ed8;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #1d4ed8;
+            font-weight: 800;
+            background-color: #eff6ff;
+            box-shadow: 0 2px 4px rgba(29, 78, 216, 0.15);
+        }
+        .likert-btn {
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .form-card { box-shadow: none !important; border: none !important; }
+        }
+    </style>
+</head>
+<body class="py-4 sm:py-8 px-3 sm:px-6 lg:px-8 text-slate-800">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Control Bar -->
+        <div class="no-print mb-4 sm:mb-6 bg-white p-3.5 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-3 justify-between items-center">
+            <div class="flex items-center gap-2 text-slate-700 font-bold text-xs sm:text-sm text-center sm:text-left">
+                <i class="fa-solid fa-laptop-code text-blue-600 text-base sm:text-lg"></i>
+                <span>Sistem Web Borang Maklum Balas Industri</span>
+            </div>
+            <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-center sm:justify-end">
+                <button type="button" id="btnDownloadManual" onclick="downloadPDFManual()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto">
+                    <i class="fa-solid fa-file-pdf"></i> Muat Turun PDF Saya
+                </button>
+                <button type="button" onclick="resetForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 flex-1 sm:flex-none">
+                    <i class="fa-solid fa-rotate-left"></i> Set Semula
+                </button>
+                <button type="button" onclick="openAdminModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 shadow-sm flex-1 sm:flex-none">
+                    <i class="fa-solid fa-user-shield"></i> Log Masuk Admin
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Form Container -->
+        <div id="printable-form" class="form-card bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-8 md:p-12 relative overflow-hidden">
+            
+            <!-- Header Lampiran 4 -->
+            <div class="text-center border-b-2 border-slate-200 pb-5 mb-6 sm:mb-8">
+                <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                    <span class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full border border-slate-200">Lampiran 4</span>
+                    <span class="text-[10px] sm:text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                        <i class="fa-solid fa-circle-check mr-1"></i> Auto Sync (Spreadsheet + PDF Drive)
+                    </span>
+                </div>
+                
+                <h3 class="text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">KEMENTERIAN PENDIDIKAN TINGGI</h3>
+                <h4 class="text-[11px] sm:text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">JABATAN PENDIDIKAN POLITEKNIK DAN KOLEJ KOMUNITI</h4>
+                
+               <!-- KEMASKINI: HTML Header Kluster Dinamik -->
+<div class="my-3 inline-block bg-gradient-to-r from-blue-50 via-slate-50 to-blue-50 px-4 sm:px-6 py-3 rounded-xl border border-blue-100 max-w-full">
+    <h1 class="text-base sm:text-xl font-black text-slate-800 tracking-tight flex items-center justify-center flex-wrap gap-1.5 sm:gap-2">
+        <span>BORANG MAKLUM BALAS INDUSTRI KLUSTER</span>
+        <span id="publicKlusterDisplay" class="inline-flex items-center gap-1">
+            <span class="text-xs text-blue-600 font-normal animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Memuatkan...</span>
+        </span>
+    </h1>
+</div>
+                <p class="text-[11px] sm:text-xs text-slate-500 italic mt-1">(Dilengkapkan oleh pihak industri yang menjalankan Aktiviti IEEP)</p>
+
+                <!-- PAPARAN NAMA PROGRAM & TARIKH PROGRAM (READ-ONLY FOR PUBLIC) -->
+                <div class="mt-4 bg-blue-50/80 border border-blue-200 rounded-xl p-3.5 sm:p-4 text-left max-w-2xl mx-auto shadow-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-slate-500 text-[10px] sm:text-xs uppercase tracking-wider"><i class="fa-solid fa-graduation-cap text-blue-600 mr-1"></i> Nama Program:</span>
+                            <span id="publicNamaProgram" class="font-extrabold text-blue-900 mt-0.5">Memuatkan...</span>
+                        </div>
+                        <div class="flex flex-col sm:border-l sm:border-blue-200 sm:pl-3">
+                            <span class="font-bold text-slate-500 text-[10px] sm:text-xs uppercase tracking-wider"><i class="fa-solid fa-calendar-days text-blue-600 mr-1"></i> Tarikh Program:</span>
+                            <span id="publicTarikhProgram" class="font-extrabold text-blue-900 mt-0.5">Memuatkan...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <form id="feedbackForm" onsubmit="handleSubmit(event)" class="space-y-6 sm:space-y-8">
+
+                <!-- Bahagian A: Maklumat Industri -->
+                <div class="bg-slate-50/80 p-4 sm:p-6 rounded-xl border border-slate-200">
+                    <h2 class="text-sm sm:text-base font-bold text-blue-900 border-l-4 border-blue-600 pl-3 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-building text-blue-600"></i> Bahagian A: Maklumat Industri
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Nama Industri <span class="text-red-500">*</span></label>
+                            <input type="text" id="namaIndustri" name="namaIndustri" required placeholder="Cth: Syarikat ABC Sdn Bhd" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm outline-none transition-all">
+                            <span class="text-[10px] text-slate-400 mt-1 block">Simpan di Lajur A</span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Nama Pegawai <span class="text-red-500">*</span></label>
+                            <input type="text" id="namaPegawai" name="namaPegawai" required placeholder="Cth: En. Ahmad Razali" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm outline-none transition-all">
+                            <span class="text-[10px] text-slate-400 mt-1 block">Simpan di Lajur B (Nama Fail PDF)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bahagian B: Pelaksanaan Aktiviti IEEP -->
+                <div>
+                    <h2 class="text-sm sm:text-base font-bold text-blue-900 border-l-4 border-blue-600 pl-3 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-blue-600"></i> Bahagian B: Pelaksanaan Aktiviti IEEP (Skala Likert)
+                    </h2>
+                    
+                    <div class="bg-blue-50/70 rounded-xl p-3.5 sm:p-4 mb-4 sm:mb-6 border border-blue-100 text-xs">
+                        <span class="font-bold text-blue-900 block mb-2"><i class="fa-solid fa-circle-info mr-1"></i> Skala Penilaian:</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-slate-700 text-center font-medium">
+                            <div class="bg-white p-1.5 rounded border border-blue-100 text-[11px]"><span class="font-bold text-blue-600">1</span> = Sangat Tidak Setuju</div>
+                            <div class="bg-white p-1.5 rounded border border-blue-100 text-[11px]"><span class="font-bold text-blue-600">2</span> = Tidak Setuju</div>
+                            <div class="bg-white p-1.5 rounded border border-blue-100 text-[11px]"><span class="font-bold text-blue-600">3</span> = Neutral</div>
+                            <div class="bg-white p-1.5 rounded border border-blue-100 text-[11px]"><span class="font-bold text-blue-600">4</span> = Setuju</div>
+                            <div class="bg-white p-1.5 rounded border border-blue-100 text-[11px]"><span class="font-bold text-blue-600">5</span> = Sangat Setuju</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3.5 sm:space-y-4" id="questionsContainer"></div>
+                </div>
+
+                <!-- Soalan Tambahan -->
+                <div class="bg-slate-50/80 p-4 sm:p-6 rounded-xl border border-slate-200 space-y-4 sm:space-y-6">
+                    <h2 class="text-sm sm:text-base font-bold text-blue-900 border-l-4 border-blue-600 pl-3 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-blue-600"></i> Soalan Tambahan
+                    </h2>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">1. Apakah aspek yang paling berkesan dalam pelaksanaan program IEEP ini?</label>
+                        <textarea id="st1" name="st1" rows="3" placeholder="Tuliskan pandangan anda di sini..." class="w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm transition-all outline-none resize-y"></textarea>
+                        <span class="text-[10px] text-slate-400 mt-1 block">Lajur K (ST1)</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">2. Cadangan penambahbaikan daripada pihak industri untuk program IEEP akan datang:</label>
+                        <textarea id="st2" name="st2" rows="3" placeholder="Tuliskan cadangan anda di sini..." class="w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm transition-all outline-none resize-y"></textarea>
+                        <span class="text-[10px] text-slate-400 mt-1 block">Lajur L (ST2)</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="no-print flex justify-end gap-4 pt-4 border-t border-slate-200">
+                    <button type="submit" id="submitBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
+                        <i class="fa-solid fa-paper-plane"></i> Hantar Maklum Balas
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- POP-UP RESPONDEN: MAKLUM BALAS BERJAYA DITERIMA -->
+    <div id="respondentSuccessModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 text-center relative">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-emerald-200 shadow-inner">
+                <i class="fa-solid fa-circle-check text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-extrabold text-slate-800 mb-2">Maklum Balas Berjaya Diterima & Disimpan!</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                Terima kasih atas kerjasama anda. Maklum balas anda telah selamat direkodkan ke dalam sistem. Sekiranya pegawai dan industri yang sama menghantar semula borang, rekod lama dan fail PDF terdahulu akan dikemaskini secara automatik.
+            </p>
+            <div class="flex flex-col gap-2">
+                <button type="button" id="btnDownloadRespondentPdf" onclick="downloadPDFManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Muat Turun Salinan PDF Saya
+                </button>
+                <button type="button" onclick="closeRespondentSuccessModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm transition-all">
+                    Faham & Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="adminModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 relative">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-user-lock text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Log Masuk Pentadbir (Admin)</h3>
+                <p class="text-xs text-slate-500 mt-1">Sila masukkan kata laluan untuk mengakses analisis dan tetapan.</p>
+            </div>
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kata Laluan Admin</label>
+                    <input type="password" id="adminPassword" required placeholder="Sila masukkan kata laluan..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <button type="submit" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-sm transition-all shadow-md">
+                    <i class="fa-solid fa-right-to-bracket mr-1"></i> Log Masuk
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL & DASHBOARD MODAL -->
+    <div id="adminPanelModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-4 sm:p-6 my-4 border border-slate-100 relative max-h-[95vh] flex flex-col">
+            
+            <!-- Panel Header & Navigation Tabs -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-200 gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="p-2.5 bg-blue-100 text-blue-600 rounded-xl font-bold"><i class="fa-solid fa-chart-column text-xl"></i></span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800">Panel Admin & Dashboard Analisis</h3>
+                        <p class="text-xs text-slate-500" id="totalRecordsText">Jumlah Responden: 0</p>
+                    </div>
+                </div>
+
+                <!-- Tab Buttons -->
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <button type="button" id="tabBtnChart" onclick="switchAdminTab('chart')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-sm flex-1 sm:flex-none flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-chart-bar"></i> Carta Analisis
+                    </button>
+                    <button type="button" id="tabBtnRecords" onclick="switchAdminTab('records')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200 flex-1 sm:flex-none flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-list-check"></i> Rekod Individu
+                    </button>
+                    <button type="button" onclick="openProgramModal()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white flex items-center gap-1">
+                        <i class="fa-solid fa-pen-to-square"></i> Tetapan Program (A & B)
+                    </button>
+                    <button type="button" onclick="closeAdminPanel()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KAWALAN PROGRAM & TAPISAN DINAMIK -->
+            <div class="bg-slate-100 p-3.5 my-3 rounded-xl border border-slate-200 space-y-3">
+                
+                <!-- Filter Program Dropdown (Carian Mengikut Lajur O) -->
+                <div class="bg-white p-3 rounded-xl border border-blue-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-filter text-blue-600 text-base"></i>
+                        <span class="text-xs font-bold text-slate-800 uppercase">Tapis Mengikut Program (Lajur O):</span>
+                    </div>
+                    <div class="w-full sm:w-auto flex-1">
+                        <select id="programFilterSelect" onchange="onProgramFilterChange()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="ALL">-- SEMUA PROGRAM (KESELURUHAN REKOD) --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center gap-3 pt-1">
+                    <div class="flex flex-wrap items-center gap-3 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-500 uppercase block text-[10px]">Program Aktif Borang</span>
+                            <span id="displayNamaProgram" class="font-extrabold text-blue-900">Belum Ditetapkan</span>
+                        </div>
+                        <div class="border-l border-slate-300 pl-3">
+                            <span class="font-bold text-slate-500 uppercase block text-[10px]">Tarikh Active</span>
+                            <span id="displayTarikhProgram" class="font-extrabold text-blue-900">Belum Ditetapkan</span>
+                        </div>
+						
+						<!-- PETAK BAHARU: KLUSTER ACTIVE -->
+                        <div class="border-l border-slate-300 pl-3">
+                            <span class="font-bold text-slate-500 uppercase block text-[10px]">Kluster Active</span>
+                            <span id="displayKlusterProgram" class="font-extrabold text-blue-900">Belum Ditetapkan</span>
+                        </div>
+						
+                        <div class="border-l border-slate-300 pl-3">
+                            <span class="font-bold text-slate-500 uppercase block text-[10px]">Status Borang</span>
+                            <span id="adminFormStatusBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                DIBUKA
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" id="btnOverallPdf" onclick="generateOverallPDFReportAction()" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-pdf"></i> Muat Turun Laporan Keseluruhan (PDF)
+                        </button>
+                        <button type="button" id="btnToggleFormStatus" onclick="toggleFormStatusAction()" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-lock"></i> Tutup Borang
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 1: DASHBOARD CARTA & PERATUSAN ANALISIS -->
+            <div id="adminTabChartContent" class="flex-1 overflow-y-auto pt-2 space-y-4">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-1 bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex flex-col justify-between">
+                        <label class="block text-xs font-bold uppercase text-slate-700 mb-1">
+                            <i class="fa-solid fa-filter text-blue-600 mr-1"></i> Tapisan Soalan (Filter)
+                        </label>
+                        <select id="questionFilter" onchange="renderChartAndGuide()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="ALL">Semua Soalan (S1 hingga S8)</option>
+                            <option value="s1">S1: Objektif & Tujuan Program</option>
+                            <option value="s2">S2: Komunikasi & Kerjasama</option>
+                            <option value="s3">S3: Aktiviti Relevan</option>
+                            <option value="s4">S4: Disiplin & Profesionalism Pelajar</option>
+                            <option value="s5">S5: Kemahiran Teknikal Pelajar</option>
+                            <option value="s6">S6: Kemahiran Insaniah Pelajar</option>
+                            <option value="s7">S7: Nilai Tambah Kepada Industri</option>
+                            <option value="s8">S8: Kepuasan Keseluruhan</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2 grid grid-cols-2 gap-3">
+                        <div class="bg-blue-50/80 p-3.5 rounded-xl border border-blue-100 flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-blue-600 uppercase">Jumlah Responden Program</span>
+                                <p class="text-lg font-extrabold text-slate-800" id="statTotalResponden">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-emerald-50/80 p-3.5 rounded-xl border border-emerald-100 flex items-center gap-3">
+                            <div class="w-10 h-10 bg-emerald-600 text-white rounded-lg flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-emerald-700 uppercase">Purata Skor Program</span>
+                                <p class="text-lg font-extrabold text-slate-800" id="statAvgScore">0.0 / 5.0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white p-4 rounded-xl shadow-md border border-blue-800">
+                    <span class="text-[10px] font-bold tracking-widest text-blue-300 uppercase block mb-1">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Petunjuk Soalan Dipilih
+                    </span>
+                    <p id="questionGuideText" class="text-xs sm:text-sm font-semibold leading-relaxed">
+                        Memuatkan petunjuk soalan...
+                    </p>
+                </div>
+
+                <!-- CARTA BAR CONTAINER -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative min-h-[250px]">
+                    <canvas id="barChartCanvas" class="max-h-[300px] w-full"></canvas>
+                </div>
+
+                <!-- JADUAL ANALISIS PERATUSAN UNTUK SETIAP SOALAN -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <h4 class="text-xs font-bold text-slate-800 uppercase mb-3 flex items-center gap-1.5">
+                        <i class="fa-solid fa-percent text-blue-600"></i> Jadual Analisis Peratusan Bagi Setiap Soalan Dijawab
+                    </h4>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b border-slate-300">
+                                <th class="p-2.5 text-center">Soalan</th>
+                                <th class="p-2.5">Item Penilaian</th>
+                                <th class="p-2.5 text-center">Skor 1<br><span class="text-[9px] font-normal text-slate-500">(Sgt Tdk Setuju)</span></th>
+                                <th class="p-2.5 text-center">Skor 2<br><span class="text-[9px] font-normal text-slate-500">(Tdk Setuju)</span></th>
+                                <th class="p-2.5 text-center">Skor 3<br><span class="text-[9px] font-normal text-slate-500">(Neutral)</span></th>
+                                <th class="p-2.5 text-center">Skor 4<br><span class="text-[9px] font-normal text-slate-500">(Setuju)</span></th>
+                                <th class="p-2.5 text-center">Skor 5<br><span class="text-[9px] font-normal text-slate-500">(Sgt Setuju)</span></th>
+                                <th class="p-2.5 text-center">Purata</th>
+                            </tr>
+                        </thead>
+                        <tbody id="percentageTableBody" class="divide-y divide-slate-200">
+                            <!-- Injected by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- TAB 2: REKOD INDIVIDU -->
+            <div id="adminTabRecordsContent" class="hidden flex-1 overflow-y-auto pt-2 space-y-4">
+                <div id="navigationBar" class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <button id="btnPrev" onclick="navigateRecord(-1)" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-40">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Sebelum
+                        </button>
+                        <span class="text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg border border-slate-200" id="recordCounter">0 / 0</span>
+                        <button id="btnNext" onclick="navigateRecord(1)" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-40">
+                            Seterusnya <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btnSinglePdf" onclick="downloadCurrentRecordPDF()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-file-pdf"></i> PDF Rekod Ini
+                        </button>
+                    </div>
+                </div>
+
+                <div id="recordViewer" class="space-y-4 p-1">
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+                        <p class="text-xs mt-2">Memuatkan data dari Google Spreadsheet...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+   <!-- POP-UP MODAL NAMA PROGRAM, TARIKH PROGRAM & KLUSTER -->
+    <div id="programInfoModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 relative">
+            <button onclick="closeProgramModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fa-solid fa-calendar-days text-xl"></i>
+                </div>
+                <!-- PAPARAN TEKS TAJUK & PENERANGAN DIKEMASKINI -->
+                <h3 class="text-base font-bold text-slate-800">Kemaskini Nama & Tarikh Program dan KLUSTER</h3>
+                <p class="text-xs text-slate-500">Data ini akan disimpan ke dalam tab <strong>PROGRAMTARIKH</strong> (Lajur A & B & C) dan dijadikan default bagi jawapan baharu.</p>
+            </div>
+            <form onsubmit="handleSaveProgramInfo(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Program (Lajur A)</label>
+                    <input type="text" id="inputNamaProgram" required placeholder="Cth: Bengkel Keusahawanan IEEP 2026" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tarikh Program (Lajur B)</label>
+                    <input type="text" id="inputTarikhProgram" required placeholder="Cth: 16 - 18 OKTOBER 2026" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                <!-- COMBOBOX DROPDOWN KLUSTER -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kluster Program (Lajur C - Tab PENETAPAN)</label>
+                    <select id="inputKlusterProgram" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm font-bold text-blue-900 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <!-- Diisi secara dinamik oleh JavaScript -->
+                    </select>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeProgramModal()" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2.5 rounded-lg text-xs transition-all">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSaveProgram" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 rounded-lg text-xs transition-all shadow-md">
+                        Simpan Tetapan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- POP-UP MODAL KEPUTUSAN GENERATE OVERALL PDF REPORT (ADMIN) -->
+    <div id="overallPdfSuccessModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 text-center relative">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-emerald-200">
+                <i class="fa-solid fa-file-circle-check text-3xl"></i>
+            </div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-800 mb-2">Laporan Maklum Balas PDF Telah Berjaya!</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6" id="overallPdfText">
+                Laporan analisis penuh beserta gabungan semua borang individu telah berjaya dijana dan disimpan dalam Google Drive.
+            </p>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeOverallPdfModal()" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs sm:text-sm transition-all">
+                    Tutup
+                </button>
+                <button type="button" id="btnDownloadOverallPdfTarget" onclick="openOverallPdfLink()" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-download"></i> Muat Turun
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POP-UP MODAL APABILA BORANG DITUTUP -->
+    <div id="formClosedModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 text-center relative">
+            <button onclick="closeFormClosedModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-200">
+                <i class="fa-solid fa-lock text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Borang Maklum Balas Telah Ditutup</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                Pentadbir telah menutup borang ini setelah proses penerimaan maklum balas selesai. Tiada sebarang maklum balas baharu diterima pada masa ini. Terima kasih atas kerjasama anda.
+            </p>
+            <button onclick="closeFormClosedModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-md">
+                Faham & Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 no-print hidden bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all z-50">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastMsg" class="text-sm font-medium">Borang berjaya dihantar!</span>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_2wk_9e7pzfnxBBiFkYtcNmuTSsKT1WNhVVrP8Fq9kDQw4Z71Fx_gF7_c8l6zixY/exec";
+       
+        let lastSubmittedPdfUrl = ""; 
+        let currentGeneratedOverallPdfUrl = "";
+        let rawAdminRecords = [];      
+        let filteredAdminRecords = []; 
+        let currentRecordIndex = 0;
+        let myChartInstance = null;
+        let currentAdminPassword = "";
+        let currentFormStatus = "OPEN";
+        let currentNamaProgram = "";
+        let currentTarikhProgram = "";
+		let currentKlusterProgram = "";
+        let listKlusterOptions = ["1", "2", "3"];
+        let selectedProgramFilter = "ALL";
+
+        const questionTextMap = {
+            's1': '1. Objektif dan tujuan program IEEP diterangkan dengan jelas oleh pihak institusi sebelum pelaksanaan.',
+            's2': '2. Komunikasi dan kerjasama antara pihak institusi dan industri berjalan dengan baik sepanjang pelaksanaan aktiviti.',
+            's3': '3. Aktiviti yang dijalankan adalah relevan dan sesuai dengan keperluan sebenar industri.',
+            's4': '4. Pelajar menunjukkan tahap disiplin, komitmen dan sikap profesional yang baik sepanjang program.',
+            's5': '5. Pelajar mempunyai kemahiran teknikal/asas yang mencukupi untuk melaksanakan tugasan di tempat industri.',
+            's6': '6. Aktiviti IEEP membantu pelajar meningkatkan kemahiran insaniah seperti komunikasi, kerjasama dan tanggungjawab.',
+            's7': '7. Pelaksanaan aktiviti IEEP memberi nilai tambah dan manfaat kepada organisasi/industri anda.',
+            's8': '8. Secara keseluruhan, pihak industri berpuas hati dengan pelaksanaan dan hasil program IEEP.'
+        };
+
+        const questionsList = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'];
+        const qContainer = document.getElementById('questionsContainer');
+
+        questionsList.forEach((qKey, index) => {
+            const colLabel = String.fromCharCode(67 + index);
+            let optionsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                optionsHtml += `
+                    <label class="flex-1 text-center cursor-pointer">
+                        <input type="radio" name="${qKey}" value="${i}" required class="peer hidden">
+                        <div class="likert-btn py-2 rounded-lg text-xs font-extrabold text-slate-600 border border-slate-200 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 hover:bg-slate-100 transition-all">
+                            ${i}
+                        </div>
+                    </label>
+                `;
+            }
+
+            const card = document.createElement('div');
+            card.className = "p-3.5 sm:p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 transition-all shadow-sm";
+            card.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div class="md:w-3/5">
+                        <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">${questionTextMap[qKey]}</p>
+                        <span class="text-[10px] text-slate-400">Disimpan di Lajur ${colLabel} (${qKey.toUpperCase()})</span>
+                    </div>
+                    <div class="md:w-2/5 w-full">
+                        <div class="flex justify-between gap-1.5 sm:gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
+                            ${optionsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            qContainer.appendChild(card);
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchProgramInfoForPublic();
+        });
+		
+	
+
+        // KEMASKINI: Penjana Header HTML Kluster 1 / 2 / 3 mengikut nilai Lajur C (PROGRAMTARIKH)
+        function renderKlusterHeaderHTML(selectedKluster) {
+            let rawK = (selectedKluster !== undefined && selectedKluster !== null && String(selectedKluster).trim() !== "")
+                ? selectedKluster
+                : currentKlusterProgram;
+
+            // Bersihkan nilai Kluster aktif (contoh: "Kluster 3" atau "3.0" -> "3")
+            const activeK = String(rawK || "").replace(/^kluster\s+/i, "").replace(/\.0+$/, "").trim();
+
+            // Kekalkan paparan asas 1 / 2 / 3 seperti format Borang Lampiran 4
+            let opts = ["1", "2", "3"];
+            if (activeK && activeK !== "0" && !opts.includes(activeK)) {
+                opts.push(activeK);
+                opts.sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+            }
+
+            return opts.map(opt => {
+                const cleanOpt = String(opt).trim();
+                // Bulatkan nombor 1, 2, atau 3 yang sepadan dengan Lajur C tab PROGRAMTARIKH
+                if (activeK !== "" && activeK !== "0" && (cleanOpt === activeK || parseInt(cleanOpt, 10) === parseInt(activeK, 10))) {
+                    return `<span class="circled-num" title="Kluster ${cleanOpt} Aktif">${cleanOpt}</span>`;
+                }
+                return `<span>${cleanOpt}</span>`;
+            }).join('<span class="mx-1">/</span>');
+        }
+
+        // KEMASKINI: Baca Nama Program (Lajur A), Tarikh (Lajur B) & Kluster (Lajur C) semasa refresh web
+        function fetchProgramInfoForPublic() {
+            const applyFetchedData = (resData) => {
+                if (!resData) return false;
+                currentNamaProgram = resData.namaProgram || "";
+                currentTarikhProgram = formatTarikhDisplay(resData.tarikhProgram || "");
+
+                if (resData.kluster !== undefined && resData.kluster !== null && String(resData.kluster).trim() !== "") {
+                    let fetchedKluster = String(resData.kluster).replace(/^kluster\s+/i, "").replace(/\.0+$/, "").trim();
+                    if (fetchedKluster && fetchedKluster !== "0") {
+                        currentKlusterProgram = fetchedKluster;
+                    }
+                }
+                if (resData.listKluster && resData.listKluster.length > 0) {
+                    listKlusterOptions = resData.listKluster.map(v => String(v).replace(/^kluster\s+/i, "").replace(/\.0+$/, "").trim());
+                }
+                updateProgramDisplay();
+
+                // Papar amaran terus jika SCRIPT_URL masih menjalankan deployment lama
+                if (resData.scriptVersion !== "v2.0") {
+                    showToast('Amaran: SCRIPT_URL masih menjalankan versi lama! Sila kemaskini Version ke "New version" di Manage Deployments.', 'error');
+                    return false;
+                }
+                return true;
+            };
+
+            fetch(`${SCRIPT_URL}?t=${Date.now()}`, { cache: "no-store" })
+                .then(r => r.json())
+                .then(getData => {
+                    const isUpdated = applyFetchedData(getData);
+                    if (!isUpdated) {
+                        return fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify({ action: "getFormStatus" })
+                        })
+                        .then(res => res.json())
+                        .then(postData => applyFetchedData(postData));
+                    }
+                })
+                .catch(() => updateProgramDisplay());
+        }
+        function downloadPDFManual() {
+            if (lastSubmittedPdfUrl) {
+                window.open(lastSubmittedPdfUrl, '_blank');
+                showToast('Membuka PDF daripada Google Drive...', 'success');
+            } else {
+                showToast('Tiada fail PDF dijumpai. Sila hantar borang dahulu.', 'error');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('feedbackForm').reset();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Hantar Maklum Balas';
+            lastSubmittedPdfUrl = "";
+            document.getElementById('btnDownloadManual').classList.add('hidden');
+            showToast('Borang telah diset semula.', 'info');
+        }
+
+        function openRespondentSuccessModal() {
+            document.getElementById('respondentSuccessModal').classList.remove('hidden');
+        }
+
+        function closeRespondentSuccessModal() {
+            document.getElementById('respondentSuccessModal').classList.add('hidden');
+        }
+
+        function openFormClosedModal() {
+            document.getElementById('formClosedModal').classList.remove('hidden');
+        }
+
+        function closeFormClosedModal() {
+            document.getElementById('formClosedModal').classList.add('hidden');
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnText = submitBtn.innerHTML;
+
+            const namaPegawai = document.getElementById('namaPegawai').value.trim();
+
+            // KEMASKINI: Sertakan 'kluster: currentKlusterProgram' dalam formData
+            const formData = {
+                namaIndustri: document.getElementById('namaIndustri').value,
+                namaPegawai: namaPegawai,
+                kluster: currentKlusterProgram, // <--- TAMBAHAN: Hantar kluster paparan web semasa (cth: "3")
+                s1: document.querySelector('input[name="s1"]:checked')?.value || '',
+                s2: document.querySelector('input[name="s2"]:checked')?.value || '',
+                s3: document.querySelector('input[name="s3"]:checked')?.value || '',
+                s4: document.querySelector('input[name="s4"]:checked')?.value || '',
+                s5: document.querySelector('input[name="s5"]:checked')?.value || '',
+                s6: document.querySelector('input[name="s6"]:checked')?.value || '',
+                s7: document.querySelector('input[name="s7"]:checked')?.value || '',
+                s8: document.querySelector('input[name="s8"]:checked')?.value || '',
+                st1: document.getElementById('st1').value,
+                st2: document.getElementById('st2').value
+            };
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menghantar maklum balas...';
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(resData => {
+                if (resData.result === 'closed' || resData.status === 'closed') {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    openFormClosedModal();
+                    showToast('Borang maklum balas telah ditutup oleh pentadbir.', 'error');
+                    return;
+                }
+
+                if (resData.pdfUrl) {
+                    lastSubmittedPdfUrl = resData.pdfUrl;
+                    document.getElementById('btnDownloadManual').classList.remove('hidden');
+                    document.getElementById('btnDownloadRespondentPdf').classList.remove('hidden');
+                } else {
+                    document.getElementById('btnDownloadRespondentPdf').classList.add('hidden');
+                }
+
+                // Reset borang maklum balas secara automatik selepas hantar
+                document.getElementById('feedbackForm').reset();
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Hantar Maklum Balas';
+
+                openRespondentSuccessModal();
+                showToast(`Maklum balas berjaya dihantar & direkodkan! PDF [${namaPegawai}.pdf] telah dikemaskini.`, 'success');
+            })
+            .catch(err => {
+                console.error(err);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+                showToast('Maklum balas berjaya dihantar!', 'success');
+            });
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanelModal').classList.add('hidden');
+        }
+
+        function openProgramModal() {
+            document.getElementById('inputNamaProgram').value = currentNamaProgram;
+            document.getElementById('inputTarikhProgram').value = currentTarikhProgram;
+            
+            const klusterSelect = document.getElementById('inputKlusterProgram');
+            klusterSelect.innerHTML = '';
+            
+            let activeKluster = String(currentKlusterProgram || "1").replace(/^kluster\s+/i, "").replace(/\.0+$/, "").trim();
+            let optionsToRender = (listKlusterOptions && listKlusterOptions.length > 0)
+                ? [...listKlusterOptions]
+                : ["1", "2", "3"];
+
+            if (activeKluster && activeKluster !== "0" && !optionsToRender.includes(activeKluster)) {
+                optionsToRender.push(activeKluster);
+            }
+
+            optionsToRender.forEach(optRaw => {
+                const valStr = String(optRaw).replace(/^kluster\s+/i, "").replace(/\.0+$/, "").trim();
+                if (!valStr || valStr === "0") return;
+
+                const opt = document.createElement('option');
+                opt.value = valStr;
+                opt.innerText = `Kluster ${valStr}`;
+                if (valStr === activeKluster || parseInt(valStr, 10) === parseInt(activeKluster, 10)) {
+                    opt.selected = true;
+                }
+                klusterSelect.appendChild(opt);
+            });
+
+            if (activeKluster !== "") {
+                klusterSelect.value = activeKluster;
+            }
+
+            document.getElementById('programInfoModal').classList.remove('hidden');
+        }
+        function closeProgramModal() {
+            document.getElementById('programInfoModal').classList.add('hidden');
+        }
+
+        function openOverallPdfModal() {
+            document.getElementById('overallPdfSuccessModal').classList.remove('hidden');
+        }
+
+        function closeOverallPdfModal() {
+            document.getElementById('overallPdfSuccessModal').classList.add('hidden');
+        }
+
+        function openOverallPdfLink() {
+            if (currentGeneratedOverallPdfUrl) {
+                window.open(currentGeneratedOverallPdfUrl, '_blank');
+            }
+        }
+
+        function switchAdminTab(tab) {
+            const btnChart = document.getElementById('tabBtnChart');
+            const btnRecords = document.getElementById('tabBtnRecords');
+            const contentChart = document.getElementById('adminTabChartContent');
+            const contentRecords = document.getElementById('adminTabRecordsContent');
+
+            if (tab === 'chart') {
+                btnChart.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-sm flex-1 sm:flex-none flex items-center justify-center gap-1.5";
+                btnRecords.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200 flex-1 sm:flex-none flex items-center justify-center gap-1.5";
+                contentChart.classList.remove('hidden');
+                contentRecords.classList.add('hidden');
+                renderChartAndGuide();
+                renderPercentageTable();
+            } else {
+                btnRecords.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-sm flex-1 sm:flex-none flex items-center justify-center gap-1.5";
+                btnChart.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200 flex-1 sm:flex-none flex items-center justify-center gap-1.5";
+                contentRecords.classList.remove('hidden');
+                contentChart.classList.add('hidden');
+                renderRecord();
+            }
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Semakan...';
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "getResponses", password: pass })
+            })
+            .then(res => res.json())
+            .then(resData => {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-1"></i> Log Masuk';
+                
+                if (resData.status === "success") {
+                    currentAdminPassword = pass;
+                    closeAdminModal();
+                    rawAdminRecords = resData.data || [];
+                    currentRecordIndex = 0;
+                    currentFormStatus = resData.formStatus || "OPEN";
+                    // Di dalam handleAdminLogin(e) selepas resData.status === "success":
+                    currentNamaProgram = resData.namaProgram || "";
+                    currentTarikhProgram = formatTarikhDisplay(resData.tarikhProgram || "");
+                    if (resData.kluster !== undefined && resData.kluster !== null && String(resData.kluster).trim() !== "") {
+                        currentKlusterProgram = String(resData.kluster).replace(/^kluster\s+/i, "").replace(/\.0+$/, "").trim();
+                    }
+                    if (resData.listKluster && resData.listKluster.length > 0) {
+                        listKlusterOptions = resData.listKluster.map(v => String(v).replace(/^kluster\s+/i, "").replace(/\.0+$/, "").trim());
+                    }
+                    
+                    populateProgramFilterOptions();
+                    applyProgramFilter();
+                    
+                    updateProgramDisplay();
+                    updateFormStatusUI(currentFormStatus);
+                    document.getElementById('adminPanelModal').classList.remove('hidden');
+                    switchAdminTab('chart');
+
+                    if (!currentNamaProgram || !currentTarikhProgram) {
+                        openProgramModal();
+                    }
+                } else {
+                    showToast('Kata laluan salah. Sila cuba lagi.', 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-1"></i> Log Masuk';
+                showToast('Gagal berhubung dengan pelayan.', 'error');
+            });
+        }
+        function populateProgramFilterOptions() {
+            const selectElem = document.getElementById('programFilterSelect');
+            selectElem.innerHTML = '<option value="ALL">-- SEMUA PROGRAM (KESELURUHAN REKOD) --</option>';
+
+            const programList = [];
+            rawAdminRecords.forEach(r => {
+                let name = (r.namaProgram || "").trim();
+                if (name && !programList.includes(name)) {
+                    programList.push(name);
+                }
+            });
+
+            programList.sort().forEach(progName => {
+                const opt = document.createElement('option');
+                opt.value = progName;
+                opt.innerText = progName;
+                selectElem.appendChild(opt);
+            });
+        }
+
+        function onProgramFilterChange() {
+            selectedProgramFilter = document.getElementById('programFilterSelect').value;
+            applyProgramFilter();
+            currentRecordIndex = 0;
+            
+            const activeTabIsChart = !document.getElementById('adminTabChartContent').classList.contains('hidden');
+            if (activeTabIsChart) {
+                renderChartAndGuide();
+                renderPercentageTable();
+            } else {
+                renderRecord();
+            }
+        }
+
+        function applyProgramFilter() {
+            if (selectedProgramFilter === "ALL") {
+                filteredAdminRecords = [...rawAdminRecords];
+            } else {
+                filteredAdminRecords = rawAdminRecords.filter(r => (r.namaProgram || "").trim() === selectedProgramFilter);
+            }
+            updateOverviewStats();
+        }
+
+        // Fungsi Pembantu Frontend: Penukar Format Tarikh kepada "13 NOVEMBER 2026"
+        function formatTarikhDisplay(str) {
+            if (!str) return "Belum Ditetapkan";
+            str = str.toString().trim();
+            if (str.includes("GMT") || str.includes("00:00:00") || (!isNaN(Date.parse(str)) && str.length > 18)) {
+                const d = new Date(str);
+                if (!isNaN(d.getTime())) {
+                    const bulanNama = ["JANUARI", "FEBRUARI", "MAC", "APRIL", "MEI", "JUN", "JULAI", "OGOS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DISEMBER"];
+                    return `${d.getDate()} ${bulanNama[d.getMonth()]} ${d.getFullYear()}`;
+                }
+            }
+            return str.toUpperCase();
+        }
+        // KEMASKINI: Kemaskini Paparan Elemen Web secara Menyeluruh
+        function updateProgramDisplay() {
+            document.getElementById('displayNamaProgram').innerText = currentNamaProgram || "Belum Ditetapkan";
+            document.getElementById('displayTarikhProgram').innerText = formatTarikhDisplay(currentTarikhProgram);
+            document.getElementById('displayKlusterProgram').innerText = currentKlusterProgram ? `Kluster ${currentKlusterProgram}` : "Belum Ditetapkan";
+            
+            document.getElementById('publicNamaProgram').innerText = currentNamaProgram || "Belum Ditetapkan";
+            document.getElementById('publicTarikhProgram').innerText = formatTarikhDisplay(currentTarikhProgram);
+            
+            const headerKlusterElem = document.getElementById('publicKlusterDisplay');
+            if (headerKlusterElem) {
+                headerKlusterElem.innerHTML = renderKlusterHeaderHTML(currentKlusterProgram);
+            }
+        }
+// Hantar dan Simpan Tetapan Program & Kluster daripada Combobox ke Google Spreadsheet
+        function handleSaveProgramInfo(e) {
+            e.preventDefault();
+            const namaProg = document.getElementById('inputNamaProgram').value.trim();
+            const tarikhProg = document.getElementById('inputTarikhProgram').value.trim();
+            
+            const klusterElem = document.getElementById('inputKlusterProgram');
+            let klusterProg = "";
+            
+            // 1. Ambil nilai secara tepat daripada combobox
+            if (klusterElem && klusterElem.value) {
+                klusterProg = klusterElem.value.toString().replace(/^kluster\s+/i, "").trim();
+            } else if (klusterElem && klusterElem.selectedIndex >= 0) {
+                klusterProg = klusterElem.options[klusterElem.selectedIndex].value.toString().replace(/^kluster\s+/i, "").trim();
+            }
+
+            // 2. Pastikan nilai tidak kosong atau 0
+            if (!klusterProg || klusterProg === "0") {
+                klusterProg = (listKlusterOptions && listKlusterOptions.length > 0) ? listKlusterOptions[0] : "1";
+            }
+
+            const btnSave = document.getElementById('btnSaveProgram');
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            // 3. Hantar data klusterProg ke Apps Script
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: "updateProgramInfo",
+                    password: currentAdminPassword,
+                    namaProgram: namaProg,
+                    tarikhProgram: tarikhProg,
+                    kluster: klusterProg // Value combobox yang dipilih (contoh: "3")
+                })
+            })
+            .then(res => res.json())
+            .then(resData => {
+                btnSave.disabled = false;
+                btnSave.innerHTML = 'Simpan Tetapan';
+                if (resData.status === "success") {
+                    currentNamaProgram = resData.namaProgram || namaProg;
+                    currentTarikhProgram = formatTarikhDisplay(resData.tarikhProgram || tarikhProg);
+                    currentKlusterProgram = resData.kluster || klusterProg;
+                    
+                    if (resData.listKluster && resData.listKluster.length > 0) {
+                        listKlusterOptions = resData.listKluster;
+                    }
+                    
+                    updateProgramDisplay();
+                    closeProgramModal();
+                    showToast('Tetapan Program & Kluster (Lajur A, B, C) berjaya disimpan ke tab PROGRAMTARIKH!', 'success');
+                } else {
+                    showToast('Gagal menyimpan maklumat program.', 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                btnSave.disabled = false;
+                btnSave.innerHTML = 'Simpan Tetapan';
+                showToast('Ralat sambungan pelayan.', 'error');
+            });
+        }
+        function generateOverallPDFReportAction() {
+            const btn = document.getElementById('btnOverallPdf');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menjana PDF Gabungan...';
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: "generateOverallPdf",
+                    password: currentAdminPassword,
+                    selectedProgram: selectedProgramFilter
+                })
+            })
+            .then(res => res.json())
+            .then(resData => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Muat Turun Laporan Keseluruhan (PDF)';
+
+                if (resData.status === "success" && resData.pdfUrl) {
+                    currentGeneratedOverallPdfUrl = resData.pdfUrl;
+                    document.getElementById('overallPdfText').innerText = `Laporan maklum balas PDF [${resData.fileName}] telah berjaya dijana dan disimpan dalam Google Drive.`;
+                    openOverallPdfModal();
+                } else {
+                    showToast('Gagal menjana laporan PDF keseluruhan.', 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Muat Turun Laporan Keseluruhan (PDF)';
+                showToast('Ralat sambungan pelayan.', 'error');
+            });
+        }
+
+        function updateFormStatusUI(status) {
+            const badge = document.getElementById('adminFormStatusBadge');
+            const toggleBtn = document.getElementById('btnToggleFormStatus');
+
+            if (status === "OPEN") {
+                badge.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                badge.innerHTML = 'DIBUKA';
+                toggleBtn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-1.5";
+                toggleBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Tutup Borang';
+            } else {
+                badge.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-800 border border-red-200";
+                badge.innerHTML = 'DITUTUP';
+                toggleBtn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center gap-1.5";
+                toggleBtn.innerHTML = '<i class="fa-solid fa-lock-open"></i> Buka Borang';
+            }
+        }
+
+        function toggleFormStatusAction() {
+            const targetStatus = (currentFormStatus === "OPEN") ? "CLOSED" : "OPEN";
+            const btn = document.getElementById('btnToggleFormStatus');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Kemaskini...';
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "toggleFormStatus", password: currentAdminPassword, status: targetStatus })
+            })
+            .then(res => res.json())
+            .then(resData => {
+                btn.disabled = false;
+                if (resData.status === "success") {
+                    currentFormStatus = resData.formStatus;
+                    updateFormStatusUI(currentFormStatus);
+                    showToast(`Status borang berjaya dikemaskini kepada: ${currentFormStatus === "OPEN" ? "DIBUKA" : "DITUTUP"}.`, 'success');
+                } else {
+                    showToast('Gagal mengemaskini status borang.', 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                btn.disabled = false;
+                showToast('Ralat sambungan pelayan.', 'error');
+            });
+        }
+
+        function updateOverviewStats() {
+            const countResponden = filteredAdminRecords.length;
+            document.getElementById('totalRecordsText').innerText = `Jumlah Responden: ${countResponden} orang (Tapisan: ${selectedProgramFilter})`;
+            document.getElementById('statTotalResponden').innerText = `${countResponden} orang`;
+
+            if (countResponden === 0) {
+                document.getElementById('statAvgScore').innerText = "0.0 / 5.0";
+                return;
+            }
+
+            let totalSum = 0;
+            let count = 0;
+
+            filteredAdminRecords.forEach(r => {
+                questionsList.forEach(q => {
+                    let val = parseFloat(r[q]);
+                    if (!isNaN(val) && val > 0) {
+                        totalSum += val;
+                        count++;
+                    }
+                });
+            });
+
+            const avg = count > 0 ? (totalSum / count).toFixed(2) : "0.00";
+            document.getElementById('statAvgScore').innerText = `${avg} / 5.0`;
+        }
+
+        function renderPercentageTable() {
+            const tbody = document.getElementById('percentageTableBody');
+            const totalResponden = filteredAdminRecords.length;
+
+            if (totalResponden === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Tiada rekod data responden bagi program ini.</td></tr>';
+                return;
+            }
+
+            let rowsHtml = '';
+
+            questionsList.forEach((qKey, idx) => {
+                let counts = [0, 0, 0, 0, 0];
+                let sum = 0;
+                let answered = 0;
+
+                filteredAdminRecords.forEach(r => {
+                    let v = parseInt(r[qKey], 10);
+                    if (v >= 1 && v <= 5) {
+                        counts[v - 1]++;
+                        sum += v;
+                        answered++;
+                    }
+                });
+
+                let avgScore = answered > 0 ? (sum / answered).toFixed(2) : '0.00';
+
+                let colsHtml = '';
+                counts.forEach(cnt => {
+                    let pct = totalResponden > 0 ? ((cnt / totalResponden) * 100).toFixed(1) : '0.0';
+                    colsHtml += `<td class="p-2.5 text-center font-bold text-slate-700">${cnt} <span class="text-[10px] font-semibold text-blue-600 block">(${pct}%)</span></td>`;
+                });
+
+                rowsHtml += `
+                    <tr class="hover:bg-slate-50 transition-all">
+                        <td class="p-2.5 text-center font-bold text-slate-800">S${idx + 1}</td>
+                        <td class="p-2.5 font-medium text-slate-700 text-[11px]">${questionTextMap[qKey]}</td>
+                        ${colsHtml}
+                        <td class="p-2.5 text-center font-extrabold text-blue-900 bg-blue-50">${avgScore}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = rowsHtml;
+        }
+
+        function renderChartAndGuide() {
+            const selectedFilter = document.getElementById('questionFilter').value;
+            const guideTextElem = document.getElementById('questionGuideText');
+
+            if (selectedFilter === 'ALL') {
+                guideTextElem.innerHTML = `<strong>Pilihan: Semua Soalan (S1 hingga S8)</strong><br>Carta memaparkan <em>Purata Skor Skala Likert (1 - 5)</em> bagi kesemua 8 soalan (Program: ${selectedProgramFilter}).`;
+            } else {
+                guideTextElem.innerHTML = `<strong>Petunjuk Soalan (${selectedFilter.toUpperCase()}):</strong><br>${questionTextMap[selectedFilter]}`;
+            }
+
+            let labels = [];
+            let chartData = [];
+            let backgroundColors = [];
+            let chartTitle = '';
+
+            const vibrantColors = ['#ef4444', '#f97316', '#eab308', '#3b82f6', '#22c55e'];
+            const multiBarColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#6366f1'];
+
+            if (selectedFilter === 'ALL') {
+                chartTitle = `Purata Skor Setiap Soalan (${selectedProgramFilter})`;
+                labels = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8'];
+                backgroundColors = multiBarColors;
+
+                chartData = questionsList.map(q => {
+                    let sum = 0, c = 0;
+                    filteredAdminRecords.forEach(r => {
+                        let v = parseFloat(r[q]);
+                        if (!isNaN(v) && v > 0) { sum += v; c++; }
+                    });
+                    return c > 0 ? (sum / c).toFixed(2) : 0;
+                });
+            } else {
+                chartTitle = `Taburan Skor ${selectedFilter.toUpperCase()} (${selectedProgramFilter})`;
+                labels = ['Skor 1 (Sgt Tdk Setuju)', 'Skor 2 (Tidak Setuju)', 'Skor 3 (Neutral)', 'Skor 4 (Setuju)', 'Skor 5 (Sangat Setuju)'];
+                backgroundColors = vibrantColors;
+
+                let scoreCounts = [0, 0, 0, 0, 0];
+                filteredAdminRecords.forEach(r => {
+                    let v = parseInt(r[selectedFilter], 10);
+                    if (v >= 1 && v <= 5) {
+                        scoreCounts[v - 1]++;
+                    }
+                });
+                chartData = scoreCounts;
+            }
+
+            const ctx = document.getElementById('barChartCanvas').getContext('2d');
+
+            if (myChartInstance) {
+                myChartInstance.destroy();
+            }
+
+            myChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: chartTitle,
+                        data: chartData,
+                        backgroundColor: backgroundColors,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: '#cbd5e1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: chartTitle,
+                            font: { size: 13, weight: 'bold' },
+                            color: '#1e293b'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: selectedFilter === 'ALL' ? 1 : 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRecord() {
+            const viewer = document.getElementById('recordViewer');
+            const counter = document.getElementById('recordCounter');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+
+            if (filteredAdminRecords.length === 0) {
+                counter.innerText = '0 / 0';
+                btnPrev.disabled = true;
+                btnNext.disabled = true;
+                viewer.innerHTML = '<div class="text-center py-12 text-slate-500 font-medium">Tiada rekod jawapan dijumpai bagi program ini.</div>';
+                return;
+            }
+
+            counter.innerText = `${currentRecordIndex + 1} / ${filteredAdminRecords.length}`;
+            btnPrev.disabled = (currentRecordIndex === 0);
+            btnNext.disabled = (currentRecordIndex === filteredAdminRecords.length - 1);
+
+            const rec = filteredAdminRecords[currentRecordIndex];
+
+            viewer.innerHTML = `
+                <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex flex-wrap justify-between items-start border-b border-slate-200 pb-3 gap-2">
+                        <div>
+                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Lajur M</span>
+                            <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-clock mr-1"></i> Masa Hantar: <strong>${rec.tarikhMasa || 'Tiada Rekod'}</strong></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">Lajur O & P & Q</span>
+                            <p class="text-xs font-bold text-slate-800 mt-1"><i class="fa-solid fa-graduation-cap mr-1"></i> ${rec.namaProgram || '-'} | <span class="text-blue-900 font-extrabold">Kluster ${rec.kluster || '-'}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold block">Nama Industri (Lajur A)</span>
+                            <p class="text-xs sm:text-sm font-bold text-slate-800">${rec.namaIndustri || '-'}</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold block">Nama Pegawai (Lajur B)</span>
+                            <p class="text-xs sm:text-sm font-bold text-slate-800">${rec.namaPegawai || '-'}</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-lg border border-slate-200">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase mb-2.5 border-b pb-1.5"><i class="fa-solid fa-star text-amber-500 mr-1"></i> Skor Skala Likert (S1 - S8)</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                            <div class="p-2 bg-slate-50 rounded border">S1: <strong>${rec.s1}</strong></div>
+                            <div class="p-2 bg-slate-50 rounded border">S2: <strong>${rec.s2}</strong></div>
+                            <div class="p-2 bg-slate-50 rounded border">S3: <strong>${rec.s3}</strong></div>
+                            <div class="p-2 bg-slate-50 rounded border">S4: <strong>${rec.s4}</strong></div>
+                            <div class="p-2 bg-slate-50 rounded border">S5: <strong>${rec.s5}</strong></div>
+                            <div class="p-2 bg-slate-50 rounded border">S6: <strong>${rec.s6}</strong></div>
+                            <div class="p-2 bg-slate-50 rounded border">S7: <strong>${rec.s7}</strong></div>
+                            <div class="p-2 bg-slate-50 rounded border">S8: <strong>${rec.s8}</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-lg border border-slate-200 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase border-b pb-1.5"><i class="fa-solid fa-comment-dots text-blue-500 mr-1"></i> Soalan Tambahan</h4>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold block">1. Aspek Paling Berkesan (Lajur K / ST1)</span>
+                            <p class="text-xs text-slate-800 bg-slate-50 p-2.5 rounded border mt-1">${rec.st1 || '-'}</p>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold block">2. Cadangan Penambahbaikan (Lajur L / ST2)</span>
+                            <p class="text-xs text-slate-800 bg-slate-50 p-2.5 rounded border mt-1">${rec.st2 || '-'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function navigateRecord(direction) {
+            currentRecordIndex += direction;
+            if (currentRecordIndex < 0) currentRecordIndex = 0;
+            if (currentRecordIndex >= filteredAdminRecords.length) currentRecordIndex = filteredAdminRecords.length - 1;
+            renderRecord();
+        }
+
+        function downloadCurrentRecordPDF() {
+            if (filteredAdminRecords.length === 0) return;
+            const rec = filteredAdminRecords[currentRecordIndex];
+            if (rec.pdfUrl) {
+                window.open(rec.pdfUrl, '_blank');
+                showToast(`Membuka PDF untuk ${rec.namaPegawai}...`, 'success');
+            } else {
+                showToast('Pautan PDF tidak dijumpai untuk rekod ini.', 'error');
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+            if (type === 'error') {
+                toastIcon.className = 'fa-solid fa-circle-xmark text-red-400 text-lg';
+            } else if (type === 'info') {
+                toastIcon.className = 'fa-solid fa-circle-info text-blue-400 text-lg';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+            }
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistem Penyertaan & Sijil Pencapaian</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans">
+
+  <!-- Header -->
+  <header class="bg-blue-900 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-award text-amber-400 text-3xl"></i>
+        <div>
+          <h1 class="text-2xl font-bold tracking-wide">Sistem Penyertaan & Sijil Pencapaian</h1>
+          <p class="text-xs text-blue-200">Pengurusan Kehadiran Pelajar & Pengesahan Sijil</p>
+        </div>
+      </div>
+      <button onclick="loadData()" class="bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition">
+        <i class="fa-solid fa-rotate"></i> Muat Semula Data
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Tab Navigation -->
+    <div class="flex border-b border-slate-300 mb-6 bg-white rounded-t-xl p-2 shadow-sm gap-2">
+      <button id="btnTab1" onclick="switchTab('tab1')" class="tab-btn px-6 py-3 font-semibold rounded-lg text-blue-900 bg-blue-100 flex items-center gap-2">
+        <i class="fa-solid fa-user-check"></i> JK Pendaftaran
+      </button>
+      <button id="btnTab2" onclick="switchTab('tab2')" class="tab-btn px-6 py-3 font-semibold rounded-lg text-slate-600 hover:bg-slate-100 flex items-center gap-2">
+        <i class="fa-solid fa-user-shield"></i> Urusetia (Admin)
+      </button>
+      <button id="btnTab3" onclick="switchTab('tab3')" class="tab-btn px-6 py-3 font-semibold rounded-lg text-slate-600 hover:bg-slate-100 flex items-center gap-2">
+        <i class="fa-solid fa-file-arrow-down"></i> Semak & Muat Turun Sijil
+      </button>
+    </div>
+
+    <div id="alertBox" class="hidden mb-6 p-4 rounded-xl shadow-sm text-sm font-medium"></div>
+
+    <!-- TAB 1: JK PENDAFTARAN -->
+    <section id="tab1" class="tab-content bg-white p-6 rounded-2xl shadow-md">
+      <div class="mb-6">
+        <h2 class="text-xl font-bold text-slate-800 mb-1">Pendaftaran Kehadiran Peserta</h2>
+        <p class="text-sm text-slate-500">Cari mengikut <strong>PROJEK ID (Lajur C)</strong>, <strong>Nama Pelajar</strong>, <strong>Tahun</strong>, <strong>Nama Program</strong>, atau <strong>Sesi</strong>.</p>
+      </div>
+
+      <div id="regDisabledBox" class="hidden mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-center text-sm font-semibold">
+        <i class="fa-solid fa-lock text-amber-600 mr-2"></i> Tempoh pendaftaran kehadiran telah DITUTUP sementara oleh Urusetia / Admin.
+      </div>
+
+      <div class="relative mb-6">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+        <input type="text" id="searchJk" onkeyup="filterParticipants()" placeholder="Taip PROJEK ID, Nama Pelajar, No. Matrik, Program, Tahun, Sesi..." class="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-700 uppercase font-semibold text-xs border-b">
+            <tr>
+              <th class="p-3">Projek ID / Bil</th>
+              <th class="p-3">Nama Pelajar / Matrik</th>
+              <th class="p-3">Nama Projek</th>
+              <th class="p-3">Tahun (Lajur Q)</th>
+              <th class="p-3">Nama Program (Lajur R)</th>
+              <th class="p-3">Sesi (Lajur S)</th>
+              <th class="p-3">Status Tarikh & Masa Daftar (Lajur K)</th>
+              <th class="p-3 text-center">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="tableBodyJk" class="divide-y divide-slate-100">
+            <tr><td colspan="8" class="p-6 text-center text-slate-400">Sedang memuatkan data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINASI TAB 1 -->
+      <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3 text-sm text-slate-600">
+        <div id="paginationInfoJk" class="text-xs font-medium">Menunjukkan 0 daripada 0 rekod</div>
+        <div class="flex items-center gap-2">
+          <button id="btnPrevJk" onclick="changePageJk(-1)" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition text-xs">
+            <i class="fa-solid fa-chevron-left"></i> Sebelum
+          </button>
+          <span id="pageBadgeJk" class="px-3 py-1 bg-blue-50 text-blue-900 rounded-lg font-bold text-xs">Halaman 1 / 1</span>
+          <button id="btnNextJk" onclick="changePageJk(1)" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition text-xs">
+            Seterusnya <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: URUSETIA / ADMIN -->
+    <section id="tab2" class="tab-content hidden bg-white p-6 rounded-2xl shadow-md">
+      <div class="mb-6 flex flex-col xl:flex-row justify-between xl:items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 mb-1">Pengesahan Kehadiran Urusetia</h2>
+          <p class="text-sm text-slate-500">Semak masa maklum balas Refleksi (Lajur L) & status ketersediaan sijil (Lajur N, O, P).</p>
+        </div>
+        
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="syncRefleksiData()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-xl font-semibold shadow flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-sync"></i> Sync Auto Maklum Balas & Sijil
+          </button>
+
+          <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
+            <span class="font-bold text-slate-700">Pendaftaran (Tab 1):</span>
+            <span id="badgeRegStatus" class="px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800">ON</span>
+            <button onclick="toggleRegistrationStatus()" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded-lg transition">Tukar</button>
+          </div>
+
+          <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
+            <span class="font-bold text-slate-700">Carian Sijil (Tab 3):</span>
+            <span id="badgeCertStatus" class="px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800">ON</span>
+            <button onclick="toggleCertSearchStatus()" class="bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded-lg transition">Tukar</button>
+          </div>
+
+          <div class="flex items-center gap-2 bg-amber-50 p-2 rounded-xl border border-amber-200">
+            <i class="fa-solid fa-key text-amber-600"></i>
+            <input type="password" id="adminPwd" placeholder="Kata Laluan Admin" class="px-3 py-1 border border-slate-300 rounded-lg text-sm focus:outline-none">
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-700 uppercase font-semibold text-xs border-b">
+            <tr>
+              <th class="p-3">Projek ID</th>
+              <th class="p-3">Nama Pelajar</th>
+              <th class="p-3">Masa Daftar (Lajur K)</th>
+              <th class="p-3">Masa Maklum Balas Refleksi (Lajur L)</th>
+              <th class="p-3">Sijil Penyertaan (Lajur N)</th>
+              <th class="p-3">Sijil Emas/Perak/Gangsa (Lajur O)</th>
+              <th class="p-3">Sijil Anugerah (Lajur P)</th>
+              <th class="p-3 text-center">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="tableBodyAdmin" class="divide-y divide-slate-100">
+            <tr><td colspan="8" class="p-6 text-center text-slate-400">Sedang memuatkan data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINASI TAB 2 -->
+      <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3 text-sm text-slate-600">
+        <div id="paginationInfoAdmin" class="text-xs font-medium">Menunjukkan 0 daripada 0 rekod</div>
+        <div class="flex items-center gap-2">
+          <button id="btnPrevAdmin" onclick="changePageAdmin(-1)" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition text-xs">
+            <i class="fa-solid fa-chevron-left"></i> Sebelum
+          </button>
+          <span id="pageBadgeAdmin" class="px-3 py-1 bg-blue-50 text-blue-900 rounded-lg font-bold text-xs">Halaman 1 / 1</span>
+          <button id="btnNextAdmin" onclick="changePageAdmin(1)" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition text-xs">
+            Seterusnya <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SEMAK & MUAT TURUN SIJIL -->
+    <section id="tab3" class="tab-content hidden bg-white p-8 rounded-2xl shadow-md max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <i class="fa-solid fa-file-pdf text-red-500 text-5xl mb-3"></i>
+        <h2 class="text-2xl font-bold text-slate-800">Muat Turun Sijil</h2>
+        <p class="text-sm text-slate-500 mt-1">Masukkan <strong>PROJEK ID</strong> (contoh: JKE02) atau <strong>NO. MATRIK</strong> anda.</p>
+      </div>
+
+      <div id="certSearchDisabledBox" class="hidden mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-center text-sm font-semibold">
+        <i class="fa-solid fa-lock text-amber-600 mr-2"></i> Akses Carian & Muat Turun Sijil DITUTUP sementara oleh Urusetia.
+      </div>
+
+      <div id="certSearchContainer" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">PROJEK ID / NO. MATRIK</label>
+          <input type="text" id="certSearchInput" placeholder="Contoh: JKE02" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <button onclick="checkCert()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-md flex justify-center items-center gap-2 transition">
+          <i class="fa-solid fa-magnifying-glass"></i> Semak & Cari Sijil
+        </button>
+      </div>
+
+      <div id="certResult" class="hidden mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-200"></div>
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: POP-UP SAHKAN KATA LALUAN ADMIN -->
+  <div id="adminAuthModal" class="hidden fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 relative border border-slate-200">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-lock text-amber-600 mr-2"></i>Pengesahan Admin</h3>
+        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-600">Masukkan kata laluan admin untuk mengakses borang pengemaskinian rekod.</p>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">KATA LALUAN ADMIN</label>
+        <input type="password" id="authAdminPwd" placeholder="Masukkan Kata Laluan Admin" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeAuthModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">Batal</button>
+        <button onclick="verifyAndOpenEditModal()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-key"></i> Sahkan & Buka
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: KEMASKINI PENUH REKOD PESERTA (LAJUR B SEHINGGA J & Q, R, S) -->
+  <div id="editRecordModal" class="hidden fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 space-y-4 relative my-8">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-pen-to-square text-amber-600 mr-2"></i>Kemaskini Rekod Google Spreadsheet</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <input type="hidden" id="modalRowIndex">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">JABATAN (Lajur B)</label>
+          <input type="text" id="modalJabatan" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">PROJEK ID (Lajur C)</label>
+          <input type="text" id="modalProjekIdInput" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">PROGRAM (Lajur D)</label>
+          <input type="text" id="modalProgram" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">KATEGORI (Lajur E)</label>
+          <input type="text" id="modalKategori" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">PENYELIA PROJEK (Lajur F)</label>
+          <input type="text" id="modalPenyeliaProjek" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">NAMA KETUA KUMPULAN (Lajur I)</label>
+          <input type="text" id="modalNamaKetuaKumpulan" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block font-bold text-slate-700 mb-1">NO. MATRIK (Lajur G)</label>
+          <textarea id="modalNoMatrik" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block font-bold text-slate-700 mb-1">NAMA PELAJAR (Lajur H)</label>
+          <textarea id="modalNamaPelajarInput" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block font-bold text-slate-700 mb-1">NAMA PROJEK (Lajur J)</label>
+          <textarea id="modalNamaProjek" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">TAHUN (Lajur Q)</label>
+          <input type="text" id="modalTahun" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">NAMA PROGRAM (Lajur R)</label>
+          <input type="text" id="modalNamaProgram" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block font-bold text-slate-700 mb-1">SESI (Lajur S)</label>
+          <input type="text" id="modalSesi" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <button onclick="closeEditModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold">Batal</button>
+        <button onclick="submitRecordUpdate()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Ke Spreadsheet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycby3PdAsdtJ7mWwcbrUGlB8-CWB0E8534eEUeEP6OB-LyQ3h109p5jZEONDIZajrUr1C/exec'; 
+    let participantsData = [];
+    let certSearchGlobalStatus = 'ON';
+    let registrationGlobalStatus = 'ON';
+    let currentEditItem = null;
+    let currentAdminPassword = '';
+
+    // TETAPAN PAGINASI
+    const PAGE_SIZE = 10;
+    let currentPageJk = 1;
+    let activeJkData = [];
+
+    let currentPageAdmin = 1;
+    let activeAdminData = [];
+
+    window.onload = function() {
+      loadData();
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('bg-blue-100', 'text-blue-900');
+        el.classList.add('text-slate-600');
+      });
+
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('btn' + tabId.charAt(0).toUpperCase() + tabId.slice(1));
+      activeBtn.classList.add('bg-blue-100', 'text-blue-900');
+
+      if (tabId === 'tab3') updateTab3SearchUI();
+    }
+
+    function showAlert(msg, isSuccess = true) {
+      const box = document.getElementById('alertBox');
+      box.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+      box.classList.add(isSuccess ? 'bg-emerald-100' : 'bg-rose-100', isSuccess ? 'text-emerald-800' : 'text-rose-800');
+      box.innerHTML = `<i class="fa-solid ${isSuccess ? 'fa-circle-check' : 'fa-circle-exclamation'} mr-2"></i> ${msg}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch(`${API_URL}?action=getParticipants`);
+        const json = await res.json();
+        if (json.success) {
+          participantsData = json.data;
+          activeJkData = [...participantsData];
+          activeAdminData = [...participantsData];
+          certSearchGlobalStatus = json.certSearchStatus || 'ON';
+          registrationGlobalStatus = json.registrationStatus || 'ON';
+          
+          updateAdminControlUI();
+          renderTables();
+        } else {
+          showAlert('Gagal membaca data: ' + json.message, false);
+        }
+      } catch (err) {
+        showAlert('Ralat sambungan: ' + err.message, false);
+      }
+    }
+
+    async function syncRefleksiData() {
+      const pwd = document.getElementById('adminPwd').value;
+      if (!pwd) {
+        alert('Sila masukkan Kata Laluan Admin terlebih dahulu!');
+        return;
+      }
+      try {
+        showAlert('Sedang membuat semakan auto maklum balas Refleksi & fail Sijil...', true);
+        const res = await fetch(`${API_URL}?action=syncFeedback&password=${encodeURIComponent(pwd)}`);
+        const json = await res.json();
+        showAlert(json.message, json.success);
+        if (json.success) loadData();
+      } catch (err) {
+        showAlert('Ralat proses sync: ' + err.message, false);
+      }
+    }
+
+    function updateAdminControlUI() {
+      const badgeReg = document.getElementById('badgeRegStatus');
+      const regDisabledBox = document.getElementById('regDisabledBox');
+      if (registrationGlobalStatus === 'ON') {
+        badgeReg.className = 'px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800';
+        badgeReg.innerText = 'ON';
+        regDisabledBox.classList.add('hidden');
+      } else {
+        badgeReg.className = 'px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-800';
+        badgeReg.innerText = 'OFF';
+        regDisabledBox.classList.remove('hidden');
+      }
+
+      const badgeCert = document.getElementById('badgeCertStatus');
+      if (certSearchGlobalStatus === 'ON') {
+        badgeCert.className = 'px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800';
+        badgeCert.innerText = 'ON';
+      } else {
+        badgeCert.className = 'px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-800';
+        badgeCert.innerText = 'OFF';
+      }
+      updateTab3SearchUI();
+    }
+
+    function updateTab3SearchUI() {
+      const disabledBox = document.getElementById('certSearchDisabledBox');
+      const searchContainer = document.getElementById('certSearchContainer');
+      if (certSearchGlobalStatus === 'OFF') {
+        disabledBox.classList.remove('hidden');
+        searchContainer.classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        disabledBox.classList.add('hidden');
+        searchContainer.classList.remove('opacity-50', 'pointer-events-none');
+      }
+    }
+
+    async function toggleRegistrationStatus() {
+      const pwd = document.getElementById('adminPwd').value;
+      if (!pwd) {
+        alert('Sila masukkan Kata Laluan Admin terlebih dahulu!');
+        return;
+      }
+      const newTargetStatus = registrationGlobalStatus === 'ON' ? 'OFF' : 'ON';
+      try {
+        const res = await fetch(`${API_URL}?action=toggleRegistration&password=${encodeURIComponent(pwd)}&status=${newTargetStatus}`);
+        const json = await res.json();
+        showAlert(json.message, json.success);
+        if (json.success) {
+          registrationGlobalStatus = json.status;
+          updateAdminControlUI();
+          renderTables();
+        }
+      } catch (err) {
+        showAlert('Ralat menukar status pendaftaran: ' + err.message, false);
+      }
+    }
+
+    async function toggleCertSearchStatus() {
+      const pwd = document.getElementById('adminPwd').value;
+      if (!pwd) {
+        alert('Sila masukkan Kata Laluan Admin terlebih dahulu!');
+        return;
+      }
+      const newTargetStatus = certSearchGlobalStatus === 'ON' ? 'OFF' : 'ON';
+      try {
+        const res = await fetch(`${API_URL}?action=toggleCertSearch&password=${encodeURIComponent(pwd)}&status=${newTargetStatus}`);
+        const json = await res.json();
+        showAlert(json.message, json.success);
+        if (json.success) {
+          certSearchGlobalStatus = json.status;
+          updateAdminControlUI();
+        }
+      } catch (err) {
+        showAlert('Ralat menukar status carian sijil: ' + err.message, false);
+      }
+    }
+
+    function renderTables() {
+      renderJkTable();
+      renderAdminTable();
+    }
+
+    function formatCleanDate(str) {
+      if (!str) return '';
+      str = str.trim();
+      const match = str.match(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}(:\d{2})?/);
+      if (match) return match[0];
+      
+      if (str.includes('GMT') || str.includes('Singapore') || str.includes('Standard Time')) {
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+          const day = String(d.getDate()).padStart(2, '0');
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const year = d.getFullYear();
+          const hours = String(d.getHours()).padStart(2, '0');
+          const mins = String(d.getMinutes()).padStart(2, '0');
+          const secs = String(d.getSeconds()).padStart(2, '0');
+          return `${day}/${month}/${year} ${hours}:${mins}:${secs}`;
+        }
+      }
+      return str;
+    }
+
+    function parseStudentList(namaStr, matrikStr) {
+      if (!namaStr) return [];
+      
+      let names = namaStr.includes('\n') 
+        ? namaStr.split('\n').map(s => s.trim()).filter(Boolean)
+        : namaStr.split(/,|;/).map(s => s.trim()).filter(Boolean);
+
+      let matriks = String(matrikStr || '').split(/\s+|\n|,|\|/).map(s => s.trim()).filter(s => s.length >= 6);
+
+      if (names.length === 1 && (namaStr.includes(' BIN ') || namaStr.includes(' BINTI '))) {
+        let regex = /([A-Z\s@']+(?:BIN|BINTI)[A-Z\s@']+?)(?=\s+[A-Z\s@']+(?:BIN|BINTI)|$)/gi;
+        let matched = namaStr.match(regex);
+        if (matched && matched.length > 0) {
+          names = matched.map(s => s.trim());
+        }
+      }
+
+      return names.map((name, idx) => ({
+        nama: name,
+        matrik: matriks[idx] || ''
+      }));
+    }
+
+    // HELPER UNTUK MENGURAIKAN BARIS INDIVIDU PELAJAR (TAB 1)
+    function getFlattenedJkRows(data) {
+      let rows = [];
+      data.forEach(item => {
+        const students = parseStudentList(item.namaPelajar, item.noMatrik);
+        const registerLog = item.tarikhMasaDaftar || '';
+        const logLines = registerLog.split('\n').map(l => l.trim());
+
+        students.forEach((student, sIdx) => {
+          let rawTimestamp = logLines[sIdx] || '';
+          let studentTimestamp = formatCleanDate(rawTimestamp);
+          rows.push({
+            item: item,
+            student: student,
+            sIdx: sIdx,
+            studentTimestamp: studentTimestamp,
+            isRegistered: !!studentTimestamp
+          });
+        });
+      });
+      return rows;
+    }
+
+    // RENDERING JADUAL TAB 1 BESERTA PAGINASI 10 REKOD
+    function renderJkTable() {
+      const tbody = document.getElementById('tableBodyJk');
+      const allRows = getFlattenedJkRows(activeJkData);
+      const totalRows = allRows.length;
+
+      if (totalRows === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-400">Tiada rekod dijumpai.</td></tr>';
+        document.getElementById('paginationInfoJk').innerText = 'Menunjukkan 0 daripada 0 rekod';
+        document.getElementById('pageBadgeJk').innerText = 'Halaman 1 / 1';
+        document.getElementById('btnPrevJk').disabled = true;
+        document.getElementById('btnNextJk').disabled = true;
+        return;
+      }
+
+      const totalPages = Math.ceil(totalRows / PAGE_SIZE) || 1;
+      if (currentPageJk < 1) currentPageJk = 1;
+      if (currentPageJk > totalPages) currentPageJk = totalPages;
+
+      const startIndex = (currentPageJk - 1) * PAGE_SIZE;
+      const endIndex = Math.min(startIndex + PAGE_SIZE, totalRows);
+      const pageSlice = allRows.slice(startIndex, endIndex);
+
+      const isRegOpen = registrationGlobalStatus === 'ON';
+      let html = '';
+
+      pageSlice.forEach(rowObj => {
+        const item = rowObj.item;
+        const student = rowObj.student;
+        const sIdx = rowObj.sIdx;
+        const studentTimestamp = rowObj.studentTimestamp;
+        const isRegistered = rowObj.isRegistered;
+
+        html += `
+          <tr class="hover:bg-slate-50 border-b">
+            <td class="p-3">
+              <span class="font-bold text-blue-900">${item.projekId}</span>
+              <div class="text-xs text-slate-400">Bil: ${item.bil}</div>
+            </td>
+            <td class="p-3">
+              <div class="font-semibold text-slate-800">${student.nama}</div>
+              <div class="text-xs text-slate-500">Matrik: ${student.matrik || item.noMatrik} | ${item.program}</div>
+            </td>
+            <td class="p-3 text-xs text-slate-600 max-w-xs truncate">${item.namaProjek}</td>
+            <td class="p-3 text-xs text-slate-700 font-medium">${item.tahun || '-'}</td>
+            <td class="p-3 text-xs text-slate-700 font-medium">${item.namaProgram || '-'}</td>
+            <td class="p-3 text-xs text-slate-700 font-medium">${item.sesi || '-'}</td>
+            <td class="p-3">
+              ${isRegistered 
+                ? `<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1"><i class="fa-solid fa-check"></i> ${studentTimestamp}</span>` 
+                : `<span class="bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full text-xs font-medium">Belum Mendaftar</span>`}
+            </td>
+            <td class="p-3 text-center space-y-1.5">
+              ${isRegOpen 
+                ? `<button onclick="registerStudent('${item.rowIndex}', ${sIdx})" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow font-medium transition flex items-center gap-1 mx-auto w-full justify-center">
+                    <i class="fa-solid fa-user-check"></i> ${isRegistered ? 'Kemaskini Masa' : 'Daftar Pelajar Ini'}
+                   </button>`
+                : `<button disabled class="bg-slate-300 text-slate-500 text-xs px-3 py-1.5 rounded-lg font-medium cursor-not-allowed flex items-center gap-1 mx-auto w-full justify-center">
+                    <i class="fa-solid fa-lock"></i> Ditutup
+                   </button>`}
+              <button onclick="promptAdminPassword(${item.rowIndex})" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg shadow font-medium transition flex items-center gap-1 mx-auto w-full justify-center">
+                <i class="fa-solid fa-pen-to-square"></i> Kemaskini Rekod
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+
+      // KEMASKINI PAPARAN PAGINASI TAB 1
+      document.getElementById('paginationInfoJk').innerText = `Menunjukkan ${startIndex + 1} hingga ${endIndex} daripada ${totalRows} rekod`;
+      document.getElementById('pageBadgeJk').innerText = `Halaman ${currentPageJk} / ${totalPages}`;
+      document.getElementById('btnPrevJk').disabled = (currentPageJk <= 1);
+      document.getElementById('btnNextJk').disabled = (currentPageJk >= totalPages);
+    }
+
+    function changePageJk(delta) {
+      currentPageJk += delta;
+      renderJkTable();
+    }
+
+    function filterParticipants() {
+      const q = document.getElementById('searchJk').value.toLowerCase();
+      activeJkData = participantsData.filter(p => 
+        p.projekId.toLowerCase().includes(q) ||
+        p.namaPelajar.toLowerCase().includes(q) ||
+        p.noMatrik.toLowerCase().includes(q) ||
+        (p.tahun && p.tahun.toLowerCase().includes(q)) ||
+        (p.namaProgram && p.namaProgram.toLowerCase().includes(q)) ||
+        (p.sesi && p.sesi.toLowerCase().includes(q))
+      );
+      currentPageJk = 1;
+      renderJkTable();
+    }
+
+    async function registerStudent(rowIndex, studentIdx) {
+      if (registrationGlobalStatus === 'OFF') {
+        showAlert('Pendaftaran telah ditutup oleh Urusetia / Admin.', false);
+        return;
+      }
+      try {
+        const res = await fetch(`${API_URL}?action=registerStudent&rowIndex=${rowIndex}&studentIdx=${studentIdx}`);
+        const json = await res.json();
+        showAlert(json.message, json.success);
+        if (json.success) loadData();
+      } catch (err) {
+        showAlert('Gagal merekodkan pendaftaran: ' + err.message, false);
+      }
+    }
+
+    function promptAdminPassword(rowIndex) {
+      const item = participantsData.find(p => p.rowIndex === rowIndex);
+      if (!item) return;
+      currentEditItem = item;
+      document.getElementById('authAdminPwd').value = '';
+      document.getElementById('adminAuthModal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('adminAuthModal').classList.add('hidden');
+    }
+
+    async function verifyAndOpenEditModal() {
+      const pwd = document.getElementById('authAdminPwd').value;
+      if (!pwd) {
+        alert('Sila masukkan kata laluan admin!');
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${API_URL}?action=verifyPassword&password=${encodeURIComponent(pwd)}`);
+        const json = await res.json();
+        
+        if (json.success) {
+          currentAdminPassword = pwd;
+          closeAuthModal();
+          populateAndOpenEditModal(currentEditItem);
+        } else {
+          alert(json.message || 'Kata laluan Admin tidak sah!');
+        }
+      } catch (err) {
+        alert('Ralat pengesahan: ' + err.message);
+      }
+    }
+
+    function populateAndOpenEditModal(item) {
+      document.getElementById('modalRowIndex').value = item.rowIndex;
+      document.getElementById('modalJabatan').value = item.jabatan || '';
+      document.getElementById('modalProjekIdInput').value = item.projekId || '';
+      document.getElementById('modalProgram').value = item.program || '';
+      document.getElementById('modalKategori').value = item.kategori || '';
+      document.getElementById('modalPenyeliaProjek').value = item.penyeliaProjek || '';
+      document.getElementById('modalNoMatrik').value = item.noMatrik || '';
+      document.getElementById('modalNamaPelajarInput').value = item.namaPelajar || '';
+      document.getElementById('modalNamaKetuaKumpulan').value = item.namaKetuaKumpulan || '';
+      document.getElementById('modalNamaProjek').value = item.namaProjek || '';
+      document.getElementById('modalTahun').value = item.tahun || '';
+      document.getElementById('modalNamaProgram').value = item.namaProgram || '';
+      document.getElementById('modalSesi').value = item.sesi || '';
+
+      document.getElementById('editRecordModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editRecordModal').classList.add('hidden');
+    }
+
+    async function submitRecordUpdate() {
+      const rowIndex = document.getElementById('modalRowIndex').value;
+      const jabatan = document.getElementById('modalJabatan').value;
+      const projekId = document.getElementById('modalProjekIdInput').value;
+      const program = document.getElementById('modalProgram').value;
+      const kategori = document.getElementById('modalKategori').value;
+      const penyeliaProjek = document.getElementById('modalPenyeliaProjek').value;
+      const noMatrik = document.getElementById('modalNoMatrik').value;
+      const namaPelajar = document.getElementById('modalNamaPelajarInput').value;
+      const namaKetuaKumpulan = document.getElementById('modalNamaKetuaKumpulan').value;
+      const namaProjek = document.getElementById('modalNamaProjek').value;
+      const tahun = document.getElementById('modalTahun').value;
+      const namaProgram = document.getElementById('modalNamaProgram').value;
+      const sesi = document.getElementById('modalSesi').value;
+
+      try {
+        showAlert('Sedang mengemaskini rekod dalam Google Spreadsheet...', true);
+        const params = new URLSearchParams({
+          action: 'updateFullRecord',
+          password: currentAdminPassword,
+          rowIndex: rowIndex,
+          jabatan: jabatan,
+          projekId: projekId,
+          program: program,
+          kategori: kategori,
+          penyeliaProjek: penyeliaProjek,
+          noMatrik: noMatrik,
+          namaPelajar: namaPelajar,
+          namaKetuaKumpulan: namaKetuaKumpulan,
+          namaProjek: namaProjek,
+          tahun: tahun,
+          namaProgram: namaProgram,
+          sesi: sesi
+        });
+
+        const res = await fetch(`${API_URL}?${params.toString()}`);
+        const json = await res.json();
+        showAlert(json.message, json.success);
+        if (json.success) {
+          closeEditModal();
+          loadData();
+        }
+      } catch (err) {
+        showAlert('Ralat kemaskini rekod: ' + err.message, false);
+      }
+    }
+
+    // HELPER UNTUK MENGURAIKAN BARIS INDIVIDU PELAJAR (TAB 2)
+    function getFlattenedAdminRows(data) {
+      let rows = [];
+      data.forEach(item => {
+        const students = parseStudentList(item.namaPelajar, item.noMatrik);
+        const regLines = (item.tarikhMasaDaftar || '').split('\n').map(l => l.trim());
+        const confLines = (item.tarikhMasaDisahkan || '').split('\n').map(l => l.trim());
+
+        students.forEach((student, sIdx) => {
+          const cleanRegDate = formatCleanDate(regLines[sIdx] || '');
+          const cleanConfDate = formatCleanDate(confLines[sIdx] || '');
+          rows.push({
+            item: item,
+            student: student,
+            sIdx: sIdx,
+            cleanRegDate: cleanRegDate,
+            cleanConfDate: cleanConfDate,
+            isConfirmed: !!cleanConfDate
+          });
+        });
+      });
+      return rows;
+    }
+
+    // RENDERING JADUAL TAB 2 BESERTA PAGINASI 10 REKOD
+    function renderAdminTable() {
+      const tbody = document.getElementById('tableBodyAdmin');
+      const allRows = getFlattenedAdminRows(activeAdminData);
+      const totalRows = allRows.length;
+
+      if (totalRows === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-400">Tiada rekod dijumpai.</td></tr>';
+        document.getElementById('paginationInfoAdmin').innerText = 'Menunjukkan 0 daripada 0 rekod';
+        document.getElementById('pageBadgeAdmin').innerText = 'Halaman 1 / 1';
+        document.getElementById('btnPrevAdmin').disabled = true;
+        document.getElementById('btnNextAdmin').disabled = true;
+        return;
+      }
+
+      const totalPages = Math.ceil(totalRows / PAGE_SIZE) || 1;
+      if (currentPageAdmin < 1) currentPageAdmin = 1;
+      if (currentPageAdmin > totalPages) currentPageAdmin = totalPages;
+
+      const startIndex = (currentPageAdmin - 1) * PAGE_SIZE;
+      const endIndex = Math.min(startIndex + PAGE_SIZE, totalRows);
+      const pageSlice = allRows.slice(startIndex, endIndex);
+
+      let html = '';
+      pageSlice.forEach(rowObj => {
+        const item = rowObj.item;
+        const student = rowObj.student;
+        const sIdx = rowObj.sIdx;
+        const cleanRegDate = rowObj.cleanRegDate;
+        const cleanConfDate = rowObj.cleanConfDate;
+        const isConfirmed = rowObj.isConfirmed;
+
+        const hasPenyertaan = !!item.linkSijil;
+        const hasEmasPerakGangsa = !!item.linkEmasPerakGangsa;
+        const hasAnugerah = !!item.linkAnugerah;
+
+        html += `
+          <tr class="hover:bg-slate-50 border-b text-xs">
+            <td class="p-3 font-bold text-blue-900">${item.projekId}</td>
+            <td class="p-3 font-medium text-slate-800">
+              <div>${student.nama}</div>
+              <div class="text-[11px] text-slate-500">Matrik: ${student.matrik || item.noMatrik}</div>
+            </td>
+            <td class="p-3 text-slate-600">${cleanRegDate || '<span class="text-rose-500">Belum Daftar</span>'}</td>
+            <td class="p-3">
+              ${isConfirmed 
+                ? `<span class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full font-semibold inline-flex items-center gap-1"><i class="fa-solid fa-comment-dots text-blue-600"></i> ${cleanConfDate}</span>` 
+                : `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-medium">Belum Refleksi</span>`}
+            </td>
+            
+            <td class="p-3">
+              ${hasPenyertaan 
+                ? `<a href="${item.linkSijil}" target="_blank" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-1 rounded-lg font-bold inline-flex items-center gap-1 transition"><i class="fa-solid fa-file-pdf"></i> Tersedia</a>` 
+                : `<span class="text-slate-400">Tiada</span>`}
+            </td>
+
+            <td class="p-3">
+              ${hasEmasPerakGangsa 
+                ? `<a href="${item.linkEmasPerakGangsa}" target="_blank" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-1 rounded-lg font-bold inline-flex items-center gap-1 transition"><i class="fa-solid fa-award text-amber-600"></i> Tersedia</a>` 
+                : `<span class="text-slate-400">Tiada</span>`}
+            </td>
+
+            <td class="p-3">
+              ${hasAnugerah 
+                ? `<a href="${item.linkAnugerah}" target="_blank" class="bg-purple-100 hover:bg-purple-200 text-purple-900 px-2 py-1 rounded-lg font-bold inline-flex items-center gap-1 transition"><i class="fa-solid fa-trophy text-purple-600"></i> Tersedia</a>` 
+                : `<span class="text-slate-400">Tiada</span>`}
+            </td>
+
+            <td class="p-3 text-center">
+              <button onclick="doConfirm(${item.rowIndex}, ${sIdx})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg shadow font-medium transition">
+                ${isConfirmed ? 'Kemaskini' : 'Sahkan'}
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+
+      // KEMASKINI PAPARAN PAGINASI TAB 2
+      document.getElementById('paginationInfoAdmin').innerText = `Menunjukkan ${startIndex + 1} hingga ${endIndex} daripada ${totalRows} rekod`;
+      document.getElementById('pageBadgeAdmin').innerText = `Halaman ${currentPageAdmin} / ${totalPages}`;
+      document.getElementById('btnPrevAdmin').disabled = (currentPageAdmin <= 1);
+      document.getElementById('btnNextAdmin').disabled = (currentPageAdmin >= totalPages);
+    }
+
+    function changePageAdmin(delta) {
+      currentPageAdmin += delta;
+      renderAdminTable();
+    }
+
+    async function doConfirm(rowIndex, studentIdx) {
+      const pwd = document.getElementById('adminPwd').value;
+      if (!pwd) {
+        alert('Sila masukkan Kata Laluan Admin!');
+        return;
+      }
+      try {
+        const res = await fetch(`${API_URL}?action=confirm&rowIndex=${rowIndex}&studentIdx=${studentIdx}&password=${encodeURIComponent(pwd)}`);
+        const json = await res.json();
+        showAlert(json.message, json.success);
+        if (json.success) loadData();
+      } catch (err) {
+        showAlert('Gagal mengesahkan: ' + err.message, false);
+      }
+    }
+
+    async function checkCert() {
+      if (certSearchGlobalStatus === 'OFF') {
+        showAlert('Akses carian sijil ditutup sementara oleh Urusetia.', false);
+        return;
+      }
+
+      const key = document.getElementById('certSearchInput').value;
+      const resDiv = document.getElementById('certResult');
+      resDiv.classList.add('hidden');
+
+      if (!key) {
+        showAlert('Sila masukkan PROJEK ID atau NO. MATRIK anda.', false);
+        return;
+      }
+
+      resDiv.innerHTML = '<div class="text-center text-slate-500"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>Sedang menyemak sijil di Google Drive...</div>';
+      resDiv.classList.remove('hidden');
+
+      try {
+        const res = await fetch(`${API_URL}?action=searchCert&key=${encodeURIComponent(key)}`);
+        const json = await res.json();
+        if (json.success) {
+          let buttonsHtml = '';
+
+          if (json.linkSijil) {
+            buttonsHtml += `
+              <a href="${json.linkSijil}" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-3 rounded-xl shadow text-sm inline-flex justify-center items-center gap-2 transition">
+                <i class="fa-solid fa-file-pdf"></i> Muat Turun Sijil Penyertaan
+              </a>
+            `;
+          }
+
+          if (json.linkEmasPerakGangsa) {
+            buttonsHtml += `
+              <a href="${json.linkEmasPerakGangsa}" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-3 rounded-xl shadow text-sm inline-flex justify-center items-center gap-2 transition">
+                <i class="fa-solid fa-award"></i> Muat Turun Sijil Emas / Perak / Gangsa
+              </a>
+            `;
+          }
+
+          if (json.linkAnugerah) {
+            buttonsHtml += `
+              <a href="${json.linkAnugerah}" target="_blank" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold px-4 py-3 rounded-xl shadow text-sm inline-flex justify-center items-center gap-2 transition">
+                <i class="fa-solid fa-trophy"></i> Muat Turun Sijil Anugerah
+              </a>
+            `;
+          }
+
+          resDiv.innerHTML = `
+            <div class="text-center space-y-4">
+              <i class="fa-solid fa-circle-check text-emerald-500 text-4xl"></i>
+              <h3 class="text-lg font-bold text-slate-800">Sijil Berjaya Ditemui!</h3>
+              <p class="text-sm text-slate-600"><strong>Nama:</strong> ${json.nama}<br><strong>Projek ID:</strong> ${json.projekId} | <strong>Matrik:</strong> ${json.noMatrik}</p>
+              <div class="pt-2 flex flex-col gap-3">
+                ${buttonsHtml}
+              </div>
+            </div>
+          `;
+        } else {
+          resDiv.innerHTML = `
+            <div class="text-center space-y-2 text-rose-600">
+              <i class="fa-solid fa-circle-xmark text-3xl"></i>
+              <div class="font-bold">Status: Sijil Tidak Dapat Dikeluarkan</div>
+              <p class="text-sm text-slate-600">${json.message}</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        resDiv.innerHTML = `<div class="text-center text-rose-600">Ralat carian: ${err.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
