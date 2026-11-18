@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual Pengguna Sistem C-RIE | Politeknik Ungku Omar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- ======================================================================= -->
+  <!-- HEADER / NAVIGASI UTAMA                                                 -->
+  <!-- ======================================================================= -->
+  <header class="bg-blue-950 text-white shadow-lg border-b-4 border-yellow-400 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <h1 class="text-xl md:text-2xl font-black flex items-center gap-2.5 tracking-wide">
+          <i class="fa-solid fa-book-open-reader text-yellow-400"></i>
+          Manual Pengguna Sistem C-RIE
+        </h1>
+        <p class="text-xs text-blue-200 mt-0.5">Pusat Rujukan Interaktif, Panduan Modul &amp; Dokumentasi Rasmi (PDF)</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Butang Kembali ke Dashboard Utama C-RIE -->
+        <a href="paparan.html" class="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5 border border-blue-500">
+          <i class="fa-solid fa-house"></i> Dashboard Utama C-RIE
+        </a>
+
+        <!-- Lencana Status Akses -->
+        <span id="badgeAkses" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-900 text-blue-100 border border-blue-700">
+          <i class="fa-solid fa-eye mr-1"></i> Paparan Pengguna
+        </span>
+
+        <!-- Butang Muat Naik (Khas Pentadbir) -->
+        <button id="btnTambahManual" onclick="bukaModalManual()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Muat Naik Manual
+        </button>
+
+        <!-- Butang Log Masuk Pentadbir -->
+        <button id="btnBukaLogin" onclick="bukaModalLogin()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-2 rounded-lg text-sm font-bold shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-user-shield"></i> Log Masuk Pentadbir
+        </button>
+
+        <!-- Butang Log Keluar -->
+        <button id="btnLogout" onclick="logKeluar()" class="hidden bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-right-from-bracket"></i> Log Keluar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- KANDUNGAN UTAMA: PAPARAN DUA PANEL INTERAKTIF                           -->
+  <!-- ======================================================================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-5">
+
+    <!-- BAR CARIAN & PENAPIS KATEGORI -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+      <div class="md:col-span-6">
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Carian Manual Pengguna</label>
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+          <input type="text" id="inputCari" oninput="tapisManual()" placeholder="Cari tajuk manual, modul, atau penerangan..."
+            class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+        </div>
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kategori / Modul</label>
+        <select id="filterKategori" onchange="tapisManual()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+          <option value="">Semua Kategori / Modul</option>
+        </select>
+      </div>
+
+      <div class="md:col-span-2 flex items-center justify-between md:justify-end gap-2">
+        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-2.5 rounded-xl border border-slate-200 w-full text-center">
+          Jumlah: <b id="jumlahRekod" class="text-blue-700">0</b> Manual
+        </span>
+      </div>
+    </div>
+
+    <!-- GRID DUA PANEL: SENARAI MANUAL (KIRI) & PRATONTON PDF INTERAKTIF (KANAN) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- PANEL KIRI: SENARAI MANUAL PENGGUNA -->
+      <div class="lg:col-span-5 space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h2 class="text-sm font-black uppercase tracking-wider text-slate-700">
+            <i class="fa-solid fa-list-ul mr-1.5 text-blue-600"></i> Senarai Dokumen Manual
+          </h2>
+          <button onclick="muatSenaraiManual()" class="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-arrows-rotate"></i> Segar Semula
+          </button>
+        </div>
+
+        <div id="senaraiKadManual" class="space-y-3 max-h-[76vh] overflow-y-auto pr-1">
+          <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
+            <i class="fa-solid fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
+            <p class="text-sm font-medium">Memuatkan senarai manual pengguna...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL KANAN: PRATONTON DOKUMEN PDF SEBELUM MUAT TURUN -->
+      <div id="panelPratonton" class="lg:col-span-7 bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden sticky top-24">
+        <!-- Bar Tajuk Pratonton -->
+        <div class="bg-slate-900 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <span id="previewKategori" class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-yellow-400 text-slate-900 mb-0.5">
+              PRATONTON DOKUMEN
+            </span>
+            <h3 id="previewTajuk" class="text-sm md:text-base font-bold truncate">
+              Pilih mana-mana manual di sebelah kiri untuk pratonton
+            </h3>
+          </div>
+
+          <div id="previewTindakan" class="hidden flex items-center gap-2">
+            <a id="btnBukaTabBaru" href="#" target="_blank" rel="noopener noreferrer"
+              class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold transition flex items-center gap-1.5" title="Buka dalam tab baharu">
+              <i class="fa-solid fa-up-right-from-square"></i> <span class="hidden sm:inline">Tab Baharu</span>
+            </a>
+            <a id="btnMuatTurunUtama" href="#" target="_blank" rel="noopener noreferrer" download
+              class="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow transition flex items-center gap-1.5">
+              <i class="fa-solid fa-download"></i> Muat Turun PDF
+            </a>
+          </div>
+        </div>
+
+        <!-- Keterangan Ringkas Manual -->
+        <div id="previewInfoBar" class="hidden bg-blue-50/80 border-b border-blue-100 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+          <p id="previewPenerangan" class="flex-1"></p>
+          <span id="previewTarikh" class="text-[11px] font-semibold text-blue-800 whitespace-nowrap"></span>
+        </div>
+
+        <!-- Bingkai Pratonton PDF -->
+        <div class="relative bg-slate-200 h-[68vh] md:h-[72vh] flex items-center justify-center">
+          <div id="placeholderPratonton" class="text-center p-6 max-w-md">
+            <div class="w-16 h-16 bg-white text-blue-600 rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-3 text-3xl">
+              <i class="fa-solid fa-file-pdf text-rose-500"></i>
+            </div>
+            <h4 class="font-bold text-slate-800 text-base">Pratonton Interaktif PDF</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+              Klik pada mana-mana kad manual pengguna untuk melihat kandungan PDF secara terus di sini sebelum memuat turun dokumen.
+            </p>
+          </div>
+
+          <iframe id="iframePratontonPdf" class="hidden w-full h-full border-0" allow="autoplay"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 1: MUAT NAIK / KEMASKINI MANUAL (DENGAN PRATONTON SEBELUM UPLOAD)  -->
+  <!-- ======================================================================= -->
+  <div id="modalManual" class="fixed inset-0 bg-black/65 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[94vh] overflow-y-auto border-t-4 border-emerald-500">
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+        <h2 id="tajukModalManual" class="text-base md:text-lg font-bold flex items-center gap-2">
+          <i class="fa-solid fa-file-arrow-up text-emerald-400"></i> Muat Naik Manual Pengguna Baharu
+        </h2>
+        <button type="button" onclick="tutupModalManual()" class="text-slate-300 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <form id="formManual" onsubmit="simpanManualPengguna(event)" class="p-6 space-y-5">
+        <input type="hidden" id="editRowIndex" value="" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Tajuk Manual Pengguna (Lajur A) *</label>
+            <input type="text" id="mTajuk" required placeholder="Contoh: MANUAL PENGGUNA MODUL KIK & HARTA INTELEK"
+              class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kategori / Modul *</label>
+            <select id="mKategori" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+              <option value="UMUM & LOG MASUK">UMUM &amp; LOG MASUK</option>
+              <option value="E-DAFTAR PENYELIDIKAN & INOVASI">E-DAFTAR PENYELIDIKAN &amp; INOVASI</option>
+              <option value="KPI INOVASI & PENERBITAN">KPI INOVASI &amp; PENERBITAN</option>
+              <option value="KIK, IEEP & PAMERAN INOVASI">KIK, IEEP &amp; PAMERAN INOVASI</option>
+              <option value="GERAN, KOMERSIALAN & HARTA INTELEK">GERAN, KOMERSIALAN &amp; HARTA INTELEK</option>
+              <option value="PENGURUSAN & PENTADBIRAN">PENGURUSAN &amp; PENTADBIRAN</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Penerangan / Ringkasan Panduan</label>
+          <textarea id="mPenerangan" rows="2" placeholder="Nyatakan ringkasan kandungan atau sasaran pengguna bagi manual ini..."
+            class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none"></textarea>
+        </div>
+
+        <!-- AMARAN KEMASKINI LAJUR B -->
+        <div id="amaranKemaskiniLajurB" class="hidden bg-amber-50 border border-amber-300 rounded-xl p-3.5 text-xs text-amber-900 space-y-1">
+          <p class="font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Mod Kemaskini Manual Pengguna (Lajur B)
+          </p>
+          <p>
+            Jika anda memilih fail PDF baharu di bawah, sistem akan <b>memadam fail manual sedia ada pada Lajur B dan Google Drive secara automatik</b> sebelum menyimpan manual baharu. Biarkan kosong jika hanya ingin mengemaskini tajuk atau penerangan.
+          </p>
+          <div id="pautanFailSediaAda" class="pt-1"></div>
+        </div>
+
+        <!-- PILIH FAIL PDF + PRATONTON SEBELUM MUAT NAIK -->
+        <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-800">
+                Pilih Fail Manual Pengguna (Format PDF Sahaja — Maksimum 20 MB) <span id="tandaWajibPdf" class="text-rose-600">*</span>
+              </label>
+              <p class="text-[11px] text-slate-500">Fail akan dipratonton di bawah sebelum dimuat naik ke Google Drive C-RIE.</p>
+            </div>
+            <span id="infoSaizFail" class="hidden px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold"></span>
+          </div>
+
+          <input type="file" id="mFailPdf" accept="application/pdf,.pdf" onchange="pratontonFailSebelumUpload(this)"
+            class="w-full text-xs border border-slate-300 rounded-xl p-2.5 bg-white cursor-pointer" />
+
+          <!-- BEKAS PRATONTON LIVE SEBELUM UPLOAD -->
+          <div id="bekasPreviewUpload" class="hidden space-y-2 pt-2">
+            <div class="flex items-center justify-between bg-slate-800 text-white px-3 py-2 rounded-t-xl text-xs">
+              <span class="font-semibold flex items-center gap-1.5">
+                <i class="fa-solid fa-eye text-emerald-400"></i> Pratonton Fail Sebelum Muat Naik: <b id="namaFailPreviewUpload" class="text-yellow-300"></b>
+              </span>
+              <button type="button" onclick="resetPilihanFailUpload()" class="text-rose-300 hover:text-rose-100 font-semibold">
+                <i class="fa-solid fa-xmark"></i> Buang Fail
+              </button>
+            </div>
+            <iframe id="iframePreviewUpload" class="w-full h-80 border border-slate-300 rounded-b-xl bg-white"></iframe>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="tutupModalManual()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-100">
+            Batal
+          </button>
+          <button type="submit" id="btnSimpanManual" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Simpan &amp; Muat Naik Manual
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 2: LOG MASUK PENTADBIR (JIKA AKSES TERUS KE HALAMAN INI)          -->
+  <!-- ======================================================================= -->
+  <div id="modalLogin" class="fixed inset-0 bg-black/65 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border-t-4 border-amber-400">
+      <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
+        <h2 class="text-base font-bold flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-amber-400"></i> Log Masuk Pentadbir Manual
+        </h2>
+        <button type="button" onclick="tutupModalLogin()" class="text-slate-300 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <form onsubmit="prosesLoginAdmin(event)" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Peranan Pentadbir *</label>
+          <select id="loginPeranan" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm bg-white">
+            <option value="ADMIN">ADMIN</option>
+            <option value="KUPIK">KUPIK</option>
+            <option value="PENYELARAS PENYELIDIKAN (C-RIE)">PENYELARAS PENYELIDIKAN (C-RIE)</option>
+            <option value="PENYELARAS INOVASI (C-RIE)">PENYELARAS INOVASI (C-RIE)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">No. Kad Pengenalan *</label>
+          <input type="text" id="loginIc" required placeholder="Tanpa sengkang (-)"
+            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Kata Laluan *</label>
+          <input type="password" id="loginPass" required placeholder="Masukkan kata laluan"
+            class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm" />
+        </div>
+        <button type="submit" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-900 py-2.5 rounded-xl text-sm font-black shadow">
+          Sahkan &amp; Log Masuk
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- JAVASCRIPT                                                              -->
+  <!-- ======================================================================= -->
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec";
+
+    // Senarai peranan pentadbir yang dibenarkan muat naik, kemaskini & padam manual
+    const PERANAN_PENTADBIR = [
+      "ADMIN",
+      "KUPIK",
+      "PENYELARAS PENYELIDIKAN (C-RIE)",
+      "PENYELARAS INOVASI (C-RIE)"
+    ];
+
+    let senaraiManual = [];
+    let rowIndexAktif = null;
+    let urlBlobSemasa = null;
+
+    let sesiPengguna = {
+      role: "PENGGUNA",
+      nama: ""
+    };
+
+    function adalahPentadbir(role) {
+      return PERANAN_PENTADBIR.includes(String(role || "").trim().toUpperCase());
+    }
+
+    function escapeHtml(teks) {
+      return String(teks || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function ekstrakIdFailDrive(url) {
+      const bersih = String(url || "").trim();
+      const padan = bersih.match(/[-\w]{25,}/);
+      return padan ? padan[0] : "";
+    }
+
+    function dapatkanUrlPreviewDrive(url) {
+      const id = ekstrakIdFailDrive(url);
+      return id ? `https://drive.google.com/file/d/${id}/preview` : String(url || "").trim();
+    }
+
+    function dapatkanUrlMuatTurunDrive(url) {
+      const id = ekstrakIdFailDrive(url);
+      return id ? `https://drive.google.com/uc?export=download&id=${id}` : String(url || "").trim();
+    }
+
+    // =========================================================================
+    // 1. INISIALISASI SESI & MUAT DATA
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      const storedRole = (sessionStorage.getItem("peranan") || localStorage.getItem("peranan") || "").trim().toUpperCase();
+      const storedNama = sessionStorage.getItem("namaPengguna") || sessionStorage.getItem("nama") || localStorage.getItem("nama") || "";
+
+      if (adalahPentadbir(storedRole)) {
+        sesiPengguna.role = storedRole;
+        sesiPengguna.nama = storedNama || storedRole;
+      }
+
+      kemaskiniPaparanAkses();
+      muatSenaraiManual();
+    });
+
+    function kemaskiniPaparanAkses() {
+      const badge = document.getElementById("badgeAkses");
+      const btnTambah = document.getElementById("btnTambahManual");
+      const btnLogin = document.getElementById("btnBukaLogin");
+      const btnLogout = document.getElementById("btnLogout");
+
+      if (adalahPentadbir(sesiPengguna.role)) {
+        badge.innerHTML = `<i class="fa-solid fa-user-shield mr-1"></i> ${escapeHtml(sesiPengguna.role)} (${escapeHtml(sesiPengguna.nama)})`;
+        badge.className = "px-3 py-1.5 rounded-full text-xs font-bold bg-yellow-400 text-slate-900 shadow-sm";
+        btnTambah.classList.remove("hidden");
+        btnLogin.classList.add("hidden");
+        btnLogout.classList.remove("hidden");
+      } else {
+        badge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> Paparan Pengguna`;
+        badge.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-900 text-blue-100 border border-blue-700";
+        btnTambah.classList.add("hidden");
+        btnLogin.classList.remove("hidden");
+        btnLogout.classList.add("hidden");
+      }
+    }
+
+    async function muatSenaraiManual() {
+      const bekas = document.getElementById("senaraiKadManual");
+      bekas.innerHTML = `
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
+          <i class="fa-solid fa-spinner fa-spin text-2xl text-blue-600 mb-2"></i>
+          <p class="text-sm font-medium">Memuatkan senarai manual pengguna...</p>
+        </div>`;
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=ambilManualPengguna`);
+        const json = await res.json();
+
+        if (json.status === "BERJAYA") {
+          senaraiManual = json.data || [];
+          janaPenapisKategori(senaraiManual);
+          tapisManual();
+
+          // Buka pratonton manual pertama secara automatik jika ada rekod
+          if (senaraiManual.length > 0 && !rowIndexAktif) {
+            paparPratontonManual(senaraiManual[0].rowIndex, false);
+          } else if (rowIndexAktif) {
+            const masihWujud = senaraiManual.find(m => m.rowIndex === rowIndexAktif);
+            if (masihWujud) {
+              paparPratontonManual(rowIndexAktif, false);
+            } else {
+              resetPanelPratonton();
+            }
+          }
+        } else {
+          bekas.innerHTML = `<div class="bg-rose-50 text-rose-700 p-4 rounded-2xl border border-rose-200 text-sm font-semibold">${escapeHtml(json.mesej)}</div>`;
+        }
+      } catch (err) {
+        bekas.innerHTML = `<div class="bg-rose-50 text-rose-700 p-4 rounded-2xl border border-rose-200 text-sm">Ralat sambungan pelayan: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function janaPenapisKategori(data) {
+      const kategoriUnik = [...new Set(data.map(d => d.kategori).filter(Boolean))].sort();
+      const select = document.getElementById("filterKategori");
+      const pilihanSemasa = select.value;
+      select.innerHTML = `<option value="">Semua Kategori / Modul</option>` +
+        kategoriUnik.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("");
+      select.value = pilihanSemasa;
+    }
+
+    // =========================================================================
+    // 2. PENAPISAN & PAPARAN KAD MANUAL
+    // =========================================================================
+    function tapisManual() {
+      const q = document.getElementById("inputCari").value.toLowerCase().trim();
+      const kat = document.getElementById("filterKategori").value;
+
+      const hasil = senaraiManual.filter(m => {
+        const padanTeks = !q ||
+          String(m.tajuk || "").toLowerCase().includes(q) ||
+          String(m.kategori || "").toLowerCase().includes(q) ||
+          String(m.penerangan || "").toLowerCase().includes(q);
+        const padanKat = !kat || String(m.kategori) === kat;
+        return padanTeks && padanKat;
+      });
+
+      document.getElementById("jumlahRekod").textContent = hasil.length;
+      paparSenaraiKad(hasil);
+    }
+
+    function paparSenaraiKad(senarai) {
+      const bekas = document.getElementById("senaraiKadManual");
+      if (!senarai.length) {
+        bekas.innerHTML = `
+          <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
+            <i class="fa-solid fa-folder-open text-3xl text-slate-300 mb-2"></i>
+            <p class="text-sm font-semibold">Tiada manual pengguna ditemui.</p>
+          </div>`;
+        return;
+      }
+
+      const isAdmin = adalahPentadbir(sesiPengguna.role);
+
+      bekas.innerHTML = senarai.map((item, idx) => {
+        const aktif = item.rowIndex === rowIndexAktif;
+        const urlMuatTurun = dapatkanUrlMuatTurunDrive(item.link_pdf);
+
+        return `
+          <div onclick="paparPratontonManual(${item.rowIndex}, true)"
+            class="cursor-pointer bg-white rounded-2xl p-4 border-2 transition-all shadow-sm hover:shadow-md ${aktif ? 'border-blue-600 bg-blue-50/40 ring-2 ring-blue-200' : 'border-slate-200 hover:border-blue-300'}">
+            
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs font-bold shrink-0">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </span>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-indigo-100 text-indigo-800">
+                  ${escapeHtml(item.kategori || "UMUM")}
+                </span>
+              </div>
+              <span class="text-[11px] font-semibold text-slate-400">#${idx + 1}</span>
+            </div>
+
+            <h3 class="font-bold text-slate-900 text-sm mt-2.5 leading-snug">
+              ${escapeHtml(item.tajuk)}
+            </h3>
+
+            ${item.penerangan ? `<p class="text-xs text-slate-500 mt-1 line-clamp-2">${escapeHtml(item.penerangan)}</p>` : ""}
+
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-3 pt-2.5 border-t border-slate-100">
+              <span><i class="fa-regular fa-calendar mr-1"></i> ${escapeHtml(item.tarikh_kemaskini || "-")}</span>
+              ${aktif ? `<span class="text-blue-700 font-bold"><i class="fa-solid fa-eye mr-1"></i> Sedang Dipratonton</span>` : ""}
+            </div>
+
+            <!-- BUTANG TINDAKAN KAD -->
+            <div class="flex flex-wrap items-center gap-1.5 mt-3" onclick="event.stopPropagation()">
+              <button type="button" onclick="paparPratontonManual(${item.rowIndex}, true)"
+                class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition flex items-center gap-1">
+                <i class="fa-solid fa-eye"></i> Pratonton
+              </button>
+
+              <a href="${escapeHtml(urlMuatTurun)}" target="_blank" rel="noopener noreferrer" download
+                class="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold transition flex items-center gap-1">
+                <i class="fa-solid fa-download"></i> Muat Turun
+              </a>
+
+              ${isAdmin ? `
+                <button type="button" onclick="bukaModalKemaskini(${item.rowIndex})"
+                  class="px-2.5 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-semibold transition flex items-center gap-1" title="Kemaskini Manual">
+                  <i class="fa-solid fa-pen-to-square"></i> Kemaskini
+                </button>
+                <button type="button" onclick="padamManual(${item.rowIndex})"
+                  class="px-2.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-300 text-xs font-semibold transition flex items-center gap-1" title="Padam Manual">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              ` : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // =========================================================================
+    // 3. PRATONTON DOKUMEN PDF SEBELUM MUAT TURUN
+    // =========================================================================
+    function paparPratontonManual(rowIndex, skrolKePanel = false) {
+      const item = senaraiManual.find(m => m.rowIndex === rowIndex);
+      if (!item) return;
+
+      rowIndexAktif = rowIndex;
+      tapisManual();
+
+      const urlPreview = dapatkanUrlPreviewDrive(item.link_pdf);
+      const urlMuatTurun = dapatkanUrlMuatTurunDrive(item.link_pdf);
+
+      document.getElementById("previewKategori").textContent = item.kategori || "MANUAL PENGGUNA";
+      document.getElementById("previewTajuk").textContent = item.tajuk;
+      document.getElementById("previewTindakan").classList.remove("hidden");
+
+      document.getElementById("btnBukaTabBaru").href = item.link_pdf;
+      document.getElementById("btnMuatTurunUtama").href = urlMuatTurun;
+
+      const infoBar = document.getElementById("previewInfoBar");
+      infoBar.classList.remove("hidden");
+      document.getElementById("previewPenerangan").textContent = item.penerangan || "Panduan rujukan rasmi penggunaan sistem C-RIE.";
+      document.getElementById("previewTarikh").textContent = item.tarikh_kemaskini ? `Kemaskini: ${item.tarikh_kemaskini}` : "";
+
+      document.getElementById("placeholderPratonton").classList.add("hidden");
+      const iframe = document.getElementById("iframePratontonPdf");
+      iframe.src = urlPreview;
+      iframe.classList.remove("hidden");
+
+      if (skrolKePanel && window.innerWidth < 1024) {
+        document.getElementById("panelPratonton").scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    function resetPanelPratonton() {
+      rowIndexAktif = null;
+      document.getElementById("previewKategori").textContent = "PRATONTON DOKUMEN";
+      document.getElementById("previewTajuk").textContent = "Pilih mana-mana manual di sebelah kiri untuk pratonton";
+      document.getElementById("previewTindakan").classList.add("hidden");
+      document.getElementById("previewInfoBar").classList.add("hidden");
+      document.getElementById("iframePratontonPdf").classList.add("hidden");
+      document.getElementById("iframePratontonPdf").src = "";
+      document.getElementById("placeholderPratonton").classList.remove("hidden");
+    }
+
+    // =========================================================================
+    // 4. MODAL MUAT NAIK / KEMASKINI & PRATONTON FAIL SEBELUM UPLOAD
+    // =========================================================================
+    function bukaModalManual() {
+      if (!adalahPentadbir(sesiPengguna.role)) return;
+
+      document.getElementById("formManual").reset();
+      document.getElementById("editRowIndex").value = "";
+      document.getElementById("tajukModalManual").innerHTML = `<i class="fa-solid fa-file-arrow-up text-emerald-400"></i> Muat Naik Manual Pengguna Baharu`;
+      document.getElementById("amaranKemaskiniLajurB").classList.add("hidden");
+      document.getElementById("tandaWajibPdf").classList.remove("hidden");
+      document.getElementById("mFailPdf").required = true;
+      resetPilihanFailUpload();
+
+      document.getElementById("modalManual").classList.remove("hidden");
+    }
+
+    function bukaModalKemaskini(rowIndex) {
+      if (!adalahPentadbir(sesiPengguna.role)) return;
+      const item = senaraiManual.find(m => m.rowIndex === rowIndex);
+      if (!item) return;
+
+      document.getElementById("formManual").reset();
+      resetPilihanFailUpload();
+
+      document.getElementById("editRowIndex").value = item.rowIndex;
+      document.getElementById("tajukModalManual").innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Kemaskini Manual Pengguna`;
+      document.getElementById("mTajuk").value = item.tajuk;
+      document.getElementById("mKategori").value = item.kategori || "UMUM & LOG MASUK";
+      document.getElementById("mPenerangan").value = item.penerangan || "";
+
+      document.getElementById("tandaWajibPdf").classList.add("hidden");
+      document.getElementById("mFailPdf").required = false;
+
+      const amaran = document.getElementById("amaranKemaskiniLajurB");
+      amaran.classList.remove("hidden");
+      document.getElementById("pautanFailSediaAda").innerHTML = item.link_pdf
+        ? `<a href="${escapeHtml(item.link_pdf)}" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-700 underline"><i class="fa-solid fa-file-pdf text-rose-600"></i> Lihat Fail PDF Sedia Ada (Lajur B)</a>`
+        : `<span class="italic text-slate-500">Tiada pautan fail pada Lajur B.</span>`;
+
+      document.getElementById("modalManual").classList.remove("hidden");
+    }
+
+    function tutupModalManual() {
+      resetPilihanFailUpload();
+      document.getElementById("modalManual").classList.add("hidden");
+    }
+
+    // Pratonton PDF tempatan sebelum dimuat naik ke pelayan
+ 
+    function pratontonFailSebelumUpload(input) {
+      const fail = input.files && input.files[0];
+      if (!fail) {
+        resetPilihanFailUpload();
+        return;
+      }
+
+      if (fail.type !== "application/pdf" && !fail.name.toLowerCase().endsWith(".pdf")) {
+        Swal.fire("Format Tidak Sah", "Sila pilih fail dalam format PDF sahaja.", "error");
+        resetPilihanFailUpload();
+        return;
+      }
+
+      // Had 15 MB supaya saiz selepas pengekodan Base64 kekal stabil di Google Apps Script
+      const maksSaiz = 15 * 1024 * 1024;
+      if (fail.size > maksSaiz) {
+        Swal.fire("Saiz Fail Besar", `Saiz fail ialah ${(fail.size / (1024 * 1024)).toFixed(2)} MB. Maksimum dibenarkan ialah 15 MB.`, "warning");
+        resetPilihanFailUpload();
+        return;
+      }
+
+      if (urlBlobSemasa) {
+        URL.revokeObjectURL(urlBlobSemasa);
+      }
+
+      urlBlobSemasa = URL.createObjectURL(fail);
+      document.getElementById("namaFailPreviewUpload").textContent = fail.name;
+      document.getElementById("infoSaizFail").textContent = `${(fail.size / (1024 * 1024)).toFixed(2)} MB`;
+      document.getElementById("infoSaizFail").classList.remove("hidden");
+
+      const iframe = document.getElementById("iframePreviewUpload");
+      iframe.src = urlBlobSemasa;
+      document.getElementById("bekasPreviewUpload").classList.remove("hidden");
+    }
+
+    function resetPilihanFailUpload() {
+      const input = document.getElementById("mFailPdf");
+      if (input) input.value = "";
+      if (urlBlobSemasa) {
+        URL.revokeObjectURL(urlBlobSemasa);
+        urlBlobSemasa = null;
+      }
+      document.getElementById("iframePreviewUpload").src = "";
+      document.getElementById("bekasPreviewUpload").classList.add("hidden");
+      document.getElementById("infoSaizFail").classList.add("hidden");
+    }
+
+    function bacaFailKeBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = err => reject(err);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function simpanManualPengguna(event) {
+      event.preventDefault();
+      if (!adalahPentadbir(sesiPengguna.role)) {
+        Swal.fire("Akses Ditolak", "Hanya pentadbir dibenarkan melaksanakan tindakan ini.", "error");
+        return;
+      }
+
+      const editRowIndex = document.getElementById("editRowIndex").value.trim();
+      const tajuk = document.getElementById("mTajuk").value.trim().toUpperCase();
+      const kategori = document.getElementById("mKategori").value.trim().toUpperCase();
+      const penerangan = document.getElementById("mPenerangan").value.trim();
+      const failPdf = document.getElementById("mFailPdf").files[0] || null;
+
+      if (!tajuk || (!editRowIndex && !failPdf)) {
+        Swal.fire("Maklumat Tidak Lengkap", "Tajuk manual dan fail PDF wajib diisi.", "warning");
+        return;
+      }
+
+      Swal.fire({
+        title: editRowIndex ? "Mengemaskini Manual Pengguna..." : "Memuat Naik Manual Pengguna...",
+        text: "Sila tunggu sehingga fail PDF disimpan ke Google Drive.",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        let objekFail = null;
+        if (failPdf) {
+          const base64 = await bacaFailKeBase64(failPdf);
+          if (!base64) {
+            throw new Error("Gagal membaca kandungan fail PDF. Sila pilih semula fail.");
+          }
+          objekFail = {
+            nama: failPdf.name,
+            mimeType: failPdf.type || "application/pdf",
+            base64: base64
+          };
+        }
+
+        const dikemaskiniOleh = (sesiPengguna.nama || sesiPengguna.role || "PENTADBIR").toUpperCase();
+
+        const payload = {
+          action: editRowIndex ? "kemaskiniManualPengguna" : "tambahManualPengguna",
+          USER_ROLE: sesiPengguna.role,
+          NAMA_PENGGUNA: dikemaskiniOleh,
+          DIKEMASKINI_OLEH: dikemaskiniOleh,
+          rowIndex: editRowIndex ? Number(editRowIndex) : null,
+          tajuk: tajuk,
+          TAJUK: tajuk,
+          kategori: kategori,
+          KATEGORI: kategori,
+          penerangan: penerangan,
+          PENERANGAN: penerangan,
+          KEMASKINI_FAIL: Boolean(failPdf),
+          FAIL_PDF: objekFail
+        };
+
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (json.status === "BERJAYA") {
+          tutupModalManual();
+          await Swal.fire("Berjaya!", json.mesej, "success");
+          muatSenaraiManual();
+        } else {
+          Swal.fire("Gagal", json.mesej, "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat Sistem", "Gagal menghubungi pelayan: " + err.message, "error");
+      }
+    }
+    // =========================================================================
+    // 5. PADAM MANUAL PENGGUNA (KHAS PENTADBIR)
+    // =========================================================================
+    async function padamManual(rowIndex) {
+      if (!adalahPentadbir(sesiPengguna.role)) return;
+      const item = senaraiManual.find(m => m.rowIndex === rowIndex);
+      if (!item) return;
+
+      const sah = await Swal.fire({
+        icon: "warning",
+        title: "Padam Manual Pengguna?",
+        html: `Anda pasti mahu memadam manual <b>"${escapeHtml(item.tajuk)}"</b>?<br><span class="text-xs text-rose-600">Fail PDF pada Lajur B dan Google Drive juga akan dipadam.</span>`,
+        showCancelButton: true,
+        confirmButtonColor: "#e11d48",
+        cancelButtonColor: "#64748b",
+        confirmButtonText: "Ya, Padam",
+        cancelButtonText: "Batal"
+      });
+
+      if (!sah.isConfirmed) return;
+
+      Swal.fire({ title: "Memadam manual...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "padamManualPengguna",
+            USER_ROLE: sesiPengguna.role,
+            rowIndex: rowIndex
+          })
+        });
+        const json = await res.json();
+
+        if (json.status === "BERJAYA") {
+          await Swal.fire("Dipadam!", json.mesej, "success");
+          muatSenaraiManual();
+        } else {
+          Swal.fire("Gagal", json.mesej, "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat", err.message, "error");
+      }
+    }
+
+    // =========================================================================
+    // 6. LOG MASUK & LOG KELUAR PENTADBIR
+    // =========================================================================
+    function bukaModalLogin() {
+      document.getElementById("modalLogin").classList.remove("hidden");
+    }
+
+    function tutupModalLogin() {
+      document.getElementById("modalLogin").classList.add("hidden");
+    }
+
+    async function prosesLoginAdmin(e) {
+      e.preventDefault();
+      const peranan = document.getElementById("loginPeranan").value;
+      const no_ic = document.getElementById("loginIc").value.trim();
+      const kata_laluan = document.getElementById("loginPass").value.trim();
+
+      Swal.fire({ title: "Mengesahkan Pentadbir...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "loginAdminKIK",
+            PERANAN: peranan,
+            NO_IC: no_ic,
+            KATA_LALUAN: kata_laluan
+          })
+        });
+        const json = await res.json();
+
+        if (json.status === "BERJAYA" && adalahPentadbir(json.peranan)) {
+          sesiPengguna = {
+            role: json.peranan.toUpperCase(),
+            nama: json.nama
+          };
+          sessionStorage.setItem("userLulus", "YA");
+          sessionStorage.setItem("peranan", sesiPengguna.role);
+          sessionStorage.setItem("namaPengguna", sesiPengguna.nama);
+
+          kemaskiniPaparanAkses();
+          tutupModalLogin();
+          tapisManual();
+          Swal.fire("Log Masuk Berjaya", `Selamat datang, ${json.nama} (${json.peranan}).`, "success");
+        } else {
+          Swal.fire("Akses Ditolak", json.mesej || "Hanya pentadbir dibenarkan log masuk.", "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat", err.message, "error");
+      }
+    }
+
+    function logKeluar() {
+      sesiPengguna = { role: "PENGGUNA", nama: "" };
+      ["userLulus", "peranan", "namaPengguna", "nama", "jabatan", "bahagian", "no_ic"].forEach(k => {
+        sessionStorage.removeItem(k);
+        localStorage.removeItem(k);
+      });
+      kemaskiniPaparanAkses();
+      tapisManual();
+      Swal.fire("Log Keluar", "Anda kini dalam paparan pengguna umum.", "info");
+    }
+  </script>
+</body>
+</html>
