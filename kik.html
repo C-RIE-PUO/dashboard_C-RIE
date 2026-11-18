@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistem Pengurusan KIK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="bg-indigo-900 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+          <i class="fa-solid fa-lightbulb text-amber-400"></i>
+          Pengurusan Projek Kumpulan Inovatif &amp; Kreatif (KIK)
+        </h1>
+        <p class="text-xs text-indigo-200 mt-0.5">Pangkalan Data KIK, Sijil Pencapaian &amp; Harta Intelek</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Butang Kembali ke Dashboard Utama C-RIE -->
+        <a href="paparan.html" class="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5 border border-blue-500">
+          <i class="fa-solid fa-house"></i> Dashboard Utama C-RIE
+        </a>
+
+        <!-- Lencana Status Akses -->
+        <span id="badgeAkses" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-800 text-indigo-100 border border-indigo-600">
+          <i class="fa-solid fa-eye mr-1"></i> Paparan Umum
+        </span>
+
+        <button onclick="bukaModalDaftar()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> Daftar KIK Baru
+        </button>
+
+        <button id="btnBukaLogin" onclick="bukaModalLogin()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-right-to-bracket"></i> Log Masuk (Pemilik / Admin)
+        </button>
+
+        <button id="btnLogout" onclick="logKeluar()" class="hidden bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-right-from-bracket"></i> Log Keluar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- KANDUNGAN UTAMA -->
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- KAD STATISTIK -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs font-medium text-slate-500 uppercase">Jumlah Projek KIK</p>
+        <p id="statJumlah" class="text-2xl font-bold text-indigo-700 mt-1">0</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs font-medium text-slate-500 uppercase">Disahkan</p>
+        <p id="statDisahkan" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs font-medium text-slate-500 uppercase">Pingat Emas</p>
+        <p id="statEmas" class="text-2xl font-bold text-amber-500 mt-1">0</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs font-medium text-slate-500 uppercase">Berdaftar Harta Intelek</p>
+        <p id="statIP" class="text-2xl font-bold text-sky-600 mt-1">0</p>
+      </div>
+    </div>
+
+    <!-- PENAPIS & CARIAN -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-5 gap-3">
+      <div class="md:col-span-2">
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Carian Pantas</label>
+        <input type="text" id="inputCari" oninput="tapisJadual()" placeholder="Cari produk, ketua, ahli, pertandingan, no IP..."
+          class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Tahun</label>
+        <select id="filterTahun" onchange="tapisJadual()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+          <option value="">Semua Tahun</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Jabatan</label>
+        <select id="filterJabatan" onchange="tapisJadual()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+          <option value="">Semua Jabatan</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Status</label>
+        <select id="filterStatus" onchange="tapisJadual()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+          <option value="">Semua Status</option>
+          <option value="DISAHKAN">DISAHKAN</option>
+          <option value="MENUNGGU PENGESAHAN">MENUNGGU PENGESAHAN</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- JADUAL PAPARAN DATA KIK -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead class="bg-slate-800 text-white text-xs uppercase">
+            <tr>
+              <th class="px-3 py-3 text-center">Bil</th>
+              <th class="px-3 py-3">Ketua &amp; Ahli Kumpulan</th>
+              <th class="px-3 py-3">Jabatan</th>
+              <th class="px-3 py-3">Produk &amp; Pertandingan</th>
+              <th class="px-3 py-3">Pingat / Tahun</th>
+              <th class="px-3 py-3">Harta Intelek (IP)</th>
+              <th class="px-3 py-3">Sijil Pencapaian</th>
+              <th class="px-3 py-3 text-center">Sijil Penghargaan</th>
+              <th class="px-3 py-3 text-center">Status</th>
+              <th class="px-3 py-3 text-center">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyKIK" class="divide-y divide-slate-200">
+            <tr>
+              <td colspan="10" class="text-center py-8 text-slate-500">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuatkan data KIK...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 1: DAFTAR / KEMASKINI KIK                                         -->
+  <!-- ======================================================================= -->
+  <div id="modalBorangKIK" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto">
+      <div class="bg-indigo-900 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between sticky top-0 z-10">
+        <h2 id="tajukModalBorang" class="text-lg font-bold">Daftar Rekod KIK Baharu</h2>
+        <button onclick="tutupModalBorang()" class="text-indigo-200 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <form id="formKIK" onsubmit="hantarBorangKIK(event)" class="p-6 space-y-5">
+        <input type="hidden" id="editBil" value="" />
+
+        <!-- SEKSYEN 1: KETUA PROJEK & AHLI KUMPULAN (MAKSIMUM 8 ORANG TERMASUK KETUA) -->
+        <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="font-bold text-indigo-900 text-sm">
+              <i class="fa-solid fa-users mr-1"></i> Maklumat Pasukan KIK (Maksimum 8 Ahli Termasuk Ketua Projek)
+            </h3>
+            <span id="kaunterAhli" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-600 text-white">
+              Jumlah Ahli: 1 / 8
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">1. Ketua Projek / Innovator (Lajur B) *</label>
+              <input type="text" id="fInnovator" required placeholder="NAMA PENUH KETUA PROJEK"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm uppercase bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">No. KP Ketua Projek (Lajur M) *</label>
+              <input type="text" id="fNoKpKetua" required placeholder="Contoh: 880101085544"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white" />
+              <p class="text-[11px] text-slate-500 mt-0.5">Digunakan sebagai kata laluan log masuk Pemilik Jabatan.</p>
+            </div>
+          </div>
+
+          <!-- Senarai Dinamik Ahli Tambahan (Maksimum 7) -->
+          <div class="space-y-2 pt-2 border-t border-indigo-200">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-700">Ahli Kumpulan Tambahan (Lajur C — Maksimum 7 Ahli)</label>
+              <button type="button" id="btnTambahAhli" onclick="tambahInputAhli('')"
+                class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition">
+                <i class="fa-solid fa-user-plus mr-1"></i> Tambah Ahli
+              </button>
+            </div>
+            <div id="senaraiInputAhli" class="space-y-2"></div>
+          </div>
+        </div>
+
+        <!-- SEKSYEN 2: MAKLUMAT PRODUK & PERTANDINGAN (GANTIKAN MEDAN JABATAN) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Jabatan (Lajur D) *</label>
+            <select id="fJabatan" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white uppercase">
+              <option value="">-- Pilih Jabatan --</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Produk / Projek KIK (Lajur E) *</label>
+            <input type="text" id="fProduk" required placeholder="NAMA PRODUK INOVASI KIK"
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm uppercase" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pertandingan (Lajur F) *</label>
+            <input type="text" id="fPertandingan" required placeholder="NAMA KONVENSYEN / PERTANDINGAN"
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm uppercase" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tarikh Pertandingan (Lajur G) *</label>
+            <input type="date" id="fTarikh" required
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Pingat / Pencapaian (Lajur H) *</label>
+            <select id="fPingat" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+              <option value="">-- Pilih Pingat --</option>
+              <option value="EMAS">EMAS</option>
+              <option value="PERAK">PERAK</option>
+              <option value="GANGSA">GANGSA</option>
+              <option value="PENYERTAAN">PENYERTAAN</option>
+              <option value="ANUGERAH KHAS">ANUGERAH KHAS</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun (Lajur I) *</label>
+            <input type="number" id="fTahun" required min="2000" max="2099" placeholder="2026"
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+          </div>
+        </div>
+
+        <!-- SEKSYEN 3: HARTA INTELEK (IP) -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+          <h3 class="font-bold text-slate-800 text-sm">
+            <i class="fa-solid fa-shield-halved mr-1 text-sky-600"></i> Maklumat Harta Intelek (Pilihan)
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Harta Intelek (Lajur N)</label>
+              <select id="fJenisIP" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+                <option value="">-- Tiada / Pilih Jenis IP --</option>
+                <option value="HAK CIPTA">HAK CIPTA</option>
+                <option value="PATEN">PATEN</option>
+                <option value="CAP DAGANGAN">CAP DAGANGAN</option>
+                <option value="REKA BENTUK PERINDUSTRIAN">REKA BENTUK PERINDUSTRIAN</option>
+                <option value="PERBAHARUAN UTILITI">PERBAHARUAN UTILITI</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">No. Pendaftaran IP (Lajur O)</label>
+              <input type="text" id="fNoDaftarIP" placeholder="Contoh: CRLY2026001234"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm uppercase bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Daftar IP (Lajur P)</label>
+              <input type="number" id="fTahunDaftarIP" min="2000" max="2099" placeholder="2026"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white" />
+            </div>
+          </div>
+        </div>
+
+       <!-- SEKSYEN 4: MUAT NAIK 2 SIJIL PDF -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4 space-y-3">
+          <h3 class="font-bold text-amber-900 text-sm">
+            <i class="fa-solid fa-file-pdf mr-1 text-rose-600"></i> Muat Naik Sijil Pencapaian (PDF, Maks 10 MB Setiap Fail)
+          </h3>
+
+          <div id="bekasSijilSediaAda" class="hidden space-y-1.5 bg-white p-3 rounded-lg border border-amber-200">
+            <p class="text-xs font-semibold text-slate-700">Sijil Sedia Ada (Lajur K):</p>
+            <div id="senaraiSijilKekal" class="space-y-1"></div>
+            <p class="text-[11px] text-rose-600 font-medium mt-1">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+              Nota: Jika anda memuat naik fail baharu untuk mengemaskini sijil pencapaian, sijil sedia ada dalam Lajur K dan Google Drive akan dipadam secara automatik sebelum sijil baharu disimpan.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                Sijil Pencapaian 1 <span class="text-rose-600 font-bold">* (Wajib - PDF, Maks 10MB)</span>
+              </label>
+              <input type="file" id="fSijilPdf1" accept="application/pdf,.pdf" onchange="semakFailPdf(this)"
+                class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                Sijil Pencapaian 2 <span class="text-slate-500 font-normal">(Optional - PDF, Maks 10MB)</span>
+              </label>
+              <input type="file" id="fSijilPdf2" accept="application/pdf,.pdf" onchange="semakFailPdf(this)"
+                class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-white" />
+            </div>
+          </div>
+        </div>
+
+        <!-- KAWALAN STATUS KHAS ADMIN -->
+        <div id="bekasStatusAdmin" class="hidden bg-rose-50 border border-rose-200 rounded-xl p-4">
+          <label class="block text-xs font-bold text-rose-900 mb-1">Status Pengesahan Rekod (Lajur J — Akses Admin)</label>
+          <select id="fStatusAdmin" class="w-full md:w-64 border border-rose-300 rounded-lg px-3 py-2 text-sm bg-white font-semibold">
+            <option value="MENUNGGU PENGESAHAN">MENUNGGU PENGESAHAN</option>
+            <option value="DISAHKAN">DISAHKAN</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="tutupModalBorang()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-100">
+            Batal
+          </button>
+          <button type="submit" id="btnSimpanKIK" class="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow">
+            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Rekod KIK
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 2: LOG MASUK (PEMILIK JABATAN / ADMIN)                            -->
+  <!-- ======================================================================= -->
+  <div id="modalLogin" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
+        <h2 class="text-base font-bold"><i class="fa-solid fa-lock mr-1.5 text-amber-400"></i> Log Masuk Pengurusan KIK</h2>
+        <button onclick="tutupModalLogin()" class="text-slate-300 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <!-- Tab Pilihan Peranan -->
+      <div class="grid grid-cols-2 border-b border-slate-200 text-xs font-bold">
+        <button type="button" id="tabLoginPemilik" onclick="tukarTabLogin('PEMILIK')" class="py-3 bg-indigo-50 text-indigo-700 border-b-2 border-indigo-600">
+          STAF (NO. KP KETUA)
+        </button>
+        <button type="button" id="tabLoginAdmin" onclick="tukarTabLogin('ADMIN')" class="py-3 text-slate-500 hover:bg-slate-50">
+          ADMIN / PENYELARAS
+        </button>
+      </div>
+
+      <!-- Borang Login Staf (Pemilik Rekod) -->
+      <form id="formLoginPemilik" onsubmit="prosesLoginPemilik(event)" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Jabatan *</label>
+          <select id="loginJabatanPemilik" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+            <option value="">-- Pilih Jabatan --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Laluan (No. KP Ketua — Lajur M) *</label>
+          <input type="password" id="loginNoKpPemilik" required placeholder="Masukkan No. KP Ketua Projek"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg text-sm font-semibold shadow">
+          Log Masuk Staf
+        </button>
+      </form>
+
+      <!-- Borang Login Admin / Penyelaras C-RIE -->
+      <form id="formLoginAdmin" onsubmit="prosesLoginAdmin(event)" class="hidden p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Peranan *</label>
+          <select id="loginPerananAdmin" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white">
+            <option value="ADMIN">ADMIN</option>
+            <option value="KUPIK">KUPIK</option>
+            <option value="PENYELARAS PENYELIDIKAN (C-RIE)">PENYELARAS PENYELIDIKAN (C-RIE)</option>
+            <option value="PENYELARAS INOVASI (C-RIE)">PENYELARAS INOVASI (C-RIE)</option>
+            <option value="PENYELARAS KIK (C-RIE)">PENYELARAS KIK (C-RIE)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">No. IC *</label>
+          <input type="text" id="loginIcAdmin" required placeholder="Masukkan No. IC"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Laluan *</label>
+          <input type="password" id="loginPassAdmin" required placeholder="Masukkan Kata Laluan"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 py-2.5 rounded-lg text-sm font-bold shadow">
+          Log Masuk Admin / Penyelaras
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- JAVASCRIPT                                                              -->
+  <!-- ======================================================================= -->
+  <script>
+    // ⚠️ GANTIKAN DENGAN URL DEPLOYMENT WEB APP GOOGLE APPS SCRIPT ANDA
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxh9pAf8LKl5CU7HFcr5TfKZYy1O5XeFhAX9GgiojzCvB81IOfnNBOuzQoV7zntObI/exec";
+
+    const PERANAN_ADMIN_KIK = [
+      "ADMIN",
+      "KUPIK",
+      "PENYELARAS PENYELIDIKAN",
+      "PENYELARAS INOVASI",
+      "PENYELARAS KIK",
+      "PENYELARAS PENYELIDIKAN (C-RIE)",
+      "PENYELARAS INOVASI (C-RIE)",
+      "PENYELARAS KIK (C-RIE)"
+    ];
+
+    function adalahAdminKIK(role) {
+      return PERANAN_ADMIN_KIK.includes(String(role || "").trim().toUpperCase());
+    }
+
+    // Ekstrak singkatan dalam kurungan: "JABATAN KEJURUTERAAN PERKAPALAN (JKP)" -> "JKP"
+    function ekstrakSingkatanJabatan(teks) {
+      const bersih = String(teks || "").trim().toUpperCase();
+      if (!bersih) return "";
+      const padan = bersih.match(/\(([^)]+)\)/);
+      return padan ? padan[1].trim() : bersih;
+    }
+
+    let senaraiDataKIK = [];
+    let sesiPengguna = {
+      role: "AWAM", // "AWAM" | "STAF" | salah satu daripada PERANAN_ADMIN_KIK
+      jabatan: "",
+      no_kp: "",
+      nama: ""
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const storedRole = (sessionStorage.getItem("peranan") || localStorage.getItem("peranan") || "").trim().toUpperCase();
+      const storedNama = sessionStorage.getItem("namaPengguna") || sessionStorage.getItem("nama") || localStorage.getItem("nama") || "";
+      const storedJabatan = sessionStorage.getItem("jabatan") || localStorage.getItem("jabatan") || "";
+
+      if (adalahAdminKIK(storedRole)) {
+        sesiPengguna.role = storedRole;
+        sesiPengguna.nama = storedNama || storedRole;
+        sesiPengguna.jabatan = ekstrakSingkatanJabatan(storedJabatan);
+      } else if (storedRole === "STAF" && sessionStorage.getItem("userLulus") === "YA") {
+        sesiPengguna.role = "STAF";
+        sesiPengguna.nama = storedNama || "STAF";
+        sesiPengguna.jabatan = ekstrakSingkatanJabatan(storedJabatan);
+      }
+
+      kemaskiniPaparanAkses();
+      muatTetapanJabatan();
+      muatDataKIK();
+    });
+
+    // =========================================================================
+    // 1. MUAT DATA DARI GOOGLE SPREADSHEET (TAB 'KIK' & 'SISTEM')
+    // =========================================================================
+    async function muatTetapanJabatan() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=ambilTetapanSenarai`);
+        const json = await res.json();
+        if (json.status === "BERJAYA" && Array.isArray(json.JABATAN)) {
+          isiPilihanJabatan(json.JABATAN);
+        }
+      } catch (e) {
+        console.warn("Gagal memuatkan senarai jabatan dari tab SISTEM:", e);
+      }
+    }
+
+    function isiPilihanJabatan(senaraiJabatan) {
+      // Populate singkatan dari lajur B tab SISTEM
+      const unik = [...new Set(senaraiJabatan.map(j => ekstrakSingkatanJabatan(j)).filter(Boolean))].sort();
+      const comboDaftar = document.getElementById("fJabatan");
+      const filterJab = document.getElementById("filterJabatan");
+      const loginJab = document.getElementById("loginJabatanPemilik");
+
+      const pilihanOpt = unik.map(j => `<option value="${j}">${j}</option>`).join("");
+      comboDaftar.innerHTML = `<option value="">-- Pilih Jabatan --</option>` + pilihanOpt;
+      filterJab.innerHTML = `<option value="">Semua Jabatan</option>` + pilihanOpt;
+      loginJab.innerHTML = `<option value="">-- Pilih Jabatan --</option>` + pilihanOpt;
+    }
+
+    async function muatDataKIK() {
+      const tbody = document.getElementById("tbodyKIK");
+      tbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuatkan data KIK...</td></tr>`;
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=ambilDataKIK&role=${encodeURIComponent(sesiPengguna.role)}`);
+        const json = await res.json();
+
+        if (json.status === "BERJAYA") {
+          senaraiDataKIK = json.data || [];
+          janaPenapisDinamik(senaraiDataKIK);
+          kemaskiniStatistik(senaraiDataKIK);
+          tapisJadual();
+        } else {
+          tbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-rose-600 font-semibold">${json.mesej}</td></tr>`;
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-rose-600">Ralat sambungan pelayan: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Fungsi bantuan untuk selamatkan paparan teks HTML (elak XSS / pecah tag)
+    function escapeHtml(teks) {
+      return String(teks || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function janaPenapisDinamik(data) {
+      const tahunUnik = [...new Set(data.map(d => d.tahun).filter(Boolean))].sort().reverse();
+      const filterTahun = document.getElementById("filterTahun");
+      const pilihanSemasa = filterTahun.value;
+      filterTahun.innerHTML = `<option value="">Semua Tahun</option>` + tahunUnik.map(t => `<option value="${t}">${t}</option>`).join("");
+      filterTahun.value = pilihanSemasa;
+
+      const jabatanDariData = data.map(d => d.jabatan).filter(Boolean);
+      if (document.getElementById("loginJabatanPemilik").options.length <= 1 && jabatanDariData.length > 0) {
+        isiPilihanJabatan(jabatanDariData);
+      }
+    }
+
+    function kemaskiniStatistik(data) {
+      document.getElementById("statJumlah").textContent = data.length;
+      document.getElementById("statDisahkan").textContent = data.filter(d => String(d.status || "").toUpperCase() === "DISAHKAN").length;
+      document.getElementById("statEmas").textContent = data.filter(d => String(d.pingat || "").toUpperCase().includes("EMAS")).length;
+      document.getElementById("statIP").textContent = data.filter(d => String(d.jenis_ip || "").trim() !== "" || String(d.no_pendaftaran_ip || "").trim() !== "").length;
+    }
+
+    // =========================================================================
+    // 2. PAPARAN JADUAL & PENAPISAN
+    // =========================================================================
+    function tapisJadual() {
+      const q = document.getElementById("inputCari").value.toLowerCase().trim();
+      const tahun = document.getElementById("filterTahun").value;
+      const jabatan = document.getElementById("filterJabatan").value;
+      const status = document.getElementById("filterStatus").value;
+
+      const hasil = senaraiDataKIK.filter(d => {
+        const namaProduk = String(d.produk || d.nama_produk || "").toLowerCase();
+        const padanCarian = !q ||
+          namaProduk.includes(q) ||
+          String(d.innovator || "").toLowerCase().includes(q) ||
+          String(d.ahli || "").toLowerCase().includes(q) ||
+          String(d.nama_pertandingan || "").toLowerCase().includes(q) ||
+          String(d.no_pendaftaran_ip || "").toLowerCase().includes(q);
+
+        const padanTahun = !tahun || String(d.tahun) === tahun;
+        const padanJabatan = !jabatan || String(d.jabatan) === jabatan;
+        const padanStatus = !status || String(d.status) === status;
+
+        return padanCarian && padanTahun && padanJabatan && padanStatus;
+      });
+
+      paparJadual(hasil);
+    }
+
+    // Helper: Tukar pautan Google Drive kepada pautan muat turun terus
+    function dapatkanUrlMuatTurunDrive(url) {
+      const bersih = String(url || "").trim();
+      const matchId = bersih.match(/[-\w]{25,}/);
+      return matchId ? `https://drive.google.com/uc?export=download&id=${matchId[0]}` : bersih;
+    }
+
+    function paparJadual(senarai) {
+      const tbody = document.getElementById("tbodyKIK");
+      if (!senarai || senarai.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-slate-500">Tiada rekod KIK dijumpai.</td></tr>`;
+        return;
+      }
+
+      const isAdmin = adalahAdminKIK(sesiPengguna.role);
+
+      tbody.innerHTML = senarai.map(item => {
+        const sudahDisahkan = String(item.status || "").toUpperCase() === "DISAHKAN";
+        const namaProduk = item.produk || item.nama_produk || "-";
+        const bilSafe = escapeHtml(item.bil);
+
+        // 1. Paparan Sijil Pencapaian (Lajur K)
+        const senaraiLinkPencapaian = String(item.link_pencapaian || "")
+          .split(/[\n,]+/)
+          .map(u => u.trim())
+          .filter(Boolean);
+
+        const htmlSijilPencapaian = senaraiLinkPencapaian.length > 0
+          ? senaraiLinkPencapaian.map((url, idx) => `
+              <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"
+                 class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 mb-1">
+                <i class="fa-solid fa-file-pdf text-rose-600"></i> Sijil ${idx + 1}
+              </a>
+            `).join("<br>")
+          : `<span class="text-xs text-slate-400 italic">Tiada Sijil</span>`;
+
+        // 2. Paparan Sijil Penghargaan (Lajur L)
+        const linkPenghargaan = String(item.link_sijil || "").trim();
+        let htmlSijilPenghargaan = "";
+
+        if (sudahDisahkan) {
+          if (linkPenghargaan !== "") {
+            const urlMuatTurun = dapatkanUrlMuatTurunDrive(linkPenghargaan);
+            htmlSijilPenghargaan = `
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="flex flex-wrap justify-center gap-1">
+                  <a href="${escapeHtml(linkPenghargaan)}" target="_blank" rel="noopener noreferrer"
+                     class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200">
+                    <i class="fa-solid fa-eye"></i> Lihat
+                  </a>
+                  <a href="${escapeHtml(urlMuatTurun)}" target="_blank" rel="noopener noreferrer" download
+                     class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200">
+                    <i class="fa-solid fa-download"></i> Muat Turun
+                  </a>
+                </div>
+                ${isAdmin ? `
+                  <button type="button" onclick="muatNaikSijilPenghargaan('${bilSafe}')"
+                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300">
+                    <i class="fa-solid fa-arrows-rotate"></i> Tukar Sijil
+                  </button>
+                ` : ""}
+              </div>
+            `;
+          } else {
+            htmlSijilPenghargaan = `
+              <div class="flex flex-col items-center gap-1.5">
+                <span class="text-xs text-slate-400 italic">Belum Dimuat Naik</span>
+                ${isAdmin ? `
+                  <button type="button" onclick="muatNaikSijilPenghargaan('${bilSafe}')"
+                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-500 text-slate-900 hover:bg-amber-600 shadow-sm">
+                    <i class="fa-solid fa-upload"></i> Muat Naik Sijil
+                  </button>
+                ` : ""}
+              </div>
+            `;
+          }
+        } else {
+          htmlSijilPenghargaan = `
+            <span class="inline-block px-2 py-1 rounded text-[11px] font-medium bg-slate-100 text-slate-500">
+              <i class="fa-solid fa-clock mr-1"></i> Menunggu Pengesahan
+            </span>
+          `;
+        }
+
+        // 3. Lencana Status (Lajur Q)
+        const badgeStatus = sudahDisahkan
+          ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">DISAHKAN</span>`
+          : `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">MENUNGGU PENGESAHAN</span>`;
+
+        // 4. Butang Tindakan
+        const bolehEditStaf = (sesiPengguna.role === "STAF" && ekstrakSingkatanJabatan(item.jabatan) === sesiPengguna.jabatan);
+        let htmlTindakan = `<span class="text-xs text-slate-400">-</span>`;
+
+        if (isAdmin) {
+          htmlTindakan = `
+            <div class="flex flex-wrap justify-center gap-1">
+              ${!sudahDisahkan ? `
+                <button type="button" onclick="sahkanRekodKIK('${bilSafe}')"
+                  class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold" title="Sahkan Rekod">
+                  <i class="fa-solid fa-check"></i> Sahkan
+                </button>
+              ` : ""}
+              <button type="button" onclick="bukaModalEdit('${bilSafe}')"
+                class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold" title="Kemaskini">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" onclick="padamRekodKIK('${bilSafe}')"
+                class="px-2.5 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold" title="Padam">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          `;
+        } else if (bolehEditStaf) {
+          htmlTindakan = `
+            <button type="button" onclick="bukaModalEdit('${bilSafe}')"
+              class="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold">
+              <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
+            </button>
+          `;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-3 py-3 text-center font-semibold text-slate-700">${bilSafe}</td>
+            <td class="px-3 py-3">
+              <div class="font-bold text-slate-900">${escapeHtml(item.innovator)}</div>
+              ${item.ahli ? `<div class="text-xs text-slate-500 mt-0.5">Ahli: ${escapeHtml(item.ahli)}</div>` : ""}
+            </td>
+            <td class="px-3 py-3 font-semibold text-indigo-800">${escapeHtml(item.jabatan)}</td>
+            <td class="px-3 py-3">
+              <div class="font-bold text-slate-800">${escapeHtml(namaProduk)}</div>
+              <div class="text-xs text-slate-600 mt-0.5">${escapeHtml(item.nama_pertandingan)}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(item.tarikh_pertandingan)}</div>
+            </td>
+            <td class="px-3 py-3">
+              <span class="font-bold text-amber-700">${escapeHtml(item.pingat)}</span>
+              <div class="text-xs text-slate-500">${escapeHtml(item.tahun)}</div>
+            </td>
+            <td class="px-3 py-3 text-xs">
+              ${item.jenis_ip ? `<div class="font-semibold text-sky-700">${escapeHtml(item.jenis_ip)}</div><div>${escapeHtml(item.no_pendaftaran_ip || "-")} (${escapeHtml(item.tahun_daftar_ip || "-")})</div>` : `<span class="text-slate-400">Tiada</span>`}
+            </td>
+            <td class="px-3 py-3">${htmlSijilPencapaian}</td>
+            <td class="px-3 py-3 text-center">${htmlSijilPenghargaan}</td>
+            <td class="px-3 py-3 text-center">${badgeStatus}</td>
+            <td class="px-3 py-3 text-center">${htmlTindakan}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+	
+	// Muat naik / ganti Sijil Penghargaan (Lajur L) oleh 5 peranan pengurusan selepas rekod DISAHKAN
+    async function muatNaikSijilPenghargaan(bil) {
+      if (!adalahAdminKIK(sesiPengguna.role)) {
+        Swal.fire("Akses Ditolak", "Hanya ADMIN, KUPIK, atau Penyelaras C-RIE dibenarkan memuat naik Sijil Penghargaan.", "error");
+        return;
+      }
+
+      const rekod = senaraiDataKIK.find(r => String(r.bil) === String(bil));
+      if (!rekod || String(rekod.status).toUpperCase() !== "DISAHKAN") {
+        Swal.fire("Belum Disahkan", "Rekod hendaklah disahkan terlebih dahulu sebelum memuat naik Sijil Penghargaan.", "warning");
+        return;
+      }
+
+      const adaSijilLama = String(rekod.link_sijil || "").trim() !== "";
+      const { value: failDipilih } = await Swal.fire({
+        title: adaSijilLama ? "Tukar Sijil Penghargaan (PDF)" : "Muat Naik Sijil Penghargaan (PDF)",
+        html: `
+          <p class="text-xs text-slate-600 mb-3">
+            Produk: <b>${rekod.produk}</b><br>
+            ${adaSijilLama ? '<span class="text-rose-600 font-semibold">Sijil penghargaan sedia ada dalam Lajur L dan Google Drive akan dipadam secara automatik sebelum sijil baharu disimpan.</span>' : 'Format dibenarkan: PDF sahaja (Maksimum 10 MB).'}
+          </p>
+          <input type="file" id="swalInputSijilPenghargaan" accept="application/pdf,.pdf" class="w-full text-xs border border-slate-300 rounded-lg p-2" />
+        `,
+        showCancelButton: true,
+        confirmButtonText: "Muat Naik & Simpan",
+        cancelButtonText: "Batal",
+        preConfirm: () => {
+          const input = document.getElementById("swalInputSijilPenghargaan");
+          const file = input && input.files ? input.files[0] : null;
+          if (!file) {
+            Swal.showValidationMessage("Sila pilih fail PDF Sijil Penghargaan terlebih dahulu.");
+            return false;
+          }
+          if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+            Swal.showValidationMessage("Hanya fail format PDF dibenarkan.");
+            return false;
+          }
+          if (file.size > 10 * 1024 * 1024) {
+            Swal.showValidationMessage("Saiz fail melebihi had maksimum 10 MB.");
+            return false;
+          }
+          return file;
+        }
+      });
+
+      if (!failDipilih) return;
+
+      Swal.fire({
+        title: "Memuat naik Sijil Penghargaan...",
+        text: "Sila tunggu sebentar.",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        const base64Data = await bacaFailKeBase64(failDipilih);
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "uploadSijilPenghargaanKIK",
+            USER_ROLE: sesiPengguna.role,
+            bil: bil,
+            SIJIL_PENGHARGAAN: {
+              nama: failDipilih.name,
+              mimeType: "application/pdf",
+              base64: base64Data
+            }
+          })
+        });
+        const json = await res.json();
+        if (json.status === "BERJAYA") {
+          await Swal.fire("Berjaya", json.mesej, "success");
+          muatDataKIK();
+        } else {
+          Swal.fire("Gagal", json.mesej, "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat", "Gagal memuat naik sijil: " + err.message, "error");
+      }
+    }
+	
+	function bacaFailKeBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+	
+	// =========================================================================
+    // PENGESAHAN REKOD (KEMASKINI STATUS LAJUR Q KEPADA 'DISAHKAN')
+    // =========================================================================
+    // PENAMBAHBAIKAN FUNGSI PENGESAHAN: Ambil nama produk terus daripada senaraiDataKIK (Lajur E)
+    async function sahkanRekodKIK(bil) {
+      const rekod = senaraiDataKIK.find(item => String(item.bil).trim() === String(bil).trim());
+      const namaProduk = rekod ? (rekod.produk || rekod.nama_produk || "-") : "-";
+
+      const sah = await Swal.fire({
+        icon: "question",
+        title: "Pengesahan Rekod KIK",
+        text: `Sahkan rekod KIK bagi produk "${namaProduk}"?`,
+        showCancelButton: true,
+        confirmButtonColor: "#10b981",
+        cancelButtonColor: "#64748b",
+        confirmButtonText: "Ya, Sahkan",
+        cancelButtonText: "Batal"
+      });
+
+      if (!sah.isConfirmed) return;
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "sahkanDataKIK",
+            bil: bil,
+            USER_ROLE: sesiPengguna.role
+          })
+        });
+        const json = await res.json();
+
+        if (json.status === "BERJAYA") {
+          Swal.fire("Disahkan!", json.mesej, "success");
+          muatDataKIK();
+        } else {
+          Swal.fire("Gagal", json.mesej, "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat", "Gagal menghubungi pelayan: " + err.message, "error");
+      }
+    }
+	
+	
+    // =========================================================================
+    // 3. KAWALAN DINAMIK AHLI KUMPULAN (MAKSIMUM 8 TERMASUK 1 KETUA)
+    // =========================================================================
+    function tambahInputAhli(nilai = "") {
+      const bekas = document.getElementById("senaraiInputAhli");
+      const bilSemasa = bekas.querySelectorAll(".baris-ahli").length;
+
+      // Maksimum 7 ahli tambahan (kerana + 1 Ketua Projek = 8 orang)
+      if (bilSemasa >= 7) {
+        Swal.fire("Had Maksimum", "Maksimum 8 ahli sahaja dibenarkan termasuk 1 Ketua Projek.", "warning");
+        return;
+      }
+
+      const div = document.createElement("div");
+      div.className = "baris-ahli flex items-center gap-2";
+      div.innerHTML = `
+        <span class="label-nombor-ahli text-xs font-bold text-indigo-800 w-16">Ahli ${bilSemasa + 2}:</span>
+        <input type="text" value="${nilai}" placeholder="NAMA PENUH AHLI KUMPULAN"
+          class="input-nama-ahli flex-1 border border-slate-300 rounded-lg px-3 py-1.5 text-sm uppercase bg-white" />
+        <button type="button" onclick="kurangkanInputAhli(this)" title="Kurangkan Ahli"
+          class="bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1.5 rounded-lg text-xs font-bold">
+          <i class="fa-solid fa-minus"></i>
+        </button>
+      `;
+      bekas.appendChild(div);
+      kemaskiniKaunterAhli();
+    }
+
+    function kurangkanInputAhli(btn) {
+      btn.closest(".baris-ahli").remove();
+      kemaskiniKaunterAhli();
+    }
+
+    function kemaskiniKaunterAhli() {
+      const baris = document.querySelectorAll("#senaraiInputAhli .baris-ahli");
+      baris.forEach((el, idx) => {
+        el.querySelector(".label-nombor-ahli").textContent = `Ahli ${idx + 2}:`;
+      });
+
+      const jumlah = 1 + baris.length;
+      document.getElementById("kaunterAhli").textContent = `Jumlah Ahli: ${jumlah} / 8`;
+      document.getElementById("btnTambahAhli").disabled = (jumlah >= 8);
+    }
+
+    // =========================================================================
+    // 4. SEMAKAN FAIL PDF (MAKSIMUM 10 MB) & PENUKARAN BASE64
+    // =========================================================================
+    function semakFailPdf(input) {
+      const fail = input.files[0];
+      if (!fail) return;
+
+      if (fail.type !== "application/pdf" && !fail.name.toLowerCase().endsWith(".pdf")) {
+        Swal.fire("Format Tidak Sah", "Sila muat naik fail berformat PDF sahaja.", "error");
+        input.value = "";
+        return;
+      }
+
+      const maksSaiz = 10 * 1024 * 1024; // 10 MB
+      if (fail.size > maksSaiz) {
+        Swal.fire("Fail Terlalu Besar", `Saiz fail ialah ${(fail.size / (1024 * 1024)).toFixed(2)} MB. Maksimum dibenarkan ialah 10 MB.`, "error");
+        input.value = "";
+      }
+    }
+
+    function failKeBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(",")[1];
+          resolve({ nama: file.name, mimeType: "application/pdf", base64 });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+   // =========================================================================
+    // MODAL DAFTAR / EDIT & HANTAR BORANG (DIKEMASKINI TANPA fLinkSijil)
+    // =========================================================================
+    function bukaModalDaftar() {
+      document.getElementById("formKIK").reset();
+      document.getElementById("editBil").value = "";
+      document.getElementById("tajukModalBorang").textContent = "Daftar Rekod KIK Baharu";
+      document.getElementById("senaraiInputAhli").innerHTML = "";
+      document.getElementById("bekasSijilSediaAda").classList.add("hidden");
+      document.getElementById("fNoKpKetua").readOnly = false;
+      document.getElementById("fNoKpKetua").required = true;
+
+      if (adalahAdminKIK(sesiPengguna.role)) {
+        document.getElementById("bekasStatusAdmin").classList.remove("hidden");
+        document.getElementById("fStatusAdmin").value = "DISAHKAN";
+      } else {
+        document.getElementById("bekasStatusAdmin").classList.add("hidden");
+      }
+
+      kemaskiniKaunterAhli();
+      document.getElementById("modalBorangKIK").classList.remove("hidden");
+    }
+
+    function bukaModalEdit(bil) {
+      const rekod = senaraiDataKIK.find(r => String(r.bil) === String(bil));
+      if (!rekod) return;
+
+      document.getElementById("formKIK").reset();
+      document.getElementById("editBil").value = rekod.bil;
+      document.getElementById("tajukModalBorang").textContent = `Kemaskini Rekod KIK (BIL: ${rekod.bil})`;
+
+      document.getElementById("fInnovator").value = rekod.innovator;
+
+      const jabSingkatan = ekstrakSingkatanJabatan(rekod.jabatan);
+      const comboJab = document.getElementById("fJabatan");
+      if (jabSingkatan && !Array.from(comboJab.options).some(o => o.value === jabSingkatan)) {
+        comboJab.add(new Option(jabSingkatan, jabSingkatan));
+      }
+      comboJab.value = jabSingkatan;
+
+      document.getElementById("fProduk").value = rekod.produk;
+      document.getElementById("fPertandingan").value = rekod.nama_pertandingan;
+      document.getElementById("fTarikh").value = rekod.tarikh_pertandingan;
+      document.getElementById("fPingat").value = rekod.pingat;
+      document.getElementById("fTahun").value = rekod.tahun;
+      document.getElementById("fJenisIP").value = rekod.jenis_ip;
+      document.getElementById("fNoDaftarIP").value = rekod.no_pendaftaran_ip;
+      document.getElementById("fTahunDaftarIP").value = rekod.tahun_daftar_ip;
+
+      document.getElementById("senaraiInputAhli").innerHTML = "";
+      const senaraiAhli = rekod.ahli ? rekod.ahli.split(/[\n,]+/).map(a => a.trim()).filter(Boolean) : [];
+      senaraiAhli.slice(0, 7).forEach(nama => tambahInputAhli(nama));
+      kemaskiniKaunterAhli();
+
+      const inputKp = document.getElementById("fNoKpKetua");
+      if (adalahAdminKIK(sesiPengguna.role)) {
+        inputKp.value = rekod.no_kp_ketua;
+        inputKp.readOnly = false;
+        inputKp.required = false;
+        document.getElementById("bekasStatusAdmin").classList.remove("hidden");
+        document.getElementById("fStatusAdmin").value = rekod.status;
+      } else {
+        inputKp.value = sesiPengguna.no_kp;
+        inputKp.readOnly = true;
+        document.getElementById("bekasStatusAdmin").classList.add("hidden");
+      }
+
+      const bekasSijil = document.getElementById("bekasSijilSediaAda");
+      const senaraiSijilDiv = document.getElementById("senaraiSijilKekal");
+      const links = rekod.link_pencapaian ? rekod.link_pencapaian.split(/[\n,]+/).map(u => u.trim()).filter(Boolean) : [];
+
+      if (links.length > 0) {
+        bekasSijil.classList.remove("hidden");
+        senaraiSijilDiv.innerHTML = links.map((url, idx) => `
+          <label class="flex items-center gap-2 text-xs bg-white p-2 rounded border border-slate-200">
+            <input type="checkbox" class="chk-sijil-kekal" value="${url}" checked />
+            <a href="${url}" target="_blank" class="text-indigo-700 underline truncate">Sijil Pencapaian ${idx + 1}</a>
+          </label>
+        `).join("");
+      } else {
+        bekasSijil.classList.add("hidden");
+        senaraiSijilDiv.innerHTML = "";
+      }
+
+      document.getElementById("modalBorangKIK").classList.remove("hidden");
+    }
+    function tutupModalBorang() {
+      document.getElementById("modalBorangKIK").classList.add("hidden");
+    }
+
+    // =========================================================================
+    // 6. HANTAR BORANG (SIMPAN BARU / KEMASKINI) KE GOOGLE APPS SCRIPT
+    // =========================================================================
+   // Kemaskini dalam hantarBorangKIK(event): Pengesahan Sijil Pencapaian 1 (Wajib) & 2 (Optional)
+    async function hantarBorangKIK(event) {
+      event.preventDefault();
+
+      const editBil = document.getElementById("editBil").value.trim();
+      const file1 = document.getElementById("fSijilPdf1").files[0] || null;
+      const file2 = document.getElementById("fSijilPdf2").files[0] || null;
+      const adaUploadBaharu = Boolean(file1 || file2);
+
+      // Daftar baharu: Sijil Pencapaian 1 WAJIB, Sijil Pencapaian 2 OPTIONAL
+      if (editBil === "" && !file1) {
+        Swal.fire("Sijil Wajib", "Muat naik Sijil Pencapaian 1 (PDF) adalah wajib.", "warning");
+        return;
+      }
+
+      // Kemaskini rekod: Jika mengemaskini sijil pencapaian, Sijil Pencapaian 1 WAJIB dan Sijil Pencapaian 2 OPTIONAL
+      if (editBil !== "" && adaUploadBaharu && !file1) {
+        Swal.fire("Sijil 1 Wajib", "Apabila mengemaskini sijil pencapaian, muat naik Sijil Pencapaian 1 adalah wajib dan Sijil Pencapaian 2 adalah optional.", "warning");
+        return;
+      }
+
+      const sijilDataPayload = [];
+      if (file1) {
+        sijilDataPayload.push({
+          nama: file1.name,
+          mimeType: "application/pdf",
+          base64: await bacaFailKeBase64(file1)
+        });
+      }
+      if (file2) {
+        sijilDataPayload.push({
+          nama: file2.name,
+          mimeType: "application/pdf",
+          base64: await bacaFailKeBase64(file2)
+        });
+      }
+
+      const ahliInputs = Array.from(document.querySelectorAll("#senaraiInputAhli input"))
+        .map(inp => inp.value.trim())
+        .filter(Boolean);
+
+      const rekodAsal = editBil ? senaraiDataKIK.find(r => String(r.bil) === String(editBil)) : null;
+      const kotakSemakSijil = document.querySelectorAll(".chk-sijil-kekal");
+      const linkKekal = (!adaUploadBaharu && rekodAsal)
+        ? (kotakSemakSijil.length > 0
+            ? Array.from(document.querySelectorAll(".chk-sijil-kekal:checked")).map(cb => cb.value.trim()).filter(Boolean)
+            : String(rekodAsal.link_pencapaian || "").split(/[\n,]+/).map(u => u.trim()).filter(Boolean))
+        : [];
+
+      const payload = {
+        action: editBil ? "kemaskiniDataKIK" : "tambahDataKIK",
+        USER_ROLE: sesiPengguna.role,
+        NO_KP_LOGIN: sesiPengguna.no_kp,
+        bil: editBil,
+        innovator: document.getElementById("fInnovator").value.trim(),
+        no_kp_ketua: document.getElementById("fNoKpKetua").value.trim(),
+        ahli_list: ahliInputs,
+        jabatan: document.getElementById("fJabatan").value,
+        produk: document.getElementById("fProduk").value.trim(),
+        nama_pertandingan: document.getElementById("fPertandingan").value.trim(),
+        tarikh_pertandingan: document.getElementById("fTarikh").value,
+        pingat: document.getElementById("fPingat").value,
+        tahun: document.getElementById("fTahun").value,
+        jenis_ip: document.getElementById("fJenisIP").value,
+        no_pendaftaran_ip: document.getElementById("fNoDaftarIP").value.trim(),
+        tahun_daftar_ip: document.getElementById("fTahunDaftarIP").value,
+        status: document.getElementById("fStatusAdmin").value,
+        KEMASKINI_SIJIL: adaUploadBaharu,
+        link_pencapaian_kekal: linkKekal,
+        SIJIL_DATA: sijilDataPayload
+      };
+
+      Swal.fire({
+        title: "Menyimpan rekod KIK...",
+        text: "Sila tunggu sehingga proses muat naik selesai.",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.status === "BERJAYA") {
+          tutupModalBorang();
+          await Swal.fire("Berjaya", json.mesej, "success");
+          muatDataKIK();
+        } else {
+          Swal.fire("Gagal", json.mesej, "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat", "Ralat pelayan: " + err.message, "error");
+      }
+    }
+    // =========================================================================
+    // 7. PADAM REKOD KIK (KHAS ADMIN)
+    // =========================================================================
+    // PENAMBAHBAIKAN FUNGSI PADAM: Turut guna carian bil supaya nama produk tepat & tidak undefined
+    async function padamRekodKIK(bil) {
+      const rekod = senaraiDataKIK.find(item => String(item.bil).trim() === String(bil).trim());
+      const namaProduk = rekod ? (rekod.produk || rekod.nama_produk || "-") : "-";
+
+      const sah = await Swal.fire({
+        icon: "warning",
+        title: "Padam Rekod KIK?",
+        text: `Anda pasti mahu memadam rekod produk "${namaProduk}"? Tindakan ini tidak boleh dibatalkan.`,
+        showCancelButton: true,
+        confirmButtonColor: "#e11d48",
+        cancelButtonColor: "#64748b",
+        confirmButtonText: "Ya, Padam",
+        cancelButtonText: "Batal"
+      });
+
+      if (!sah.isConfirmed) return;
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "padamDataKIK",
+            bil: bil,
+            USER_ROLE: sesiPengguna.role
+          })
+        });
+        const json = await res.json();
+
+        if (json.status === "BERJAYA") {
+          Swal.fire("Dipadam!", json.mesej, "success");
+          muatDataKIK();
+        } else {
+          Swal.fire("Gagal", json.mesej, "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat", "Gagal menghubungi pelayan: " + err.message, "error");
+      }
+    }
+
+    // =========================================================================
+    // 8. LOG MASUK & LOG KELUAR (PEMILIK JABATAN & ADMIN)
+    // =========================================================================
+    function bukaModalLogin() {
+      document.getElementById("modalLogin").classList.remove("hidden");
+    }
+
+    function tutupModalLogin() {
+      document.getElementById("modalLogin").classList.add("hidden");
+    }
+
+    function tukarTabLogin(tab) {
+      const isPemilik = tab === "PEMILIK";
+      document.getElementById("formLoginPemilik").classList.toggle("hidden", !isPemilik);
+      document.getElementById("formLoginAdmin").classList.toggle("hidden", isPemilik);
+
+      document.getElementById("tabLoginPemilik").className = isPemilik
+        ? "py-3 bg-indigo-50 text-indigo-700 border-b-2 border-indigo-600"
+        : "py-3 text-slate-500 hover:bg-slate-50";
+      document.getElementById("tabLoginAdmin").className = !isPemilik
+        ? "py-3 bg-amber-50 text-amber-800 border-b-2 border-amber-500"
+        : "py-3 text-slate-500 hover:bg-slate-50";
+    }
+
+    // =========================================================================
+    // LOG MASUK STAF & 5 PERANAN ADMIN / PENYELARAS
+    // =========================================================================
+    async function prosesLoginPemilik(e) {
+      e.preventDefault();
+      const jabatan = document.getElementById("loginJabatanPemilik").value;
+      const no_kp = document.getElementById("loginNoKpPemilik").value.trim();
+
+      Swal.fire({ title: "Mengesahkan Staf...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "loginPemilikKIK", JABATAN: jabatan, NO_KP: no_kp })
+        });
+        const json = await res.json();
+
+        if (json.status === "BERJAYA") {
+          sesiPengguna = { role: "STAF", jabatan: json.jabatan, no_kp: json.no_kp, nama: json.ketua };
+          kemaskiniPaparanAkses();
+          tutupModalLogin();
+          tapisJadual();
+          Swal.fire("Log Masuk Berjaya", `Selamat datang, ${json.ketua} (${json.jabatan}). Anda boleh mengemaskini rekod KIK anda.`, "success");
+        } else {
+          Swal.fire("Log Masuk Gagal", json.mesej, "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat", err.message, "error");
+      }
+    }
+
+    async function prosesLoginAdmin(e) {
+      e.preventDefault();
+      const peranan = document.getElementById("loginPerananAdmin").value;
+      const no_ic = document.getElementById("loginIcAdmin").value.trim();
+      const kata_laluan = document.getElementById("loginPassAdmin").value.trim();
+
+      Swal.fire({ title: "Mengesahkan Akaun...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "loginAdminKIK",
+            NO_IC: no_ic,
+            KATA_LALUAN: kata_laluan,
+            PERANAN: peranan
+          })
+        });
+        const json = await res.json();
+
+        if (json.status === "BERJAYA" && adalahAdminKIK(json.peranan)) {
+          sesiPengguna = { role: json.peranan.toUpperCase(), jabatan: json.jabatan, no_kp: "", nama: json.nama };
+          kemaskiniPaparanAkses();
+          tutupModalLogin();
+          muatDataKIK();
+          Swal.fire("Akses Aktif", `Selamat datang, ${json.nama} (${json.peranan}).`, "success");
+        } else {
+          Swal.fire("Akses Ditolak", json.mesej || "Akaun tidak mempunyai kebenaran pengurusan KIK.", "error");
+        }
+      } catch (err) {
+        Swal.fire("Ralat", err.message, "error");
+      }
+    }
+
+    function logKeluar() {
+      sesiPengguna = { role: "AWAM", jabatan: "", no_kp: "", nama: "" };
+      ["userLulus", "peranan", "namaPengguna", "nama", "jabatan", "bahagian", "no_ic"].forEach(k => {
+        sessionStorage.removeItem(k);
+        localStorage.removeItem(k);
+      });
+      kemaskiniPaparanAkses();
+      muatDataKIK();
+      Swal.fire("Log Keluar", "Anda telah kembali ke paparan umum.", "info");
+    }
+
+    function kemaskiniPaparanAkses() {
+      const badge = document.getElementById("badgeAkses");
+      const btnLogin = document.getElementById("btnBukaLogin");
+      const btnLogout = document.getElementById("btnLogout");
+
+      if (adalahAdminKIK(sesiPengguna.role)) {
+        badge.innerHTML = `<i class="fa-solid fa-user-shield mr-1 text-amber-300"></i> ${sesiPengguna.role} (${sesiPengguna.nama})`;
+        badge.className = "px-3 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-slate-900";
+        btnLogin.classList.add("hidden");
+        btnLogout.classList.remove("hidden");
+      } else if (sesiPengguna.role === "STAF") {
+        badge.innerHTML = `<i class="fa-solid fa-user-check mr-1"></i> STAF: ${sesiPengguna.jabatan}`;
+        badge.className = "px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-600 text-white";
+        btnLogin.classList.add("hidden");
+        btnLogout.classList.remove("hidden");
+      } else {
+        badge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> Paparan Umum`;
+        badge.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-800 text-indigo-100 border border-indigo-600";
+        btnLogin.classList.remove("hidden");
+        btnLogout.classList.add("hidden");
+      }
+    }
+  </script>
+</body>
+</html>
