@@ -29,11 +29,11 @@
         const bolehSahkan = perananPengesah.includes(userPeranan.toUpperCase());
         
         // KAWALAN BAHARU: Akses spesifik untuk Padam (Staf, Penyelia, dan Penyelaras Jabatan TIDAK BOLEH padam)
-        const perananDilarangPadam = ["STAF", "PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN"];
+        const perananDilarangPadam = ["STAF", "PENYELIA PROJEK PELAJAR", "PENYELARAS GERAN (C-RIE)", "PENYELARAS KIK (C-RIE)", "PENYELARAS PENGKOMERSILAN (C-RIE)", "PENYELARAS HARTA INTELEK (C-RIE)", "PENYELARAS JABATAN"];
         const bolehPadam = !perananDilarangPadam.includes(userPeranan.toUpperCase());
 
         // KAWALAN BAHARU: Akses kemaskini untuk Penyelia Projek Pelajar & Penyelaras Jabatan (Memerlukan Kata Laluan No IC Penyelia)
-        const perananDenganPengesahan = ["PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN", "STAF"];
+        const perananDenganPengesahan = ["PENYELARAS GERAN (C-RIE)", "PENYELARAS KIK (C-RIE)", "PENYELARAS PENGKOMERSILAN (C-RIE)", "PENYELARAS HARTA INTELEK (C-RIE)", "PENYELIA PROJEK PELAJAR", "PENYELARAS JABATAN", "STAF"];
         const bolehEditDenganPengesahan = perananDenganPengesahan.includes(userPeranan.toUpperCase());
         const bolehEditMasingMasing = bolehEditPenuh || bolehEditDenganPengesahan;
     </script>
